@@ -35,36 +35,36 @@ void setup() {
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   while (1) {}
   }
-  Serial.print("Temperature  Pressure  Altitude  Pressure at sealevel (calculated)  Real altitude");
+  Serial.println("Temperature(*C) \t Pressure(Pa) \t Altitude(m) \t Pressure at sealevel(calculated)(Pa) \t Real altitude(m)");
 }
 
 // the loop function runs over and over again forever
 void loop() {
   digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(3000);                       // wait for a second
+  delay(500);                       // wait for a second
   digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-  delay(1000);                       // wait for a second
+  delay(500);                       // wait for a second
   digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
   delay(500);                       // wait for a second
   digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-  delay(1000);                       // wait for a second
+  delay(500);                       // wait for a second
     // Serial.print("Temperature = ");
     Serial.print(bmp.readTemperature());
-    Serial.print(" *C ");
+    Serial.print("\t");
     
     // Serial.print("Pressure = ");
     Serial.print(bmp.readPressure());
-    Serial.print(" Pa ");
+    Serial.print("\t");
     
     // Calculate altitude assuming 'standard' barometric
     // pressure of 1013.25 millibar = 101325 Pascal
     // Serial.print("Altitude = ");
     Serial.print(bmp.readAltitude());
-    Serial.print(" meters ");
+    Serial.print("\t");
 
    //Serial.print("Pressure at sealevel (calculated) = ");
     Serial.print(bmp.readSealevelPressure());
-    Serial.print(" Pa ");
+    Serial.print("\t");
 
   // you can get a more precise measurement of altitude
   // if you know the current sea level pressure which will
@@ -72,7 +72,7 @@ void loop() {
   // that is equal to 101500 Pascals.
   // Serial.print("Real altitude = ");
     Serial.print(bmp.readAltitude(101500));
-    Serial.print(" meters");
+    Serial.print("\t");
     
     Serial.println();
     delay(500);
