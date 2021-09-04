@@ -19,33 +19,22 @@ void loop() {
     delay(500);                       // wait for a second
     digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
 
-    Serial.println("_________________________________");
-    Serial.print("Temperature ");
+    Serial.print("Temperature (*C) ");
+    Serial.print(" Pressure (Pa) ");
+    Serial.print("Altitude (meters)  ");
+    Serial.print("Pressure at sealevel (Pa)  ");
+    Serial.println("Real altitude (meters)  ");
+    
     Serial.print(bmp.readTemperature());
-    Serial.println(" *C  ");
-    Serial.println("_________________________________");
-      
-    Serial.print("Pressure ");
+    
     Serial.print(bmp.readPressure());
-    Serial.println(" Pa ");
-    Serial.println("_________________________________");
-      
-    // Calculate altitude assuming 'standard' barometric
-    // pressure of 1013.25 millibar = 101325 Pascal
-    Serial.print("Altitude ");
+    
     Serial.print(bmp.readAltitude());
-    Serial.println(" meters ");
-    Serial.println("_________________________________");
-  
-    Serial.print("Pressure at sealevel ");
+   
     Serial.print(bmp.readSealevelPressure());
-    Serial.println(" Pa ");
-    Serial.println("_________________________________");
-
-    Serial.print("Real altitude ");
+    
     Serial.print(bmp.readAltitude(101500));
-    Serial.println(" meters ");
-    Serial.println("_________________________________");
+    
     
     Serial.println();
     delay(500);
