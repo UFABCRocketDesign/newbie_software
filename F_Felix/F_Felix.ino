@@ -18,7 +18,8 @@ void setup() {
     Serial.print("Alt.(m)\t");
     Serial.print("Pres. sealevel(Pa)\t");
     Serial.print("Real alt.(m)\t");
-    Serial.println("Foguete\t");
+    Serial.print("Foguete\t");
+    Serial.println();
 
 }
 
@@ -36,7 +37,7 @@ void loop() {
     Serial.print(bmp.readPressure());
     Serial.print("\t");
     
-    Serial.print(bmp.readAltitude());
+    Serial.print(alt);
     Serial.print("\t");
    
     Serial.print(bmp.readSealevelPressure());
@@ -46,7 +47,7 @@ void loop() {
     Serial.print("\t");
 
     if(alt > aux){
-      Serial.println("subindo\t");
+      Serial.print("subindo\t");
     }
     else if (alt == aux){
       Serial.print("parado\t");
@@ -54,6 +55,7 @@ void loop() {
     else{
       Serial.print("caindo\t");
     }
+    Serial.println();
     aux = alt;
    
     delay(500);
