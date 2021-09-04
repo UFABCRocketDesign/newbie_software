@@ -25,11 +25,7 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-    float alt = bmp.readAltitude();
-        
-    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-    delay(500);                       // wait for a second
-    digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+    float alt = bmp.readAltitude();      
     
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
@@ -48,12 +44,14 @@ void loop() {
 
     if(alt > aux){
       Serial.print("subindo\t");
+      digitalWrite(LED_BUILTIN, LOW);
     }
     else if (alt == aux){
       Serial.print("parado\t");
     }
     else{
       Serial.print("caindo\t");
+      digitalWrite(LED_BUILTIN, HIGH);
     }
     Serial.println();
     aux = alt;
