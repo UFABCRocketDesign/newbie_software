@@ -24,7 +24,7 @@ void setup() {
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   while (1) {}
   }
-  Serial.print("Temperatura °C |  Pressão Pa |  Altitude metros |  Pressão ao nivel do mar Pa |  Altitude real metros |");
+  Serial.println("Temperatura °C \t Pressão Pa \t Altitude metros \t Pressão ao nivel do mar Pa \t Altitude real metros");
 }
 
 void loop() {
