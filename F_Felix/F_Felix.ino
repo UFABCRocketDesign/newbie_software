@@ -1,7 +1,7 @@
 #include <Adafruit_BMP085.h>
 
 Adafruit_BMP085 bmp;
-int aux = 0;
+float aux = 0;
 
 void setup() {
     // initialize digital pin LED_BUILTIN as an output.
@@ -25,7 +25,7 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-    int alt = bmp.readAltitude();
+    float alt = bmp.readAltitude();
         
     digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
     delay(500);                       // wait for a second
