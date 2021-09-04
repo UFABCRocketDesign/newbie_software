@@ -56,5 +56,5 @@ void loop() {
     Serial.println();
     aux = alt;
    
-    delay(500);
+    // delay(100);
 }
