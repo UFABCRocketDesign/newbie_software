@@ -12,11 +12,11 @@ void setup() {
     while (1) {}
     }
 
-    Serial.print("Temp.(*C) ");
-    Serial.print(" Pres.(Pa) ");
-    Serial.print("Alt.(m)  ");
-    Serial.print("Pres. sealevel(Pa)  ");
-    Serial.println("Real alt.(m)  ");
+    Serial.print("Temp.(*C)\t");
+    Serial.print("Pres.(Pa)\t");
+    Serial.print("Alt.(m)\t");
+    Serial.print("Pres. sealevel(Pa)\t");
+    Serial.println("Real alt.(m)\t");
 }
 
 // the loop function runs over and over again forever
@@ -26,19 +26,19 @@ void loop() {
     digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
     
     Serial.print(bmp.readTemperature());
-    Serial.print("         ");
+    Serial.print("\t");
     
     Serial.print(bmp.readPressure());
-    Serial.print("         ");
+    Serial.print("\t");
     
     Serial.print(bmp.readAltitude());
-    Serial.print("         ");
+    Serial.print("\t");
    
     Serial.print(bmp.readSealevelPressure());
-    Serial.print("            ");
+    Serial.print("\t");
     
     Serial.print(bmp.readAltitude(101500));
-    Serial.println("        ");
+    Serial.println("\t");
    
     delay(500);
 }
