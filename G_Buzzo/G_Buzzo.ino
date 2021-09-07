@@ -1,6 +1,16 @@
+#include <Adafruit_BMP085.h>
+
+Adafruit_BMP085 bmp;
+
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
   pinMode(LED_BUILTIN, OUTPUT);
+
+  Serial.begin(9600);
+  if (!bmp.begin()) {
+  Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+  while (1) {}
+  }
 }
 
 // the loop function runs over and over again forever
