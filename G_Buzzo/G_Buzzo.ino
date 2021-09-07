@@ -57,11 +57,11 @@ void loop() {
   digitalWrite(LED_BUILTIN, LOW);   
   delay(100);
 
-  Serial.print("Temperature = ");
-  Serial.print("Pressure = ");
-  Serial.print("Altitude = ");
-  Serial.print("Pressure at sealevel (calculated) = ");
-  Serial.println("Real altitude = ");
+  Serial.print("Temperatura ");
+  Serial.print("Pressão ");
+  Serial.print("Altitude ");
+  Serial.print("Pressão nível do mar ");
+  Serial.println("Altitude Real ");
   
   Serial.print(bmp.readTemperature());
   Serial.print(" ºC");
