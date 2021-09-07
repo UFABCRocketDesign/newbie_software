@@ -21,57 +21,57 @@ void loop() {
   digitalWrite(LED_BUILTIN, HIGH);   
   delay(300);                       
   digitalWrite(LED_BUILTIN, LOW);   
-  delay(100);      
+  delay(200);      
   digitalWrite(LED_BUILTIN, HIGH);   
   delay(300);                       
   digitalWrite(LED_BUILTIN, LOW);   
-  delay(100);     
+  delay(200);     
   digitalWrite(LED_BUILTIN, HIGH);   
   delay(300);                       
   digitalWrite(LED_BUILTIN, LOW);   
-  delay(100);
+  delay(200);
 
   digitalWrite(LED_BUILTIN, HIGH);   
-  delay(700);                       
+  delay(800);                       
   digitalWrite(LED_BUILTIN, LOW);   
-  delay(100);   
+  delay(200);   
   digitalWrite(LED_BUILTIN, HIGH);   
-  delay(700);                       
+  delay(800);                       
   digitalWrite(LED_BUILTIN, LOW);   
-  delay(100);
+  delay(200);
   digitalWrite(LED_BUILTIN, HIGH);   
-  delay(700);                       
+  delay(800);                       
   digitalWrite(LED_BUILTIN, LOW);   
-  delay(100);
+  delay(200);
 
   digitalWrite(LED_BUILTIN, HIGH);   
   delay(300);                       
   digitalWrite(LED_BUILTIN, LOW);   
-  delay(100);      
+  delay(200);      
   digitalWrite(LED_BUILTIN, HIGH);   
   delay(300);                       
   digitalWrite(LED_BUILTIN, LOW);   
-  delay(100);     
+  delay(200);     
   digitalWrite(LED_BUILTIN, HIGH);   
   delay(300);                       
   digitalWrite(LED_BUILTIN, LOW);   
-  delay(100);
+  delay(200);
 
-  Serial.print("Temperatura ");
-  Serial.print("Pressão ");
-  Serial.print("Altitude ");
-  Serial.print("Pressão nível do mar ");
+  Serial.print("Temperatura "),
+  Serial.print("Pressão "),
+  Serial.print("Altitude "),
+  Serial.print("Pressão nível do mar "),
   Serial.println("Altitude Real ");
   
-  Serial.print(bmp.readTemperature());
-  Serial.print(" ºC ");
-  Serial.print(bmp.readPressure());
-  Serial.print(" Pa ");
-  Serial.print(bmp.readAltitude());
-  Serial.print(" metros ");
-  Serial.print(bmp.readSealevelPressure());
-  Serial.print(" Pa ");
-  Serial.print(bmp.readAltitude(101500));
+  Serial.print(bmp.readTemperature()),
+  Serial.print(" ºC"),
+  Serial.print(bmp.readPressure()),
+  Serial.print(" Pa"),
+  Serial.print(bmp.readAltitude()),
+  Serial.print(" metros"),
+  Serial.print(bmp.readSealevelPressure()),
+  Serial.print(" Pa"),
+  Serial.print(bmp.readAltitude(101500)),
   Serial.print(" metros ");
     
   Serial.println();
