@@ -37,51 +37,60 @@ void setup() {
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   while (1) {}
   }
+
+  Serial.println("| Temperature | Pressure | Altitude | Pressure at sealevel (calculated) | Real altitude |");
 }
 
 // the loop function runs over and over again forever
 void loop() {
+
+    int cont=0;
+    
     // INICIO - LED DO ARDUINO
     digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
     delay(1000);                       // wait for a second
     digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
     delay(1000);                       // wait for a second
     // FIM - LED DO ARDUINO
-  
-    // BMP085 - TESTE
-      // Criação de Colunas - 1º Linha:
-    Serial.println("| Temperature | Pressure | Altitude | Pressure at sealevel (calculated) | Real altitude |");
 
-      // Criação de Colunas - 2º Linha:
-        // Temperatura
-    Serial.print("| ");
-    Serial.print(bmp.readTemperature());
-    Serial.print(" *C    |");
-        // Pressão
-    Serial.print("| ");
-    Serial.print(bmp.readPressure());
-    Serial.print(" Pa |");
-        // Altitude
-    // Calculate altitude assuming 'standard' barometric
-    // pressure of 1013.25 millibar = 101325 Pascal
-    Serial.print("| ");
-    Serial.print(bmp.readAltitude());
-    Serial.print(" m |");
-        // Pressão nivel do mar
-    Serial.print("| ");
-    Serial.print(bmp.readSealevelPressure());
-    Serial.print(" Pa                           |");
-        // Altitude Real
-    // you can get a more precise measurement of altitude
-    // if you know the current sea level pressure which will
-    // vary with weather and such. If it is 1015 millibars
-    // that is equal to 101500 Pascals.
-    Serial.print("| ");
-    Serial.print(bmp.readAltitude(101500));
-    Serial.print(" m      |");
+    while (cont != 10) {
+      // BMP085 - TESTE
+        // Criação de Colunas - 2º Linha:
+          // Temperatura
+      Serial.print("| ");
+      Serial.print(bmp.readTemperature());
+      Serial.print(" *C    ");
+          // Pressão
+      Serial.print("| ");
+      Serial.print(bmp.readPressure());
+      Serial.print(" Pa ");
+          // Altitude
+      // Calculate altitude assuming 'standard' barometric
+      // pressure of 1013.25 millibar = 101325 Pascal
+      Serial.print("| ");
+      Serial.print(bmp.readAltitude());
+      Serial.print(" m ");
+          // Pressão nivel do mar
+      Serial.print("| ");
+      Serial.print(bmp.readSealevelPressure());
+      Serial.print(" Pa                           ");
+          // Altitude Real
+      // you can get a more precise measurement of altitude
+      // if you know the current sea level pressure which will
+      // vary with weather and such. If it is 1015 millibars
+      // that is equal to 101500 Pascals.
+      Serial.print("| ");
+      Serial.print(bmp.readAltitude(101500));
+      Serial.print(" m      ");
 
+      // Espaçamento temporal entre cada medição
+      delay(500);
+
+      cont++; //Importante para não ficar ruim a tabela - desconexa as infos e o cabeçalho
+    }
+    
     // Espaçamento nova medição
     Serial.println();
     Serial.println();
-    delay(500);
+   
 }
