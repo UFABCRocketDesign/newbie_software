@@ -64,15 +64,15 @@ void loop() {
   Serial.println("Altitude Real ");
   
   Serial.print(bmp.readTemperature());
-  Serial.print(" ºC");
+  Serial.print(" ºC ");
   Serial.print(bmp.readPressure());
-  Serial.print(" Pa");
+  Serial.print(" Pa ");
   Serial.print(bmp.readAltitude());
-  Serial.print(" meters");
+  Serial.print(" metros ");
   Serial.print(bmp.readSealevelPressure());
-  Serial.print(" Pa");
+  Serial.print(" Pa ");
   Serial.print(bmp.readAltitude(101500));
-  Serial.print(" meters");
+  Serial.print(" metros ");
     
   Serial.println();
   delay(500);
