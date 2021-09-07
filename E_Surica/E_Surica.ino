@@ -1,4 +1,5 @@
 #include <Adafruit_BMP085.h>
+Adafruit_BMP085 bmp;
 
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.

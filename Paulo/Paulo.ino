@@ -24,6 +24,8 @@
   http://www.arduino.cc/en/Tutorial/Blink
 */
 
+Adafruit_BMP085 bmp; // Declaração da biblioteca
+
 // the setup function runs once when you press reset or power the board
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
@@ -34,44 +36,52 @@ void setup() {
   if (!bmp.begin()) {
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   while (1) {}
+  }
 }
 
 // the loop function runs over and over again forever
 void loop() {
-  // INICIO - LED DO ARDUINO
-  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(1000);                       // wait for a second
-  digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-  delay(1000);                       // wait for a second
-  // FIM - LED DO ARDUINO
-
-  // BMP085 - TESTE
-  Serial.print("Temperature = ");
-  Serial.print(bmp.readTemperature());
-  Serial.println(" *C");
+    // INICIO - LED DO ARDUINO
+    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+    delay(1000);                       // wait for a second
+    digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+    delay(1000);                       // wait for a second
+    // FIM - LED DO ARDUINO
   
-  Serial.print("Pressure = ");
-  Serial.print(bmp.readPressure());
-  Serial.println(" Pa");
-  
-  // Calculate altitude assuming 'standard' barometric
-  // pressure of 1013.25 millibar = 101325 Pascal
-  Serial.print("Altitude = ");
-  Serial.print(bmp.readAltitude());
-  Serial.println(" meters");
+    // BMP085 - TESTE
+      // Criação de Colunas - 1º Linha:
+    Serial.println("| Temperature | Pressure | Altitude | Pressure at sealevel (calculated) | Real altitude |");
 
-  Serial.print("Pressure at sealevel (calculated) = ");
-  Serial.print(bmp.readSealevelPressure());
-  Serial.println(" Pa");
+      // Criação de Colunas - 2º Linha:
+        // Temperatura
+    Serial.print("| ");
+    Serial.print(bmp.readTemperature());
+    Serial.print(" *C    |");
+        // Pressão
+    Serial.print("| ");
+    Serial.print(bmp.readPressure());
+    Serial.print(" Pa |");
+        // Altitude
+    // Calculate altitude assuming 'standard' barometric
+    // pressure of 1013.25 millibar = 101325 Pascal
+    Serial.print("| ");
+    Serial.print(bmp.readAltitude());
+    Serial.print(" m |");
+        // Pressão nivel do mar
+    Serial.print("| ");
+    Serial.print(bmp.readSealevelPressure());
+    Serial.print(" Pa                           |");
+        // Altitude Real
+    // you can get a more precise measurement of altitude
+    // if you know the current sea level pressure which will
+    // vary with weather and such. If it is 1015 millibars
+    // that is equal to 101500 Pascals.
+    Serial.print("| ");
+    Serial.print(bmp.readAltitude(101500));
+    Serial.print(" m      |");
 
-  // you can get a more precise measurement of altitude
-  // if you know the current sea level pressure which will
-  // vary with weather and such. If it is 1015 millibars
-  // that is equal to 101500 Pascals.
-  Serial.print("Real altitude = ");
-  Serial.print(bmp.readAltitude(101500));
-  Serial.println(" meters");
-  
-  Serial.println();
-  delay(500);
+    // Espaçamento nova medição
+    Serial.println();
+    Serial.println();
+    delay(500);
 }
