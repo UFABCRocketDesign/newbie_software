@@ -10,7 +10,7 @@ void setup() {
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   while (1) {}
   }
-  Serial.println("Temperature [*C] - Pressure [Pa] - Altitude [m] - Pressure at sealevel (calculated) [Pa] - Real altitude [m]"); 
+  Serial.println("Temperature [*C]\tPressure [Pa]\tAltitude [m]\tPressure at sealevel (calculated) [Pa]\tReal altitude [m]"); 
 }
 
 // the loop function runs over and over again forever
@@ -21,21 +21,21 @@ void loop() {
   delay(1000);                       // wait for a second
 
   Serial.print(bmp.readTemperature());
-  Serial.print("-");
+  Serial.print("\t");
     
   Serial.print(bmp.readPressure());
-  Serial.print("-");
+  Serial.print("\t");
   
   // Calculate altitude assuming 'standard' barometric
   // pressure of 1013.25 millibar = 101325 Pascal
   Serial.print(bmp.readAltitude());
-  Serial.print("-");
+  Serial.print("\t");
 
   Serial.print(bmp.readSealevelPressure());
-  Serial.print("-");
+  Serial.print("\t");
 
   Serial.print(bmp.readAltitude(101500));
-  Serial.print("-");
+  Serial.print("\t");
 
   Serial.println();
   delay(1000);
