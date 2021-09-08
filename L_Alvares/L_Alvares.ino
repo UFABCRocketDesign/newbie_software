@@ -1,11 +1,14 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
+float ALT = 0.0;
+float ALTo = 0.0;
 
 void setup() 
 {
   pinMode(LED_BUILTIN, OUTPUT);
-  Serial.begin(9600);
-  Serial.print("Temperatura(°C)  Pressão(Pa) Altitude(m) PressãoNivelMar(Pa)  AltitudeReal(m)");
+  Serial.begin(115200);
+  //Serial.print("Temperatura(°C)  Pressão(Pa) Altitude(m) PressãoNivelMar(Pa)  AltitudeReal(m)");
+  Serial.print("Pressão(Pa)");
   Serial.println();
   if (!bmp.begin()) 
   {
@@ -16,20 +19,35 @@ void setup()
 
 void loop() 
 {
-    Serial.print(bmp.readTemperature());
+    //Serial.print(bmp.readTemperature());
+    //Serial.print("\t");
+    //Serial.print(bmp.readPressure());
+    //Serial.print("\t");
+    //Serial.print(bmp.readAltitude());
+    //Serial.print("\t");
+    //Serial.print(bmp.readSealevelPressure());
+    //Serial.print("\t");
+    //Serial.print(bmp.readAltitude(101500));
+    //Serial.println();
+
+    ALT = bmp.readAltitude();
+
+    if(ALT < ALTo)
+     {
+      digitalWrite(LED_BUILTIN, HIGH);   
+      delay(500);                       
+      digitalWrite(LED_BUILTIN, LOW);    
+      delay(500); 
+      Serial.print("Foguete Em Queda");
+      ALTo = ALT;
+     }
+    else
+     {
+       ALTo = ALT;
+     }
+
+    Serial.print(ALT);
     Serial.print("\t");
-    Serial.print(bmp.readPressure());
-    Serial.print("\t");
-    Serial.print(bmp.readAltitude());
-    Serial.print("\t");
-    Serial.print(bmp.readSealevelPressure());
-    Serial.print("\t");
-    Serial.print(bmp.readAltitude(101500));
-    Serial.println();
-    
-    digitalWrite(LED_BUILTIN, HIGH);   
-    delay(200);                       
-    digitalWrite(LED_BUILTIN, LOW);    
-    delay(100); 
- 
+    Serial.print(ALTo);
+    Serial.println(); 
 }

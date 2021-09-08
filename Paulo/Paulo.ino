@@ -25,43 +25,54 @@
 */
 
 Adafruit_BMP085 bmp; // Declaração da biblioteca
+float altitudeLeitura, nova_altLeitura;
 
 // the setup function runs once when you press reset or power the board
 void setup() {
-  // initialize digital pin LED_BUILTIN as an output.
+  // Inicializando o led embutido no arduino
   pinMode(LED_BUILTIN, OUTPUT);
-
+  
   // INICIALIZA O MONITOR SERIAL E PUXA BIBLIOTECA
-  Serial.begin(9600);
+  Serial.begin(115200);
   if (!bmp.begin()) {
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   while (1) {}
   }
 
-  Serial.println("Temperature (ºC)\tPressure (Pa)\tAltitude (m)\tPressure at sealevel (calculated) (Pa)\tReal altitude (m) ");
+  nova_altLeitura = bmp.readAltitude();
+  //Serial.println("Temperature (ºC)\tPressure (Pa)\tAltitude(m)\tPressure at sealevel (calculated) (Pa)\tReal altitude (m) ");
+
 }
 
 // the loop function runs over and over again forever
 void loop() {
-    // INICIO - LED DO ARDUINO
-    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-    delay(1000);                       // wait for a second
-    digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-    delay(1000);                       // wait for a second
-    // FIM - LED DO ARDUINO
-
+    altitudeLeitura = nova_altLeitura;
+    nova_altLeitura = bmp.readAltitude();
+    if (nova_altLeitura < altitudeLeitura) {
+      Serial.print("Subindo-");
+      digitalWrite(LED_BUILTIN, LOW);
+    }
+    else if (nova_altLeitura > altitudeLeitura) {
+      Serial.print("Descendo-");
+      digitalWrite(LED_BUILTIN, HIGH);
+    }
+    
     // BMP085 - TESTE
       // Criação de Colunas - 2º Linha:
         // Temperatura
+    /*
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
         // Pressão
     Serial.print(bmp.readPressure());
     Serial.print("\t");
+    */
         // Altitude
     // Calculate altitude assuming 'standard' barometric
     // pressure of 1013.25 millibar = 101325 Pascal
-    Serial.print(bmp.readAltitude());
+    Serial.print(nova_altLeitura);
+    Serial.println(" m");
+    /*
     Serial.print("\t");
         // Pressão nivel do mar
     Serial.print(bmp.readSealevelPressure());
@@ -72,8 +83,6 @@ void loop() {
     // vary with weather and such. If it is 1015 millibars
     // that is equal to 101500 Pascals.
     Serial.println(bmp.readAltitude(101500));
-
-    // Espaçamento temporal entre cada medição
-    delay(500);
+    */
        
 }
