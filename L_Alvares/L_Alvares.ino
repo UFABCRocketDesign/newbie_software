@@ -35,19 +35,12 @@ void loop()
     if(ALT < ALTo)
      {
       digitalWrite(LED_BUILTIN, HIGH);   
-      delay(500);                       
-      digitalWrite(LED_BUILTIN, LOW);    
-      delay(500); 
-      Serial.print("Foguete Em Queda");
-      ALTo = ALT;
+      Serial.print(" Foguete Em Queda ");
+      Serial.print("\t");
      }
-    else
-     {
-       ALTo = ALT;
-     }
-
+    ALTo = ALT;
     Serial.print(ALT);
     Serial.print("\t");
-    Serial.print(ALTo);
     Serial.println(); 
+    digitalWrite(LED_BUILTIN, LOW); 
 }
