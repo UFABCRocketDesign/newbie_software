@@ -25,8 +25,7 @@
 */
 
 Adafruit_BMP085 bmp; // Declaração da biblioteca
-
-float altitudeLeitura, nova_altLeitura=bmp.readAltitude();
+float altitudeLeitura, nova_altLeitura;
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -40,12 +39,14 @@ void setup() {
   while (1) {}
   }
 
-  Serial.println("Temperature (ºC)\tPressure (Pa)\tAltitude(m)\tPressure at sealevel (calculated) (Pa)\tReal altitude (m) ");
+  nova_altLeitura = bmp.readAltitude();
+  //Serial.println("Temperature (ºC)\tPressure (Pa)\tAltitude(m)\tPressure at sealevel (calculated) (Pa)\tReal altitude (m) ");
 
 }
 
 // the loop function runs over and over again forever
 void loop() {
+  
     altitudeLeitura = nova_altLeitura;
     nova_altLeitura = bmp.readAltitude();
     if (nova_altLeitura < altitudeLeitura) {
