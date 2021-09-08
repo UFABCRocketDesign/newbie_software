@@ -1,7 +1,7 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
-float velhaAlt=0.0;
 float novaAlt=0.0;
+float velhaAlt=novaAlt;
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -19,8 +19,6 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-
-  float velhaAlt=novaAlt;
   
   // Calculate altitude assuming 'standard' barometric
   // pressure of 1013.25 millibar = 101325 Pascal
