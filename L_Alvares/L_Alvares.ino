@@ -23,27 +23,24 @@ void loop()
     //Serial.print("\t");
     //Serial.print(bmp.readPressure());
     //Serial.print("\t");
-    ALT = bmp.readAltitude();
-    Serial.print(bmp.readAltitude());
-    Serial.print("\t");
+    //Serial.print(bmp.readAltitude());
+    //Serial.print("\t");
     //Serial.print(bmp.readSealevelPressure());
     //Serial.print("\t");
     //Serial.print(bmp.readAltitude(101500));
-    Serial.println();
+    //Serial.println();
 
-    while (ALT > 0.0)
-    {
+    ALT = bmp.readAltitude();
+
     if(ALT < ALTo)
      {
-    digitalWrite(LED_BUILTIN, HIGH);   
-    delay(500);                       
-    digitalWrite(LED_BUILTIN, LOW);    
-    delay(500); 
-    Serial.print("Foguete Em Queda");
+      digitalWrite(LED_BUILTIN, HIGH);   
+      Serial.print(" Foguete Em Queda ");
+      Serial.print("\t");
      }
-      ALTo = ALT;
-    }
-
-    delay(1000);
- 
+    ALTo = ALT;
+    Serial.print(ALT);
+    Serial.print("\t");
+    Serial.println(); 
+    digitalWrite(LED_BUILTIN, LOW); 
 }
