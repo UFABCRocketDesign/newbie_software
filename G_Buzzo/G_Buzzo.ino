@@ -9,7 +9,7 @@ void setup() {
   // initialize digital pin LED_BUILTIN as an output.
   pinMode(LED_BUILTIN, OUTPUT);
 
-  Serial.begin(9600);
+  Serial.begin(115200);
   if (!bmp.begin()) {
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   while (1) {}
@@ -69,7 +69,7 @@ void loop() {
   delay(200);
 
 
-  Serial.print(bmp.readTemperature());
+  Serial.print(bmp.readTemperature()*2);
   Serial.print("\t");
   Serial.print(bmp.readPressure());
   Serial.print("\t");
@@ -81,6 +81,6 @@ void loop() {
 
     
   Serial.println();
-  delay(500);
+
   
 }
