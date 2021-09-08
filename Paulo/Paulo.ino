@@ -46,15 +46,14 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-  
     altitudeLeitura = nova_altLeitura;
     nova_altLeitura = bmp.readAltitude();
     if (nova_altLeitura < altitudeLeitura) {
-      Serial.println("Subindo");
+      Serial.print("Subindo-");
       digitalWrite(LED_BUILTIN, LOW);
     }
     else if (nova_altLeitura > altitudeLeitura) {
-      Serial.println("Descendo");
+      Serial.print("Descendo-");
       digitalWrite(LED_BUILTIN, HIGH);
     }
     
@@ -71,7 +70,8 @@ void loop() {
         // Altitude
     // Calculate altitude assuming 'standard' barometric
     // pressure of 1013.25 millibar = 101325 Pascal
-    Serial.println(nova_altLeitura);
+    Serial.print(nova_altLeitura);
+    Serial.println(" m");
     /*
     Serial.print("\t");
         // Pressão nivel do mar
@@ -84,8 +84,5 @@ void loop() {
     // that is equal to 101500 Pascals.
     Serial.println(bmp.readAltitude(101500));
     */
-
-    // Espaçamento temporal entre cada medição
-    delay(500);
        
 }
