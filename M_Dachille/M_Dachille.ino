@@ -24,17 +24,15 @@ void setup() {
   Serial.print("Pressure at sealevel (calculated)(Pa)");
   Serial.print("\t");
     // Altitude Real
-  Serial.print("Real altitude (m)");
-  Serial.print("\t");
-  Serial.print("\t");
+  Serial.println("Real altitude (m)");
 }
 
 void loop() {
   // Piscar o LED
   digitalWrite(LED_BUILTIN, HIGH);   
-  delay(1000);                       
+  delay(10);                       
   digitalWrite(LED_BUILTIN, LOW);    
-  delay(1500);                       
+  delay(10);                       
 
   //Segunda coluna - valores
     //temperatura
@@ -53,5 +51,4 @@ void loop() {
   Serial.print(bmp.readAltitude(101500));                       
   
   Serial.println();
-  delay(1000);
 }
