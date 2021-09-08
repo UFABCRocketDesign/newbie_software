@@ -4,7 +4,7 @@ Adafruit_BMP085 bmp;
 void setup() 
 {
   pinMode(LED_BUILTIN, OUTPUT);
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.print("Temperatura(°C)  Pressão(Pa) Altitude(m) PressãoNivelMar(Pa)  AltitudeReal(m)");
   Serial.println();
   if (!bmp.begin()) 
