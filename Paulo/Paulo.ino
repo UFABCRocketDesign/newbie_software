@@ -25,7 +25,7 @@
 */
 
 Adafruit_BMP085 bmp; // Declaração da biblioteca
-float altitudeLeitura, nova_altLeitura;
+float altitudeLeitura, nova_altLeitura, diferenca_med;
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -48,12 +48,13 @@ void setup() {
 void loop() {
     altitudeLeitura = nova_altLeitura;
     nova_altLeitura = bmp.readAltitude();
-    if (nova_altLeitura < altitudeLeitura) {
-      Serial.print("Subindo-");
+    diferenca_med = nova_altLeitura-altitudeLeitura;
+    if (nova_altLeitura > altitudeLeitura && diferenca_med > 15) {
+      Serial.print("Subindo\t");
       digitalWrite(LED_BUILTIN, LOW);
     }
-    else if (nova_altLeitura > altitudeLeitura) {
-      Serial.print("Descendo-");
+    else if (nova_altLeitura < altitudeLeitura && diferenca_med < -15) {
+      Serial.print("Descendo\t");
       digitalWrite(LED_BUILTIN, HIGH);
     }
     
