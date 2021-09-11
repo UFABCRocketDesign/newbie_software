@@ -61,7 +61,7 @@ void loop() {
 //   Serial.print(press);
 //   Serial.print("\t");
   Serial.print(alt);
-  for(int i=lvl-1; i<lvl; i++)
+  for(int i=0; i<lvl; i++)
   {
     Serial.print("\t");
     Serial.print(av[i]);
