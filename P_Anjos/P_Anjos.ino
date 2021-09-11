@@ -63,7 +63,7 @@ void loop() {
   }
   Vetor[0]=bmp.readAltitude()-AltitudeRef;    // Esse é o valor que será atualizado sempre 
   for (int i = 0; i < 10; i++) {              //Este for serve somar os últimos 10 valores medidos.
-    SomaMov=SomaMov+Vetor[i+1];
+    SomaMov=SomaMov+Vetor[i];
   }
   MediaMov=SomaMov/10;                        // Média móvel
   H2 = H1;                                    // Guardei a altitude de referência (medição anterior)
