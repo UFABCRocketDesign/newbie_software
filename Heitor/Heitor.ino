@@ -1,6 +1,7 @@
 #include <Adafruit_BMP085.h>
 
 Adafruit_BMP085 bmp;
+float solo = 0.0;
 
 void setup() {
   Serial.begin(250000);
@@ -10,6 +11,11 @@ void setup() {
   }
 //   Serial.print("*C\tPa\tm\t" );
   Serial.print("m");
+  for(int i=0; i<100; i++)
+  {
+    solo += bmp.readAltitude();
+  }
+  solo /= 100.0;
 }
 
 void loop() {
@@ -21,7 +27,7 @@ void loop() {
 //   Serial.print("\t");
 //   Serial.print(press);
 //   Serial.print("\t");
-  Serial.print(alt);
+  Serial.print(alt-solo);
   Serial.print("\t");
 
   Serial.println();
