@@ -43,7 +43,7 @@ void setup() {
     while (1) {}
   }
   Serial.println("Temperature(*C)\tPressure(Pa)\tAltitude(m)\tPressure at sealevel(calculated)(Pa)\tReal altitude(m)");
-  for (int i = 0; i <= 100; i++) {
+  for (int i = 0; i < 100; i++) {
     Soma = Soma + bmp.readAltitude();
   }
   Media = Soma / 100;
