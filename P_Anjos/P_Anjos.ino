@@ -25,53 +25,53 @@
 
 // the setup function runs once when you press reset or power the board
 
-float H1=0;// Variável global - Não é ressetada a cada loop. Armazena o dado.
-float H2=0;
-float Hmax=0;
-float Soma=0;
-float Media=0;
+float H1 = 0; // Variável global - Não é ressetada a cada loop. Armazena o dado.
+float H2 = 0;
+float Hmax = 0;
+float Soma = 0;
+float Media = 0;
+
 
 Adafruit_BMP085 bmp;
 
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
   pinMode(LED_BUILTIN, OUTPUT);
-    Serial.begin(115200);
+  Serial.begin(115200);
   if (!bmp.begin()) {
-  Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-  while (1) {}
+    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+    while (1) {}
   }
   Serial.println("Temperature(*C)\tPressure(Pa)\tAltitude(m)\tPressure at sealevel(calculated)(Pa)\tReal altitude(m)");
+  for (int i = 0; i <= 100; i++) {
+    Soma = Soma + bmp.readAltitude();
+  }
+  Media = Soma / 100;
 }
 
 // the loop function runs over and over again forever
 void loop() {
-    
-    H2=H1;                 // Guardei a altitude de referência (medição anterior)
-    H1=bmp.readAltitude(); // Nova leitura de altitude
 
-    for (int i = 0; i <= 100; i++) {
-      Soma=Soma+bmp.readAltitude();
-    }
-    Media=Soma/100;
-    Hmax=Media;
-    
-    if(Hmax<H1){
-      Hmax=H1;
-    }
-    Serial.print(Hmax);
+  H2 = H1;               // Guardei a altitude de referência (medição anterior)
+  H1 = bmp.readAltitude() - Media; // Nova leitura de altitude
+
+
+  if (Hmax < H1) {
+    Hmax = H1;
+  }
+  Serial.print(Hmax);
+  Serial.print("\t");
+  Serial.print(H1);
+  Serial.print("\t");
+
+  if (Hmax - H1 >= 1) {
+    digitalWrite(LED_BUILTIN, HIGH);   // A partir do momento que a diferença de altitude for acima de 3, provavelmente o foguete está descendo.
     Serial.print("\t");
-    Serial.print(H1);
-    Serial.print("\t");
-   
-    if(Hmax-H1>=1){
-        digitalWrite(LED_BUILTIN, HIGH);   // A partir do momento que a diferença de altitude for acima de 3, provavelmente o foguete está descendo.
-        Serial.print("\t");
-        Serial.print("Descendo");
-    }
-    else{
-      Serial.print("Subindo");
-    }
-   Serial.println();
-   
+    Serial.print("Descendo");
+  }
+  else {
+    Serial.print("Subindo");
+  }
+  Serial.println();
+
 }
