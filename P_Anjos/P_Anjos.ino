@@ -48,10 +48,7 @@ void loop() {
     H2=H1;                 // Guardei a altitude de referência (medição anterior)
     H1=bmp.readAltitude(); // Nova leitura de altitude
 
-    if(H2>H1){
-      Hmax=H2;
-    }
-    else{
+    if(Hmax<H1){
       Hmax=H1;
     }
     Serial.print(Hmax);
@@ -59,7 +56,7 @@ void loop() {
     Serial.print(H1);
     Serial.print("\t");
    
-    if(Hmax-H1>=3){
+    if(Hmax-H1>=1){
         digitalWrite(LED_BUILTIN, HIGH);   // A partir do momento que a diferença de altitude for acima de 3, provavelmente o foguete está descendo.
         Serial.print("\t");
         Serial.print("Descendo");
