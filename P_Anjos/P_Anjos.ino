@@ -30,7 +30,10 @@ float H2 = 0;
 float Hmax = 0;
 float Soma = 0;
 float SomaMov = 0;
-float Media = 0;
+float AltitudeRef = 0;
+float MediaMov = 0;
+float Delta;
+float n;
 
 
 Adafruit_BMP085 bmp;
@@ -47,18 +50,19 @@ void setup() {
   for (int i = 0; i < 100; i++) {               //Este for serve para definir a altitude da base de lançamento como valor de referência.
     Soma = Soma + bmp.readAltitude();
   }
-  Media = Soma / 100;
+  AltitudeRef = Soma / 100;
 }
 
 // the loop function runs over and over again forever
 void loop() {
 
   for (int i = 0; i < 10; i++) {              //Este for serve somar os últimos 10 valores medidos.
-    SomaMov = SomaMov + bmp.readAltitude();
+    n=bmp.readAltitude()-AltitudeRef;         //Esta é adiferença em relação à altitude da base
+    SomaMov = SomaMov + n;
   }
   MediaMov=SomaMov/10;                        // Média móvel
   H2 = H1;                                    // Guardei a altitude de referência (medição anterior)
-  H1 = bmp.readAltitude() - MediaMov;            // Nova leitura de altitude já descontando a altitude da base 
+  H1 = bmp.readAltitude() - MediaMov;         // Nova leitura de altitude já descontando a altitude da base 
 
 
   if (Hmax < H1) {
