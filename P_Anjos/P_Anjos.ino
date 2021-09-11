@@ -57,11 +57,13 @@ void setup() {
 void loop() {
 
   SomaMov=0;
-  for (int i = 0; i < 10; i++) {                  //Este for serve para armazenar os últimos 10 valores medidos no vetor.
-    Vetor[i]= bmp.readAltitude()-AltitudeRef;     //Esta é adiferença em relação à altitude da base
+  
+  for (int i = 0; i < 10; i++){
+   Vetor[i+1]= Vetor[i];                      //Esse Vetor serve para guardar os valores
   }
-  for (int i = 0; i < 10; i++) {                  //Este for serve somar os últimos 10 valores medidos.
-    SomaMov=SomaMov+Vetor[i];
+  Vetor[0]=bmp.readAltitude()-AltitudeRef;    
+  for (int i = 0; i < 10; i++) {              //Este for serve somar os últimos 10 valores medidos.
+    SomaMov=SomaMov+Vetor[i+1];
   }
   MediaMov=SomaMov/10;                        // Média móvel
   H2 = H1;                                    // Guardei a altitude de referência (medição anterior)
