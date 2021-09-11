@@ -29,6 +29,7 @@ float H1 = 0; // Variável global - Não é ressetada a cada loop. Armazena o da
 float H2 = 0;
 float Hmax = 0;
 float Soma = 0;
+float SomaMov = 0;
 float Media = 0;
 
 
@@ -43,7 +44,7 @@ void setup() {
     while (1) {}
   }
   Serial.println("Temperature(*C)\tPressure(Pa)\tAltitude(m)\tPressure at sealevel(calculated)(Pa)\tReal altitude(m)");
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 100; i++) {               //Este for serve para definir a altitude da base de lançamento como valor de referência.
     Soma = Soma + bmp.readAltitude();
   }
   Media = Soma / 100;
@@ -52,8 +53,12 @@ void setup() {
 // the loop function runs over and over again forever
 void loop() {
 
-  H2 = H1;               // Guardei a altitude de referência (medição anterior)
-  H1 = bmp.readAltitude() - Media; // Nova leitura de altitude
+  for (int i = 0; i < 10; i++) {              //Este for serve somar os últimos 10 valores medidos.
+    SomaMov = SomaMov + bmp.readAltitude();
+  }
+  MediaMov=SomaMov/10;                        // Média móvel
+  H2 = H1;                                    // Guardei a altitude de referência (medição anterior)
+  H1 = bmp.readAltitude() - MediaMov;            // Nova leitura de altitude já descontando a altitude da base 
 
 
   if (Hmax < H1) {
@@ -63,9 +68,12 @@ void loop() {
   Serial.print("\t");
   Serial.print(H1);
   Serial.print("\t");
-
-  if (Hmax - H1 >= 1) {
+  Delta=Hmax-H1;
+  
+  if (Delta >= 2) {
     digitalWrite(LED_BUILTIN, HIGH);   // A partir do momento que a diferença de altitude for acima de 3, provavelmente o foguete está descendo.
+    Serial.print("\t");
+    Serial.print(Delta);
     Serial.print("\t");
     Serial.print("Descendo");
   }
