@@ -56,6 +56,8 @@ void loop() {
     }
     Serial.print(Hmax);
     Serial.print("\t");
+    Serial.print(H1);
+    Serial.print("\t");
    
     if(Hmax-H1>=3){
         digitalWrite(LED_BUILTIN, HIGH);   // A partir do momento que a diferença de altitude for acima de 3, provavelmente o foguete está descendo.
