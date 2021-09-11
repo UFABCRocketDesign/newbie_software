@@ -16,7 +16,7 @@ void setup() {
     Serial.print("Temperature ");
     Serial.print(" Pressure ");
     Serial.print(" Altitude  ");
-    Serial.print(" Pressure at sealevel (calculated) = ");
+    Serial.print(" Pressure at sealevel (calculated)  ");
     Serial.println(" Real altitude  ");
 }
 
@@ -29,23 +29,24 @@ void loop() {
 
   
   Serial.print(bmp.readTemperature());
+  Serial.print("    ");
   //Serial.print(" *C");
   
   
   Serial.print(bmp.readPressure());
-  Serial.print(" ");
+  Serial.print("    ");
   //Serial.print(" Pa");
     
   // Calculate altitude assuming 'standard' barometric
   // pressure of 1013.25 millibar = 101325 Pascal
   
   Serial.print(bmp.readAltitude());
-  Serial.print(" ");
+  Serial.print("    ");
   //Serial.print(" meters");
 
   
   Serial.print(bmp.readSealevelPressure());
-  Serial.print(" ");
+  Serial.print("    ");
   //Serial.print(" Pa");
 
   // you can get a more precise measurement of altitude
