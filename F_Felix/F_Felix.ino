@@ -30,7 +30,7 @@ void setup() {
        soma += alt; 
     }
     
-    media = soma/100;
+    media = soma/100.0;
 
 }
 
