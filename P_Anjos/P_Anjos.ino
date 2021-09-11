@@ -25,8 +25,8 @@
 
 // the setup function runs once when you press reset or power the board
 
-float H1;// Variável global - Não é ressetada a cada loop. Armazena o dado.
-float H2;
+float H1=0;// Variável global - Não é ressetada a cada loop. Armazena o dado.
+float H2=0;
 float Hmax;
 
 Adafruit_BMP085 bmp;
@@ -45,35 +45,13 @@ void setup() {
 // the loop function runs over and over again forever
 void loop() {
 
-    // Serial.print("Temperature = ");
-    //Serial.print(bmp.readTemperature());
-    //Serial.print("\t");
     
-    // Serial.print("Pressure = ");
-    //Serial.print(bmp.readPressure());
-    //Serial.print("\t");
-    
-    // Calculate altitude assuming 'standard' barometric
-    // pressure of 1013.25 millibar = 101325 Pascal
-    // Serial.print("Altitude = ");
-    H1=bmp.readAltitude();
-    Serial.print(bmp.readAltitude());
+    H2=H1;
+    H1=bmp.readAltitude(); // Guardei a altitude de referência
+    Serial.print(H1);
     Serial.print("\t");
-    H2=bmp.readAltitude();
-   //Serial.print("Pressure at sealevel (calculated) = ");
-    //Serial.print(bmp.readSealevelPressure());
-    //Serial.print("\t");
-
-  // you can get a more precise measurement of altitude
-  // if you know the current sea level pressure which will
-  // vary with weather and such. If it is 1015 millibars
-  // that is equal to 101500 Pascals.
-  // Serial.print("Real altitude = ");
-   //Serial.print(bmp.readAltitude(101500));
-   //Serial.print("\t");
-    
-  
    
+    
     if(H1-H2>=3){
         digitalWrite(LED_BUILTIN, HIGH);   // A partir do momento que a diferença de altitude for acima de 3, provavelmente o foguete está descendo.
         Serial.print("\t");
@@ -85,5 +63,7 @@ void loop() {
         Serial.print("Subindo");
         Hmax=H2;
     }
+    H2=bmp.readAltitude(); // Guardei a altitude atual
    Serial.println();
+   
 }
