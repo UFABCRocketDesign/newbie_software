@@ -25,7 +25,7 @@ void setup() {
 	while (1) {}
   }
 //   Serial.print("*C\tPa\tm\t" );
-  Serial.print("m");
+  Serial.println("raw\tavg");
   for(int i=0; i<100; i++)
   {
     solo += bmp.readAltitude();
@@ -51,7 +51,7 @@ void loop() {
   Serial.print(alt);
   Serial.print("\t");
   Serial.print(av);
-  Serial.print("\t");
+  // Serial.print("\t");
 
   Serial.println();
 }
