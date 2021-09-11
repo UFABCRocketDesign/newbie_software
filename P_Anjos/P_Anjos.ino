@@ -26,6 +26,7 @@
 // the setup function runs once when you press reset or power the board
 
 float H1;// Variável global - Não é ressetada a cada loop. Armazena o dado.
+float H2;
 float Hmax;
 
 Adafruit_BMP085 bmp;
@@ -33,7 +34,7 @@ Adafruit_BMP085 bmp;
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
   pinMode(LED_BUILTIN, OUTPUT);
-    Serial.begin(9600);
+    Serial.begin(115200);
   if (!bmp.begin()) {
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   while (1) {}
@@ -58,7 +59,7 @@ void loop() {
     H1=bmp.readAltitude();
     Serial.print(bmp.readAltitude());
     Serial.print("\t");
-
+    H2=bmp.readAltitude();
    //Serial.print("Pressure at sealevel (calculated) = ");
     //Serial.print(bmp.readSealevelPressure());
     //Serial.print("\t");
@@ -71,17 +72,18 @@ void loop() {
    //Serial.print(bmp.readAltitude(101500));
    //Serial.print("\t");
     
-    Serial.println();
+  
    
-    if(H1-bmp.readAltitude()>=3){
+    if(H1-H2>=3){
         digitalWrite(LED_BUILTIN, HIGH);   // A partir do momento que a diferença de altitude for acima de 3, provavelmente o foguete está descendo.
         Serial.print("\t");
         Serial.print("Descendo");
         Hmax=H1;
     }
-    if(H1-bmp.readAltitude()<=0){
+    if(H1-H2<=0){
         Serial.print("\t");
         Serial.print("Subindo");
-        Hmax=bmp.readAltitude();
+        Hmax=H2;
     }
+   Serial.println();
 }
