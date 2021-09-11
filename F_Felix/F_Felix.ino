@@ -4,7 +4,6 @@ Adafruit_BMP085 bmp;
 float aux = 0;
 float media = 0;
 float soma = 0;
-float somaVet = 0;
 float mediaMovel = 0;
 float v[10] = {0,0,0,0,0,0,0,0,0,0};
 
@@ -42,12 +41,13 @@ void setup() {
 void loop() { 
     
     float alt = bmp.readAltitude();
+    float somaVet = 0;
 
     for (int i = 0; i < 9; i++){
        v[i] = v[i+1];
     }
     
-    v[10] = bmp.readAltitude();
+    v[9] = alt;
 
     for (int i = 0; i < 10; i++){
       somaVet += v[i];
