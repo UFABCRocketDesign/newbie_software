@@ -13,11 +13,11 @@ void setup() {
     while (1) {}
     }
 
-    Serial.print("Temperature ");
-    Serial.print(" Pressure ");
-    Serial.print(" Altitude  ");
-    Serial.print(" Pressure at sealevel (calculated)  ");
-    Serial.println(" Real altitude  ");
+    Serial.print("Temperature \t");
+    Serial.print(" Pressure \t");
+    Serial.print(" Altitude \t");
+    Serial.print(" Pressure at sealevel (calculated) \t");
+    Serial.println(" Real altitude \t");
 }
 
 // the loop function runs over and over again forever
@@ -29,24 +29,24 @@ void loop() {
 
   
   Serial.print(bmp.readTemperature());
-  Serial.print("    ");
+  Serial.print("\t");
   //Serial.print(" *C");
   
   
   Serial.print(bmp.readPressure());
-  Serial.print("    ");
+  Serial.print("\t");
   //Serial.print(" Pa");
     
   // Calculate altitude assuming 'standard' barometric
   // pressure of 1013.25 millibar = 101325 Pascal
   
   Serial.print(bmp.readAltitude());
-  Serial.print("    ");
+  Serial.print("\t");
   //Serial.print(" meters");
 
   
   Serial.print(bmp.readSealevelPressure());
-  Serial.print("    ");
+  Serial.print("\t");
   //Serial.print(" Pa");
 
   // you can get a more precise measurement of altitude
