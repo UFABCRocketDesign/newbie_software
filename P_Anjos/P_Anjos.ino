@@ -25,7 +25,7 @@
 
 // the setup function runs once when you press reset or power the board
 
-float H1 = 0; // Variável global - Não é ressetada a cada loop. Armazena o dado.
+float H1 = 0;      // Variável global - Não é ressetada a cada loop. Armazena o dado.
 float H2 = 0;
 float Hmax = 0;
 float Soma = 0;
@@ -33,7 +33,7 @@ float SomaMov = 0;
 float AltitudeRef = 0;
 float MediaMov = 0;
 float Delta;
-float n;
+float Vetor[10];     //Vetor para guardar os últimos 10 valores para a média móvel
 
 
 Adafruit_BMP085 bmp;
@@ -56,13 +56,16 @@ void setup() {
 // the loop function runs over and over again forever
 void loop() {
 
-  for (int i = 0; i < 10; i++) {              //Este for serve somar os últimos 10 valores medidos.
-    n=bmp.readAltitude()-AltitudeRef;         //Esta é adiferença em relação à altitude da base
-    SomaMov = SomaMov + n;
+  SomaMov=0;
+  for (int i = 0; i < 10; i++) {                  //Este for serve para armazenar os últimos 10 valores medidos no vetor.
+    Vetor[i]= bmp.readAltitude()-AltitudeRef;     //Esta é adiferença em relação à altitude da base
+  }
+  for (int i = 0; i < 10; i++) {                  //Este for serve somar os últimos 10 valores medidos.
+    SomaMov=SomaMov+Vetor[i];
   }
   MediaMov=SomaMov/10;                        // Média móvel
   H2 = H1;                                    // Guardei a altitude de referência (medição anterior)
-  H1 = bmp.readAltitude() - MediaMov;         // Nova leitura de altitude já descontando a altitude da base 
+  H1 = MediaMov;                              // Nova leitura de altitude
 
 
   if (Hmax < H1) {
