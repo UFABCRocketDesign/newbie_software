@@ -39,7 +39,7 @@ void loop() {
     
     float alt = bmp.readAltitude();
     
-    int altRelativa = media - alt;
+    float altRelativa = media - alt;
     
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
