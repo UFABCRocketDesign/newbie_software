@@ -58,10 +58,10 @@ void loop() {
 
   SomaMov=0;
   
-  for (int i = 0; i < 10; i++){
+  for (int i = 0; i < 9; i++){
    Vetor[i+1]= Vetor[i];                      //Esse Vetor serve para guardar os valores
   }
-  Vetor[0]=bmp.readAltitude()-AltitudeRef;    
+  Vetor[0]=bmp.readAltitude()-AltitudeRef;    // Esse é o valor que será atualizado sempre 
   for (int i = 0; i < 10; i++) {              //Este for serve somar os últimos 10 valores medidos.
     SomaMov=SomaMov+Vetor[i+1];
   }
