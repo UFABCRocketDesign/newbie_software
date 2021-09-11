@@ -27,7 +27,7 @@
 
 float H1=0;// Variável global - Não é ressetada a cada loop. Armazena o dado.
 float H2=0;
-float Hmax;
+float Hmax=0;
 
 Adafruit_BMP085 bmp;
 
@@ -44,26 +44,27 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-
     
-    H2=H1;
-    H1=bmp.readAltitude(); // Guardei a altitude de referência
-    Serial.print(H1);
+    H2=H1;                 // Guardei a altitude de referência (medição anterior)
+    H1=bmp.readAltitude(); // Nova leitura de altitude
+
+    if(H2>H1){
+      Hmax=H2;
+    }
+    else{
+      Hmax=H1;
+    }
+    Serial.print(Hmax);
     Serial.print("\t");
    
-    
-    if(H1-H2>=3){
+    if(Hmax-H1>=3){
         digitalWrite(LED_BUILTIN, HIGH);   // A partir do momento que a diferença de altitude for acima de 3, provavelmente o foguete está descendo.
         Serial.print("\t");
         Serial.print("Descendo");
-        Hmax=H1;
     }
-    if(H1-H2<=0){
-        Serial.print("\t");
-        Serial.print("Subindo");
-        Hmax=H2;
+    else{
+      Serial.print("Subindo");
     }
-    H2=bmp.readAltitude(); // Guardei a altitude atual
    Serial.println();
    
 }
