@@ -28,6 +28,8 @@
 float H1=0;// Variável global - Não é ressetada a cada loop. Armazena o dado.
 float H2=0;
 float Hmax=0;
+float Soma=0;
+float Media=0;
 
 Adafruit_BMP085 bmp;
 
@@ -48,6 +50,12 @@ void loop() {
     H2=H1;                 // Guardei a altitude de referência (medição anterior)
     H1=bmp.readAltitude(); // Nova leitura de altitude
 
+    for (int i = 0; i <= 100; i++) {
+      Soma=Soma+bmp.readAltitude();
+    }
+    Media=Soma/100;
+    Hmax=Media;
+    
     if(Hmax<H1){
       Hmax=H1;
     }
