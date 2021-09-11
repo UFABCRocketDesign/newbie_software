@@ -58,7 +58,7 @@ void loop() {
 
   SomaMov=0;
   
-  for (int i = 9; i>0; i--){
+  for (int i = 8; i>=0; i--){
    Vetor[i+1]= Vetor[i];                      //Esse Vetor serve para guardar os valores
   }
   Vetor[0]=bmp.readAltitude()-AltitudeRef;    // Esse é o valor que será atualizado sempre 
