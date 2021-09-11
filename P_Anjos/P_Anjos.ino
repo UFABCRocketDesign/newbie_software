@@ -25,6 +25,9 @@
 
 // the setup function runs once when you press reset or power the board
 
+float H1;// Variável global - Não é ressetada a cada loop. Armazena o dado.
+float Hmax;
+
 Adafruit_BMP085 bmp;
 
 void setup() {
@@ -35,45 +38,50 @@ void setup() {
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   while (1) {}
   }
-  Serial.println("Temperature(*C) \t Pressure(Pa) \t Altitude(m) \t Pressure at sealevel(calculated)(Pa) \t Real altitude(m)");
+  Serial.println("Temperature(*C)\tPressure(Pa)\tAltitude(m)\tPressure at sealevel(calculated)(Pa)\tReal altitude(m)\t Altura Máxima");
 }
 
 // the loop function runs over and over again forever
 void loop() {
-  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(500);                       // wait for a second
-  digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-  delay(500);                       // wait for a second
-  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(500);                       // wait for a second
-  digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-  delay(500);                       // wait for a second
+
     // Serial.print("Temperature = ");
-    Serial.print(bmp.readTemperature());
-    Serial.print("\t");
+    //Serial.print(bmp.readTemperature());
+    //Serial.print("\t");
     
     // Serial.print("Pressure = ");
-    Serial.print(bmp.readPressure());
-    Serial.print("\t");
+    //Serial.print(bmp.readPressure());
+    //Serial.print("\t");
     
     // Calculate altitude assuming 'standard' barometric
     // pressure of 1013.25 millibar = 101325 Pascal
     // Serial.print("Altitude = ");
     Serial.print(bmp.readAltitude());
     Serial.print("\t");
+    H1=Serial.print(bmp.readAltitude());
 
    //Serial.print("Pressure at sealevel (calculated) = ");
-    Serial.print(bmp.readSealevelPressure());
-    Serial.print("\t");
+    //Serial.print(bmp.readSealevelPressure());
+    //Serial.print("\t");
 
   // you can get a more precise measurement of altitude
   // if you know the current sea level pressure which will
   // vary with weather and such. If it is 1015 millibars
   // that is equal to 101500 Pascals.
   // Serial.print("Real altitude = ");
-    Serial.print(bmp.readAltitude(101500));
-    Serial.print("\t");
+   //Serial.print(bmp.readAltitude(101500));
+   //Serial.print("\t");
     
     Serial.println();
-    delay(500);
+   
+    if(H1-Serial.print(bmp.readAltitude())>=3){
+        digitalWrite(LED_BUILTIN, HIGH);   // A partir do momento que a diferença de altitude for acima de 3, provavelmente o foguete está descendo.
+        Serial.print("\t");
+        Serial.print("Descendo");
+        
+    }
+    if(H1-Serial.print(bmp.readAltitude())>=-3){
+        Hmax=Serial.print(bmp.readAltitude()); // Guarda o novo valor de altura máxima
+        Serial.print(Hmax);
+        
+    }
 }
