@@ -38,7 +38,7 @@ void setup() {
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   while (1) {}
   }
-  Serial.println("Temperature(*C)\tPressure(Pa)\tAltitude(m)\tPressure at sealevel(calculated)(Pa)\tReal altitude(m)\t Altura Máxima");
+  Serial.println("Temperature(*C)\tPressure(Pa)\tAltitude(m)\tPressure at sealevel(calculated)(Pa)\tReal altitude(m)");
 }
 
 // the loop function runs over and over again forever
@@ -55,9 +55,9 @@ void loop() {
     // Calculate altitude assuming 'standard' barometric
     // pressure of 1013.25 millibar = 101325 Pascal
     // Serial.print("Altitude = ");
+    H1=bmp.readAltitude();
     Serial.print(bmp.readAltitude());
     Serial.print("\t");
-    H1=Serial.print(bmp.readAltitude());
 
    //Serial.print("Pressure at sealevel (calculated) = ");
     //Serial.print(bmp.readSealevelPressure());
@@ -73,15 +73,15 @@ void loop() {
     
     Serial.println();
    
-    if(H1-Serial.print(bmp.readAltitude())>=3){
+    if(H1-bmp.readAltitude()>=3){
         digitalWrite(LED_BUILTIN, HIGH);   // A partir do momento que a diferença de altitude for acima de 3, provavelmente o foguete está descendo.
         Serial.print("\t");
         Serial.print("Descendo");
-        
+        Hmax=H1;
     }
-    if(H1-Serial.print(bmp.readAltitude())>=-3){
-        Hmax=Serial.print(bmp.readAltitude()); // Guarda o novo valor de altura máxima
-        Serial.print(Hmax);
-        
+    if(H1-bmp.readAltitude()<=0){
+        Serial.print("\t");
+        Serial.print("Subindo");
+        Hmax=bmp.readAltitude();
     }
 }
