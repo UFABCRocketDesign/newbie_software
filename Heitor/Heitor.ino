@@ -8,7 +8,7 @@ void setup() {
 	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
 	while (1) {}
   }
-//   Serial.print("*C\tPa\tm\t");
+//   Serial.print("*C\tPa\tm\t" );
   Serial.print("m");
 }
 
