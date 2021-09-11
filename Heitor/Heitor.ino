@@ -1,19 +1,20 @@
 #include <Adafruit_BMP085.h>
 
 #define len 10
-#define coiso vec[len]
-#define idx vec[index]
-#define av_pp av += idx
-#define av_ll av -= idx
-#define av_tt av *= len
-#define av_dd av /= len
+#define lvl 3
+#define coiso vec[lvl][len]
+#define idx(I) vec[(I)][index[(I)]]
+#define av_pp(I) av[(I)] += idx(I)
+#define av_ll(I) av[(I)] -= idx(I)
+#define av_tt(I) av[(I)] *= len
+#define av_dd(I) av[(I)] /= len
 #define update(X) ((++X)%len)
-#define av_fst av_tt;av_ll
-#define av_lst av_pp;av_dd
+#define av_fst(I) av_tt(I);av_ll(I)
+#define av_lst(I) av_pp(I);av_dd(I)
 
-float coiso;
-int index = 0;
-float av = 0;
+float coiso = {};
+int index[lvl] = {};
+float av[lvl] = {};
 
 Adafruit_BMP085 bmp;
 float solo = 0.0;
@@ -25,7 +26,14 @@ void setup() {
 	while (1) {}
   }
 //   Serial.print("*C\tPa\tm\t" );
-  Serial.println("raw\tavg");
+  Serial.print("raw");
+  for(int i=0; i<lvl; i++)
+  {
+    Serial.print("\tav");
+    Serial.print(i);
+  }
+  Serial.println();
+
   for(int i=0; i<100; i++)
   {
     solo += bmp.readAltitude();
@@ -39,18 +47,25 @@ void loop() {
   int press = bmp.readPressure();
   float alt = bmp.readAltitude()-solo;
 
-  av_fst;
-  idx = alt;
-  av_lst;
-  index = update(index);
+  for(int i=0; i<lvl; i++)
+  {
+    av_fst(i);
+    if(i==0) idx(i) = alt;
+    else idx(i) = av[i-1];
+    av_lst(i);
+    index[i] = update(index[i]);
+  }
 
 //   Serial.print(temp);
 //   Serial.print("\t");
 //   Serial.print(press);
 //   Serial.print("\t");
   Serial.print(alt);
-  Serial.print("\t");
-  Serial.print(av);
+  for(int i=lvl-1; i<lvl; i++)
+  {
+    Serial.print("\t");
+    Serial.print(av[i]);
+  }
   // Serial.print("\t");
 
   Serial.println();
