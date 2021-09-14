@@ -1,97 +1,61 @@
 #include <Adafruit_BMP085.h>
 
+float H1 = 0;      // Variável global - Não é ressetada a cada loop. Armazena o dado.
+float H2 = 0;
+float Hmax = 0;
+float Soma = 0;
+float SomaMov = 0;
+float AltitudeRef = 0;
+float MediaMov = 0;
+float Delta;
+float Vetor[10];     //Vetor para guardar os últimos 10 valores para a média móvel
+
 Adafruit_BMP085 bmp;
 
-// constants won't change. Used here to set a pin number:
-const int ledPin =  LED_BUILTIN;// the number of the LED pin
-
-// Variables will change:
-int ledState = LOW;             // ledState used to set the LED
-
-// Generally, you should use "unsigned long" for variables that hold time
-// The value will quickly become too large for an int to store
-//unsigned long previousMillis = 0;        // will store last time LED was updated
-
-// constants won't change:
-//const long interval = 2000;           // interval at which to blink (milliseconds)
-float a=0;
-float b=0;
-float teste=0;
-
 void setup() {
-  // set the digital pin as output: BLINK
-  pinMode(ledPin, OUTPUT);
-  // Parte do BMP
-  Serial.begin(9600);
+  pinMode(LED_BUILTIN, OUTPUT);
+  Serial.begin(115200);
   if (!bmp.begin()) {
-  Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-  while (1) {}
+    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+    while (1) {}
   }
-  Serial.println("Altitude(m)\t");//"Temperatura °C \t Pressão Pa \t Altitude metros \t Pressão ao nivel do mar Pa \t Altitude real metros");
+  Serial.println("Temperature(*C)\tPressure(Pa)\tAltitude(m)\tPressure at sealevel(calculated)(Pa)\tReal altitude(m)");
+  for (int i = 0; i < 100; i++) {               //Este for serve para definir a altitude da base de lançamento como valor de referência.
+    Soma = Soma + bmp.readAltitude();
+  }
+  AltitudeRef = Soma / 100;
 }
-
 void loop() {
-  // here is where you'd put code that needs to be running all the time.
-
-  // check to see if it's time to blink the LED; that is, if the difference
-  // between the current time and last time you blinked the LED is bigger than
-  // the interval at which you want to blink the LED.
-  //unsigned long currentMillis = millis();
-
-  //if (currentMillis - previousMillis >= interval) {
-    // save the last time you blinked the LED
-    //previousMillis = currentMillis;
-
-    // if the LED is off turn it on and vice-versa:
-    //if (ledState == LOW) {
-      //ledState = HIGH;
-    //} else {
-      //ledState = LOW;
-    //}
-
-    // set the LED with the ledState of the variable:
-    //digitalWrite(ledPin, ledState);
-  //}
-  // Parte do BMP//////////////////////////////////////////////////
-    //Serial.print("Temperature = ");
-    //Serial.print(bmp.readTemperature());
-    //Serial.print("\t");
-    
-    //Serial.print("Pressure = ");
-    //Serial.print(bmp.readPressure());
-    //Serial.print("\t");
-    
-    // Calculate altitude assuming 'standard' barometric
-    // pressure of 1013.25 millibar = 101325 Pascal
-    //Serial.print("Altitude = ");
-    Serial.print(bmp.readAltitude());
+  SomaMov=0;
+  for (int i = 8; i>=0; i--){
+   Vetor[i+1]= Vetor[i];                      //Esse Vetor serve para guardar os valores
+  }
+  Vetor[0]=bmp.readAltitude()-AltitudeRef;    // Esse é o valor que será atualizado sempre 
+  for (int i = 0; i < 10; i++) {              //Este for serve somar os últimos 10 valores medidos.
+    SomaMov=SomaMov+Vetor[i];
+  }
+  MediaMov=SomaMov/10;                        // Média móvel
+  H2 = H1;                                    // Guardei a altitude de referência (medição anterior)
+  H1 = MediaMov;                              // Nova leitura de altitude
+  if (Hmax < H1) {
+    Hmax = H1;
+  }
+  Serial.print(Hmax);
+  Serial.print("\t");
+  Serial.print(H1);
+  Serial.print("\t");
+  Serial.print(Vetor[0]);
+  Serial.print("\t");
+  Delta=Hmax-H1;
+  if (Delta >= 2) {
+    digitalWrite(LED_BUILTIN, HIGH);   // A partir do momento que a diferença de altitude for acima de 3, provavelmente o foguete está descendo.
     Serial.print("\t");
-
-    //Serial.print("Pressure at sealevel (calculated) = ");
-    //Serial.print(bmp.readSealevelPressure());
-    //Serial.print("\t");
-
-  // you can get a more precise measurement of altitude
-  // if you know the current sea level pressure which will
-  // vary with weather and such. If it is 1015 millibars
-  // that is equal to 101500 Pascals.
-    //Serial.print("Real altitude = ");
-    //Serial.print(bmp.readAltitude(101500));
-    //Serial.print("\t");
-
-    b=a;
-    a=bmp.readAltitude();
-    
-    teste=a-b;
-
-    if (teste <= -2) {
-      ledState = HIGH;
-      Serial.print("Descendo\t");
-    } else {
-      ledState = LOW;
-      Serial.print("Subindo\t");
-    }
-    digitalWrite(ledPin, ledState);
-    
-    Serial.println();
+    Serial.print(Delta);
+    Serial.print("\t");
+    Serial.print("Descendo");
+  }
+  else {
+    Serial.print("Subindo");
+  }
+  Serial.println();
 }

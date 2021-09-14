@@ -31,23 +31,16 @@ void loop()
     //Serial.println();
 
     ALT = bmp.readAltitude();
-
+    Serial.print(ALT);
+    Serial.print("\t");
+     
     if(ALT < ALTo)
      {
       digitalWrite(LED_BUILTIN, HIGH);   
-      delay(500);                       
-      digitalWrite(LED_BUILTIN, LOW);    
-      delay(500); 
-      Serial.print("Foguete Em Queda");
-      ALTo = ALT;
+      Serial.print(" Foguete Em Queda ");
+      Serial.println(); 
      }
-    else
-     {
-       ALTo = ALT;
-     }
-
-    Serial.print(ALT);
-    Serial.print("\t");
-    Serial.print(ALTo);
-    Serial.println(); 
+     
+    ALTo = ALT;
+    digitalWrite(LED_BUILTIN, LOW); 
 }
