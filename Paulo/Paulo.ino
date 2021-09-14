@@ -52,7 +52,7 @@ void setup() {
 
   nova_altLeitura = bmp.readAltitude() - media_alt_inicio;
   ult_subida = 0;
-  media_alt_inicio = 0;
+  cont_subidas = 0;
   cont_sub = 0;
   cont_desc = 0;
 }
@@ -89,7 +89,6 @@ void loop() {
       Serial.print("Apogeu em: ");
       Serial.println(ult_subida);
     }
-    
     
     // BMP085 - TESTE
       // Criação de Colunas - 2º Linha:
