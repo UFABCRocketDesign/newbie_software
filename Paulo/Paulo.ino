@@ -25,7 +25,8 @@
 */
 
 Adafruit_BMP085 bmp; // Declaração da biblioteca
-float altitudeLeitura, nova_altLeitura, diferenca_med;
+//float altitudeLeitura, nova_altLeitura;
+float altura_inicio, media_alt_inicio;
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -38,25 +39,36 @@ void setup() {
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   while (1) {}
   }
-
-  nova_altLeitura = bmp.readAltitude();
+  
+  //nova_altLeitura = bmp.readAltitude();
   //Serial.println("Temperature (ºC)\tPressure (Pa)\tAltitude(m)\tPressure at sealevel (calculated) (Pa)\tReal altitude (m) ");
-
+  media_alt_inicio = 0;
+  
 }
 
 // the loop function runs over and over again forever
 void loop() {
+
+    for (float i=0; i<10; i++) {
+      medicao_altura_inicio = bmp.readAltitude();
+      media_alt_inicio = media_alt_inicio + medicao_altura_inicio;
+    }
+    
+    media_alt_inicio = media_alt_inicio / i;
+    nova_altLeitura = bmp.readAltitude();
+    
+    /*
     altitudeLeitura = nova_altLeitura;
     nova_altLeitura = bmp.readAltitude();
-    diferenca_med = nova_altLeitura-altitudeLeitura;
-    if (nova_altLeitura > altitudeLeitura && diferenca_med > 15) {
+    if (nova_altLeitura > altitudeLeitura) {
       Serial.print("Subindo\t");
       digitalWrite(LED_BUILTIN, LOW);
     }
-    else if (nova_altLeitura < altitudeLeitura && diferenca_med < -15) {
+    else if (nova_altLeitura < altitudeLeitura) {
       Serial.print("Descendo\t");
       digitalWrite(LED_BUILTIN, HIGH);
     }
+    */
     
     // BMP085 - TESTE
       // Criação de Colunas - 2º Linha:
@@ -71,7 +83,7 @@ void loop() {
         // Altitude
     // Calculate altitude assuming 'standard' barometric
     // pressure of 1013.25 millibar = 101325 Pascal
-    Serial.print(nova_altLeitura);
+    Serial.print(nova_altLeitura - media_alt_inicio);
     Serial.println(" m");
     /*
     Serial.print("\t");
