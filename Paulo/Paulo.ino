@@ -25,8 +25,8 @@
 */
 
 Adafruit_BMP085 bmp; // Declaração da biblioteca
-//float altitudeLeitura, nova_altLeitura;
-float altura_inicio, media_alt_inicio;
+float altitudeLeitura, nova_altLeitura, cont_sub, cont_subidas, cont_desc, ult_subida;
+float altura_inicio, media_alt_inicio, i;
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -39,36 +39,56 @@ void setup() {
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   while (1) {}
   }
-  
-  //nova_altLeitura = bmp.readAltitude();
+
   //Serial.println("Temperature (ºC)\tPressure (Pa)\tAltitude(m)\tPressure at sealevel (calculated) (Pa)\tReal altitude (m) ");
-  media_alt_inicio = 0;
-  
+
+  // Medicao
+  for (i=0; i<10; i++) {
+    altura_inicio = bmp.readAltitude();
+    media_alt_inicio = media_alt_inicio + altura_inicio;
+    delay (100);
+  }
+  media_alt_inicio = media_alt_inicio / i;
+
+  nova_altLeitura = bmp.readAltitude() - media_alt_inicio;
+  ult_subida = 0;
+  cont_subidas = 0;
+  cont_sub = 0;
+  cont_desc = 0;
 }
 
 // the loop function runs over and over again forever
 void loop() {
-
-    for (float i=0; i<10; i++) {
-      medicao_altura_inicio = bmp.readAltitude();
-      media_alt_inicio = media_alt_inicio + medicao_altura_inicio;
+    // Zerar contagem de altitude
+    if (cont_sub > 0 and cont_desc == 1) {
+      cont_sub = 0;
+    }
+    if (cont_desc > 0 and cont_sub == 1) {
+      cont_desc = 0;
     }
     
-    media_alt_inicio = media_alt_inicio / i;
-    nova_altLeitura = bmp.readAltitude();
-    
-    /*
+    // Detecção de Apogeu
     altitudeLeitura = nova_altLeitura;
-    nova_altLeitura = bmp.readAltitude();
+    nova_altLeitura = bmp.readAltitude() - media_alt_inicio;
     if (nova_altLeitura > altitudeLeitura) {
-      Serial.print("Subindo\t");
-      digitalWrite(LED_BUILTIN, LOW);
+      cont_sub += 1;
     }
     else if (nova_altLeitura < altitudeLeitura) {
-      Serial.print("Descendo\t");
-      digitalWrite(LED_BUILTIN, HIGH);
+      cont_desc += 1;
     }
-    */
+
+    if (cont_sub > 10) {
+      Serial.print("Subindo");
+      cont_subidas = 1;
+      ult_subida = nova_altLeitura;
+    }
+    else if (cont_desc > 10) {
+      Serial.print("Descendo");
+    }
+    if (cont_subidas > 0 and cont_desc == 10) {
+      Serial.print("Apogeu em: ");
+      Serial.println(ult_subida);
+    }
     
     // BMP085 - TESTE
       // Criação de Colunas - 2º Linha:
@@ -83,7 +103,7 @@ void loop() {
         // Altitude
     // Calculate altitude assuming 'standard' barometric
     // pressure of 1013.25 millibar = 101325 Pascal
-    Serial.print(nova_altLeitura - media_alt_inicio);
+    Serial.print(nova_altLeitura);
     Serial.println(" m");
     /*
     Serial.print("\t");
