@@ -1,7 +1,7 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 
-
+  float primeira_altitude, segunda_altitude;
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
   pinMode(LED_BUILTIN, OUTPUT);
@@ -11,25 +11,19 @@ void setup() {
   while (1) {}
   }
     // Criando a variável 
-  float primeira_altitude, segunda_altitude;
+
 }
 
 void loop() {
 
   primeira_altitude = bmp.readAltitude();
   // Comparando as variáveis
-  if((primeira_altitude << segunda_altitude)
-  digitalWrite(LED_BUILTIN, HIGH));
+  if(primeira_altitude < segunda_altitude);
+  digitalWrite(LED_BUILTIN, HIGH);
   
     //Altitude
-  Serial.print(bmp.readAltitude());
-  Serial.print("\t");
-    //Altitude real
-  Serial.print(bmp.readAltitude(101500));                       
-
-  
-segunda_altitude = bmp.readAltitude();
-
-
+  Serial.print(primeira_altitude);
+  Serial.print("\t");                     
+  segunda_altitude = primeira_altitude;
   Serial.println();
 }
