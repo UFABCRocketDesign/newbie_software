@@ -20,7 +20,7 @@ void setup()
   while (1) {}
   }
 
-  for( i = 0; i <= 12; i++)
+  for( i = 0; i < 12; i++)
   {
    ALT = bmp.readAltitude();
    Med = Med + ALT;
