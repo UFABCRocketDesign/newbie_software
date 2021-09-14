@@ -1,7 +1,7 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 float novaAlt=0.0;
-float velhaAlt=novaAlt;
+float velhaAlt=0.0;
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -28,9 +28,13 @@ void loop() {
   
   if (novaAlt < velhaAlt) {
     Serial.println("caindo");
+    velhaAlt = novaAlt;
   }
-  else {
+  if (novaAlt > velhaAlt) {
     Serial.println("subindo");
+    velhaAlt = novaAlt;
   }
+  
+  delay(100);
 
 }
