@@ -2,7 +2,6 @@
 Adafruit_BMP085 bmp;
 
 float x;
-float i = bmp.readAltitude();
 float media;
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
@@ -19,10 +18,15 @@ void setup() {
 void loop() {
 
   // Fazer a média das altitudes 
-  for (int i = 0; i < 15; x = i++) {
-    media = x/15;
+  for (int i = 0; i < 15; i++) {
+    float media = 0;
+    media = media + bmp.readAltitude();
   }
+
+  //calculo real da média
+  media = media/15;
+  
   //Altitude
-  Serial.print(bmp.readAltitude());
+  Serial.print(media);
   Serial.println();
 }
