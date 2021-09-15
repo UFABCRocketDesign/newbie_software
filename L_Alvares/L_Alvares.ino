@@ -12,20 +12,20 @@ void setup()
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
   //Serial.print("Temperatura(°C)  Pressão(Pa) Altitude(m) PressãoNivelMar(Pa)  AltitudeReal(m)");
-  Serial.print("Pressão(Pa)");
-  Serial.println();
+  //Serial.print("Pressão(Pa)");
+  //Serial.println();
   if (!bmp.begin()) 
   {
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   while (1) {}
   }
 
-  for( i = 0; i < 12; i++)
+  for( i = 0; i < 11; i++)
   {
    ALT = bmp.readAltitude();
    Med = Med + ALT;
   }
-  M = (Med/12);
+  M = (Med/11);
   
 }
 
