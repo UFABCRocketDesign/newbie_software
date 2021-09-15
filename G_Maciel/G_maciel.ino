@@ -2,7 +2,7 @@
 Adafruit_BMP085 bmp;
 float novaAlt=0.0;
 float velhaAlt=0.0;
-float i=0.0;
+float altitude=0.0;
 float media=0.0;
 float h = 0.0;
 
@@ -15,6 +15,11 @@ void setup() {
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   while (1) {}
   }
+  for (int i=0; i<20; i++) {
+    altitude=bmp.readAltitude();
+    media =  media + altitude;
+  }
+  media = media / 20;
   
   // Serial.println("Altitude [m]\tApogeu"); 
 
@@ -27,26 +32,16 @@ void loop() {
   // pressure of 1013.25 millibar = 101325 Pascal
   float novaAlt=bmp.readAltitude();
  
+  h = novaAlt - media;
+  Serial.println(h);
+  // Serial.print("\t");
+  //if (h < velhaAlt) {
+    //Serial.println("caindo");
+    //velhaAlt = h;
+  //}
+  //if (h > velhaAlt) {
+    //Serial.println("subindo");
+    //velhaAlt = h;
+  //}
 
-  if (i<20) {
-    media =  media + novaAlt;
-    i = i + 1.0;
-  }
-  if (i=20) {
-    media = media/20;
-    i = i + 1.0;
-  }
-  if (i>20) {
-    h = novaAlt - media;
-    Serial.println(h);
-    // Serial.print("\t");
-    //if (h < velhaAlt) {
-      //Serial.println("caindo");
-      //velhaAlt = h;
-    //}
-    //if (h > velhaAlt) {
-      //Serial.println("subindo");
-      //velhaAlt = h;
-    //}
-  }
 }

@@ -2,6 +2,10 @@
 Adafruit_BMP085 bmp;
 float ALT = 0.0;
 float ALTo = 0.0;
+float i = 0.0;
+float Med = 0.0;
+float M = 0.0;
+
 
 void setup() 
 {
@@ -15,6 +19,14 @@ void setup()
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   while (1) {}
   }
+
+  for( i = 0; i < 12; i++)
+  {
+   ALT = bmp.readAltitude();
+   Med = Med + ALT;
+  }
+  M = (Med/12);
+  
 }
 
 void loop() 
@@ -30,14 +42,14 @@ void loop()
     //Serial.print(bmp.readAltitude(101500));
     //Serial.println();
 
-    ALT = (bmp.readAltitude() - 780);
+    ALT = (bmp.readAltitude() - M);
     Serial.print(ALT);
     Serial.print("\t");
      
     if(ALT < ALTo)
      {
       digitalWrite(LED_BUILTIN, HIGH);   
-      Serial.print(" Foguete Em Queda ");
+      //Serial.print(" Foguete Em Queda ");
      }
 
     Serial.println(); 
