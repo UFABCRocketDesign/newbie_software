@@ -4,7 +4,8 @@
 
 Adafruit_BMP085 bmp;
 
-float zero;
+float v[100];
+float zero = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -15,16 +16,15 @@ void setup() {
   }
 
   Serial.print("Altura  (metros)");
-
-  float m = 0;
-
-  for (int i = 0; i < 101; i++) {
-    m += bmp.readAltitude();
+  
+  for (int i = 0; i < 100; i++) {
+    v[i] = bmp.readAltitude();
+    zero += v[i];
   }
-  
-  zero = m/101;
+
+  zero = zero/100;
 }
-  
+
 void loop() {
 //    //Pisca rapido duas vezes para iniciar medição
 //    for (int i = 0; i < 2; i++) {
@@ -41,8 +41,21 @@ void loop() {
 //    Serial.print(bmp.readPressure());
 //    Serial.print('\t');
 
-    Serial.print(float(int((bmp.readAltitude() - zero)*10))/10);
+    float m = bmp.readAltitude();
+    Serial.print(float(int((m - zero)*10))/10);
     Serial.println('\t');
+
+    for (int i = 1; i < 100; i++) {
+      v[i - 1] = v[i];
+    }
+
+    v[99] = m;
+
+    for (int i = 0; i < 100; i++) {
+      zero += v[i];
+    }
+
+    zero = zero/100;
 
 //    Serial.print(bmp.readSealevelPressure());
 //    Serial.print('\t');
