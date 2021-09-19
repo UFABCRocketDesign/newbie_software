@@ -4,9 +4,8 @@
 
 Adafruit_BMP085 bmp;
 
-float v[100];
+float v[100] = {};
 float zero = 0;
-int n = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -23,32 +22,24 @@ void setup() {
   }
   
   zero = zero/100;
-  
-  for (int i = 0; i < 100; i++) {
-    v[i] = 0;
-  }
-
 }
 
 void loop() {
     float m = bmp.readAltitude() - zero;
+    Serial.print(m/100);
+    Serial.print('\t');
 
-    if (n < 100) {
-      v[n] = m;
-      n++;
-    } else {
-      for (int i = 1; i < 100; i++) {
-        v[i - 1] = v[i];
-      }
-      v[99] = m;
+    for (int i = 1; i < 100; i++) {
+      v[i - 1] = v[i];
     }
+      v[99] = m;
 
     float aux = 0;
     for (int i = 0; i < 100; i++) {
       aux += v[i];
     }
     
-    Serial.println(aux/(n));
+    Serial.println(aux/100);
 
 
 }
