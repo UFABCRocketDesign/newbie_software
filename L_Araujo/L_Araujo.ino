@@ -4,12 +4,12 @@
 
 Adafruit_BMP085 bmp;
 
-void printa_linha() {
-  for (int i = 0; i < 70; i++) {
-    Serial.print("_");
-  }
-  Serial.println("");
-}
+//void printa_linha() {
+//  for (int i = 0; i < 70; i++) {
+//    Serial.print("_");
+//  }
+//  Serial.println("");
+//}
 
 void setup() {
   Serial.begin(115200);
@@ -20,7 +20,8 @@ void setup() {
   }
 
   //printa_linha();
-  Serial.println("| Temperatura (°C) |  Pressão (Pa)  |  Altitude  (meters) |  Pressão a nível do mar (Pa) |  Real Altitude (meters)|");
+  //Serial.println("Temperatura (°C)\tPressão (Pa)\tAltitude  (meters)\tPressão a nível do mar (Pa)\tReal Altitude (meters)|");
+  Serial.print("Altitude  (meters)");
   //printa_linha();
   
 }
@@ -29,34 +30,33 @@ void loop() {
     //Pisca rapido duas vezes para iniciar medição
     for (int i = 0; i < 2; i++) {
       digitalWrite(LED_BUILTIN, HIGH);
-      delay(500);
+      //delay(500);
       digitalWrite(LED_BUILTIN, LOW);
-      delay(500);
+      //delay(500);
     }
            
     //Mede temperatura
-    Serial.print(bmp.readTemperature());
-    Serial.print('\t');
-
-    Serial.print(bmp.readPressure());
-    Serial.print('\t');
+//    Serial.print(bmp.readTemperature());
+//    Serial.print('\t');
+//
+//    Serial.print(bmp.readPressure());
+//    Serial.print('\t');
     
     // Calculate altitude assuming 'standard' barometric
     // pressure of 1013.25 millibar = 101325 Pascal
     Serial.print(bmp.readAltitude());
-    Serial.print('\t');
+    Serial.println('\t');
 
-    Serial.print(bmp.readSealevelPressure());
-    Serial.print('\t');
+//    Serial.print(bmp.readSealevelPressure());
+//    Serial.print('\t');
 
   // you can get a more precise measurement of altitude
   // if you know the current sea level pressure which will
   // vary with weather and such. If it is 1015 millibars
   // that is equal to 101500 Pascals.
-    Serial.print(bmp.readAltitude(101500));
-    Serial.print('\t');
+//    Serial.print(bmp.readAltitude(101500));
+//    Serial.print('\t');
+//    
     
-    Serial.println();
-    
-    delay(500);
+    //delay(500);
 }
