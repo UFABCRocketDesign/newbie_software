@@ -6,7 +6,7 @@
 
 Adafruit_BMP085 bmp;
 
-float v[100] = {};
+float v[tam_vetor] = {};
 float zero = 0;
 
 void setup() {
