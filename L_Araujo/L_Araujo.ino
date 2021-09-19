@@ -31,10 +31,10 @@ void loop() {
     Serial.print(m);
     Serial.print('\t');
 
-    for (int i = 99; i < tam_vetor; i++) {
+    for (int i = 0; i < tam_vetor; i++) {
       v[i - 1] = v[i];
     }
-      v[99] = m;
+      v[tam_vetor-1] = m;
 
     float aux = 0;
     for (int i = 0; i < tam_vetor; i++) {
