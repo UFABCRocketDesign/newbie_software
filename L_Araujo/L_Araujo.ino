@@ -16,13 +16,13 @@ void setup() {
 
   Serial.print("Altura  (metros)");
 
-  int m = 0;
+  float m = 0;
 
   for (int i = 0; i <= 100; i++) {
     m += bmp.readAltitude();
   }
   
-  zero = int(m/101);
+  zero = m/101;
 }
   
 void loop() {
