@@ -4,13 +4,6 @@
 
 Adafruit_BMP085 bmp;
 
-//void printa_linha() {
-//  for (int i = 0; i < 70; i++) {
-//    Serial.print("_");
-//  }
-//  Serial.println("");
-//}
-
 void setup() {
   Serial.begin(115200);
   pinMode(LED_BUILTIN, OUTPUT);
@@ -19,21 +12,18 @@ void setup() {
   while (1) {}
   }
 
-  //printa_linha();
-  //Serial.println("Temperatura (°C)\tPressão (Pa)\tAltitude  (meters)\tPressão a nível do mar (Pa)\tReal Altitude (meters)|");
-  Serial.print("Altitude  (meters)");
-  //printa_linha();
+  Serial.print("Altura  (metros)");
   
 }
   
 void loop() {
-    //Pisca rapido duas vezes para iniciar medição
-    for (int i = 0; i < 2; i++) {
-      digitalWrite(LED_BUILTIN, HIGH);
-      //delay(500);
-      digitalWrite(LED_BUILTIN, LOW);
-      //delay(500);
-    }
+//    //Pisca rapido duas vezes para iniciar medição
+//    for (int i = 0; i < 2; i++) {
+//      digitalWrite(LED_BUILTIN, HIGH);
+//      //delay(500);
+//      digitalWrite(LED_BUILTIN, LOW);
+//      //delay(500);
+//    }
            
     //Mede temperatura
 //    Serial.print(bmp.readTemperature());
@@ -42,9 +32,13 @@ void loop() {
 //    Serial.print(bmp.readPressure());
 //    Serial.print('\t');
     
-    // Calculate altitude assuming 'standard' barometric
-    // pressure of 1013.25 millibar = 101325 Pascal
-    Serial.print(bmp.readAltitude());
+    float m = 0;
+    int n = 0;
+
+    m += bmp.readAltitude();
+    n++;
+    
+    Serial.print(abs(bmp.readAltitude() - (m/n)));
     Serial.println('\t');
 
 //    Serial.print(bmp.readSealevelPressure());
