@@ -17,9 +17,9 @@ void loop() {
     //Pisca rapido duas vezes para temperatura
     for (int i = 0; i < 2; i++) {
       digitalWrite(LED_BUILTIN, HIGH);
-      delay(900);
-      digitalWrite(LED_BUILTIN, HIGH);
-      delay(900);
+      delay(500);
+      digitalWrite(LED_BUILTIN, LOW);
+      delay(500);
     }
          
     //Mede temperatura
@@ -30,9 +30,9 @@ void loop() {
     //Pisca lento três vezes para pressão
     for (int i = 0; i < 2; i++) {
       digitalWrite(LED_BUILTIN, HIGH);
-      delay(2000);
-      digitalWrite(LED_BUILTIN, HIGH);
-      delay(2000);
+      delay(1000);
+      digitalWrite(LED_BUILTIN, LOW);
+      delay(1000);
     }
     
     Serial.print("Pressure = ");
