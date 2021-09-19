@@ -40,8 +40,8 @@ void loop() {
 //
 //    Serial.print(bmp.readPressure());
 //    Serial.print('\t');
-    
-    Serial.print(int(bmp.readAltitude() - zero));
+
+    Serial.print(float(int((bmp.readAltitude() - zero)*10))/10);
     Serial.println('\t');
 
 //    Serial.print(bmp.readSealevelPressure());
