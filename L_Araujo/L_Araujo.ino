@@ -26,7 +26,7 @@ void setup() {
 
 void loop() {
     float m = bmp.readAltitude() - zero;
-    Serial.print(m/100);
+    Serial.print(m);
     Serial.print('\t');
 
     for (int i = 1; i < 100; i++) {
