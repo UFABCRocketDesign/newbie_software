@@ -43,7 +43,7 @@ void loop() {
       v[99] = m;
     }
 
-    int aux = 0;
+    float aux = 0;
     for (int i = 0; i < 100; i++) {
       aux += v[i];
     }
