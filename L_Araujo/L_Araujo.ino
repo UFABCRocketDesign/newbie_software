@@ -31,7 +31,7 @@ void setup() {
 }
 
 void loop() {
-    float m = float(int((m - zero)*10))/10;
+    float m = bmp.readAltitude() - zero;
 
     if (n < 100) {
       v[n] = m;
