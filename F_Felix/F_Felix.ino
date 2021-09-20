@@ -2,6 +2,11 @@
 
 Adafruit_BMP085 bmp;
 float aux = 0;
+float media = 0;
+float soma = 0;
+float mediaMovel = 0;
+float v[10] = {0,0,0,0,0,0,0,0,0,0};
+
 
 void setup() {
     // initialize digital pin LED_BUILTIN as an output.
@@ -19,13 +24,38 @@ void setup() {
     Serial.print("Pres. sealevel(Pa)\t");
     Serial.print("Real alt.(m)\t");
     Serial.print("Foguete\t");
+    Serial.print("Variação\t");
+    Serial.print("Média\t");
     Serial.println();
 
+    float alt = bmp.readAltitude();
+
+    for (int j = 0; j < 100; j++){
+      soma += alt;
+    }
+
+    media = soma/100.0;
 }
 
 // the loop function runs over and over again forever
-void loop() {
-    float alt = bmp.readAltitude();      
+void loop() { 
+    
+    float alt = bmp.readAltitude();
+    float somaVet = 0;
+
+    for (int i = 0; i < 9; i++){
+       v[i] = v[i+1];
+    }
+    
+    v[9] = alt;
+
+    for (int i = 0; i < 10; i++){
+      somaVet += v[i];
+    }
+
+    mediaMovel = somaVet/10.0;
+    
+    float altRelativa = media - alt;
     
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
@@ -53,7 +83,15 @@ void loop() {
       Serial.print("caindo\t");
       digitalWrite(LED_BUILTIN, HIGH);
     }
+
+    Serial.print(altRelativa);
+    Serial.print("\t");
+
+    Serial.print(mediaMovel);
+    Serial.print("\t");
+    
     Serial.println();
+    
     aux = alt;
    
     // delay(100);
