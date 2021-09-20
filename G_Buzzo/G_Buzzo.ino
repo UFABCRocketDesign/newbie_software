@@ -6,7 +6,6 @@ Adafruit_BMP085 bmp;
 float med = 0;
 int i = 0;
 float vet[20];
-float filtro = 0;
 float valor = 0;
 
 void setup() {
@@ -102,7 +101,8 @@ void loop() {
   */
 
   float alt = bmp.readAltitude();
-
+  float filtro = 0;
+  
   for (i = 0; i <= 19; i++)
   {
     vet[i] = bmp.readAltitude();
