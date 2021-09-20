@@ -102,10 +102,12 @@ void loop() {
 
   float alt = bmp.readAltitude();
   float filtro = 0;
+
+  vet[19] = alt;
   
-  for (i = 0; i <= 19; i++)
+  for (i = 0; i <= 18; i++)
   {
-    vet[i] = bmp.readAltitude();
+    vet[i] = vet[i+1];
     filtro = filtro + vet[i];
     valor = filtro/20;
   }
