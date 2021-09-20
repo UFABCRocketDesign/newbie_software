@@ -5,12 +5,13 @@
 
 //Define constantes
 #define tam_vetor 100
-#define base_descida 70
+#define base_descida 35
 
 //Define variáveis globais
 Adafruit_BMP085 bmp;
 
 float v[tam_vetor] = {};
+float mm[tam_vetor] = {};
 float zero = 0;
 
 //Função que devolve quantos valores seguidos tem de queda nas últimas (tam_vetor) contagens
@@ -74,7 +75,7 @@ void loop() {
     Serial.println(aux/tam_vetor);
 
     //Identifica apogeu
-    if (def_apogeu(v) >= base_descida) {
+    if (def_apogeu(mm) >= base_descida) {
       Serial.print("Atingiu apogeu na altura ");
       Serial.println(v[0]);
       for (int i = 0; i < 3; i++) {
