@@ -72,24 +72,20 @@ void loop() {
     for (int i = 0; i < tam_vetor; i++) {
       aux += v[i];
     }
-    
-    Serial.println(aux/tam_vetor);
+
+    float m_atual = aux/tam_vetor;
+    Serial.println(m_atual);
     for (int i = 0; i < tam_vetor; i++) {
       mm[i - 1] = mm[i];
     }
-    mm[tam_vetor-1] = aux/tam_vetor;
+    mm[tam_vetor-1] = m_atual;
     n_mm++;
 
     //Identifica apogeu
     if ((def_apogeu(mm) >= base_descida) && (n_mm > base_descida)) {
       Serial.print("Atingiu apogeu na altura ");
       Serial.println(v[0]);
-      for (int i = 0; i < 3; i++) {
-         digitalWrite(LED_BUILTIN, HIGH);
-         delay(500);
-         digitalWrite(LED_BUILTIN, LOW);
-         delay(500);
-      }
+      digitalWrite(LED_BUILTIN, HIGH);
     }
 
 
