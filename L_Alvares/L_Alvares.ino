@@ -5,7 +5,7 @@ float ALT = 0.0;
 float i = 0.0;
 float Med = 0.0;
 float M = 0.0;
-float N = 1.0;
+int N = 1;
 float Filtro = 0.0;
 
 
@@ -33,20 +33,18 @@ void setup()
 
 void loop() 
 {
+    for (i = 0; i < N; i++)
+    {
     ALT = (bmp.readAltitude() - M);
     Serial.print(ALT);
     Serial.print("\t");
-
-    for (i = 0; i < N; i++)
-    {
     Filtro = Filtro + ALT/N; 
     Serial.print(Filtro);
     Serial.print("\t");
-    N++;
+    Serial.println();
+    N++; 
     }
 
-    Serial.println();  
-     
     //if(ALT < ALTo)
     // {
     //  digitalWrite(LED_BUILTIN, HIGH);   
