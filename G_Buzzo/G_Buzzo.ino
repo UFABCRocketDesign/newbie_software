@@ -112,7 +112,7 @@ void loop() {
 
   Serial.print(alt - med);
   Serial.print("\t");
-  Serial.print(valor);
+  Serial.print(valor - med);
 
   Serial.println();
 
