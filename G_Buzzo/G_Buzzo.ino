@@ -99,7 +99,8 @@ void loop() {
 
   Serial.println();
   */
-
+  
+  alt = bmp.readAltitude(101500);
   Serial.print(alt - med);
    
 
