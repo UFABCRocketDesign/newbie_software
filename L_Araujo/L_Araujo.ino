@@ -12,6 +12,7 @@ Adafruit_BMP085 bmp;
 
 float v[tam_vetor] = {};
 float mm[tam_vetor] = {};
+int n_mm = 0;
 float zero = 0;
 
 //Função que devolve quantos valores seguidos tem de queda nas últimas (tam_vetor) contagens
@@ -73,9 +74,14 @@ void loop() {
     }
     
     Serial.println(aux/tam_vetor);
+    for (int i = 0; i < tam_vetor; i++) {
+      mm[i - 1] = mm[i];
+    }
+    mm[tam_vetor-1] = aux/tam_vetor;
+    n_mm++;
 
     //Identifica apogeu
-    if (def_apogeu(mm) >= base_descida) {
+    if ((def_apogeu(mm) >= base_descida) && (n_mm > base_descida)) {
       Serial.print("Atingiu apogeu na altura ");
       Serial.println(v[0]);
       for (int i = 0; i < 3; i++) {
