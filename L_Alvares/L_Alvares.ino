@@ -5,7 +5,7 @@ float ALT = 0.0;
 float i = 0.0;
 float Med = 0.0;
 float M = 0.0;
-int N = 0;
+int N = 1;
 float Filtro = 0.0;
 
 
