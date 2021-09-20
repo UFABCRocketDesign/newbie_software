@@ -16,14 +16,12 @@ void setup() {
   while (1) {}
   }
 
-  for (i = 0; i >= 0; i++)
+  for (i = 0; i <= 9; i++)
   {
     alt = alt + bmp.readAltitude(101500);
-    if (i == 9)
-    {
-      med = alt/10;
-    }
   }
+  
+  med = alt/10;
 
   
 
