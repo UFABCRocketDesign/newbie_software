@@ -100,6 +100,7 @@ void loop() {
   
   alt = bmp.readAltitude(101500);
   Serial.print(alt - med);
+  Serial.print("\t");
    
 
 
