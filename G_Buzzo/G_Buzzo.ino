@@ -2,9 +2,12 @@
 
 Adafruit_BMP085 bmp;
 
-float alt = 0;
+
 float med = 0;
 int i = 0;
+float vet[20];
+float filtro = 0;
+float valor = 0;
 
 void setup() {
 
@@ -18,10 +21,10 @@ void setup() {
 
   for (i = 0; i <= 9; i++)
   {
-    alt = alt + bmp.readAltitude(101500);
+    med = med + bmp.readAltitude();
   }
   
-  med = alt/10;
+  med = med/10;
 
   
 
@@ -97,10 +100,21 @@ void loop() {
 
   Serial.println();
   */
-  
-  alt = bmp.readAltitude(101500);
-  Serial.println(alt - med);
-   
+
+  float alt = bmp.readAltitude();
+
+  for (i = 0; i <= 19; i++)
+  {
+    vet[i] = bmp.readAltitude();
+    filtro = filtro + vet[i];
+    valor = filtro/20;
+  }
+
+  Serial.print(alt - med);
+  Serial.print("\t");
+  Serial.print(valor);
+
+  Serial.println();
 
 
   
