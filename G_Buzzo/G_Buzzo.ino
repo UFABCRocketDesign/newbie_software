@@ -2,6 +2,9 @@
 
 Adafruit_BMP085 bmp;
 
+float alt = 0;
+int i = 0;
+
 void setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);
@@ -24,8 +27,7 @@ void setup() {
   Serial.println("Altitude Real (m)");
 */
 
-  float alt = 0;
-  int i = 0;
+
 }
 
 
@@ -86,10 +88,11 @@ void loop() {
   Serial.println();
   */
    
-  for i >= 0{
+  for (i = 0; i >= 0; i++)
+  {
     alt = alt + bmp.readAltitude(101500);
-    i++;
-    if i == 9{
+    if (i == 9)
+    {
       Serial.print(alt/10);
     }
   }
