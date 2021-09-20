@@ -1,10 +1,12 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 float ALT = 0.0;
-float ALTo = 0.0;
+//float ALTo = 0.0;
 float i = 0.0;
 float Med = 0.0;
 float M = 0.0;
+float N = 1.0;
+float Filtro = 0.0;
 
 
 void setup() 
@@ -31,28 +33,25 @@ void setup()
 
 void loop() 
 {
-    //Serial.print(bmp.readTemperature());
-    //Serial.print("\t");
-    //Serial.print(bmp.readPressure());
-    //Serial.print("\t");
-    //Serial.print(bmp.readAltitude());
-    //Serial.print("\t");
-    //Serial.print(bmp.readSealevelPressure());
-    //Serial.print("\t");
-    //Serial.print(bmp.readAltitude(101500));
-    //Serial.println();
-
     ALT = (bmp.readAltitude() - M);
     Serial.print(ALT);
     Serial.print("\t");
-     
-    if(ALT < ALTo)
-     {
-      digitalWrite(LED_BUILTIN, HIGH);   
-      //Serial.print(" Foguete Em Queda ");
-     }
 
-    Serial.println(); 
-    ALTo = ALT;
-    digitalWrite(LED_BUILTIN, LOW); 
+    for (i = 0; i < N; i++)
+    {
+    Filtro = Filtro + ALT/N; 
+    Serial.print(Filtro);
+    Serial.print("\t");
+    N++;
+    }
+
+    Serial.println();  
+     
+    //if(ALT < ALTo)
+    // {
+    //  digitalWrite(LED_BUILTIN, HIGH);   
+    //  Serial.print(" Foguete Em Queda ");
+    // }
+    //ALTo = ALT;
+    //digitalWrite(LED_BUILTIN, LOW); 
 }
