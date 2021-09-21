@@ -93,6 +93,6 @@ void loop() {
     // pressure of 1013.25 millibar = 101325 Pascal
     Serial.print(nova_altLeitura);
     Serial.print("\t");
-    Serial.print(media_movel);
+    Serial.println(media_movel);
        
 }
