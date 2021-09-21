@@ -59,6 +59,7 @@ void loop() {
     Serial.print(led);
   }
   else {
+    digitalWrite(LED_BUILTIN, LOW);
     led = 0;
     Serial.print("Subindo");
     Serial.print("\t");
