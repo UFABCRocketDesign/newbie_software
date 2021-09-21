@@ -51,7 +51,7 @@ void setup() {
   cont_sub = 0; 
   cont_subidas = 0;
   cont_desc = 0;
-  ult_subida = 0
+  ult_subida = 0;
   altura_inicio = 0;
   media_alt_inicio = 0;
   media_movel = 0;
