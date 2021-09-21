@@ -4,7 +4,7 @@ Adafruit_BMP085 bmp; // Declaração da biblioteca
 float altitudeLeitura, nova_altLeitura, cont_sub, cont_subidas, cont_desc, ult_subida;
 float altura_inicio, media_alt_inicio;
 int j;
-float list_media_movel[10], media_movel;
+float list_media_movel[10], media_movel, nova_media_movel;
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -34,6 +34,12 @@ void setup() {
     list_media_movel[j] = list_media_movel[j] - media_alt_inicio;
   }
 
+  // Primeira media movel
+  for (j=0; j<10; j++) {
+      media_movel = media_movel + list_media_movel[j];
+  }
+  media_movel = media_movel / 10;
+
   // Inicialização de variáveis
   nova_altLeitura = bmp.readAltitude() - media_alt_inicio;
   ult_subida = 0;
@@ -46,8 +52,6 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-
-    /*
     // Zerar contagem de altitude
     if (cont_sub > 0 and cont_desc == 1) {
       cont_sub = 0;
@@ -55,32 +59,32 @@ void loop() {
     if (cont_desc > 0 and cont_sub == 1) {
       cont_desc = 0;
     }
-    */
     
     // Detecção de Apogeu
     altitudeLeitura = nova_altLeitura;
     nova_altLeitura = bmp.readAltitude() - media_alt_inicio;
-    if (nova_altLeitura > altitudeLeitura) {
-      cont_sub += 1;
-    }
-    else if (nova_altLeitura < altitudeLeitura) {
-      cont_desc += 1;
-    }
-
+    
+    media_movel = nova_media_movel;
     // Media Movel
-      // Cálculo da Média Movel
-    for (j=0; j<10; j++) {
-      media_movel = media_movel + list_media_movel[j];
-    }
-    media_movel = media_movel / 10;
-
       // Mudança do vetor, considerando 10 valores mais recentes
     for (j=0; j<9; j++) {
       list_media_movel[j] = list_media_movel[j+1];
     }
     list_media_movel[9] = nova_altLeitura;
+      // Cálculo da Média Movel
+    for (j=0; j<10; j++) {
+      media_movel = media_movel + list_media_movel[j];
+    }
+    nova_media_movel = media_movel / 10;
+    
+    if (nova_altLeitura > altitudeLeitura && nova_media_movel > media_movel) {
+      cont_sub += 1;
+    }
+    else if (nova_altLeitura < altitudeLeitura && nova_media_movel < media_movel) {
+      cont_desc += 1;
+    }
 
-    /*
+    // Identificação de subida/descida/apogeu
     if (cont_sub > 10) {
       Serial.print("Subindo");
       cont_subidas = 1;
@@ -93,7 +97,6 @@ void loop() {
       Serial.print("Apogeu em: ");
       Serial.println(ult_subida);
     }
-    */
 
         // Altura
     // Calculate altitude assuming 'standard' barometric
