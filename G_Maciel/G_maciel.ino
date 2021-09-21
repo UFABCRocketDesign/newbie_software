@@ -36,7 +36,7 @@ void loop() {
   for (int k=0; k<(l-1); k++) {
     lista[k] = lista[k+1];
   }
-  lista[l] = h;
+  lista[l-1] = h;
   for (int j=0; j<l; j++) {
     media_mov = media_mov + lista[j];
   }
