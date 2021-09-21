@@ -4,7 +4,6 @@ float novaAlt=0.0;
 float velhaAlt=0.0;
 float media=0.0;
 float h = 0.0;
-float nova_h = 0;
 float lista[] = {0,0,0,0,0,0,0,0,0,0};
 float media_mov = 0;
 
@@ -33,19 +32,18 @@ void loop() {
   float novaAlt=bmp.readAltitude();
  
   h = novaAlt - media;
-  for (int j=0; j<10; j++) {
-    media_mov = media_mov + lista[j];
-  }
-  media_mov = media_mov/10;
-  nova_h = (h + media_mov)/2;
   for (int k=0; k<9; k++) {
     lista[k] = lista[k+1];
   }
   lista[9] = h;
-  media_mov = 0;
+  for (int j=0; j<10; j++) {
+    media_mov = media_mov + lista[j];
+  }
+  media_mov = media_mov/10;
   Serial.print(h);
   Serial.print("\t");
-  Serial.println(nova_h);
+  Serial.println(media_mov);
+  media_mov = 0;
   
   // Serial.print("\t");
   //if (h < velhaAlt) {
