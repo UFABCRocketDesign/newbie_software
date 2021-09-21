@@ -2,9 +2,11 @@
 Adafruit_BMP085 bmp;
 float novaAlt=0.0;
 float velhaAlt=0.0;
-float altitude=0.0;
 float media=0.0;
 float h = 0.0;
+float nova_h = 0;
+float lista[] = {0,0,0,0,0,0,0,0,0,0};
+float media_mov = 0;
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -16,13 +18,11 @@ void setup() {
   while (1) {}
   }
   for (int i=0; i<20; i++) {
-    altitude=bmp.readAltitude();
-    media =  media + altitude;
+    media =  media + bmp.readAltitude();
   }
   media = media / 20;
-  
-  // Serial.println("Altitude [m]\tApogeu"); 
 
+  // Serial.println("Altitude [m]\tApogeu"); 
 }
 
 // the loop function runs over and over again forever
@@ -33,7 +33,20 @@ void loop() {
   float novaAlt=bmp.readAltitude();
  
   h = novaAlt - media;
-  Serial.println(h);
+  for (int j=0; j<10; j++) {
+    media_mov = media_mov + lista[j];
+  }
+  media_mov = media_mov/10;
+  nova_h = (h + media_mov)/2;
+  for (int k=0; k<9; k++) {
+    lista[k] = lista[k+1];
+  }
+  lista[9] = h;
+  media_mov = 0;
+  Serial.print(h);
+  Serial.print("\t");
+  Serial.println(nova_h);
+  
   // Serial.print("\t");
   //if (h < velhaAlt) {
     //Serial.println("caindo");
