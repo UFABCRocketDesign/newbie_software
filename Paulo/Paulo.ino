@@ -52,13 +52,14 @@ void setup() {
   cont_subidas = 0;
   cont_sub = 0;
   cont_desc = 0;
-  media_movel = 0;
-  media_movel_lg = 0;
   
 }
 
 // the loop function runs over and over again forever
 void loop() {
+    media_movel = 0;
+    media_movel_lg = 0;
+    
     // Zerar contagem de altitude
     if (cont_sub > 0 and cont_desc == 1) {
       cont_sub = 0;
@@ -76,7 +77,7 @@ void loop() {
     for (j=0; j<9; j++) {
       list_media_movel[j] = list_media_movel[j+1];
     }
-    list_media_movel[9] = nova_altLeitura;
+    list_media_movel[filt_i-1] = nova_altLeitura;
       // Cálculo da Média Movel
     for (j=0; j<filt_i; j++) {
       media_movel = media_movel + list_media_movel[j];
