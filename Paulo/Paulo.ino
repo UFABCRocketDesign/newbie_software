@@ -96,7 +96,7 @@ void loop() {
     }
       // Cálculo da Média Movel
     for (j=0; j<filt_f; j++) {
-      media_movel_lg = media_movel_lg + list_media_movel[j];
+      media_movel_lg = media_movel_lg + list_media_movel_lg[j];
     }
     nova_media_movel_lg = media_movel_lg / filt_f;
 
