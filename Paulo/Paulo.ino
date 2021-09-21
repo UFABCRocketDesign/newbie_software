@@ -36,7 +36,7 @@ void setup() {
 
   for (j=0; j<10; j++) {
     list_media_movel[j] = list_media_movel[j] - media_alt_inicio;
-    list_media_movel_lg[j] = list_media_movel[j];
+    list_media_movel_lg[j] = list_media_movel[j] - media_alt_inicio;
   }
   i = j;
 
