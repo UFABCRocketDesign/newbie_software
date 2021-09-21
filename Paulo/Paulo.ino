@@ -1,7 +1,7 @@
 #include <Adafruit_BMP085.h>
 
 Adafruit_BMP085 bmp; // Declaração da biblioteca
-float altitudeLeitura, nova_altLeitura, cont_sub, cont_subidas, cont_desc, ult_subida;
+float nova_altLeitura, cont_sub, cont_subidas, cont_desc, ult_subida;
 float altura_inicio, media_alt_inicio;
 int j;
 float list_media_movel[10], media_movel, nova_media_movel;
@@ -61,7 +61,6 @@ void loop() {
     }
     
     // Detecção de Apogeu
-    altitudeLeitura = nova_altLeitura;
     nova_altLeitura = bmp.readAltitude() - media_alt_inicio;
     
     media_movel = nova_media_movel;
@@ -77,10 +76,10 @@ void loop() {
     }
     nova_media_movel = media_movel / 10;
     
-    if (nova_altLeitura > altitudeLeitura && nova_media_movel > media_movel) {
+    if (nova_media_movel > media_movel) {
       cont_sub += 1;
     }
-    else if (nova_altLeitura < altitudeLeitura && nova_media_movel < media_movel) {
+    else if (nova_media_movel < media_movel) {
       cont_desc += 1;
     }
 
@@ -89,7 +88,7 @@ void loop() {
     // pressure of 1013.25 millibar = 101325 Pascal
     Serial.print(nova_altLeitura);
     Serial.print("\t");
-    Serial.print(media_movel);
+    Serial.print(nova_media_movel);
 
     // Identificação de subida/descida/apogeu
     if (cont_sub > 10) {
