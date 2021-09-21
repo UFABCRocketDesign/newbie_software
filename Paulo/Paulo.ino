@@ -89,7 +89,7 @@ void loop() {
     // pressure of 1013.25 millibar = 101325 Pascal
     Serial.print(nova_altLeitura);
     Serial.print("\t");
-    Serial.println(media_movel);
+    Serial.print(media_movel);
 
     // Identificação de subida/descida/apogeu
     if (cont_sub > 10) {
@@ -102,7 +102,9 @@ void loop() {
     }
     if (cont_subidas > 0 and cont_desc == 10) {
       Serial.print("\tApogeu em: ");
-      Serial.println(ult_subida);
+      Serial.print(ult_subida);
     }
+
+    Serial.println();
        
 }
