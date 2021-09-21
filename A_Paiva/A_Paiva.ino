@@ -47,13 +47,10 @@ void loop() {
   Serial.print("\t");
   Serial.print(Vetor[0]);
   Serial.print("\t");         
-  Serial.print(Delta);
-  Serial.print("\t");
-  if (Delta >= 2) {                           //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo.
-    digitalWrite(LED_BUILTIN, HIGH);          
-    //Serial.print("\t");
-    //Serial.print(Delta);
-    //Serial.print("\t");
+  //Serial.print(Delta);
+  //Serial.print("\t");
+  if (Delta >= 2) {                           //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
+    digitalWrite(LED_BUILTIN, HIGH);
     Serial.print("Descendo");
   }
   else {
