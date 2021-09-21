@@ -31,12 +31,13 @@ void setup() {
     media_alt_inicio = media_alt_inicio + altura_inicio;
     delay (100);
     list_media_movel[j] = altura_inicio;
+    list_media_movel_lg[j] = altura_inicio;
   }
   media_alt_inicio = media_alt_inicio / 10;
 
   for (j=0; j<10; j++) {
     list_media_movel[j] = list_media_movel[j] - media_alt_inicio;
-    list_media_movel_lg[j] = list_media_movel[j] - media_alt_inicio;
+    list_media_movel_lg[j] = list_media_movel_lg[j] - media_alt_inicio;
   }
   i = filt_i;
 
