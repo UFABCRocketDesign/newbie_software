@@ -30,6 +30,10 @@ void setup() {
   }
   media_alt_inicio = media_alt_inicio / 10;
 
+  for (j=0; j<10; j++) {
+    list_media_movel[j] = list_media_movel[j] - media_alt_inicio;
+  }
+
   // Inicialização de variáveis
   nova_altLeitura = bmp.readAltitude() - media_alt_inicio;
   ult_subida = 0;
@@ -64,13 +68,16 @@ void loop() {
     }
 
     // Media Movel
+      // Cálculo da Média Movel
     for (j=0; j<10; j++) {
       media_movel = media_movel + list_media_movel[j];
-      if (j < 9) {
-        list_media_movel[j] = list_media_movel[j+1];
-      }
     }
-    media_movel = (media_movel + nova_altLeitura) / 11;
+    media_movel = media_movel / 10;
+
+      // Mudança do vetor, considerando 10 valores mais recentes
+    for (j=0; j<9; j++) {
+      list_media_movel[j] = list_media_movel[j+1];
+    }
     list_media_movel[9] = nova_altLeitura;
 
     /*
