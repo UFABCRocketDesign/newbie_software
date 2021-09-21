@@ -84,6 +84,13 @@ void loop() {
       cont_desc += 1;
     }
 
+        // Altura
+    // Calculate altitude assuming 'standard' barometric
+    // pressure of 1013.25 millibar = 101325 Pascal
+    Serial.print(nova_altLeitura);
+    Serial.print("\t");
+    Serial.println(media_movel);
+
     // Identificação de subida/descida/apogeu
     if (cont_sub > 10) {
       Serial.print("Subindo");
@@ -97,12 +104,5 @@ void loop() {
       Serial.print("Apogeu em: ");
       Serial.println(ult_subida);
     }
-
-        // Altura
-    // Calculate altitude assuming 'standard' barometric
-    // pressure of 1013.25 millibar = 101325 Pascal
-    Serial.print(nova_altLeitura);
-    Serial.print("\t");
-    Serial.println(media_movel);
        
 }
