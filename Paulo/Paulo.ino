@@ -93,15 +93,15 @@ void loop() {
 
     // Identificação de subida/descida/apogeu
     if (cont_sub > 10) {
-      Serial.print("Subindo");
+      Serial.print("\tSubindo");
       cont_subidas = 1;
       ult_subida = nova_altLeitura;
     }
     else if (cont_desc > 10) {
-      Serial.print("Descendo");
+      Serial.print("\tDescendo");
     }
     if (cont_subidas > 0 and cont_desc == 10) {
-      Serial.print("Apogeu em: ");
+      Serial.print("\tApogeu em: ");
       Serial.println(ult_subida);
     }
        
