@@ -48,11 +48,17 @@ void setup() {
 
   // Inicialização de variáveis
   nova_altLeitura = bmp.readAltitude() - media_alt_inicio;
-  ult_subida = 0;
+  cont_sub = 0; 
   cont_subidas = 0;
-  cont_sub = 0;
   cont_desc = 0;
-  
+  ult_subida = 0
+  altura_inicio = 0;
+  media_alt_inicio = 0;
+  media_movel = 0;
+  nova_media_movel = 0;
+  media_movel_lg = 0;
+  nova_media_movel_lg = 0;
+
 }
 
 // the loop function runs over and over again forever
