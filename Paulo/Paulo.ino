@@ -1,10 +1,14 @@
 #include <Adafruit_BMP085.h>
 
 Adafruit_BMP085 bmp; // Declaração da biblioteca
+#define filt_i 10
+#define filt_f 20
+
 float nova_altLeitura, cont_sub, cont_subidas, cont_desc, ult_subida;
 float altura_inicio, media_alt_inicio;
-int j;
-float list_media_movel[10], media_movel, nova_media_movel;
+int j, i;
+float list_media_movel[filt_i], media_movel, nova_media_movel;
+float list_media_movel_lg[filt_f], media_movel_lg, nova_media_movel_lg;
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -32,7 +36,9 @@ void setup() {
 
   for (j=0; j<10; j++) {
     list_media_movel[j] = list_media_movel[j] - media_alt_inicio;
+    list_media_movel_lg[j] = list_media_movel[j];
   }
+  i = j;
 
   // Primeira media movel
   for (j=0; j<10; j++) {
@@ -47,6 +53,7 @@ void setup() {
   cont_sub = 0;
   cont_desc = 0;
   media_movel = 0;
+  media_movel_lg = 0;
   
 }
 
@@ -64,18 +71,37 @@ void loop() {
     nova_altLeitura = bmp.readAltitude() - media_alt_inicio;
     
     media_movel = nova_media_movel;
-    // Media Movel
+    // Media Movel - 10 e 20
       // Mudança do vetor, considerando 10 valores mais recentes
     for (j=0; j<9; j++) {
       list_media_movel[j] = list_media_movel[j+1];
     }
     list_media_movel[9] = nova_altLeitura;
       // Cálculo da Média Movel
-    for (j=0; j<10; j++) {
+    for (j=0; j<filt_i; j++) {
       media_movel = media_movel + list_media_movel[j];
     }
-    nova_media_movel = media_movel / 10;
-    
+    nova_media_movel = media_movel / j;
+
+    media_movel_lg = nova_media_movel_lg;
+      // Mudança do vetor, considerando 20 valores mais recentes
+    if (i < filt_f) {
+      list_media_movel_lg[i] = nova_altLeitura;
+      i += 1;
+    }
+    if (i >= filt_f) {
+      for (j=0; j<filt_f; j++) {
+        list_media_movel_lg[j] = list_media_movel_lg[j+1];
+      }
+      list_media_movel_lg[filt_f-1] = nova_altLeitura;
+    }
+      // Cálculo da Média Movel
+    for (j=0; j<filt_f; j++) {
+      media_movel_lg = media_movel_lg + list_media_movel[j];
+    }
+    nova_media_movel_lg = media_movel_lg / j;
+
+    // Consideração de Subidas e Descidas
     if (nova_media_movel > media_movel) {
       cont_sub += 1;
     }
@@ -89,6 +115,8 @@ void loop() {
     Serial.print(nova_altLeitura);
     Serial.print("\t");
     Serial.print(nova_media_movel);
+    Serial.print("\t");
+    Serial.print(nova_media_movel_lg);
 
     // Identificação de subida/descida/apogeu
     if (cont_sub > 10) {
@@ -105,5 +133,5 @@ void loop() {
     }
 
     Serial.println();
-       
+    
 }
