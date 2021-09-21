@@ -94,12 +94,13 @@ void loop() {
         list_media_movel_lg[j] = list_media_movel_lg[j+1];
       }
       list_media_movel_lg[filt_f-1] = nova_altLeitura;
+    
+        // Cálculo da Média Movel
+      for (j=0; j<filt_f; j++) {
+        media_movel_lg = media_movel_lg + list_media_movel_lg[j];
+      }
+      nova_media_movel_lg = media_movel_lg / filt_f;
     }
-      // Cálculo da Média Movel
-    for (j=0; j<filt_f; j++) {
-      media_movel_lg = media_movel_lg + list_media_movel_lg[j];
-    }
-    nova_media_movel_lg = media_movel_lg / filt_f;
 
     // Consideração de Subidas e Descidas
     if (nova_media_movel > media_movel) {
