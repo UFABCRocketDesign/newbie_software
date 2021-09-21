@@ -7,7 +7,7 @@ Adafruit_BMP085 bmp; // Declaração da biblioteca
 float nova_altLeitura, cont_sub, cont_subidas, cont_desc, ult_subida;
 float altura_inicio, media_alt_inicio;
 int j, i;
-float list_media_movel[filt_i], media_movel, nova_media_movel;
+float list_media_movel[filt_i], media_movel, nova_media_movel, antiga_media_movel;
 float list_media_movel_lg[filt_f], media_movel_lg, nova_media_movel_lg;
 
 // the setup function runs once when you press reset or power the board
@@ -53,9 +53,9 @@ void setup() {
   cont_desc = 0;
   ult_subida = 0;
   altura_inicio = 0;
-  media_alt_inicio = 0;
   media_movel = 0;
   nova_media_movel = 0;
+  antiga_media_movel = 0;
   media_movel_lg = 0;
   nova_media_movel_lg = 0;
 
@@ -77,7 +77,7 @@ void loop() {
     // Detecção de Apogeu
     nova_altLeitura = bmp.readAltitude() - media_alt_inicio;
     
-    media_movel = nova_media_movel;
+    antiga_media_movel = nova_media_movel;
     // Media Movel - 10 e 20
       // Mudança do vetor, considerando 10 valores mais recentes
     for (j=0; j<9; j++) {
@@ -109,10 +109,10 @@ void loop() {
     }
 
     // Consideração de Subidas e Descidas
-    if (nova_media_movel > media_movel) {
+    if (nova_media_movel > antiga_media_movel) {
       cont_sub += 1;
     }
-    else if (nova_media_movel < media_movel) {
+    else if (nova_media_movel < antiga_media_movel) {
       cont_desc += 1;
     }
 
