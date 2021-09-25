@@ -74,7 +74,7 @@ void loop() {
     for (int i = 8; i>=0; i--){           // Laco apenas para a movimentação
       Vetor[j][i+1]= Vetor[j][i]; 
      }
-    if(j=0){
+    if(j==0){
       Vetor[j][0]=Aux;
     }
     for (int i = 0; i < 10; i++){         // Laco para a somatoria dos valores
