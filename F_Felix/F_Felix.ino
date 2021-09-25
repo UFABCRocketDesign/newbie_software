@@ -6,8 +6,8 @@ float media = 0;
 float soma = 0;
 float mediaMovel = 0;
 float segundaMediaMovel = 0;
-float v[10] = {0,0,0,0,0,0,0,0,0,0};
-float v2[10] = {0,0,0,0,0,0,0,0,0,0};
+float matriz[2][10];
+
 
 
 void setup() {
@@ -33,11 +33,11 @@ void setup() {
 
     float alt = bmp.readAltitude();
 
-    for (int j = 0; j < 20; j++){
+    for (int j = 0; j < 100; j++){
       soma += alt;
     }
 
-    media = soma/20.0;
+    media = soma/100.0;
 }
 
 // the loop function runs over and over again forever
@@ -48,30 +48,31 @@ void loop() {
     float somaVet2 = 0;
 
     float altRelativa = alt - media;
-
-    for (int i = 0; i < 9; i++){
-       v[i] = v[i+1];
-    }
     
-    v[9] = altRelativa;
-
-    for (int i = 0; i < 10; i++){
-      somaVet += v[i];
-    }
+     for (int i = 0; i < 9; i++){
+         matriz[0][i] = matriz[0][i+1];
+     }
+     matriz[0][9] = altRelativa;
+  
+    
+     for (int i = 0; i < 10; i++){
+        somaVet += matriz[0][i];
+      }
 
     mediaMovel = somaVet/10.0;
 
-    for (int j = 0; j < 9; j++){
-      v2[j] = v2[j+1];
-    }
-
-    v2[9] = mediaMovel;
-
-    for (int i = 0; i < 10; i++){
-      somaVet2 += v2[i];
-    }
     
-   segundaMediaMovel = somaVet2/10.0;
+      for (int i = 0; i < 9; i ++) {
+        matriz [1][i] = matriz [1][i+1];
+      }
+      matriz[1][9] = mediaMovel;
+
+      
+      for (int i = 0; i < 10; i++){
+        somaVet2 += matriz[1][i];
+      }
+
+    segundaMediaMovel = somaVet2/10.0;
     
     /* Serial.print(bmp.readTemperature());
     Serial.print("\t");
