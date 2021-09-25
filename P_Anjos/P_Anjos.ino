@@ -42,6 +42,7 @@ float FiltroA[10];      //Segunda filtragem para a média móvel
 float FiltroB[10];      // terceira filtragem para a média móvel
 float SomaFA = 0;
 float SomaFB = 0;
+float Aux=0;
 
 
 Adafruit_BMP085 bmp;
@@ -68,14 +69,19 @@ void loop() {
   SomaMov=0;
   //SomaFA=0;
   //SomaFB=0; 
-  Vetor[0][0]=bmp.readAltitude()-AltitudeRef;
-  for(int j = 3; j>=0; j--){
-    for (int i = 8; i>=0; i--){
+  Aux=bmp.readAltitude()-AltitudeRef;
+  for(int j = 0; j < 3; j++){
+    for (int i = 8; i>=0; i--){           // Laco apenas para a movimentação
       Vetor[j][i+1]= Vetor[j][i]; 
-      SomaMov=SomaMov+Vetor[j][i];
      }
+    if(j=0){
+      Vetor[j][0]=Aux;
+    }
+    for (int i = 0; i < 10; i++){         // Laco para a somatoria dos valores
+      SomaMov=SomaMov+Vetor[j][i];
+    }
     MediaMov=SomaMov/10;
-    if(j<3){ 
+    if(j<2){ 
      Vetor[j+1][0]=MediaMov;
     }
     SomaMov=0;
