@@ -2,11 +2,14 @@
 
 Adafruit_BMP085 bmp;
 
-#define BuZZ (1)
-#define BEEPING (BuZZ && 1)
+
+float med = 0;
+int i = 0;
+float vet[20];
+float valor = 0;
 
 void setup() {
-  // initialize digital pin LED_BUILTIN as an output.
+
   pinMode(LED_BUILTIN, OUTPUT);
 
   Serial.begin(115200);
@@ -15,6 +18,16 @@ void setup() {
   while (1) {}
   }
 
+  for (i = 0; i <= 9; i++)
+  {
+    med = med + bmp.readAltitude();
+  }
+  
+  med = med/10;
+
+  
+
+/*
   Serial.print("Temperatura (ºC)");
   Serial.print("\t");
   Serial.print("Pressão (Pa)");
@@ -24,11 +37,16 @@ void setup() {
   Serial.print("Pressão nível do mar (Pa)");
   Serial.print("\t");
   Serial.println("Altitude Real (m)");
+*/
+
+
 }
 
 
-// the loop function runs over and over again forever
+
 void loop() {
+  
+  /*
   digitalWrite(LED_BUILTIN, HIGH);   
   delay(300);                       
   digitalWrite(LED_BUILTIN, LOW);   
@@ -79,8 +97,27 @@ void loop() {
   Serial.print("\t");
   Serial.print(bmp.readAltitude(101500));
 
-    
   Serial.println();
+  */
+
+  float alt = bmp.readAltitude();
+  float filtro = 0;
+
+  vet[19] = alt;
+  
+  for (i = 0; i <= 18; i++)
+  {
+    vet[i] = vet[i+1];
+    filtro = filtro + vet[i];
+    valor = filtro/20;
+  }
+
+  Serial.print(alt - med);
+  Serial.print("\t");
+  Serial.print(valor - med);
+
+  Serial.println();
+
 
   
 }

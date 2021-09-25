@@ -1,32 +1,14 @@
 #include <Adafruit_BMP085.h>
 
-/*
-  Blink
-
-  Turns an LED on for one second, then off for one second, repeatedly.
-
-  Most Arduinos have an on-board LED you can control. On the UNO, MEGA and ZERO
-  it is attached to digital pin 13, on MKR1000 on pin 6. LED_BUILTIN is set to
-  the correct LED pin independent of which board is used.
-  If you want to know what pin the on-board LED is connected to on your Arduino
-  model, check the Technical Specs of your board at:
-  https://www.arduino.cc/en/Main/Products
-
-  modified 8 May 2014
-  by Scott Fitzgerald
-  modified 2 Sep 2016
-  by Arturo Guadalupi
-  modified 8 Sep 2016
-  by Colby Newman
-
-  This example code is in the public domain.
-
-  http://www.arduino.cc/en/Tutorial/Blink
-*/
-
 Adafruit_BMP085 bmp; // Declaração da biblioteca
-float altitudeLeitura, nova_altLeitura, cont_sub, cont_subidas, cont_desc, ult_subida;
-float altura_inicio, media_alt_inicio, i;
+#define filt_i 10
+#define filt_f 20
+
+float nova_altLeitura, cont_sub, cont_subidas, cont_desc, ult_subida;
+float altura_inicio, media_alt_inicio;
+int j, i;
+float list_media_movel[filt_i], media_movel, nova_media_movel, antiga_media_movel;
+float list_media_movel_lg[filt_f], media_movel_lg, nova_media_movel_lg;
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -41,24 +23,50 @@ void setup() {
   }
 
   //Serial.println("Temperature (ºC)\tPressure (Pa)\tAltitude(m)\tPressure at sealevel (calculated) (Pa)\tReal altitude (m) ");
-
+  Serial.println("Altitude\tMedia Movel(10)");
+  
   // Medicao
-  for (i=0; i<10; i++) {
+  for (j=0; j<10; j++) {
     altura_inicio = bmp.readAltitude();
     media_alt_inicio = media_alt_inicio + altura_inicio;
     delay (100);
+    list_media_movel[j] = altura_inicio;
+    list_media_movel_lg[j] = altura_inicio;
   }
-  media_alt_inicio = media_alt_inicio / i;
+  media_alt_inicio = media_alt_inicio / 10;
 
+  for (j=0; j<10; j++) {
+    list_media_movel[j] = list_media_movel[j] - media_alt_inicio;
+    list_media_movel_lg[j] = list_media_movel_lg[j] - media_alt_inicio;
+  }
+  i = filt_i;
+
+  // Primeira media movel
+  for (j=0; j<filt_i; j++) {
+      media_movel = media_movel + list_media_movel[j];
+  }
+  media_movel = media_movel / filt_i;
+
+  // Inicialização de variáveis
   nova_altLeitura = bmp.readAltitude() - media_alt_inicio;
-  ult_subida = 0;
+  cont_sub = 0; 
   cont_subidas = 0;
-  cont_sub = 0;
   cont_desc = 0;
+  ult_subida = 0;
+  altura_inicio = 0;
+  media_movel = 0;
+  nova_media_movel = 0;
+  antiga_media_movel = 0;
+  media_movel_lg = 0;
+  nova_media_movel_lg = 0;
+
 }
 
 // the loop function runs over and over again forever
 void loop() {
+    media_movel = 0;
+    media_movel_lg = 0;
+    
     // Zerar contagem de altitude
     if (cont_sub > 0 and cont_desc == 1) {
       cont_sub = 0;
@@ -68,54 +76,70 @@ void loop() {
     }
     
     // Detecção de Apogeu
-    altitudeLeitura = nova_altLeitura;
     nova_altLeitura = bmp.readAltitude() - media_alt_inicio;
-    if (nova_altLeitura > altitudeLeitura) {
+    
+    antiga_media_movel = nova_media_movel;
+    // Media Movel - 10 e 20
+      // Mudança do vetor, considerando 10 valores mais recentes
+    for (j=0; j<9; j++) {
+      list_media_movel[j] = list_media_movel[j+1];
+    }
+    list_media_movel[filt_i-1] = nova_altLeitura;
+      // Cálculo da Média Movel
+    for (j=0; j<filt_i; j++) {
+      media_movel = media_movel + list_media_movel[j];
+    }
+    nova_media_movel = media_movel / filt_i;
+
+      // Mudança do vetor, considerando 20 valores mais recentes
+    if (i < filt_f) {
+      list_media_movel_lg[i] = nova_altLeitura;
+      i += 1;
+    }
+    if (i = filt_f) {
+      for (j=0; j<filt_f; j++) {
+        list_media_movel_lg[j] = list_media_movel_lg[j+1];
+      }
+      list_media_movel_lg[filt_f-1] = nova_altLeitura;
+    
+        // Cálculo da Média Movel
+      for (j=0; j<filt_f; j++) {
+        media_movel_lg = media_movel_lg + list_media_movel_lg[j];
+      }
+      nova_media_movel_lg = media_movel_lg / filt_f;
+    }
+
+    // Consideração de Subidas e Descidas
+    if (nova_media_movel > antiga_media_movel) {
       cont_sub += 1;
     }
-    else if (nova_altLeitura < altitudeLeitura) {
+    else if (nova_media_movel < antiga_media_movel) {
       cont_desc += 1;
     }
 
+        // Altura
+    // Calculate altitude assuming 'standard' barometric
+    // pressure of 1013.25 millibar = 101325 Pascal
+    Serial.print(nova_altLeitura);
+    Serial.print("\t");
+    Serial.print(nova_media_movel);
+    Serial.print("\t");
+    Serial.print(nova_media_movel_lg);
+
+    // Identificação de subida/descida/apogeu
     if (cont_sub > 10) {
-      Serial.print("Subindo");
+      Serial.print("\tSubindo");
       cont_subidas = 1;
       ult_subida = nova_altLeitura;
     }
     else if (cont_desc > 10) {
-      Serial.print("Descendo");
+      Serial.print("\tDescendo");
     }
     if (cont_subidas > 0 and cont_desc == 10) {
-      Serial.print("Apogeu em: ");
-      Serial.println(ult_subida);
+      Serial.print("\tApogeu em: ");
+      Serial.print(ult_subida);
     }
+
+    Serial.println();
     
-    // BMP085 - TESTE
-      // Criação de Colunas - 2º Linha:
-        // Temperatura
-    /*
-    Serial.print(bmp.readTemperature());
-    Serial.print("\t");
-        // Pressão
-    Serial.print(bmp.readPressure());
-    Serial.print("\t");
-    */
-        // Altitude
-    // Calculate altitude assuming 'standard' barometric
-    // pressure of 1013.25 millibar = 101325 Pascal
-    Serial.print(nova_altLeitura);
-    Serial.println(" m");
-    /*
-    Serial.print("\t");
-        // Pressão nivel do mar
-    Serial.print(bmp.readSealevelPressure());
-    Serial.print("\t");
-        // Altitude Real
-    // you can get a more precise measurement of altitude
-    // if you know the current sea level pressure which will
-    // vary with weather and such. If it is 1015 millibars
-    // that is equal to 101500 Pascals.
-    Serial.println(bmp.readAltitude(101500));
-    */
-       
 }
