@@ -74,10 +74,11 @@ void loop() {
       Vetor[j][i+1]= Vetor[j][i]; 
       SomaMov=SomaMov+Vetor[j][i];
      }
-     MediaMov=SomaMov/10;
+    MediaMov=SomaMov/10;
     if(j<3){ 
      Vetor[j+1][0]=MediaMov;
     }
+    SomaMov=0;
   }
  
   // ---------------   CODIGO QUE ESTAVA FUNCIONANDO -------------------------------------------------------------------------------------------------------------------------------------
