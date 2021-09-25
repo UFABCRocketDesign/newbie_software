@@ -5,7 +5,9 @@ float aux = 0;
 float media = 0;
 float soma = 0;
 float mediaMovel = 0;
+float segundaMediaMovel = 0;
 float v[10] = {0,0,0,0,0,0,0,0,0,0};
+float v2[10] = {0,0,0,0,0,0,0,0,0,0};
 
 
 void setup() {
@@ -18,23 +20,24 @@ void setup() {
     while (1) {}
     }
 
-    Serial.print("Temp.(*C)\t");
-    Serial.print("Pres.(Pa)\t");
-    Serial.print("Alt.(m)\t");
-    Serial.print("Pres. sealevel(Pa)\t");
-    Serial.print("Real alt.(m)\t");
-    Serial.print("Foguete\t");
+   // Serial.print("Temp.(*C)\t");
+   // Serial.print("Pres.(Pa)\t");
+   // Serial.print("Alt.(m)\t");
+   // Serial.print("Pres. sealevel(Pa)\t");
+   // Serial.print("Real alt.(m)\t");
+   // Serial.print("Foguete\t");
     Serial.print("Variação\t");
     Serial.print("Média\t");
+    Serial.print("Média 2\t");
     Serial.println();
 
     float alt = bmp.readAltitude();
 
-    for (int j = 0; j < 100; j++){
+    for (int j = 0; j < 20; j++){
       soma += alt;
     }
 
-    media = soma/100.0;
+    media = soma/20.0;
 }
 
 // the loop function runs over and over again forever
@@ -42,22 +45,35 @@ void loop() {
     
     float alt = bmp.readAltitude();
     float somaVet = 0;
+    float somaVet2 = 0;
+
+    float altRelativa = alt - media;
 
     for (int i = 0; i < 9; i++){
        v[i] = v[i+1];
     }
     
-    v[9] = alt;
+    v[9] = altRelativa;
 
     for (int i = 0; i < 10; i++){
       somaVet += v[i];
     }
 
     mediaMovel = somaVet/10.0;
+
+    for (int j = 0; j < 9; j++){
+      v2[j] = v2[j+1];
+    }
+
+    v2[9] = mediaMovel;
+
+    for (int i = 0; i < 10; i++){
+      somaVet2 += v2[i];
+    }
     
-    float altRelativa = media - alt;
+   segundaMediaMovel = somaVet2/10.0;
     
-    Serial.print(bmp.readTemperature());
+    /* Serial.print(bmp.readTemperature());
     Serial.print("\t");
     
     Serial.print(bmp.readPressure());
@@ -82,12 +98,15 @@ void loop() {
     else{
       Serial.print("caindo\t");
       digitalWrite(LED_BUILTIN, HIGH);
-    }
-
+    } */
+  
     Serial.print(altRelativa);
     Serial.print("\t");
 
     Serial.print(mediaMovel);
+    Serial.print("\t");
+
+    Serial.print(segundaMediaMovel);
     Serial.print("\t");
     
     Serial.println();
