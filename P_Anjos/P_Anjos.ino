@@ -103,6 +103,8 @@ void loop() {
   Serial.print(Hmax);
   Serial.print("\t");
   Serial.print(H1);
+  Serial.print(MediaMA);
+  Serial.print(MediaMov);
   Serial.print("\t");
   Serial.print(Vetor[0]);
   Serial.print("\t");
