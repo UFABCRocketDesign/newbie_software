@@ -1,7 +1,7 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 
-float altitude1, altitude2, media2, media1;
+float zerado, filtro, m_filtro;
 float media = 0;
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
@@ -11,23 +11,29 @@ void setup() {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
-  // Fazer a média das altitudes
-  altitude1 = bmp.readAltitude();
-  for (int i = 0; i < 10; i++) {
-    media1 = media1 + altitude1;
+  // Fazer a média das altitudes 
+  for (int i = 0; i < 25; i++) {
+    media = media + bmp.readAltitude();
   }
-
-  //Fazer a média móvel
-  media2 = media1 + altitude2;
-  
   //calculo real da média
-  media = media2/11;  
+  media = media/25;
+
+  
 }
 
 void loop() {
-  //Altitude
-  Serial.print(media);
+  //"zerar" o valor
+  zerado = bmp.readAltitude () - media;
 
-  altitude2 = altitude1;
+  //filtro
+  for (int j = 0; j < 10; j++) {
+    filtro = media + zerado;
+  }
+  m_filtro = filtro/10;
+  
+  //Altitude
+  Serial.print(zerado);
+  Serial.print("\t");
+  Serial.print(m_filtro);
   Serial.println();
 }
