@@ -27,7 +27,7 @@ void loop() {
 
   //filtro
   for (int j = 0; j < 10; j++) {
-    filtro = media + zerado;
+    filtro = filtro + zerado;
   }
   m_filtro = filtro/10;
   
