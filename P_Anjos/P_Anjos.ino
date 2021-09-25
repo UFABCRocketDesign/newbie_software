@@ -66,28 +66,20 @@ void loop() {
 
 
   SomaMov=0;
-  SomaFA=0;
-  SomaFB=0; 
+  //SomaFA=0;
+  //SomaFB=0; 
+  Vetor[0][0]=bmp.readAltitude()-AltitudeRef;
   for(int j = 3; j>=0; j--){
     for (int i = 8; i>=0; i--){
       Vetor[j][i+1]= Vetor[j][i]; 
+      SomaMov=SomaMov+Vetor[j][i];
      }
+     MediaMov=SomaMov/10;
+    if(j<3){ 
+     Vetor[j+1][0]=MediaMov;
+    }
   }
-  Vetor[0][0]=bmp.readAltitude()-AltitudeRef;
-  for (int i = 0; i < 10; i++) {             
-    SomaMov=SomaMov+Vetor[0][i];
-  }
-  MediaMov=SomaMov/10;
-  Vetor[1][0]=MediaMov;  
-  for (int i = 0; i < 10; i++) {              
-    SomaFA=SomaFA+Vetor[1][i];
-  }
-  MediaMA=SomaFA/10;
-  Vetor[2][0]=MediaMA;
-  for (int i = 0; i < 10; i++) {  
-    SomaFB=SomaFB+Vetor[2][i];
-  }
-  MediaMB=SomaFB/10; 
+ 
   // ---------------   CODIGO QUE ESTAVA FUNCIONANDO -------------------------------------------------------------------------------------------------------------------------------------
   //for (int i = 8; i>=0; i--){
   // Vetor[0][i+1]= Vetor[0][i];                      //Esse Vetor serve para guardar os valores. Preciso usar os ultimos 10 valores medidos e por isso preciso registrar aos poucos
@@ -115,7 +107,7 @@ void loop() {
   //MediaMB=SomaFB/10;  
  // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   H2 = H1;                                    // Guardei a altitude de referencia (medicao anterior)
-  H1 = MediaMB;                               // Nova leitura de altitude
+  H1 = MediaMov;                               // Nova leitura de altitude
 
 
   if (Hmax < H1) {
