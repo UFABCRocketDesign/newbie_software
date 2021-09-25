@@ -48,29 +48,29 @@ void loop() {
     float somaVet2 = 0;
 
     float altRelativa = alt - media;
-
-    for( int j = 0; j < 2; j++){
-      for (int i = 0; i < 9; i++){
-         matriz[j][i] = matriz[j][i+1];
-      }
-      matriz[1][9] = altRelativa;
-    }
     
-    for (int j = 0; j < 1; j++){
-      for (int i = 0; i < 10; i++){
-        somaVet += matriz[j][i];
+     for (int i = 0; i < 9; i++){
+         matriz[1][i] = matriz[1][i+1];
+     }
+     matriz[1][9] = altRelativa;
+  
+    
+     for (int i = 0; i < 10; i++){
+        somaVet += matriz[1][i];
       }
-    }
 
     mediaMovel = somaVet/10.0;
 
-    matriz[2][9] = mediaMovel;
-
-    for (int j = 0; j < 2; j++){
-      for (int i = 0; i < 10; i++){
-        somaVet2 += matriz[j][i];
+    
+      for (int i = 0; i < 9; i ++) {
+        matriz [2][i] = matriz [2][i+1];
       }
-    }
+      matriz[2][9] = mediaMovel;
+
+      
+      for (int i = 0; i < 10; i++){
+        somaVet2 += matriz[2][i];
+      }
 
     segundaMediaMovel = somaVet2/10.0;
     
