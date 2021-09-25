@@ -20,12 +20,12 @@ void setup() {
     while (1) {}
     }
 
-    Serial.print("Temp.(*C)\t");
-    Serial.print("Pres.(Pa)\t");
-    Serial.print("Alt.(m)\t");
-    Serial.print("Pres. sealevel(Pa)\t");
-    Serial.print("Real alt.(m)\t");
-    Serial.print("Foguete\t");
+   // Serial.print("Temp.(*C)\t");
+   // Serial.print("Pres.(Pa)\t");
+   // Serial.print("Alt.(m)\t");
+   // Serial.print("Pres. sealevel(Pa)\t");
+   // Serial.print("Real alt.(m)\t");
+   // Serial.print("Foguete\t");
     Serial.print("Variação\t");
     Serial.print("Média\t");
     Serial.print("Média 2\t");
@@ -33,11 +33,11 @@ void setup() {
 
     float alt = bmp.readAltitude();
 
-    for (int j = 0; j < 100; j++){
+    for (int j = 0; j < 20; j++){
       soma += alt;
     }
 
-    media = soma/100.0;
+    media = soma/20.0;
 }
 
 // the loop function runs over and over again forever
@@ -47,11 +47,13 @@ void loop() {
     float somaVet = 0;
     float somaVet2 = 0;
 
+    float altRelativa = alt - media;
+
     for (int i = 0; i < 9; i++){
        v[i] = v[i+1];
     }
     
-    v[9] = alt;
+    v[9] = altRelativa;
 
     for (int i = 0; i < 10; i++){
       somaVet += v[i];
@@ -71,9 +73,7 @@ void loop() {
     
    segundaMediaMovel = somaVet2/10.0;
     
-    float altRelativa = media - alt;
-    
-    Serial.print(bmp.readTemperature());
+    /* Serial.print(bmp.readTemperature());
     Serial.print("\t");
     
     Serial.print(bmp.readPressure());
@@ -98,8 +98,8 @@ void loop() {
     else{
       Serial.print("caindo\t");
       digitalWrite(LED_BUILTIN, HIGH);
-    }
-
+    } */
+  
     Serial.print(altRelativa);
     Serial.print("\t");
 
