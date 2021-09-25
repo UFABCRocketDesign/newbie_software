@@ -69,22 +69,17 @@ void loop() {
   SomaMov=0;
   //SomaFA=0;
   //SomaFB=0; 
-  Aux=bmp.readAltitude()-AltitudeRef;
+  MediaMov=bmp.readAltitude()-AltitudeRef;
   for(int j = 0; j < 3; j++){
     for (int i = 8; i>=0; i--){           // Laco apenas para a movimentação
       Vetor[j][i+1]= Vetor[j][i]; 
      }
-    if(j==0){
-      Vetor[j][0]=Aux;
-    }
+      Vetor[j][0]=MediaMov;
+      SomaMov=0;
     for (int i = 0; i < 10; i++){         // Laco para a somatoria dos valores
       SomaMov=SomaMov+Vetor[j][i];
     }
     MediaMov=SomaMov/10;
-    if(j<2){ 
-     Vetor[j+1][0]=MediaMov;
-    }
-    SomaMov=0;
   }
  
   // ---------------   CODIGO QUE ESTAVA FUNCIONANDO -------------------------------------------------------------------------------------------------------------------------------------
@@ -122,13 +117,13 @@ void loop() {
   }
   Serial.print(Hmax);
   Serial.print("\t");
-  Serial.print(H1);
+  Serial.print(H1);                // Vai exibir a media movel final
   Serial.print("\t");
-  Serial.print(MediaMA);
+  for(int j = 0; j < 3; j++){
+  Serial.print(Vetor[j][0]);        // vai exibir as duas medias
   Serial.print("\t");
-  Serial.print(MediaMov);
-  Serial.print("\t");
-  Serial.print(Vetor[0][0]);
+  }
+  Serial.print(Vetor[0][0]);        // vai exibir o valor medido no sensor
   Serial.print("\t");
   Delta=Hmax-H1;
   
