@@ -37,7 +37,7 @@ float MediaMov = 0;
 float MediaMA = 0;
 float MediaMB = 0;    
 float Delta;            //Diferença da altitude anterior com a nova que foi medida 
-float Vetor[10];        //Vetor para guardar os últimos 10 valores para a média móvel
+float Vetor[3][10];     //Vetor para guardar os últimos 10 valores para a média móvel
 float FiltroA[10];      //Segunda filtragem para a média móvel
 float FiltroB[10];      // terceira filtragem para a média móvel
 float SomaFA = 0;
@@ -69,28 +69,28 @@ void loop() {
   SomaFA=0;
   SomaFB=0; 
   for (int i = 8; i>=0; i--){
-   Vetor[i+1]= Vetor[i];                      //Esse Vetor serve para guardar os valores. Preciso usar os ultimos 10 valores medidos e por isso preciso registrar aos poucos
+   Vetor[0][i+1]= Vetor[0][i];                      //Esse Vetor serve para guardar os valores. Preciso usar os ultimos 10 valores medidos e por isso preciso registrar aos poucos
   }
-  Vetor[0]=bmp.readAltitude()-AltitudeRef;    // Esse e o valor que sera atualizado sempre 
+  Vetor[0][0]=bmp.readAltitude()-AltitudeRef;    // Esse e o valor que sera atualizado sempre 
   for (int i = 0; i < 10; i++) {              //Este for serve somar os ultimos 10 valores medidos.
-    SomaMov=SomaMov+Vetor[i];
+    SomaMov=SomaMov+Vetor[0][i];
   }
   MediaMov=SomaMov/10;                        // Media movel (para a filtragem)
  // ETAPA DE FILTRAGEM 
   for (int i = 8; i>=0; i--){
-   FiltroA[i+1]= FiltroA[i];         
+   Vetor[1][i+1]= Vetor[1][i];         
   }
-  FiltroA[0]=MediaMov;                        // Esse e o valor que sera atualizado sempre 
+  Vetor[1][0]=MediaMov;                        // Esse e o valor que sera atualizado sempre 
   for (int i = 0; i < 10; i++) {              //Este for serve somar os ultimos 10 valores medidos.
-    SomaFA=SomaFA+FiltroA[i];
+    SomaFA=SomaFA+Vetor[1][i];
   }
   MediaMA=SomaFA/10;                          
   for (int i = 8; i>=0; i--){
-   FiltroB[i+1]= FiltroB[i];         
+   Vetor[2][i+1]= Vetor[2][i];         
   }
-  FiltroB[0]=MediaMA;                        // Esse e o valor que sera atualizado sempre 
+  Vetor[2][0]=MediaMA;                        // Esse e o valor que sera atualizado sempre 
   for (int i = 0; i < 10; i++) {              //Este for serve somar os ultimos 10 valores medidos.
-    SomaFB=SomaFB+FiltroB[i];
+    SomaFB=SomaFB+Vetor[2][i];
   }
   MediaMB=SomaFB/10;  
   H2 = H1;                                    // Guardei a altitude de referencia (medicao anterior)
@@ -108,7 +108,7 @@ void loop() {
   Serial.print("\t");
   Serial.print(MediaMov);
   Serial.print("\t");
-  Serial.print(Vetor[0]);
+  Serial.print(Vetor[0][0]);
   Serial.print("\t");
   Delta=Hmax-H1;
   
