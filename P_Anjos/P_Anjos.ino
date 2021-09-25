@@ -68,31 +68,52 @@ void loop() {
   SomaMov=0;
   SomaFA=0;
   SomaFB=0; 
-  for (int i = 8; i>=0; i--){
-   Vetor[0][i+1]= Vetor[0][i];                      //Esse Vetor serve para guardar os valores. Preciso usar os ultimos 10 valores medidos e por isso preciso registrar aos poucos
+  for(int j = 3; j>=0; j--){
+    for (int i = 8; i>=0; i--){
+      Vetor[j][i+1]= Vetor[j][i]; 
+     }
   }
-  Vetor[0][0]=bmp.readAltitude()-AltitudeRef;    // Esse e o valor que sera atualizado sempre 
-  for (int i = 0; i < 10; i++) {              //Este for serve somar os ultimos 10 valores medidos.
+  Vetor[0][0]=bmp.readAltitude()-AltitudeRef;
+  for (int i = 0; i < 10; i++) {             
     SomaMov=SomaMov+Vetor[0][i];
   }
-  MediaMov=SomaMov/10;                        // Media movel (para a filtragem)
- // ETAPA DE FILTRAGEM 
-  for (int i = 8; i>=0; i--){
-   Vetor[1][i+1]= Vetor[1][i];         
-  }
-  Vetor[1][0]=MediaMov;                        // Esse e o valor que sera atualizado sempre 
-  for (int i = 0; i < 10; i++) {              //Este for serve somar os ultimos 10 valores medidos.
+  MediaMov=SomaMov/10;
+  Vetor[1][0]=MediaMov;  
+  for (int i = 0; i < 10; i++) {              
     SomaFA=SomaFA+Vetor[1][i];
   }
-  MediaMA=SomaFA/10;                          
-  for (int i = 8; i>=0; i--){
-   Vetor[2][i+1]= Vetor[2][i];         
-  }
-  Vetor[2][0]=MediaMA;                        // Esse e o valor que sera atualizado sempre 
-  for (int i = 0; i < 10; i++) {              //Este for serve somar os ultimos 10 valores medidos.
+  MediaMA=SomaFA/10;
+  Vetor[2][0]=MediaMA;
+  for (int i = 0; i < 10; i++) {  
     SomaFB=SomaFB+Vetor[2][i];
   }
-  MediaMB=SomaFB/10;  
+  MediaMB=SomaFB/10; 
+  // ---------------   CODIGO QUE ESTAVA FUNCIONANDO -------------------------------------------------------------------------------------------------------------------------------------
+  //for (int i = 8; i>=0; i--){
+  // Vetor[0][i+1]= Vetor[0][i];                      //Esse Vetor serve para guardar os valores. Preciso usar os ultimos 10 valores medidos e por isso preciso registrar aos poucos
+  //}
+  //Vetor[0][0]=bmp.readAltitude()-AltitudeRef;    // Esse e o valor que sera atualizado sempre 
+  //for (int i = 0; i < 10; i++) {              //Este for serve somar os ultimos 10 valores medidos.
+  //  SomaMov=SomaMov+Vetor[0][i];
+  //}
+  //MediaMov=SomaMov/10;                        // Media movel (para a filtragem)
+  //for (int i = 8; i>=0; i--){
+   //Vetor[1][i+1]= Vetor[1][i];         
+  //}
+ //Vetor[1][0]=MediaMov;                        // Esse e o valor que sera atualizado sempre 
+  //for (int i = 0; i < 10; i++) {              //Este for serve somar os ultimos 10 valores medidos.
+   // SomaFA=SomaFA+Vetor[1][i];
+  //}
+  //MediaMA=SomaFA/10;                          
+  //for (int i = 8; i>=0; i--){
+   //Vetor[2][i+1]= Vetor[2][i];         
+  //}
+  //Vetor[2][0]=MediaMA;                        // Esse e o valor que sera atualizado sempre 
+  //for (int i = 0; i < 10; i++) {              //Este for serve somar os ultimos 10 valores medidos.
+    //SomaFB=SomaFB+Vetor[2][i];
+  //}
+  //MediaMB=SomaFB/10;  
+ // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   H2 = H1;                                    // Guardei a altitude de referencia (medicao anterior)
   H1 = MediaMB;                               // Nova leitura de altitude
 
