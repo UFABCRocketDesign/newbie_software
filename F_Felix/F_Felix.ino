@@ -5,7 +5,9 @@ float aux = 0;
 float media = 0;
 float soma = 0;
 float mediaMovel = 0;
+float segundaMediaMovel = 0;
 float v[10] = {0,0,0,0,0,0,0,0,0,0};
+float v2[10] = {0,0,0,0,0,0,0,0,0,0};
 
 
 void setup() {
@@ -26,6 +28,7 @@ void setup() {
     Serial.print("Foguete\t");
     Serial.print("Variação\t");
     Serial.print("Média\t");
+    Serial.print("Média 2\t");
     Serial.println();
 
     float alt = bmp.readAltitude();
@@ -42,6 +45,7 @@ void loop() {
     
     float alt = bmp.readAltitude();
     float somaVet = 0;
+    float somaVet2 = 0;
 
     for (int i = 0; i < 9; i++){
        v[i] = v[i+1];
@@ -54,6 +58,18 @@ void loop() {
     }
 
     mediaMovel = somaVet/10.0;
+
+    for (int j = 0; j < 9; j++){
+      v2[j] = v2[j+1];
+    }
+
+    v2[9] = mediaMovel;
+
+    for (int i = 0; i < 10; i++){
+      somaVet2 += v2[i];
+    }
+    
+   segundaMediaMovel = somaVet2/10.0;
     
     float altRelativa = media - alt;
     
@@ -88,6 +104,9 @@ void loop() {
     Serial.print("\t");
 
     Serial.print(mediaMovel);
+    Serial.print("\t");
+
+    Serial.print(segundaMediaMovel);
     Serial.print("\t");
     
     Serial.println();
