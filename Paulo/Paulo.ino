@@ -52,12 +52,13 @@ void setup() {
     media_alt_inicio = media_alt_inicio + altura_inicio;
     delay (100);
     list_med_movel[0][j] = altura_inicio;
+    list_med_movel[1][j] = altura_inicio;
   }
   media_alt_inicio = media_alt_inicio / 10;
 
   for (j=0; j<10; j++) {
     list_med_movel[0][j] = list_med_movel[0][j] - media_alt_inicio;
-    list_med_movel[1][j] = list_med_movel[0][j];
+    list_med_movel[1][j] = list_med_movel[1][j] - media_alt_inicio;
   }
   i = filt_i;
 
@@ -73,8 +74,6 @@ void setup() {
   cont_subidas = 0;
   cont_desc = 0;
   ult_subida = 0;
-  altura_inicio = 0;
-  media_movel = 0;
   nova_media_movel = 0;
   antiga_media_movel = 0;
   media_movel_lg = 0;
@@ -86,9 +85,6 @@ void setup() {
 void loop() {
   // Cria uma string para ser adicionada ao cartao
   String dataString = "";
-  
-  media_movel = 0;
-  media_movel_lg = 0;
   
   // Zerar contagem de altitude
   if (cont_sub > 0 and cont_desc == 1) {
@@ -176,5 +172,8 @@ void loop() {
   else {
     Serial.println("error opening datalog.txt");
   }
+
+  media_movel = 0;
+  media_movel_lg = 0;
     
 }
