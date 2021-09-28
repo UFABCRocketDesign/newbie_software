@@ -1,6 +1,10 @@
 #include <Adafruit_BMP085.h>
+#include <SPI.h>
+#include <SD.h>
 
 Adafruit_BMP085 bmp; // Declaração da biblioteca
+const int chipSelect = 53; // Declaração de CS
+
 #define filt_i 10
 #define filt_f 20
 
@@ -22,8 +26,23 @@ void setup() {
   while (1) {}
   }
 
-  //Serial.println("Temperature (ºC)\tPressure (Pa)\tAltitude(m)\tPressure at sealevel (calculated) (Pa)\tReal altitude (m) ");
-  Serial.println("Altitude\tMedia Movel(10)");
+  // Verifica se o cartão está presente e pode ser inicializado
+  if (!SD.begin(chipSelect)) {
+    Serial.println("Card failed, or not present");
+    // don't do anything more:
+    while (1);
+  }
+  Serial.println("card initialized.");
+
+  // Determina o nome do FILE
+  File dataFile = SD.open("paulo.txt", FILE_WRITE);
+  // Inicia inserindo essa informação no FILE nomeado
+  if (dataFile) {
+    dataFile.println("Altitude\tMedia Movel(10)");
+    dataFile.close();
+    // print to the serial port too:
+    Serial.println("Altitude\tMedia Movel(10)");
+  }
   
   // Medicao
   for (j=0; j<10; j++) {
@@ -64,82 +83,99 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-    media_movel = 0;
-    media_movel_lg = 0;
-    
-    // Zerar contagem de altitude
-    if (cont_sub > 0 and cont_desc == 1) {
-      cont_sub = 0;
+  // Cria uma string para ser adicionada ao cartao
+  String dataString = "";
+  
+  media_movel = 0;
+  media_movel_lg = 0;
+  
+  // Zerar contagem de altitude
+  if (cont_sub > 0 and cont_desc == 1) {
+    cont_sub = 0;
+  }
+  if (cont_desc > 0 and cont_sub == 1) {
+    cont_desc = 0;
+  }
+  
+  // Detecção de Apogeu
+  nova_altLeitura = bmp.readAltitude() - media_alt_inicio;
+  
+  antiga_media_movel = nova_media_movel;
+  // Media Movel - 10 e 20
+    // Mudança do vetor, considerando 10 valores mais recentes
+  for (j=0; j<9; j++) {
+    list_media_movel[j] = list_media_movel[j+1];
+  }
+  list_media_movel[filt_i-1] = nova_altLeitura;
+    // Cálculo da Média Movel
+  for (j=0; j<filt_i; j++) {
+    media_movel = media_movel + list_media_movel[j];
+  }
+  nova_media_movel = media_movel / filt_i;
+  
+    // Mudança do vetor, considerando 20 valores mais recentes
+  if (i < filt_f) {
+    list_media_movel_lg[i] = nova_altLeitura;
+    i += 1;
+  }
+  if (i = filt_f) {
+    for (j=0; j<filt_f; j++) {
+      list_media_movel_lg[j] = list_media_movel_lg[j+1];
     }
-    if (cont_desc > 0 and cont_sub == 1) {
-      cont_desc = 0;
-    }
-    
-    // Detecção de Apogeu
-    nova_altLeitura = bmp.readAltitude() - media_alt_inicio;
-    
-    antiga_media_movel = nova_media_movel;
-    // Media Movel - 10 e 20
-      // Mudança do vetor, considerando 10 valores mais recentes
-    for (j=0; j<9; j++) {
-      list_media_movel[j] = list_media_movel[j+1];
-    }
-    list_media_movel[filt_i-1] = nova_altLeitura;
+    list_media_movel_lg[filt_f-1] = nova_altLeitura;
+  
       // Cálculo da Média Movel
-    for (j=0; j<filt_i; j++) {
-      media_movel = media_movel + list_media_movel[j];
+    for (j=0; j<filt_f; j++) {
+      media_movel_lg = media_movel_lg + list_media_movel_lg[j];
     }
-    nova_media_movel = media_movel / filt_i;
+    nova_media_movel_lg = media_movel_lg / filt_f;
+  }
+  
+  // Consideração de Subidas e Descidas
+  if (nova_media_movel > antiga_media_movel) {
+    cont_sub += 1;
+  }
+  else if (nova_media_movel < antiga_media_movel) {
+    cont_desc += 1;
+  }
+  
+  // Altura
+  dataString += String(nova_altLeitura);
+  dataString += "\t";
+  dataString += String(nova_altLeitura);
+  dataString += "\t";
+  dataString += String(nova_altLeitura);
+  
+  // Identificação de subida/descida/apogeu
+  if (cont_sub > 10) {
+    dataString += "\tSubindo";
+    cont_subidas = 1;
+    ult_subida = nova_altLeitura;
+  }
+  else if (cont_desc > 10) {
+    dataString += "\tDescendo";
+  }
+  if (cont_subidas > 0 and cont_desc == 10) {
+    dataString += "\tApogeu em: ";
+    dataString += String(ult_subida);
+  }
+  
+  Serial.println();
 
-      // Mudança do vetor, considerando 20 valores mais recentes
-    if (i < filt_f) {
-      list_media_movel_lg[i] = nova_altLeitura;
-      i += 1;
-    }
-    if (i = filt_f) {
-      for (j=0; j<filt_f; j++) {
-        list_media_movel_lg[j] = list_media_movel_lg[j+1];
-      }
-      list_media_movel_lg[filt_f-1] = nova_altLeitura;
-    
-        // Cálculo da Média Movel
-      for (j=0; j<filt_f; j++) {
-        media_movel_lg = media_movel_lg + list_media_movel_lg[j];
-      }
-      nova_media_movel_lg = media_movel_lg / filt_f;
-    }
+  // open the file. note that only one file can be open at a time,
+  // so you have to close this one before opening another.
+  File dataFile = SD.open("paulo.txt", FILE_WRITE);
 
-    // Consideração de Subidas e Descidas
-    if (nova_media_movel > antiga_media_movel) {
-      cont_sub += 1;
-    }
-    else if (nova_media_movel < antiga_media_movel) {
-      cont_desc += 1;
-    }
-
-        // Altura
-    // Calculate altitude assuming 'standard' barometric
-    // pressure of 1013.25 millibar = 101325 Pascal
-    Serial.print(nova_altLeitura);
-    Serial.print("\t");
-    Serial.print(nova_media_movel);
-    Serial.print("\t");
-    Serial.print(nova_media_movel_lg);
-
-    // Identificação de subida/descida/apogeu
-    if (cont_sub > 10) {
-      Serial.print("\tSubindo");
-      cont_subidas = 1;
-      ult_subida = nova_altLeitura;
-    }
-    else if (cont_desc > 10) {
-      Serial.print("\tDescendo");
-    }
-    if (cont_subidas > 0 and cont_desc == 10) {
-      Serial.print("\tApogeu em: ");
-      Serial.print(ult_subida);
-    }
-
-    Serial.println();
+  // if the file is available, write to it:
+  if (dataFile) {
+    dataFile.println(dataString);
+    dataFile.close();
+    // print to the serial port too:
+    Serial.println(dataString);
+  }
+  // if the file isn't open, pop up an error:
+  else {
+    Serial.println("error opening datalog.txt");
+  }
     
 }
