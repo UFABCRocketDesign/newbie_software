@@ -13,7 +13,9 @@ float lista2[l];
 float media_mov = 0;
 float media_mov2 = 0;
 const int chipSelect = 53;
+String cabecalho = "Altura [m]\tFiltro 1\tFiltro 2";
 // float velhaAlt=0.0;
+File dataFile = SD.open("gabriela.txt", FILE_WRITE);
 
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
@@ -36,7 +38,12 @@ void setup() {
     while (1);
   }
   Serial.println("card initialized.");
-  Serial.println("Altura [m]\tFiltro 1\tFiltro 2"); 
+  Serial.println(cabecalho); 
+ 
+  dataFile;
+  dataFile.println(cabecalho);
+  dataFile.close();
+  
 }
 
 void loop() {
@@ -73,11 +80,7 @@ void loop() {
   media_mov2 = media_mov2/l;
   dataString += String(media_mov2);
 
-  Serial.print(h);
-  Serial.print("\t");
-  Serial.print(media_mov);
-  Serial.print("\t");
-  Serial.println(media_mov2);
+  Serial.println(dataString);
   // Serial.print("\t");
   //if (h < velhaAlt) {
     //Serial.println("caindo");
@@ -89,7 +92,7 @@ void loop() {
   //}
 
   // open the file.
-  File dataFile = SD.open("gabriela.txt", FILE_WRITE);
+  dataFile;
 
   // if the file is available, write to it:
   if (dataFile) {
