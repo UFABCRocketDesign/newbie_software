@@ -14,7 +14,7 @@ int j, i;
 float media_movel, nova_media_movel, antiga_media_movel;
 float media_movel_lg, nova_media_movel_lg;
 
-float list_med_movel[2][filt_f];
+float list_med_movel[2][filt_i];
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -47,19 +47,17 @@ void setup() {
   }
   
   // Medicao
-  for (j=0; j<10; j++) {
+  for (j=0; j<filt_i; j++) {
     altura_inicio = bmp.readAltitude();
     media_alt_inicio = media_alt_inicio + altura_inicio;
     delay (100);
     list_med_movel[0][j] = altura_inicio;
   }
-  media_alt_inicio = media_alt_inicio / 10;
+  media_alt_inicio = media_alt_inicio / filt_i;
 
-  for (j=0; j<10; j++) {
+  for (j=0; j<filt_i; j++) {
     list_med_movel[0][j] = list_med_movel[0][j] - media_alt_inicio;
-    list_med_movel[1][j] = list_med_movel[0][j];
   }
-  i = filt_i;
 
   // Primeira media movel
   for (j=0; j<filt_i; j++) {
@@ -73,12 +71,11 @@ void setup() {
   cont_subidas = 0;
   cont_desc = 0;
   ult_subida = 0;
-  altura_inicio = 0;
-  media_movel = 0;
   nova_media_movel = 0;
   antiga_media_movel = 0;
   media_movel_lg = 0;
   nova_media_movel_lg = 0;
+  i = 0;
 
 }
 
@@ -86,9 +83,6 @@ void setup() {
 void loop() {
   // Cria uma string para ser adicionada ao cartao
   String dataString = "";
-  
-  media_movel = 0;
-  media_movel_lg = 0;
   
   // Zerar contagem de altitude
   if (cont_sub > 0 and cont_desc == 1) {
@@ -115,21 +109,21 @@ void loop() {
   nova_media_movel = media_movel / filt_i;
   
     // Mudança do vetor, considerando 20 valores mais recentes
-  if (i < filt_f) {
-    list_med_movel[1][i] = nova_altLeitura;
+  if (i < filt_i) {
+    list_med_movel[1][i] = nova_media_movel;
     i += 1;
   }
-  if (i = filt_f) {
-    for (j=0; j<filt_f; j++) {
+  if (i = filt_i) {
+    for (j=0; j<filt_i; j++) {
       list_med_movel[1][j] = list_med_movel[1][j+1];
     }
-    list_med_movel[1][filt_f-1] = nova_altLeitura;
+    list_med_movel[1][filt_i-1] = nova_media_movel;
   
       // Cálculo da Média Movel
-    for (j=0; j<filt_f; j++) {
+    for (j=0; j<filt_i; j++) {
       media_movel_lg = media_movel_lg + list_med_movel[1][j];
     }
-    nova_media_movel_lg = media_movel_lg / filt_f;
+    nova_media_movel_lg = media_movel_lg / filt_i;
   }
   
   // Consideração de Subidas e Descidas
@@ -143,9 +137,9 @@ void loop() {
   // Altura
   dataString += String(nova_altLeitura);
   dataString += "\t";
-  dataString += String(nova_altLeitura);
+  dataString += String(nova_media_movel);
   dataString += "\t";
-  dataString += String(nova_altLeitura);
+  dataString += String(nova_media_movel_lg);
   
   // Identificação de subida/descida/apogeu
   if (cont_sub > 10) {
@@ -157,7 +151,7 @@ void loop() {
     dataString += "\tDescendo";
   }
   if (cont_subidas > 0 and cont_desc == 10) {
-    dataString += "\tApogeu em: ";
+    dataString += "\tApogeu em:";
     dataString += String(ult_subida);
   }
 
@@ -176,5 +170,8 @@ void loop() {
   else {
     Serial.println("error opening datalog.txt");
   }
+
+  media_movel = 0;
+  media_movel_lg = 0;
     
 }
