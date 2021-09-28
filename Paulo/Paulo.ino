@@ -82,8 +82,6 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-  estado = "\t---";
-  
   // Cria uma string para ser adicionada ao cartao
   String dataString = "";
   
