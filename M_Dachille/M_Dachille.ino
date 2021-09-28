@@ -1,7 +1,7 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 
-float zerado;
+float zerado, filtro, m_filtro;
 float media = 0;
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
@@ -17,13 +17,23 @@ void setup() {
   }
   //calculo real da média
   media = media/25;
+
   
 }
 
 void loop() {
   //"zerar" o valor
   zerado = bmp.readAltitude () - media;
+
+  //filtro
+  for (int j = 0; j < 10; j++) {
+    filtro = filtro + zerado;
+  }
+  m_filtro = filtro/10;
+  
   //Altitude
   Serial.print(zerado);
+  Serial.print("\t");
+  Serial.print(m_filtro);
   Serial.println();
 }

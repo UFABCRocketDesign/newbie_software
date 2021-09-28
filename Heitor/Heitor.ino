@@ -1,5 +1,9 @@
 #include <Adafruit_BMP085.h>
 
+#define use_buzzer 1
+
+#define apg_limiar 60
+
 #define len 10
 #define lvl 3
 #define coiso vec[lvl][len]
@@ -15,6 +19,8 @@
 float coiso = {};
 int index[lvl] = {};
 float av[lvl] = {};
+float last_val = 0.0;
+int apg_counter = 0;
 
 Adafruit_BMP085 bmp;
 float solo = 0.0;
@@ -22,9 +28,16 @@ float solo = 0.0;
 void setup() {
   Serial.begin(115200);
   if (!bmp.begin()) {
-	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-	while (1) {}
+    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+    while (1) {}
   }
+  pinMode(LED_BUILTIN,OUTPUT);
+#if use_buzzer
+  pinMode(A0,OUTPUT);
+  digitalWrite(A0,LOW);
+  delay(250);
+  digitalWrite(A0,HIGH);
+#endif
 //   Serial.print("*C\tPa\tm\t" );
   Serial.print("raw");
   for(int i=0; i<lvl; i++)
@@ -32,12 +45,11 @@ void setup() {
     Serial.print("\tav");
     Serial.print(i);
   }
+  Serial.print("\testado");
+  Serial.print("\tdetector");
   Serial.println();
 
-  for(int i=0; i<100; i++)
-  {
-    solo += bmp.readAltitude();
-  }
+  for(int i=0; i<100; i++) solo += bmp.readAltitude();
   solo /= 100.0;
 }
 
@@ -66,7 +78,30 @@ void loop() {
     Serial.print("\t");
     Serial.print(av[i]);
   }
-  // Serial.print("\t");
+  Serial.print("\t");
+
+  float curr_val = av[lvl-1];
+  if(last_val > curr_val)
+  {
+    Serial.print(1);
+    digitalWrite(LED_BUILTIN,HIGH);
+    apg_counter++;
+  }
+  else
+  {
+    Serial.print(-1);
+    digitalWrite(LED_BUILTIN,LOW);
+    apg_counter=0;
+  }
+  last_val = curr_val;
+
+    Serial.print("\t");
+    Serial.print(float(min(apg_counter,apg_limiar))/apg_limiar);
+
+#if use_buzzer
+  if(apg_counter>=apg_limiar) digitalWrite(A0,LOW);
+  else digitalWrite(A0,HIGH);
+#endif
 
   Serial.println();
 }

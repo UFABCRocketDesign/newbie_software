@@ -25,6 +25,8 @@
 
 // the setup function runs once when you press reset or power the board
 
+// Código para detecção do apogeu de um foguete que utiliza sensor de pressão. 
+
 float H1 = 0;      // Variável global - Não é ressetada a cada loop. Armazena o dado.
 float H2 = 0;
 float Hmax = 0;
@@ -32,8 +34,15 @@ float Soma = 0;
 float SomaMov = 0;
 float AltitudeRef = 0;
 float MediaMov = 0;
-float Delta;
-float Vetor[10];     //Vetor para guardar os últimos 10 valores para a média móvel
+float MediaMA = 0;
+float MediaMB = 0;    
+float Delta;            //Diferença da altitude anterior com a nova que foi medida 
+float Vetor[3][10];     //Vetor para guardar os últimos 10 valores para a média móvel
+float FiltroA[10];      //Segunda filtragem para a média móvel
+float FiltroB[10];      // terceira filtragem para a média móvel
+float SomaFA = 0;
+float SomaFB = 0;
+float Aux=0;
 
 
 Adafruit_BMP085 bmp;
@@ -47,7 +56,7 @@ void setup() {
     while (1) {}
   }
   Serial.println("Temperature(*C)\tPressure(Pa)\tAltitude(m)\tPressure at sealevel(calculated)(Pa)\tReal altitude(m)");
-  for (int i = 0; i < 100; i++) {               //Este for serve para definir a altitude da base de lançamento como valor de referência.
+  for (int i = 0; i < 100; i++) {             //Este for serve para definir a altitude da base de lancamento como valor de referencia.
     Soma = Soma + bmp.readAltitude();
   }
   AltitudeRef = Soma / 100;
@@ -56,18 +65,51 @@ void setup() {
 // the loop function runs over and over again forever
 void loop() {
 
+
   SomaMov=0;
-  
-  for (int i = 8; i>=0; i--){
-   Vetor[i+1]= Vetor[i];                      //Esse Vetor serve para guardar os valores
+  //SomaFA=0;
+  //SomaFB=0; 
+  MediaMov=bmp.readAltitude()-AltitudeRef;
+  for(int j = 0; j < 3; j++){
+    for (int i = 8; i>=0; i--){           // Laco apenas para a movimentação
+      Vetor[j][i+1]= Vetor[j][i]; 
+     }
+      Vetor[j][0]=MediaMov;
+      SomaMov=0;
+    for (int i = 0; i < 10; i++){         // Laco para a somatoria dos valores
+      SomaMov=SomaMov+Vetor[j][i];
+    }
+    MediaMov=SomaMov/10;
   }
-  Vetor[0]=bmp.readAltitude()-AltitudeRef;    // Esse é o valor que será atualizado sempre 
-  for (int i = 0; i < 10; i++) {              //Este for serve somar os últimos 10 valores medidos.
-    SomaMov=SomaMov+Vetor[i];
-  }
-  MediaMov=SomaMov/10;                        // Média móvel
-  H2 = H1;                                    // Guardei a altitude de referência (medição anterior)
-  H1 = MediaMov;                              // Nova leitura de altitude
+ 
+  // ---------------   CODIGO QUE ESTAVA FUNCIONANDO -------------------------------------------------------------------------------------------------------------------------------------
+  //for (int i = 8; i>=0; i--){
+  // Vetor[0][i+1]= Vetor[0][i];                      //Esse Vetor serve para guardar os valores. Preciso usar os ultimos 10 valores medidos e por isso preciso registrar aos poucos
+  //}
+  //Vetor[0][0]=bmp.readAltitude()-AltitudeRef;    // Esse e o valor que sera atualizado sempre 
+  //for (int i = 0; i < 10; i++) {              //Este for serve somar os ultimos 10 valores medidos.
+  //  SomaMov=SomaMov+Vetor[0][i];
+  //}
+  //MediaMov=SomaMov/10;                        // Media movel (para a filtragem)
+  //for (int i = 8; i>=0; i--){
+   //Vetor[1][i+1]= Vetor[1][i];         
+  //}
+ //Vetor[1][0]=MediaMov;                        // Esse e o valor que sera atualizado sempre 
+  //for (int i = 0; i < 10; i++) {              //Este for serve somar os ultimos 10 valores medidos.
+   // SomaFA=SomaFA+Vetor[1][i];
+  //}
+  //MediaMA=SomaFA/10;                          
+  //for (int i = 8; i>=0; i--){
+   //Vetor[2][i+1]= Vetor[2][i];         
+  //}
+  //Vetor[2][0]=MediaMA;                        // Esse e o valor que sera atualizado sempre 
+  //for (int i = 0; i < 10; i++) {              //Este for serve somar os ultimos 10 valores medidos.
+    //SomaFB=SomaFB+Vetor[2][i];
+  //}
+  //MediaMB=SomaFB/10;  
+ // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  H2 = H1;                                    // Guardei a altitude de referencia (medicao anterior)
+  H1 = MediaMov;                               // Nova leitura de altitude
 
 
   if (Hmax < H1) {
@@ -75,14 +117,18 @@ void loop() {
   }
   Serial.print(Hmax);
   Serial.print("\t");
-  Serial.print(H1);
+  Serial.print(H1);                // Vai exibir a media movel final
   Serial.print("\t");
-  Serial.print(Vetor[0]);
+  for(int j = 0; j < 3; j++){
+  Serial.print(Vetor[j][0]);        // vai exibir as duas medias
+  Serial.print("\t");
+  }
+  Serial.print(Vetor[0][0]);        // vai exibir o valor medido no sensor
   Serial.print("\t");
   Delta=Hmax-H1;
   
   if (Delta >= 2) {
-    digitalWrite(LED_BUILTIN, HIGH);   // A partir do momento que a diferença de altitude for acima de 3, provavelmente o foguete está descendo.
+    digitalWrite(LED_BUILTIN, HIGH);   // A partir do momento que a diferença de altitude for acima de 2, provavelmente o foguete está descendo.
     Serial.print("\t");
     Serial.print(Delta);
     Serial.print("\t");
