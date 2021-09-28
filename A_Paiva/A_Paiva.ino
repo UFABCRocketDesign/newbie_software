@@ -106,8 +106,10 @@ void loop() {
     dataFile.print(H12);
     dataFile.print("\t");
     dataFile.print(MatrizFiltros[0][0]);
-    dataFile.print("\t");
+    dataFile.println("\t");
     dataFile.close();
+  }
+
     Serial.print(Hmax2);
     Serial.print("\t");
     Serial.print(H11);
@@ -116,7 +118,6 @@ void loop() {
     Serial.print("\t");
     Serial.print(MatrizFiltros[0][0]);
     Serial.print("\t");
-  }
   
   if (Delta2 >= 2) {                                    //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
     digitalWrite(LED_BUILTIN, HIGH);
