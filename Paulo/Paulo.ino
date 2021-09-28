@@ -11,8 +11,10 @@ const int chipSelect = 53; // Declaração de CS
 float nova_altLeitura, cont_sub, cont_subidas, cont_desc, ult_subida;
 float altura_inicio, media_alt_inicio;
 int j, i;
-float list_media_movel[filt_i], media_movel, nova_media_movel, antiga_media_movel;
-float list_media_movel_lg[filt_f], media_movel_lg, nova_media_movel_lg;
+float media_movel, nova_media_movel, antiga_media_movel;
+float media_movel_lg, nova_media_movel_lg;
+
+float list_med_movel[2][filt_f];
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -38,10 +40,10 @@ void setup() {
   File dataFile = SD.open("paulo.txt", FILE_WRITE);
   // Inicia inserindo essa informação no FILE nomeado
   if (dataFile) {
-    dataFile.println("Altitude\tMedia Movel(10)");
+    dataFile.println("Altitude\tMedia Movel(10)\tMedia Movel(20)");
     dataFile.close();
     // print to the serial port too:
-    Serial.println("Altitude\tMedia Movel(10)");
+    Serial.println("Altitude\tMedia Movel(10)\tMedia Movel(20)");
   }
   
   // Medicao
@@ -49,20 +51,19 @@ void setup() {
     altura_inicio = bmp.readAltitude();
     media_alt_inicio = media_alt_inicio + altura_inicio;
     delay (100);
-    list_media_movel[j] = altura_inicio;
-    list_media_movel_lg[j] = altura_inicio;
+    list_med_movel[0][j] = altura_inicio;
   }
   media_alt_inicio = media_alt_inicio / 10;
 
   for (j=0; j<10; j++) {
-    list_media_movel[j] = list_media_movel[j] - media_alt_inicio;
-    list_media_movel_lg[j] = list_media_movel_lg[j] - media_alt_inicio;
+    list_med_movel[0][j] = list_med_movel[0][j] - media_alt_inicio;
+    list_med_movel[1][j] = list_med_movel[0][j];
   }
   i = filt_i;
 
   // Primeira media movel
   for (j=0; j<filt_i; j++) {
-      media_movel = media_movel + list_media_movel[j];
+      media_movel = media_movel + list_med_movel[0][j];
   }
   media_movel = media_movel / filt_i;
 
@@ -104,29 +105,29 @@ void loop() {
   // Media Movel - 10 e 20
     // Mudança do vetor, considerando 10 valores mais recentes
   for (j=0; j<9; j++) {
-    list_media_movel[j] = list_media_movel[j+1];
+    list_med_movel[0][j] = list_med_movel[0][j+1];
   }
-  list_media_movel[filt_i-1] = nova_altLeitura;
+  list_med_movel[0][filt_i-1] = nova_altLeitura;
     // Cálculo da Média Movel
   for (j=0; j<filt_i; j++) {
-    media_movel = media_movel + list_media_movel[j];
+    media_movel = media_movel + list_med_movel[0][j];
   }
   nova_media_movel = media_movel / filt_i;
   
     // Mudança do vetor, considerando 20 valores mais recentes
   if (i < filt_f) {
-    list_media_movel_lg[i] = nova_altLeitura;
+    list_med_movel[1][i] = nova_altLeitura;
     i += 1;
   }
   if (i = filt_f) {
     for (j=0; j<filt_f; j++) {
-      list_media_movel_lg[j] = list_media_movel_lg[j+1];
+      list_med_movel[1][j] = list_med_movel[1][j+1];
     }
-    list_media_movel_lg[filt_f-1] = nova_altLeitura;
+    list_med_movel[1][filt_f-1] = nova_altLeitura;
   
       // Cálculo da Média Movel
     for (j=0; j<filt_f; j++) {
-      media_movel_lg = media_movel_lg + list_media_movel_lg[j];
+      media_movel_lg = media_movel_lg + list_med_movel[1][j];
     }
     nova_media_movel_lg = media_movel_lg / filt_f;
   }
@@ -159,8 +160,6 @@ void loop() {
     dataString += "\tApogeu em: ";
     dataString += String(ult_subida);
   }
-  
-  Serial.println();
 
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
