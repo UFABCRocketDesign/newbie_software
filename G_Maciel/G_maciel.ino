@@ -13,7 +13,7 @@ float lista2[l];
 float media_mov = 0;
 float media_mov2 = 0;
 const int chipSelect = 53;
-String cabecalho = "Altura [m]\tFiltro 1\tFiltro 2";
+String cabecalho = "Altitude [m]\tAltura [m]\tFiltro1 (h)\tFiltro2 (h)\tTemperatura [*C]\tPressão [Pa]\tPressão no nível do mar [Pa]";
 // float velhaAlt=0.0;
 
 void setup() {
@@ -52,10 +52,12 @@ void loop() {
   // Calculate altitude assuming 'standard' barometric
   // pressure of 1013.25 millibar = 101325 Pascal
   float novaAlt=bmp.readAltitude();
+  dataString += String(novaAlt);
+  dataString += "\t";
   h = novaAlt - media;  //altura 
   dataString += String(h);
   dataString += "\t";
-
+  
   // filtro 1
   for (int k=0; k<(l-1); k++) {
     lista[k] = lista[k+1];
@@ -78,7 +80,17 @@ void loop() {
   }
   media_mov2 = media_mov2/l;
   dataString += String(media_mov2);
+  dataString += "\t";
 
+  float temp =  bmp.readTemperature(); //temperatura
+  dataString += String(temp);
+  dataString += "\t";
+  float pressao = bmp.readPressure(); //pressão
+  dataString += String(pressao);
+  dataString += "\t";
+  float pressaoNivelMar = bmp.readSealevelPressure(); //pressão no nível do mar
+  dataString += String(pressaoNivelMar);
+  
   Serial.println(dataString);
   // Serial.print("\t");
   //if (h < velhaAlt) {
@@ -89,8 +101,7 @@ void loop() {
     //Serial.println("subindo");
     //velhaAlt = h;
   //}
-
-  // open the file.
+  
   File dataFile = SD.open("gabriela.txt", FILE_WRITE);
 
   // if the file is available, write to it:
