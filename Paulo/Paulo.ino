@@ -13,6 +13,7 @@ float altura_inicio, media_alt_inicio;
 int j, i;
 float media_movel, nova_media_movel, antiga_media_movel;
 float media_movel_lg, nova_media_movel_lg;
+String estado;
 
 float list_med_movel[2][filt_i];
 
@@ -40,10 +41,10 @@ void setup() {
   File dataFile = SD.open("paulo.txt", FILE_WRITE);
   // Inicia inserindo essa informação no FILE nomeado
   if (dataFile) {
-    dataFile.println("Altitude\tMedia Movel(10)\tMedia Movel(20)");
+    dataFile.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tApogeu");
     dataFile.close();
     // print to the serial port too:
-    Serial.println("Altitude\tMedia Movel(10)\tMedia Movel(20)");
+    Serial.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tApogeu");
   }
   
   // Medicao
@@ -81,6 +82,8 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
+  estado = "\t---";
+  
   // Cria uma string para ser adicionada ao cartao
   String dataString = "";
   
@@ -96,8 +99,8 @@ void loop() {
   nova_altLeitura = bmp.readAltitude() - media_alt_inicio;
   
   antiga_media_movel = nova_media_movel;
-  // Media Movel - 10 e 20
-    // Mudança do vetor, considerando 10 valores mais recentes
+  // Media Movel
+    // Filtro 1
   for (j=0; j<9; j++) {
     list_med_movel[0][j] = list_med_movel[0][j+1];
   }
@@ -108,7 +111,7 @@ void loop() {
   }
   nova_media_movel = media_movel / filt_i;
   
-    // Mudança do vetor, considerando 20 valores mais recentes
+    // Filtro 2 - realiza filtro no filtro 1
   if (i < filt_i) {
     list_med_movel[1][i] = nova_media_movel;
     i += 1;
@@ -140,16 +143,29 @@ void loop() {
   dataString += String(nova_media_movel);
   dataString += "\t";
   dataString += String(nova_media_movel_lg);
+  dataString += "\t";
+
+  // Temperatura
+  dataString += String(bmp.readTemperature());
+  dataString += "\t";
+
+  // Pressão
+  dataString += String(bmp.readPressure());
+  dataString += "\t";
+
+  // Pressão ao nivel do mar
+  dataString += String(bmp.readSealevelPressure());
   
   // Identificação de subida/descida/apogeu
   if (cont_sub > 10) {
-    dataString += "\tSubindo";
+    estado = "\tSubindo";
     cont_subidas = 1;
     ult_subida = nova_altLeitura;
   }
   else if (cont_desc > 10) {
-    dataString += "\tDescendo";
+    estado = "\tDescendo";
   }
+  dataString += estado;
   if (cont_subidas > 0 and cont_desc == 10) {
     dataString += "\tApogeu em:";
     dataString += String(ult_subida);
@@ -172,6 +188,5 @@ void loop() {
   }
 
   media_movel = 0;
-  media_movel_lg = 0;
-    
+  media_movel_lg = 0;  
 }
