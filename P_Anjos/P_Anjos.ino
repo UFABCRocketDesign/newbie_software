@@ -63,7 +63,8 @@ void setup() {
     while (1) {}
   }
     Serial.print("Initializing SD card...");
-
+    Serial.println("Situacao\tApogeu(Hmax)\tAltura filtrada final(H1)\tAltura medida no sensor");
+  // Serial.println("Temperature(*C)\tPressure(Pa)\tAltitude(m)\tPressure at sealevel(calculated)(Pa)\tReal altitude(m)");
   // see if the card is present and can be initialized:
   if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present");
@@ -71,8 +72,8 @@ void setup() {
     while (1);
   }
   Serial.println("card initialized.");
- // Obs: Todos os Serial print foram comentados para não poluirem a tela na hora do teste do SD
- //Serial.println("Temperature(*C)\tPressure(Pa)\tAltitude(m)\tPressure at sealevel(calculated)(Pa)\tReal altitude(m)");
+ // OBS: TODOS OS SeriaL.print FORAM COMENTADOS PARA NAO POLUIREM O ACOMPANHAMENTO DA GRAVACAO DO SD
+ 
   for (int i = 0; i < 100; i++) {             //Este for serve para definir a altitude da base de lancamento como valor de referencia.
     Soma = Soma + bmp.readAltitude();
   }
@@ -148,12 +149,21 @@ void loop() {
     //Serial.print(Delta);
     //Serial.print("\t");
     //Serial.print("Descendo");
+    dataString+=String("Descendo");
+    dataString+=String("\t");
   }
   else {
     //Serial.print("Subindo");
+    dataString+=String("Subindo");
+    dataString+=String("\t");
   }
-  dataString=String(Hmax);
-  File dataFile = SD.open("dataSDPA.txt", FILE_WRITE);
+  dataString+=String(Hmax);
+  dataString+=String("\t");
+  dataString+=String(H1);
+  dataString+=String("\t");
+  dataString+=String(Vetor[0][0]);
+  
+ File dataFile = SD.open("P_ANJOS.txt", FILE_WRITE);
 
   // if the file is available, write to it:
   if (dataFile) {
@@ -164,7 +174,7 @@ void loop() {
   }
   // if the file isn't open, pop up an error:
   else {
-    Serial.println("error opening dataSDPA.txt");
+    Serial.println("error opening P_ANJOS.txt");
   }
   Serial.println();
 
