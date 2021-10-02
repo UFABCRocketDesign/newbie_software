@@ -62,9 +62,9 @@ void setup() {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
-    Serial.print("Initializing SD card...");
-    Serial.println("Situacao\tApogeu(Hmax)\tAltura filtrada final(H1)\tAltura medida no sensor");
-  // Serial.println("Temperature(*C)\tPressure(Pa)\tAltitude(m)\tPressure at sealevel(calculated)(Pa)\tReal altitude(m)");
+    //Serial.println("Initializing SD card...");
+    //Serial.println("Situacao\tApogeu(Hmax)\tAltura filtrada final(H1)\tAltura medida no sensor");
+    Serial.println("Situacao\tApogeu(Hmax)\tAltura filtrada final(H1)\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)");
   // see if the card is present and can be initialized:
   if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present");
@@ -162,6 +162,12 @@ void loop() {
   dataString+=String(H1);
   dataString+=String("\t");
   dataString+=String(Vetor[0][0]);
+  dataString+=String("\t");
+  dataString+=String(bmp.readTemperature());
+  dataString+=String("\t");
+  dataString+=String(bmp.readPressure());
+  dataString+=String("\t");
+  dataString+=String(bmp.readSealevelPressure());
   
  File dataFile = SD.open("P_ANJOS.txt", FILE_WRITE);
 
@@ -176,6 +182,5 @@ void loop() {
   else {
     Serial.println("error opening P_ANJOS.txt");
   }
-  Serial.println();
 
 }
