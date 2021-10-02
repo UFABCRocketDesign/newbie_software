@@ -8,27 +8,28 @@ void setup() {
   if (!bmp.begin()) {
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   while (1) {}
+  Serial.println("Temperature(°C ) = ");
+  Serial.println(" ");
+  Serial.println("Pressure(Pa) = ");
+  Serial.println(" ");
+  Serial.println("Altitude(m) = ");
+  
+  
   }
 }
   
 void loop() {
     digitalWrite(LED_BUILTIN, HIGH);
-    Serial.print("Temperature = ");
     Serial.print(bmp.readTemperature());
-    Serial.println(" *C");
     digitalWrite(LED_BUILTIN, LOW);
     
     digitalWrite(LED_BUILTIN, HIGH); 
-    Serial.print("Pressure = ");
     Serial.print(bmp.readPressure());
-    Serial.println(" Pa");
     digitalWrite(LED_BUILTIN, LOW);
     
     // Calculate altitude assuming 'standard' barometric
     // pressure of 1013.25 millibar = 101325 Pascal
-    Serial.print("Altitude = ");
     Serial.print(bmp.readAltitude());
-    Serial.println(" meters");
 
     Serial.print("Pressure at sealevel (calculated) = ");
     Serial.print(bmp.readSealevelPressure());
