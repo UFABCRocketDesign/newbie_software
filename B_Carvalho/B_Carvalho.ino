@@ -24,7 +24,7 @@ void setup() {
 void loop() {
   digitalWrite(LED_BUILTIN, HIGH);
   Serial.print(bmp.readTemperature());
-  Serial.print(" ");
+  Serial.print("\t");
   digitalWrite(LED_BUILTIN, LOW);
 
   digitalWrite(LED_BUILTIN, HIGH);
