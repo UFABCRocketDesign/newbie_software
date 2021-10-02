@@ -36,13 +36,37 @@ void setup() {
       while (1);
     }
     Serial.println("card initialized.");
+
+    String dataString = "";
+    
+    dataString += ("Temp.(*C)\t");
+
+    dataString += ("Pres.(Pa)\t");
+
+    dataString += ("Alt.(m)\t");
+
+    dataString += ("Real alt.(m)\t");
+
+    File dataFile = SD.open("fernanda.txt", FILE_WRITE);
+  
+    // if the file is available, write to it:
+    if (dataFile) {
+      dataFile.println(dataString);
+      dataFile.close();
+      
+      Serial.println(dataString);
+    }
+  // if the file isn't open, pop up an error:
+    else {
+      Serial.println("error opening fernanda.txt");
+    }
   
 
-    Serial.print("Temp.(*C)\t");
-    Serial.print("Pres.(Pa)\t");
-    Serial.print("Alt.(m)\t");
+   // Serial.print("Temp.(*C)\t");
+   // Serial.print("Pres.(Pa)\t");
+   // Serial.print("Alt.(m)\t");
   //  Serial.print("Pres. sealevel(Pa)\t");
-    Serial.print("Real alt.(m)\t");
+  //  Serial.print("Real alt.(m)\t");
   //  Serial.print("Foguete\t");
   //  Serial.print("Variação\t");
   //  Serial.print("Média\t");
@@ -135,16 +159,16 @@ void loop() {
     String dataString = "";
     
     dataString+=String(bmp.readTemperature());
-    dataString+=String("\t");
+    dataString+= ("\t");
 
     dataString+=String(bmp.readPressure());
-    dataString+=String("\t");
+    dataString+= ("\t");
 
     dataString+=String(bmp.readAltitude(101500));
-    dataString+=String("\t");
+    dataString+= ("\t");
 
     dataString += String(altRelativa);
-    dataString += String("\t");
+    dataString += ("\t");
 
     File dataFile = SD.open("fernanda.txt", FILE_WRITE);
   
