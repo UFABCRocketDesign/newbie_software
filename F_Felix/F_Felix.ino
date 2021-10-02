@@ -134,16 +134,16 @@ void loop() {
 
     
     dataString += String(altRelativa);
-    dataString += String(",");
+    dataString += String("\t");
     
     dataString+=String(bmp.readTemperature());
-    dataString+=String(",");
+    dataString+=String("\t");
 
     dataString+=String(bmp.readPressure());
-    dataString+=String(",");
+    dataString+=String("\t");
 
     dataString+=String(bmp.readAltitude(101500));
-    dataString+=String(",");
+    dataString+=String("\t");
 
     File dataFile = SD.open("fernanda.txt", FILE_WRITE);
   
