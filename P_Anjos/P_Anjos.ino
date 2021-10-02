@@ -64,7 +64,7 @@ void setup() {
   }
     //Serial.println("Initializing SD card...");
     //Serial.println("Situacao\tApogeu(Hmax)\tAltura filtrada final(H1)\tAltura medida no sensor");
-    Serial.println("Situacao\tApogeu(Hmax)\tAltura filtrada final(H1)\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)");
+    
   // see if the card is present and can be initialized:
   if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present");
@@ -72,7 +72,11 @@ void setup() {
     while (1);
   }
   Serial.println("card initialized.");
- // OBS: TODOS OS SeriaL.print FORAM COMENTADOS PARA NAO POLUIREM O ACOMPANHAMENTO DA GRAVACAO DO SD
+  Serial.println("Situacao\tApogeu(Hmax)\tAltura filtrada final(H1)\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)");//Cabecalho no acompanhamento
+  File dataFile = SD.open("P_ANJOS.txt", FILE_WRITE);
+    dataFile.println("Situacao\tApogeu(Hmax)\tAltura filtrada final(H1)\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)"); //Cabecalho no SD
+    dataFile.close();
+
  
   for (int i = 0; i < 100; i++) {             //Este for serve para definir a altitude da base de lancamento como valor de referencia.
     Soma = Soma + bmp.readAltitude();
@@ -182,5 +186,4 @@ void loop() {
   else {
     Serial.println("error opening P_ANJOS.txt");
   }
-
 }
