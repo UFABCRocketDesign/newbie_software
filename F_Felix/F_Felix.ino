@@ -15,7 +15,7 @@ const int chipSelect = 53;
 void setup() {
     pinMode(LED_BUILTIN, OUTPUT);
 
-    Serial.begin(9600);
+    Serial.begin(115200);
   
     if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
@@ -38,11 +38,11 @@ void setup() {
     Serial.println("card initialized.");
   
 
-   // Serial.print("Temp.(*C)\t");
-   // Serial.print("Pres.(Pa)\t");
-  //  Serial.print("Alt.(m)\t");
+    Serial.print("Temp.(*C)\t");
+    Serial.print("Pres.(Pa)\t");
+    Serial.print("Alt.(m)\t");
   //  Serial.print("Pres. sealevel(Pa)\t");
-  //  Serial.print("Real alt.(m)\t");
+    Serial.print("Real alt.(m)\t");
   //  Serial.print("Foguete\t");
   //  Serial.print("Variação\t");
   //  Serial.print("Média\t");
@@ -67,30 +67,32 @@ void loop() {
 
     float altRelativa = alt - media;
 
-     for ( int j = 0; j < 2; j ++){
-      if( j = 0){
-         for (int i = 0; i < 9; i++){
-           matriz[j][i] = matriz[j][i+1];
-         }
-         matriz[j][9] = altRelativa;
-
-         for (int i = 0; i < 10; i++){
-            somaVet += matriz[j][i];
-         }
-         mediaMovel = somaVet/10.0;
-      }
-      else {
-         for (int i = 0; i < 9; i ++) {
-            matriz [j][i] = matriz [j][i+1];
-        }
-        matriz[j][9] = mediaMovel;
-
-        for (int i = 0; i < 10; i++){
-          somaVet2 += matriz[j][i];
-        }
-        segundaMediaMovel = somaVet2/10.0;
-      } 
+    for (int i = 0; i < 9; i++){
+         matriz[0][i] = matriz[0][i+1];
      }
+     
+     matriz[0][9] = altRelativa;
+  
+    
+     for (int i = 0; i < 10; i++){
+        somaVet += matriz[0][i];
+      }
+
+    mediaMovel = somaVet/10.0;
+
+    
+      for (int i = 0; i < 9; i ++) {
+        matriz [1][i] = matriz [1][i+1];
+      }
+      matriz[1][9] = mediaMovel;
+
+      
+      for (int i = 0; i < 10; i++){
+        somaVet2 += matriz[1][i];
+      }
+
+    segundaMediaMovel = somaVet2/10.0;
+     
   
    // Serial.print(bmp.readTemperature());
   //  Serial.print("\t");
@@ -131,10 +133,6 @@ void loop() {
  //   Serial.println();
 
     String dataString = "";
-
-    
-    dataString += String(altRelativa);
-    dataString += String("\t");
     
     dataString+=String(bmp.readTemperature());
     dataString+=String("\t");
@@ -144,6 +142,9 @@ void loop() {
 
     dataString+=String(bmp.readAltitude(101500));
     dataString+=String("\t");
+
+    dataString += String(altRelativa);
+    dataString += String("\t");
 
     File dataFile = SD.open("fernanda.txt", FILE_WRITE);
   
