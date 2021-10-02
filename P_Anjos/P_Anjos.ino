@@ -103,7 +103,7 @@ void loop() {
     MediaMov=SomaMov/10;
   }
  
-  // ---------------   CODIGO QUE ESTAVA FUNCIONANDO -------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------- CODIGO QUE ESTAVA FUNCIONANDO COM VETORES SEPARADOS -----------------------------------------------------------------------------------------------
   //for (int i = 8; i>=0; i--){
   // Vetor[0][i+1]= Vetor[0][i];                      //Esse Vetor serve para guardar os valores. Preciso usar os ultimos 10 valores medidos e por isso preciso registrar aos poucos
   //}
@@ -154,23 +154,23 @@ void loop() {
     //Serial.print("\t");
     //Serial.print("Descendo");
     dataString+=String("Descendo");
-    dataString+=String("\t");
+    dataString+="\t";
   }
   else {
     //Serial.print("Subindo");
     dataString+=String("Subindo");
-    dataString+=String("\t");
+    dataString+="\t";
   }
   dataString+=String(Hmax);
-  dataString+=String("\t");
+  dataString+="\t";
   dataString+=String(H1);
-  dataString+=String("\t");
+  dataString+="\t";
   dataString+=String(Vetor[0][0]);
-  dataString+=String("\t");
+  dataString+="\t";
   dataString+=String(bmp.readTemperature());
-  dataString+=String("\t");
+  dataString+="\t";
   dataString+=String(bmp.readPressure());
-  dataString+=String("\t");
+  dataString+="\t";
   dataString+=String(bmp.readSealevelPressure());
   
  File dataFile = SD.open("P_ANJOS.txt", FILE_WRITE);
