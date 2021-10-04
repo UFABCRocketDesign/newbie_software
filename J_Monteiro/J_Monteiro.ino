@@ -49,7 +49,7 @@ void loop() {
   Serial.print( bmp.readAltitude(101500));
   Serial.print('\t');
 
-    altitude = altitude + current_Altitude;
+  
     Serial.print(altitude);
     Serial.println();
 
