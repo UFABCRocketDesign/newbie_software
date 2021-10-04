@@ -1,4 +1,7 @@
 #include <Adafruit_BMP085.h>
+#include <SPI.h>
+#include <SD.h>
+
 /*
   Blink
 
@@ -27,7 +30,8 @@
 
 // Código para detecção do apogeu de um foguete que utiliza sensor de pressão. 
 
-float H1 = 0;      // Variável global - Não é ressetada a cada loop. Armazena o dado.
+const int chipSelect = 53;   //Define o pino para o chipselect para gravar no cartão SD
+float H1 = 0;               // Variável global - Não é ressetada a cada loop. Armazena o dado.
 float H2 = 0;
 float Hmax = 0;
 float Soma = 0;
@@ -36,10 +40,10 @@ float AltitudeRef = 0;
 float MediaMov = 0;
 float MediaMA = 0;
 float MediaMB = 0;    
-float Delta;            //Diferença da altitude anterior com a nova que foi medida 
-float Vetor[3][10];     //Vetor para guardar os últimos 10 valores para a média móvel
-float FiltroA[10];      //Segunda filtragem para a média móvel
-float FiltroB[10];      // terceira filtragem para a média móvel
+float Delta;                //Diferença da altitude anterior com a nova que foi medida 
+float Vetor[3][10];         //Vetor para guardar os últimos 10 valores para a média móvel
+float FiltroA[10];          //Segunda filtragem para a média móvel
+float FiltroB[10];          // terceira filtragem para a média móvel
 float SomaFA = 0;
 float SomaFB = 0;
 float Aux=0;
@@ -51,11 +55,29 @@ void setup() {
   // initialize digital pin LED_BUILTIN as an output.
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
+   while (!Serial) {
+    ; // wait for serial port to connect. Needed for native USB port only
+  }
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
-  Serial.println("Temperature(*C)\tPressure(Pa)\tAltitude(m)\tPressure at sealevel(calculated)(Pa)\tReal altitude(m)");
+    //Serial.println("Initializing SD card...");
+    //Serial.println("Situacao\tApogeu(Hmax)\tAltura filtrada final(H1)\tAltura medida no sensor");
+    
+  // see if the card is present and can be initialized:
+  if (!SD.begin(chipSelect)) {
+    Serial.println("Card failed, or not present");
+    // don't do anything more:
+    while (1);
+  }
+  Serial.println("card initialized.");
+  Serial.println("Situacao\tApogeu(Hmax)\tAltura filtrada final(H1)\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)");//Cabecalho no acompanhamento
+  File dataFile = SD.open("P_ANJOS.txt", FILE_WRITE);
+    dataFile.println("Situacao\tApogeu(Hmax)\tAltura filtrada final(H1)\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)"); //Cabecalho no SD
+    dataFile.close();
+
+ 
   for (int i = 0; i < 100; i++) {             //Este for serve para definir a altitude da base de lancamento como valor de referencia.
     Soma = Soma + bmp.readAltitude();
   }
@@ -64,8 +86,7 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-
-
+  String dataString = "";                   // Serve para criar a string que vai guardar os dados para que eles sejam gravados no SD
   SomaMov=0;
   //SomaFA=0;
   //SomaFB=0; 
@@ -82,7 +103,7 @@ void loop() {
     MediaMov=SomaMov/10;
   }
  
-  // ---------------   CODIGO QUE ESTAVA FUNCIONANDO -------------------------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------- CODIGO QUE ESTAVA FUNCIONANDO COM VETORES SEPARADOS -----------------------------------------------------------------------------------------------
   //for (int i = 8; i>=0; i--){
   // Vetor[0][i+1]= Vetor[0][i];                      //Esse Vetor serve para guardar os valores. Preciso usar os ultimos 10 valores medidos e por isso preciso registrar aos poucos
   //}
@@ -111,32 +132,58 @@ void loop() {
   H2 = H1;                                    // Guardei a altitude de referencia (medicao anterior)
   H1 = MediaMov;                               // Nova leitura de altitude
 
-
   if (Hmax < H1) {
     Hmax = H1;
   }
-  Serial.print(Hmax);
-  Serial.print("\t");
-  Serial.print(H1);                // Vai exibir a media movel final
-  Serial.print("\t");
-  for(int j = 0; j < 3; j++){
-  Serial.print(Vetor[j][0]);        // vai exibir as duas medias
-  Serial.print("\t");
-  }
-  Serial.print(Vetor[0][0]);        // vai exibir o valor medido no sensor
-  Serial.print("\t");
+  //Serial.print(Hmax);
+  //Serial.print("\t");
+  //Serial.print(H1);                // Vai exibir a media movel final
+  //Serial.print("\t");
+  //for(int j = 0; j < 3; j++){
+  //Serial.print(Vetor[j][0]);        // vai exibir as duas medias
+  //Serial.print("\t");
+  //}
+  //Serial.print(Vetor[0][0]);        // vai exibir o valor medido no sensor
+  //Serial.print("\t");
   Delta=Hmax-H1;
   
   if (Delta >= 2) {
     digitalWrite(LED_BUILTIN, HIGH);   // A partir do momento que a diferença de altitude for acima de 2, provavelmente o foguete está descendo.
-    Serial.print("\t");
-    Serial.print(Delta);
-    Serial.print("\t");
-    Serial.print("Descendo");
+    //Serial.print("\t");
+    //Serial.print(Delta);
+    //Serial.print("\t");
+    //Serial.print("Descendo");
+    dataString+=String("Descendo");
+    dataString+="\t";
   }
   else {
-    Serial.print("Subindo");
+    //Serial.print("Subindo");
+    dataString+=String("Subindo");
+    dataString+="\t";
   }
-  Serial.println();
+  dataString+=String(Hmax);
+  dataString+="\t";
+  dataString+=String(H1);
+  dataString+="\t";
+  dataString+=String(Vetor[0][0]);
+  dataString+="\t";
+  dataString+=String(bmp.readTemperature());
+  dataString+="\t";
+  dataString+=String(bmp.readPressure());
+  dataString+="\t";
+  dataString+=String(bmp.readSealevelPressure());
+  
+ File dataFile = SD.open("P_ANJOS.txt", FILE_WRITE);
 
+  // if the file is available, write to it:
+  if (dataFile) {
+    dataFile.println(dataString);
+    dataFile.close();
+    // print to the serial port too:
+    Serial.println(dataString);
+  }
+  // if the file isn't open, pop up an error:
+  else {
+    Serial.println("error opening P_ANJOS.txt");
+  }
 }
