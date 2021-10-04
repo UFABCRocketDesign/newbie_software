@@ -2,6 +2,9 @@
 
 Adafruit_BMP085 bmp;
 
+ float altitude = 0;
+ float relative_average;
+ float  current_Altitude;
 
 
 void setup() {
@@ -23,11 +26,8 @@ void setup() {
 
 void loop() {
 
-  float altitude = 0;
-  float relative_average;
-  float current_Altitude = bmp.readAltitude();
-  float previous_Altitude;
-
+  current_Altitude = bmp.readAltitude();
+  
 
   Serial.print(bmp.readTemperature() );
   Serial.print('\t');
@@ -54,6 +54,7 @@ void loop() {
 
   for ( float i = 1; i < 15; i ++) {
 
+   
     ( current_Altitude >  altitude );
     altitude = altitude + current_Altitude;
 
