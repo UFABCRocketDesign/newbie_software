@@ -36,7 +36,7 @@ void loop() {
   Serial.print('\t');
   // Calculate altitude assuming 'standard' barometric
   // pressure of 1013.25 millibar = 101325 Pascal
-  Serial.print( bmp.readAltitude());
+  Serial.print( current_Altitude);
   Serial.print('\t');
 
   Serial.print( bmp.readSealevelPressure() );
@@ -51,12 +51,16 @@ void loop() {
 
   Serial.println();
 
+  
+   (current_Altitude >  altitude );
+    altitude = altitude + current_Altitude;
+    Serial.print(altitude);
+    
 
   for ( float i = 1; i < 15; i ++) {
 
    
-    ( current_Altitude >  altitude );
-    altitude = altitude + current_Altitude;
+    
 
     relative_average = (  altitude ) / i;
 
