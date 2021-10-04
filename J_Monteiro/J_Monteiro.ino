@@ -49,31 +49,29 @@ void loop() {
   Serial.print( bmp.readAltitude(101500));
   Serial.print('\t');
 
-  Serial.println();
-
-  
-   (current_Altitude >  altitude );
     altitude = altitude + current_Altitude;
     Serial.print(altitude);
+    Serial.println();
+
     
 
   for ( float i = 1; i < 15; i ++) {
 
    
-    
+   altitude = altitude + current_Altitude;
 
     relative_average = (  altitude ) / i;
 
 
     if (relative_average  < current_Altitude) {
 
-      Serial.print("Subida \t");
+      //Serial.print("Subida \t");
       digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
 
     }
     else {
 
-      Serial.print("Descida \t");
+      //Serial.print("Descida \t");
       digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level);
 
     }
