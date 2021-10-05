@@ -20,6 +20,14 @@ float MatrizFiltros[qf][tam];     //Vetor para guardar os valores para as média
 
 int led = 0;                      //Variável para funcionamento do LED  
 
+float T;
+float P;
+float Pm;
+
+String NomeArq;
+int aux = 1;
+float x = 0.00001;
+
 const int chipSelect = 53;
 
 Adafruit_BMP085 bmp;              //Cria variável 'bmp' para a biblioteca Adafruit_BMP085
@@ -37,47 +45,64 @@ void setup() {
     while (1);
   }
   Serial.println("card initialized.");
-  File dataFile = SD.open("Au.txt", FILE_WRITE);
-  if (dataFile) {
-    dataFile.println("Temperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)");
-    for (int i = 0; i<qf; i++){
-      dataFile.print("Altura do filtro ");
-      dataFile.print(i);
-      dataFile.print("(m)\t");
+  while(aux==1){
+    String y = String(x);
+    String z = y.substring(2,5);
+    NomeArq = "apm"+z+".txt";
+    if (SD.exists(NomeArq)) {
+      Serial.print(NomeArq);
+      Serial.println(" ja existe");
+      aux = 1;
     }
-    dataFile.println("Statu de voo");
-    dataFile.close();
+    else{
+      File dataFile = SD.open(NomeArq, FILE_WRITE);
+      if (dataFile) {
+        dataFile.println("Temperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)");
+        for (int i = 0; i<qf; i++){
+          dataFile.print("Altura do filtro ");
+          dataFile.print(i);
+          dataFile.print("(m)\t");
+        }
+        dataFile.println("Statu de voo");
+        dataFile.close();
+      }
+      Serial.println("Dados dealtitude de voo");
+      Serial.print("Temperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)\tAltura (m)\tStatu de voo");
+      for (int i = 0; i<qf; i++){
+        Serial.print("Altura do filtro ");
+        Serial.print(i);
+        Serial.print("(m)\t");
+      }
+      Serial.println("Statu de voo");
+      for (int i = 0; i < 100; i++) {                       //Este 'for' serve para definir a altitude da base de lançamento como valor de referência.
+        SomaRef = SomaRef + bmp.readAltitude();
+      }
+      AltitudeRef = SomaRef / 100;
+      aux = 0;
+    }
+    x = x+0.00001;
   }
-  Serial.println("Dados dealtitude de voo");
-  Serial.print("Temperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)\tAltura (m)\tStatu de voo");
-  for (int i = 0; i<qf; i++){
-    Serial.print("Altura do filtro ");
-    Serial.print(i);
-    Serial.print("(m)\t");
-  }
-  Serial.println("Statu de voo");
-  for (int i = 0; i < 100; i++) {                       //Este 'for' serve para definir a altitude da base de lançamento como valor de referência.
-    SomaRef = SomaRef + bmp.readAltitude();
-  }
-  AltitudeRef = SomaRef / 100;
 }
 void loop() {
-  File dataFile = SD.open("Au.txt", FILE_WRITE);
+  T = bmp.readTemperature();
+  P = bmp.readPressure();
+  Pm = bmp.readSealevelPressure();
+  File dataFile = SD.open(NomeArq, FILE_WRITE);
   if (dataFile) {
-    dataFile.print(bmp.readTemperature());
+    dataFile.print(T);
     dataFile.print("\t");
-    dataFile.print(bmp.readPressure());
+    dataFile.print(P);
     dataFile.print("\t");
-    dataFile.print(bmp.readSealevelPressure());
+    dataFile.print(Pm);
     dataFile.print("\t");    
     dataFile.print(Hmax);
     dataFile.print("\t");
   }
-  Serial.print(bmp.readTemperature());
+  Serial.print(T);
   Serial.print("\t");
-  Serial.print(bmp.readPressure());
+  Serial.print(P);
   Serial.print("\t");
-  Serial.print(bmp.readSealevelPressure());
+  Serial.print(Pm);
   Serial.print("\t");
   Serial.print(Hmax);
   Serial.print("\t");
