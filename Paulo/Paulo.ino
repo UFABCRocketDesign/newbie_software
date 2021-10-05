@@ -17,7 +17,7 @@ String estado;
 
 float list_med_movel[2][filt_i];
 
-String nome_arq, txt, file, str_number, arq_number;
+String nome_arq, txt, file, arq_number;
 int number, len;
 boolean condition;
 
@@ -47,11 +47,10 @@ void setup() {
   number = 0;
   while (condition == false) { 
     file = "";
-    str_number = String(number);
-    len = str_number.length();
-    while (len != 4) {
-      arq_number = "0" + str_number;
-      len = arq_number.length();
+    arq_number = String(number);
+    len = arq_number.length();
+    for (int j=0; j<(4-len); j++) {
+      arq_number = "0" + arq_number;
     }
     file = nome_arq + arq_number + txt;
     if (SD.exists(file)) {
