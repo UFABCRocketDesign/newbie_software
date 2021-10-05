@@ -37,15 +37,25 @@ void setup() {
     // don't do anything more:
     while (1);
   }
-  Serial.println("card initialized.");
-  Serial.println(cabecalho); 
+  Serial.println("card initialized."); 
 
-  String nome = "gabi"; 
+  String nome = "gabi"; // nome precisa ter 4 letras
   int num = 0;
   String txt = ".txt";
   bool tmp = false;
   while (tmp == false) {
-    nomeArquivo = nome + String(num) + txt;
+    if (num < 10) {
+      nomeArquivo = nome + "000" + String(num) + txt;
+    }
+    if (10 <= num < 100) {
+      nomeArquivo = nome + "00" + String(num) + txt;
+    }
+    if (100 <= num < 1000) {
+      nomeArquivo = nome + "0" + String(num) + txt;
+    }
+    if (1000 <= num < 10000) {
+      nomeArquivo = nome + String(num) + txt;
+    }
     if (SD.exists(nomeArquivo)) {
       num = num + 1;
       tmp = false;
@@ -58,6 +68,7 @@ void setup() {
     }
   }
   Serial.println("file: " + nomeArquivo);
+  Serial.println(cabecalho);
 }
 
 void loop() {
