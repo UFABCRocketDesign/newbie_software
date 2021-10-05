@@ -46,7 +46,7 @@ void setup() {
   }
   Serial.println("card initialized.");
   while(aux==1){
-    String y = String(x);
+    String y = String(x,5);
     String z = y.substring(2,5);
     NomeArq = "apm"+z+".txt";
     if (SD.exists(NomeArq)) {
