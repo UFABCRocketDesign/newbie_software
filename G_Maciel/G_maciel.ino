@@ -44,7 +44,7 @@ void setup() {
   int num = 0;
   String txt = ".txt";
   bool tmp = false;
-  while (tmp = false) {
+  while (tmp == false) {
     String nomeArquivo = nome + String(num) + txt;
     if (SD.exists(nomeArquivo)) {
       num = num + 1;
@@ -54,11 +54,10 @@ void setup() {
       File dataFile = SD.open(nomeArquivo, FILE_WRITE);
       dataFile.println(cabecalho);
       dataFile.close();
-      Serial.println("file: " + nomeArquivo);
       tmp = true;
     }
   }
-  
+  Serial.println("file: " + nomeArquivo);
 }
 
 void loop() {
