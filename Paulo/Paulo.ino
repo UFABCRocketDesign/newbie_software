@@ -19,6 +19,7 @@ float list_med_movel[2][filt_i];
 
 String nome_arq, txt, file, str_number, arq_number;
 int number, len;
+boolean condition;
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -44,7 +45,7 @@ void setup() {
   nome_arq = "phhs";
   txt = ".txt";
   number = 0;
-  while (j==0) { 
+  while (condition == false) { 
     file = "";
     str_number = String(number);
     len = str_number.length();
@@ -64,11 +65,11 @@ void setup() {
     if (SD.exists(file)) {
       Serial.print(file);
       Serial.println(" exists.");
-      j = 0;
+      condition = false;
     } else {
       Serial.print("Creating file: ");
       Serial.println(file);
-      j = 1;
+      condition = true;
     }
     number += 1;
   }
