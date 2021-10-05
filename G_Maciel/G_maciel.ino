@@ -45,7 +45,7 @@ void setup() {
   String txt = ".txt";
   bool tmp = false;
   while (tmp == false) {
-    String nomeArquivo = nome + String(num) + txt;
+    nomeArquivo = nome + String(num) + txt;
     if (SD.exists(nomeArquivo)) {
       num = num + 1;
       tmp = false;
