@@ -1,91 +1,81 @@
 #include <Adafruit_BMP085.h>
-  
+
 Adafruit_BMP085 bmp;
 
+ float altitude = 0;
+ float relative_average;
+ float  current_Altitude;
 
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   if (!bmp.begin()) {
- Serial.println("Could not find a valid BMP085 sensor");
-  while (1) {}
-   pinMode(LED_BUILTIN, OUTPUT);
+    Serial.println("Could not find a valid BMP085 sensor");
+    while (1) {}
+    pinMode(LED_BUILTIN, OUTPUT);
   }
-
-  
- 
+  Serial.print("Temperature =  \t");
+  Serial.print(" Pa \t");
+  Serial.print("  Pressure = \t");
+  Serial.print(" Pa \t");
+  Serial.print("  Pressure at sealevel (calculated) = \t");
+  Serial.print(" Pa \t");
+  Serial.print("  Real altitude = \t");
+  Serial.println(" meters \t");
 }
-  
+
 void loop() {
-  
-  float relative_average;
-  float altitude = bmp.readAltitude();
-  float current_Altitude = bmp.readAltitude();
-  float initialread = 0;
-  float previous_Altitude;
-  float altitude_max = 0;
- 
-  
-    Serial.print("Temperature = ");
-    Serial.print( bmp.readTemperature());
-    Serial.print(" *C");
-    
-    Serial.print(  "  Pressure = ");
-    Serial.print( bmp.readPressure());
-    Serial.print(" Pa");
-    
-    // Calculate altitude assuming 'standard' barometric
-    // pressure of 1013.25 millibar = 101325 Pascal
-    Serial.print(  "  Altitude = ");
-    Serial.print( bmp.readAltitude());
-    Serial.print(" meters");
 
-    Serial.print(  " Pressure at sealevel (calculated) = ");
-    Serial.print( bmp.readSealevelPressure());
-    Serial.print( " Pa");
-    
+  current_Altitude = bmp.readAltitude();
+  
 
-   
-  // you can get a more precise measurement of altitude
-  // if you know the current sea level pressure which will
+  Serial.print(bmp.readTemperature() );
+  Serial.print('\t');
+
+  Serial.print( bmp.readPressure()  );
+  Serial.print('\t');
+  // Calculate altitude assuming 'standard' barometric
+  // pressure of 1013.25 millibar = 101325 Pascal
+  Serial.print( current_Altitude);
+  Serial.print('\t');
+
+  Serial.print( bmp.readSealevelPressure() );
+  Serial.print('\t');
+
+
   // vary with weather and such. If it is 1015 millibars
   // that is equal to 101500 Pascals.
-    Serial.print("  Real altitude = ");
-    Serial.print( bmp.readAltitude(101500));
-    Serial.println(" meters");
 
+  Serial.print( bmp.readAltitude(101500));
+  Serial.print('\t');
+
+  
+    Serial.print(altitude);
     Serial.println();
-    delay(500);
-    
-     
+
     
 
-      for ( float i =0; i < 15; i ++){
+  for ( float i = 1; i < 15; i ++) {
 
-             altitude_max = 0;
-             ( current_Altitude >  altitude_max );
+   
+   altitude = altitude + current_Altitude;
 
-              altitude_max = current_Altitude;
-              altitude_max = previous_Altitude;
+    relative_average = (  altitude ) / i;
 
-               relative_average = (  previous_Altitude + current_Altitude )/ 2;     
-        
-        
-        if (relative_average  < current_Altitude){
-    
-      Serial.print("Subida");
+
+    if (relative_average  < current_Altitude) {
+
+      //Serial.print("Subida \t");
       digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-      delay(1000); 
+
     }
-     else{
+    else {
 
-      Serial.print("Descida");
-      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-      delay(1000); 
-      
-        }
-      }
-      
-     
+      //Serial.print("Descida \t");
+      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level);
+
+    }
+  }
+
+
 }
-     

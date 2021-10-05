@@ -13,8 +13,12 @@ float altura_inicio, media_alt_inicio;
 int j, i;
 float media_movel, nova_media_movel, antiga_media_movel;
 float media_movel_lg, nova_media_movel_lg;
+String estado;
 
 float list_med_movel[2][filt_i];
+
+String nome_arq, txt, file, str_number, arq_number;
+int number, len;
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -37,13 +41,45 @@ void setup() {
   Serial.println("card initialized.");
 
   // Determina o nome do FILE
-  File dataFile = SD.open("paulo.txt", FILE_WRITE);
+  nome_arq = "phhs";
+  txt = ".txt";
+  number = 0;
+  while (j==0) { 
+    file = "";
+    str_number = String(number);
+    len = str_number.length();
+    if (len == 1) {
+      arq_number = "000" + str_number;
+    }
+    else if (len == 2) {
+      arq_number = "00" + str_number;
+    }
+    else if (len == 3) {
+      arq_number == "0" + str_number;
+    }
+    else {
+      arq_number = str_number;
+    }
+    file = nome_arq + arq_number + txt;
+    if (SD.exists(file)) {
+      Serial.print(file);
+      Serial.println(" exists.");
+      j = 0;
+    } else {
+      Serial.print("Creating file: ");
+      Serial.println(file);
+      j = 1;
+    }
+    number += 1;
+  }
+  
   // Inicia inserindo essa informação no FILE nomeado
+  File dataFile = SD.open(file, FILE_WRITE);
   if (dataFile) {
-    dataFile.println("Altitude\tMedia Movel(10)\tMedia Movel(20)");
+    dataFile.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tApogeu");
     dataFile.close();
     // print to the serial port too:
-    Serial.println("Altitude\tMedia Movel(10)\tMedia Movel(20)");
+    Serial.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tApogeu");
   }
   
   // Medicao
@@ -96,8 +132,8 @@ void loop() {
   nova_altLeitura = bmp.readAltitude() - media_alt_inicio;
   
   antiga_media_movel = nova_media_movel;
-  // Media Movel - 10 e 20
-    // Mudança do vetor, considerando 10 valores mais recentes
+  // Media Movel
+    // Filtro 1
   for (j=0; j<9; j++) {
     list_med_movel[0][j] = list_med_movel[0][j+1];
   }
@@ -108,7 +144,7 @@ void loop() {
   }
   nova_media_movel = media_movel / filt_i;
   
-    // Mudança do vetor, considerando 20 valores mais recentes
+    // Filtro 2 - realiza filtro no filtro 1
   if (i < filt_i) {
     list_med_movel[1][i] = nova_media_movel;
     i += 1;
@@ -140,16 +176,29 @@ void loop() {
   dataString += String(nova_media_movel);
   dataString += "\t";
   dataString += String(nova_media_movel_lg);
+  dataString += "\t";
+
+  // Temperatura
+  dataString += String(bmp.readTemperature());
+  dataString += "\t";
+
+  // Pressão
+  dataString += String(bmp.readPressure());
+  dataString += "\t";
+
+  // Pressão ao nivel do mar
+  dataString += String(bmp.readSealevelPressure());
   
   // Identificação de subida/descida/apogeu
   if (cont_sub > 10) {
-    dataString += "\tSubindo";
+    estado = "\tSubindo";
     cont_subidas = 1;
     ult_subida = nova_altLeitura;
   }
   else if (cont_desc > 10) {
-    dataString += "\tDescendo";
+    estado = "\tDescendo";
   }
+  dataString += estado;
   if (cont_subidas > 0 and cont_desc == 10) {
     dataString += "\tApogeu em:";
     dataString += String(ult_subida);
@@ -157,7 +206,7 @@ void loop() {
 
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
-  File dataFile = SD.open("paulo.txt", FILE_WRITE);
+  File dataFile = SD.open(file, FILE_WRITE);
 
   // if the file is available, write to it:
   if (dataFile) {
@@ -172,6 +221,5 @@ void loop() {
   }
 
   media_movel = 0;
-  media_movel_lg = 0;
-    
+  media_movel_lg = 0;  
 }
