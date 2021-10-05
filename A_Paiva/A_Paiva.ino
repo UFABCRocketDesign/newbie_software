@@ -54,7 +54,13 @@ void setup() {
     dataFile.close();
   }
   Serial.println("Dados dealtitude de voo");
-  Serial.println("Altura máxima(m)\tAltura dos Filtros(m)\tStatu de voo");
+  Serial.print("Altura máxima(m)\tAltura (m)\tStatu de voo");
+  for (int i = 0; i<qf; i++){
+    Serial.print("Altura do filtro ");
+    Serial.print(i);
+    Serial.print("(m)\t");
+  }
+  Serial.println("Statu de voo");
   for (int i = 0; i < 100; i++) {                       //Este 'for' serve para definir a altitude da base de lançamento como valor de referência.
     SomaRef = SomaRef + bmp.readAltitude();
   }
@@ -71,22 +77,25 @@ void loop() {
   Serial.print("\t");
   SomaMov=0;                                           //Zera o SomaMov1 em todo loop
   //SomaMov2=0;                                           //Zera o SomaMov2 em todo loop
-  for (int j = 0; j<=qf-1; j++){
+  for (int j = 0; j<qf; j++){
       for (int i = tam-2; i>=0; i--){                      //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1
         MatrizFiltros[j][i+1]= MatrizFiltros[j][i];                    
       }
       if(j==0){
-        MatrizFiltros[0][0]=bmp.readAltitude()-AltitudeRef;   //Esse é o valor mais atualizado do filtro1 
+        MatrizFiltros[0][0]=bmp.readAltitude()-AltitudeRef;   //Esse é o valor mais atualizado do filtro1
+        Serial.print(MatrizFiltros[0][0]);
+        Serial.print("\t");
       }
       else{
         MatrizFiltros[j][0] = MediaMov;
       }
+      SomaMov=0;
       for (int i = 0; i <= tam-1; i++) {                      //Esse 'for' faz a soma dos últimos valores medidos, para a média do filtro1
         SomaMov=SomaMov+MatrizFiltros[j][i];
       }
       MediaMov=SomaMov/tam;
       Serial.print(MediaMov);
-      Serial.print(" ");
+      Serial.print("\t");
   }
   Serial.print("\t");
   //File dataFile = SD.open("Au.txt", FILE_WRITE);
