@@ -18,7 +18,7 @@ String estado;
 float list_med_movel[2][filt_i];
 
 String nome_arq, txt, file, arq_number;
-int number, len;
+int number, len_nome, len_number;
 boolean condition;
 
 // the setup function runs once when you press reset or power the board
@@ -45,11 +45,12 @@ void setup() {
   nome_arq = "phhs";
   txt = ".txt";
   number = 0;
+  len_nome = nome_arq.length();
   while (condition == false) { 
     file = "";
     arq_number = String(number);
-    len = arq_number.length();
-    for (int j=0; j<(4-len); j++) {
+    len_number = arq_number.length();
+    for (int j=0; j<(8-(len_nome+len_number)); j++) {
       arq_number = "0" + arq_number;
     }
     file = nome_arq + arq_number + txt;
