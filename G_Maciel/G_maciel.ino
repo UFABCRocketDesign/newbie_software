@@ -13,7 +13,7 @@ float lista2[l];
 float media_mov = 0;
 float media_mov2 = 0;
 const int chipSelect = 53;
-String cabecalho = "Altitude [m]\tAltura [m]\tFiltro1 (h)\tFiltro2 (h)\tTemperatura [*C]\tPressão [Pa]\tPressão no nível do mar [Pa]";
+String cabecalho = "Altitude [m]\tAltura [m]\tFiltro1 (h)\tFiltro2 (h)\tTemperatura [*C]\tPressao [Pa]\tPressao no nivel do mar [Pa]";
 // float velhaAlt=0.0;
 
 void setup() {
@@ -38,10 +38,24 @@ void setup() {
   }
   Serial.println("card initialized.");
   Serial.println(cabecalho); 
- 
-  File dataFile = SD.open("gabriela.txt", FILE_WRITE);
-  dataFile.println(cabecalho);
-  dataFile.close();
+
+  String nome = "gabi"; 
+  int num = 0;
+  String txt = ".txt";
+  bool tmp = false;
+  while (tmp = false) {
+    String nomeArquivo = nome + String(num) + txt;
+    if (SD.exists(nomeArquivo)) {
+      num = num + 1;
+      tmp = false;
+    }
+    else {
+      File dataFile = SD.open(nomeArquivo, FILE_WRITE);
+      dataFile.println(cabecalho);
+      dataFile.close();
+      Serial.println("file: " + nomeArquivo);
+    }
+  }
   
 }
 
