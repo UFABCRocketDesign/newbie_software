@@ -17,6 +17,9 @@ String estado;
 
 float list_med_movel[2][filt_i];
 
+String nome_arq, txt, file, str_number, arq_number;
+int number, len;
+
 // the setup function runs once when you press reset or power the board
 void setup() {
   // Inicializando o led embutido no arduino
@@ -38,8 +41,40 @@ void setup() {
   Serial.println("card initialized.");
 
   // Determina o nome do FILE
-  File dataFile = SD.open("paulo.txt", FILE_WRITE);
+  nome_arq = "phhs";
+  txt = ".txt";
+  number = 0;
+  while (j==0) { 
+    file = "";
+    str_number = String(number);
+    len = str_number.length();
+    if (len == 1) {
+      arq_number = "000" + str_number;
+    }
+    else if (len == 2) {
+      arq_number = "00" + str_number;
+    }
+    else if (len == 3) {
+      arq_number == "0" + str_number;
+    }
+    else {
+      arq_number = str_number;
+    }
+    file = nome_arq + arq_number + txt;
+    if (SD.exists(file)) {
+      Serial.print(file);
+      Serial.println(" exists.");
+      j = 0;
+    } else {
+      Serial.print("Creating file: ");
+      Serial.println(file);
+      j = 1;
+    }
+    number += 1;
+  }
+  
   // Inicia inserindo essa informação no FILE nomeado
+  File dataFile = SD.open(file, FILE_WRITE);
   if (dataFile) {
     dataFile.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tApogeu");
     dataFile.close();
@@ -171,7 +206,7 @@ void loop() {
 
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
-  File dataFile = SD.open("paulo.txt", FILE_WRITE);
+  File dataFile = SD.open(file, FILE_WRITE);
 
   // if the file is available, write to it:
   if (dataFile) {
