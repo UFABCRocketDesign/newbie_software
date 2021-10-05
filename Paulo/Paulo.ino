@@ -49,17 +49,9 @@ void setup() {
     file = "";
     str_number = String(number);
     len = str_number.length();
-    if (len == 1) {
-      arq_number = "000" + str_number;
-    }
-    else if (len == 2) {
-      arq_number = "00" + str_number;
-    }
-    else if (len == 3) {
-      arq_number == "0" + str_number;
-    }
-    else {
-      arq_number = str_number;
+    while (len != 4) {
+      arq_number = "0" + str_number;
+      len = arq_number.length();
     }
     file = nome_arq + arq_number + txt;
     if (SD.exists(file)) {
