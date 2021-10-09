@@ -75,9 +75,6 @@ void setup() {
     while (1);
   }
   do{
-    Serial.print("O arquivo ");
-    Serial.print(nome);
-    Serial.print(" já existe. Sendo assim será gravado com nome ");
     parteA="PA";
     a=parteA.length();
     parteB=String(cont);
@@ -89,10 +86,11 @@ void setup() {
     }
     nome+=parteB;
     nome+=".txt";
-    Serial.println(nome);
     cont=cont+1;
   }
   while (SD.exists(nome));
+  Serial.print(" O arquivo será gravado com nome ");
+  Serial.println(nome);
   Serial.println("card initialized.");
   Serial.println("Situacao\tApogeu(Hmax)\tAltura filtrada final(H1)\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)");//Cabecalho no acompanhamento
   File dataFile = SD.open(nome, FILE_WRITE);
