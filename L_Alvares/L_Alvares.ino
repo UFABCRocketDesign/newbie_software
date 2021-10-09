@@ -42,7 +42,7 @@ void loop()
     Serial.print(Filtro);
     Serial.print("\t");
     Serial.println();
-    N++; 
+    N++;  
     }
 
     //if(ALT < ALTo)
