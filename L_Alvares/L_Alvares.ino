@@ -34,8 +34,6 @@ void setup()
 
 void loop() 
 {
-    //for (i = 0; i < 11; i++)
-    //{
     ALT = (bmp.readAltitude() - M);
     Serial.print(ALT);
     Serial.print("\t");
@@ -45,15 +43,13 @@ void loop()
     A++;
     if(A >= 10)
      {
-     // i = 0;
       A = 0;
-      FF = F/11;
      }
+    FF = F/11;
     Serial.print(FF);
     Serial.print("\t");
     Serial.println();
-    //}
-
+    
     //if(ALT < ALTo)
     // {
     //  digitalWrite(LED_BUILTIN, HIGH);   
