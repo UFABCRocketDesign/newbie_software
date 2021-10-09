@@ -12,7 +12,8 @@
 #define av_ll(I) av[(I)] -= idx(I)
 #define av_tt(I) av[(I)] *= len
 #define av_dd(I) av[(I)] /= len
-#define update(X) ((++X)%len)
+// #define update(X) ((++X)%len)
+#define update(X) (((++X)<(len))?((X)):0)
 #define av_fst(I) av_tt(I);av_ll(I)
 #define av_lst(I) av_pp(I);av_dd(I)
 
