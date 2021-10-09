@@ -72,21 +72,21 @@ void setup() {
     // don't do anything more:
     while (1);
   }
-  nome="0P_ANJOS.txt";
-  if (SD.exists(nome)) {
-    cont=nome.toInt();
-    cont=cont+1;
-    nome=String(cont);
-    nome+="P_ANJOS.txt";
-    Serial.println("0P_ANJOS.txt já existe.Sendo assim, incia-se com outro valor");
-   
-  } else {
-    Serial.println("0P_ANJOS.txt não existe.Sendo assim, incia-se com 0");
-    nome="0P_ANJOS.txt";
+  nome="PA0.txt";
+  if (!SD.exists(nome)){
+    Serial.println("PA0.txt não existe.Sendo assim, incia-se com 0");
+    nome="PA0.txt";
   }
+  while (SD.exists(nome)) {
+    cont=cont+1;
+    nome="PA";
+    nome+=String(cont);
+    nome+=".txt";
+    Serial.println("0P_ANJOS.txt já existe.Sendo assim, incia-se com outro valor");
+  } 
   Serial.println("card initialized.");
   Serial.println("Situacao\tApogeu(Hmax)\tAltura filtrada final(H1)\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)");//Cabecalho no acompanhamento
-  File dataFile = SD.open("P_ANJOS.txt", FILE_WRITE);
+  File dataFile = SD.open(nome, FILE_WRITE);
     dataFile.println("Situacao\tApogeu(Hmax)\tAltura filtrada final(H1)\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)"); //Cabecalho no SD
     dataFile.close();
 
