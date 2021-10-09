@@ -47,7 +47,8 @@ float FiltroB[10];          // terceira filtragem para a média móvel
 float SomaFA = 0;
 float SomaFB = 0;
 float Aux=0;
-
+int cont=0;
+String nome;
 
 Adafruit_BMP085 bmp;
 
@@ -70,6 +71,18 @@ void setup() {
     Serial.println("Card failed, or not present");
     // don't do anything more:
     while (1);
+  }
+  nome="0P_ANJOS.txt";
+  if (SD.exists(nome)) {
+    cont=nome.toInt();
+    cont=cont+1;
+    nome=String(cont);
+    nome+="P_ANJOS.txt";
+    Serial.println("0P_ANJOS.txt já existe.Sendo assim, incia-se com outro valor");
+   
+  } else {
+    Serial.println("0P_ANJOS.txt não existe.Sendo assim, incia-se com 0");
+    nome="0P_ANJOS.txt";
   }
   Serial.println("card initialized.");
   Serial.println("Situacao\tApogeu(Hmax)\tAltura filtrada final(H1)\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)");//Cabecalho no acompanhamento
@@ -173,7 +186,7 @@ void loop() {
   dataString+="\t";
   dataString+=String(bmp.readSealevelPressure());
   
- File dataFile = SD.open("P_ANJOS.txt", FILE_WRITE);
+ File dataFile = SD.open(nome, FILE_WRITE);
 
   // if the file is available, write to it:
   if (dataFile) {
