@@ -49,6 +49,11 @@ float SomaFB = 0;
 float Aux=0;
 int cont=0;
 String nome;
+String parteA;
+String parteB;
+int a;
+int b;
+int c;
 
 Adafruit_BMP085 bmp;
 
@@ -78,10 +83,18 @@ void setup() {
     Serial.print(nome);
     Serial.print(" já existe. Sendo assim será gravado com nome ");
     cont=cont+1;
+    parteA="PA";
+    a=parteA.length();
+    parteB=String(cont);
+    b=parteB.length();
+    c=8-(a+b);  // Guarda a quantidade de zeros necessária para se colocar entre "PA" e o nº da versão.
     nome="PA";
-    nome+=String(cont);
+    for(int i = 0; i < c; i++){
+      nome+="0";
+    }
+    nome+=parteB;
     nome+=".txt";
-    Serial.print(nome);
+    Serial.println(nome);
   } 
   Serial.println("card initialized.");
   Serial.println("Situacao\tApogeu(Hmax)\tAltura filtrada final(H1)\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)");//Cabecalho no acompanhamento
