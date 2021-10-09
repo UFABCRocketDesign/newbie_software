@@ -5,9 +5,10 @@ float ALT = 0.0;
 float i = 0.0;
 float Med = 0.0;
 float M = 0.0;
-int N = 1;
-float Filtro = 0.0;
-
+float F = 0.0;
+float FF = 0.0;
+float VTeste[11];
+int A = 0;
 
 void setup() 
 {
@@ -33,16 +34,23 @@ void setup()
 
 void loop() 
 {
-    for (i = 0; i < N; i++)
+    for (i = 0; i < 11; i++)
     {
     ALT = (bmp.readAltitude() - M);
     Serial.print(ALT);
     Serial.print("\t");
-    Filtro = Filtro + ALT/N; 
-    Serial.print(Filtro);
+    F = F - VTeste[A];
+    VTeste[A] = ALT;
+    F = F + VTeste[A];
+    A++;
+    if(A >= 10)
+     {
+      i = 0;
+      FF = F/11;
+     }
+    Serial.print(FF);
     Serial.print("\t");
     Serial.println();
-    N++;  
     }
 
     //if(ALT < ALTo)
