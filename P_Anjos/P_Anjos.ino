@@ -47,7 +47,13 @@ float FiltroB[10];          // terceira filtragem para a média móvel
 float SomaFA = 0;
 float SomaFB = 0;
 float Aux=0;
-
+int cont=0;
+String nome;
+String parteA;
+String parteB;
+int a;
+int b;
+int c;
 
 Adafruit_BMP085 bmp;
 
@@ -61,19 +67,33 @@ void setup() {
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
-  }
-    //Serial.println("Initializing SD card...");
-    //Serial.println("Situacao\tApogeu(Hmax)\tAltura filtrada final(H1)\tAltura medida no sensor");
-    
+  } 
   // see if the card is present and can be initialized:
   if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present");
     // don't do anything more:
     while (1);
   }
+  do{
+    parteA="PA";
+    a=parteA.length();
+    parteB=String(cont);
+    b=parteB.length();
+    c=8-(a+b);  // Guarda a quantidade de zeros necessária para se colocar entre "PA" e o nº da versão.
+    nome="PA";
+    for(int i = 0; i < c; i++){
+      nome+="0";
+    }
+    nome+=parteB;
+    nome+=".txt";
+    cont=cont+1;
+  }
+  while (SD.exists(nome));
+  Serial.print(" O arquivo será gravado com nome ");
+  Serial.println(nome);
   Serial.println("card initialized.");
   Serial.println("Situacao\tApogeu(Hmax)\tAltura filtrada final(H1)\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)");//Cabecalho no acompanhamento
-  File dataFile = SD.open("P_ANJOS.txt", FILE_WRITE);
+  File dataFile = SD.open(nome, FILE_WRITE);
     dataFile.println("Situacao\tApogeu(Hmax)\tAltura filtrada final(H1)\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)"); //Cabecalho no SD
     dataFile.close();
 
@@ -88,8 +108,6 @@ void setup() {
 void loop() {
   String dataString = "";                   // Serve para criar a string que vai guardar os dados para que eles sejam gravados no SD
   SomaMov=0;
-  //SomaFA=0;
-  //SomaFB=0; 
   MediaMov=bmp.readAltitude()-AltitudeRef;
   for(int j = 0; j < 3; j++){
     for (int i = 8; i>=0; i--){           // Laco apenas para a movimentação
@@ -102,57 +120,16 @@ void loop() {
     }
     MediaMov=SomaMov/10;
   }
- 
-  // -------------------------------------------------------- CODIGO QUE ESTAVA FUNCIONANDO COM VETORES SEPARADOS -----------------------------------------------------------------------------------------------
-  //for (int i = 8; i>=0; i--){
-  // Vetor[0][i+1]= Vetor[0][i];                      //Esse Vetor serve para guardar os valores. Preciso usar os ultimos 10 valores medidos e por isso preciso registrar aos poucos
-  //}
-  //Vetor[0][0]=bmp.readAltitude()-AltitudeRef;    // Esse e o valor que sera atualizado sempre 
-  //for (int i = 0; i < 10; i++) {              //Este for serve somar os ultimos 10 valores medidos.
-  //  SomaMov=SomaMov+Vetor[0][i];
-  //}
-  //MediaMov=SomaMov/10;                        // Media movel (para a filtragem)
-  //for (int i = 8; i>=0; i--){
-   //Vetor[1][i+1]= Vetor[1][i];         
-  //}
- //Vetor[1][0]=MediaMov;                        // Esse e o valor que sera atualizado sempre 
-  //for (int i = 0; i < 10; i++) {              //Este for serve somar os ultimos 10 valores medidos.
-   // SomaFA=SomaFA+Vetor[1][i];
-  //}
-  //MediaMA=SomaFA/10;                          
-  //for (int i = 8; i>=0; i--){
-   //Vetor[2][i+1]= Vetor[2][i];         
-  //}
-  //Vetor[2][0]=MediaMA;                        // Esse e o valor que sera atualizado sempre 
-  //for (int i = 0; i < 10; i++) {              //Este for serve somar os ultimos 10 valores medidos.
-    //SomaFB=SomaFB+Vetor[2][i];
-  //}
-  //MediaMB=SomaFB/10;  
- // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   H2 = H1;                                    // Guardei a altitude de referencia (medicao anterior)
   H1 = MediaMov;                               // Nova leitura de altitude
 
   if (Hmax < H1) {
     Hmax = H1;
   }
-  //Serial.print(Hmax);
-  //Serial.print("\t");
-  //Serial.print(H1);                // Vai exibir a media movel final
-  //Serial.print("\t");
-  //for(int j = 0; j < 3; j++){
-  //Serial.print(Vetor[j][0]);        // vai exibir as duas medias
-  //Serial.print("\t");
-  //}
-  //Serial.print(Vetor[0][0]);        // vai exibir o valor medido no sensor
-  //Serial.print("\t");
   Delta=Hmax-H1;
   
   if (Delta >= 2) {
     digitalWrite(LED_BUILTIN, HIGH);   // A partir do momento que a diferença de altitude for acima de 2, provavelmente o foguete está descendo.
-    //Serial.print("\t");
-    //Serial.print(Delta);
-    //Serial.print("\t");
-    //Serial.print("Descendo");
     dataString+=String("Descendo");
     dataString+="\t";
   }
@@ -173,7 +150,7 @@ void loop() {
   dataString+="\t";
   dataString+=String(bmp.readSealevelPressure());
   
- File dataFile = SD.open("P_ANJOS.txt", FILE_WRITE);
+ File dataFile = SD.open(nome, FILE_WRITE);
 
   // if the file is available, write to it:
   if (dataFile) {

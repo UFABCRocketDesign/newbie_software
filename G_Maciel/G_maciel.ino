@@ -13,8 +13,9 @@ float lista2[l];
 float media_mov = 0;
 float media_mov2 = 0;
 const int chipSelect = 53;
-String cabecalho = "Altitude [m]\tAltura [m]\tFiltro1 (h)\tFiltro2 (h)\tTemperatura [*C]\tPressão [Pa]\tPressão no nível do mar [Pa]";
+String cabecalho = "Altitude [m]\tAltura [m]\tFiltro1 (h)\tFiltro2 (h)\tTemperatura [*C]\tPressao [Pa]\tPressao no nivel do mar [Pa]";
 // float velhaAlt=0.0;
+String nomeArquivo = "";
 
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
@@ -36,13 +37,38 @@ void setup() {
     // don't do anything more:
     while (1);
   }
-  Serial.println("card initialized.");
-  Serial.println(cabecalho); 
- 
-  File dataFile = SD.open("gabriela.txt", FILE_WRITE);
-  dataFile.println(cabecalho);
-  dataFile.close();
-  
+  Serial.println("card initialized."); 
+
+  String nome = "gabi"; // nome precisa ter 4 letras
+  int num = 0;
+  String txt = ".txt";
+  bool tmp = false;
+  while (tmp == false) {
+    if (num < 10) {
+      nomeArquivo = nome + "000" + String(num) + txt;
+    }
+    if (10 <= num < 100) {
+      nomeArquivo = nome + "00" + String(num) + txt;
+    }
+    if (100 <= num < 1000) {
+      nomeArquivo = nome + "0" + String(num) + txt;
+    }
+    if (1000 <= num < 10000) {
+      nomeArquivo = nome + String(num) + txt;
+    }
+    if (SD.exists(nomeArquivo)) {
+      num = num + 1;
+      tmp = false;
+    }
+    else {
+      File dataFile = SD.open(nomeArquivo, FILE_WRITE);
+      dataFile.println(cabecalho);
+      dataFile.close();
+      tmp = true;
+    }
+  }
+  Serial.println("file: " + nomeArquivo);
+  Serial.println(cabecalho);
 }
 
 void loop() {
@@ -102,7 +128,7 @@ void loop() {
     //velhaAlt = h;
   //}
   
-  File dataFile = SD.open("gabriela.txt", FILE_WRITE);
+  File dataFile = SD.open(nomeArquivo, FILE_WRITE);
 
   // if the file is available, write to it:
   if (dataFile) {
