@@ -57,21 +57,21 @@ void setup() {
   tamNomeArq = x.length();
   sub1 = 8-tamNomeArq;
   while(aux==1){
-    tamNum = String(Num).length();
+    z = String(Num);
+    tamNum = z.length();
     sub2 = sub1-tamNum;
     for(int i=0; i<sub2; i++){
       y = y+"0";
     }
-    z = String(Num);
     NomeFinal = x+y+z+".txt";
-    if (SD.exists(NomeArq)) {
-      Serial.print(NomeArq);
+    if (SD.exists(NomeFinal)) {
+      Serial.print(NomeFinal);
       Serial.println(" ja existe");
       Num++;
       aux = 1;
     }
     else{
-      File dataFile = SD.open(NomeArq, FILE_WRITE);
+      File dataFile = SD.open(NomeFinal, FILE_WRITE);
       if (dataFile) {
         dataFile.println("Temperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)");
         for (int i = 0; i<qf; i++){
@@ -102,7 +102,7 @@ void loop() {
   T = bmp.readTemperature();
   P = bmp.readPressure();
   Pm = bmp.readSealevelPressure();
-  File dataFile = SD.open(NomeArq, FILE_WRITE);
+  File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
     dataFile.print(T);
     dataFile.print("\t");
