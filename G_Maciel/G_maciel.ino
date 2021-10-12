@@ -39,62 +39,28 @@ void setup() {
   }
   Serial.println("card initialized."); 
 
-  String nome = "gabi"; // nome precisa ter 4 letras
+  String nome = "gabi"; 
+  int tamNome = nome.length();
   int num = 0;
   String txt = ".txt";
+  String zeros = "";
   bool tmp = false;
   while (tmp == false) {
-    if (num < 10) {
-      nomeArquivo = nome + "000" + String(num) + txt;
-      if (SD.exists(nomeArquivo)) {
-        num = num + 1;
-        tmp = false;
-      }
-      else {
-        File dataFile = SD.open(nomeArquivo, FILE_WRITE);
-        dataFile.println(cabecalho);
-        dataFile.close();
-        tmp = true;
-      }
+    int tamNum = String(num).length();
+    int tamTotal = tamNome + tamNum;
+    for (int j=0; j < (8-tamTotal); j++) {
+      zeros = zeros + "0";
     }
-    if (10 <= num < 100) {
-      nomeArquivo = nome + "00" + String(num) + txt;
-      if (SD.exists(nomeArquivo)) {
-        num = num + 1;
-        tmp = false;
-      }
-      else {
-        File dataFile = SD.open(nomeArquivo, FILE_WRITE);
-        dataFile.println(cabecalho);
-        dataFile.close();
-        tmp = true;
-      }
+    nomeArquivo = nome + zeros + String(num) + txt;
+    if (SD.exists(nomeArquivo)) {
+      num = num + 1;
+      tmp = false;
     }
-    if (100 <= num < 1000) {
-      nomeArquivo = nome + "0" + String(num) + txt;
-      if (SD.exists(nomeArquivo)) {
-        num = num + 1;
-        tmp = false;
-      }
-      else {
-        File dataFile = SD.open(nomeArquivo, FILE_WRITE);
-        dataFile.println(cabecalho);
-        dataFile.close();
-        tmp = true;
-      }
-    }
-    if (1000 <= num < 10000) {
-      nomeArquivo = nome + String(num) + txt;
-      if (SD.exists(nomeArquivo)) {
-        num = num + 1;
-        tmp = false;
-      }
-      else {
-        File dataFile = SD.open(nomeArquivo, FILE_WRITE);
-        dataFile.println(cabecalho);
-        dataFile.close();
-        tmp = true;
-      }
+    else {
+      File dataFile = SD.open(nomeArquivo, FILE_WRITE);
+      dataFile.println(cabecalho);
+      dataFile.close();
+      tmp = true;
     }
   }
   Serial.println("file: " + nomeArquivo);
