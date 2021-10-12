@@ -182,9 +182,15 @@ void loop() {
   if(auxled == 1){
     tempoAtual = millis();
     if ((tempoAtual - tempo0) >= intervalo) {
+      if (dataFile) {
+      dataFile.println("Descendo");
+      dataFile.close();
+      }
+      Serial.print("Descendo");
+      Serial.print("\t");
       digitalWrite(LED_BUILTIN, LOW);
       led = 0;
-      auxled = 0;
+      auxled = 1;
     }
     else{
       if (dataFile) {
