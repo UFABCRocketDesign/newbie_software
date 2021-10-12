@@ -60,6 +60,7 @@ void setup() {
     z = String(Num);
     tamNum = z.length();
     sub2 = sub1-tamNum;
+    y = "";
     for(int i=0; i<sub2; i++){
       y = y+"0";
     }
