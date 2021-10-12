@@ -1,9 +1,10 @@
 #include <Adafruit_BMP085.h>
 #include <SPI.h>
 #include <SD.h>
-
+//VALORES DE ENTRADA
 #define tam 10                    //Tamanho da matriz do filtro
 #define qf 2                      //Quantidade de filtros
+#define NomeArq "apm"               //Nome do arquivo para o cartão SD
 
 float Hmax = 0;                   //Valor máximo filtrado
 
@@ -20,13 +21,20 @@ float MatrizFiltros[qf][tam];     //Vetor para guardar os valores para as média
 
 int led = 0;                      //Variável para funcionamento do LED  
 
-float T;
-float P;
-float Pm;
+float T;                          //Valor da Temperatura
+float P;                          //Valor da Pressão
+float Pm;                         //Valor da Pressão ao nivel do Mar
 
-String NomeArq;
 int aux = 1;
-float x = 0.00001;
+int tamNomeArq = 0;
+int Num = 0;
+int tamNum = 0;
+String x;
+String y;
+String z;
+String NomeFinal;
+int sub1 = 0;
+int sub2 = 0;
 
 const int chipSelect = 53;
 
@@ -45,17 +53,25 @@ void setup() {
     while (1);
   }
   Serial.println("card initialized.");
+  x = NomeArq;
+  tamNomeArq = x.length();
+  sub1 = 8-tamNomeArq;
   while(aux==1){
-    String y = String(x,5);
-    String z = y.substring(2,5);
-    NomeArq = "apm"+z+".txt";
-    if (SD.exists(NomeArq)) {
-      Serial.print(NomeArq);
+    z = String(Num);
+    tamNum = z.length();
+    sub2 = sub1-tamNum;
+    for(int i=0; i<sub2; i++){
+      y = y+"0";
+    }
+    NomeFinal = x+y+z+".txt";
+    if (SD.exists(NomeFinal)) {
+      Serial.print(NomeFinal);
       Serial.println(" ja existe");
+      Num++;
       aux = 1;
     }
     else{
-      File dataFile = SD.open(NomeArq, FILE_WRITE);
+      File dataFile = SD.open(NomeFinal, FILE_WRITE);
       if (dataFile) {
         dataFile.println("Temperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)");
         for (int i = 0; i<qf; i++){
@@ -80,14 +96,13 @@ void setup() {
       AltitudeRef = SomaRef / 100;
       aux = 0;
     }
-    x = x+0.00001;
   }
 }
 void loop() {
   T = bmp.readTemperature();
   P = bmp.readPressure();
   Pm = bmp.readSealevelPressure();
-  File dataFile = SD.open(NomeArq, FILE_WRITE);
+  File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
     dataFile.print(T);
     dataFile.print("\t");
