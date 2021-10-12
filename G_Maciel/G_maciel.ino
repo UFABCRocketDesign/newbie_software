@@ -43,9 +43,9 @@ void setup() {
   int tamNome = nome.length();
   int num = 0;
   String txt = ".txt";
-  String zeros = "";
   bool tmp = false;
   while (tmp == false) {
+    String zeros = "";
     int tamNum = String(num).length();
     int tamTotal = tamNome + tamNum;
     for (int j=0; j < (8-tamTotal); j++) {
