@@ -16,7 +16,11 @@ float MediaMov = 0;               //É o valor da média dos valores do vetor do
 float Delta;                      //Diferença entre valor máximo do filtro1 (Hmax1) e valor atual referênciado (H11)
 float MatrizFiltros[qf][tam];     //Vetor para guardar os valores para as médias utilizadas pelos filtros
 
-int led = 0;                      //Variável para funcionamento do LED  
+int led = 0;                      //Variável para funcionamento do LED
+int auxled = 0;
+unsigned long tempo0 = 0;        // will store last time LED was updated
+unsigned long tempoAtual = 0;        // will store last time LED was updated
+const long intervalo = 10000;           // interval at which to blink (milliseconds)
 
 float T;                          //Valor da Temperatura
 float P;                          //Valor da Pressão
@@ -154,27 +158,46 @@ void loop() {
     Hmax = MediaMov;
   }
   Delta=Hmax-MediaMov;                                     //Compara o valor máximo do filtro1 com o valor atual do filtro1
-  if (Delta >= 2) {                                    //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
+  
+  if (Delta >= 2 && auxled ==0) {                                        //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
     if (dataFile) {
       dataFile.println("Descendo");
       dataFile.close();
     }
-    digitalWrite(LED_BUILTIN, HIGH);
-    led = 1;
     Serial.print("Descendo");
     Serial.print("\t");
-    Serial.print(led);
+    digitalWrite(LED_BUILTIN, HIGH);
+    led = 1;
+    auxled = 1;
+    tempo0 = millis();
   }
-  else {
+  else if(auxled == 0){
     if (dataFile) {
       dataFile.println("Subindo");
       dataFile.close();
     }
-    digitalWrite(LED_BUILTIN, LOW);
-    led = 0;
     Serial.print("Subindo");
     Serial.print("\t");
-    Serial.print(led);
   }
+  if(auxled == 1){
+    tempoAtual = millis();
+    if ((tempoAtual - tempo0) >= intervalo) {
+      digitalWrite(LED_BUILTIN, LOW);
+      led = 0;
+      auxled = 0;
+    }
+    else{
+      if (dataFile) {
+      dataFile.println("Descendo");
+      dataFile.close();
+      }
+      Serial.print("Descendo");
+      Serial.print("\t");
+      digitalWrite(LED_BUILTIN, HIGH);
+      led = 1;
+      auxled = 1;
+    }
+  }
+  Serial.print(led);
   Serial.println();
 }
