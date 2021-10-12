@@ -1,22 +1,19 @@
 #include <Adafruit_BMP085.h>
 #include <SPI.h>
 #include <SD.h>
+
 //VALORES DE ENTRADA
 #define tam 10                    //Tamanho da matriz do filtro
 #define qf 2                      //Quantidade de filtros
 #define NomeArq "apm"               //Nome do arquivo para o cartão SD
+//////////////////////////////////////////////////////////////////////
 
 float Hmax = 0;                   //Valor máximo filtrado
-
 float SomaRef = 0;                //Soma valores iniciais(foguete parado na base)
 float AltitudeRef = 0;            //É o valor da média dos valores iniciais(foguete parado na base)
-
 float SomaMov = 0;                //Soma dos valores do vetor do filtro1
-
 float MediaMov = 0;               //É o valor da média dos valores do vetor do filtro1
-
 float Delta;                      //Diferença entre valor máximo do filtro1 (Hmax1) e valor atual referênciado (H11)
-
 float MatrizFiltros[qf][tam];     //Vetor para guardar os valores para as médias utilizadas pelos filtros
 
 int led = 0;                      //Variável para funcionamento do LED  
@@ -25,16 +22,16 @@ float T;                          //Valor da Temperatura
 float P;                          //Valor da Pressão
 float Pm;                         //Valor da Pressão ao nivel do Mar
 
-int aux = 1;
-int tamNomeArq = 0;
-int Num = 0;
-int tamNum = 0;
-String x;
-String y;
-String z;
-String NomeFinal;
-int sub1 = 0;
-int sub2 = 0;
+int aux = 1;                      //Variavel auxiliar do while para criação de nome de arquivo do SD
+int tamNomeArq = 0;               //Valor da quantidade de caracteres da variavel NomeArq
+int Num = 0;                      //Valor da variavel que se somará e irá compor o nome do arquivo do SD
+int tamNum = 0;                   //Valor da quantidade de caracteres da variavel Num
+String x;                         //Primeira componente do nome do arquivo ou NomeArq
+String y;                         //Segunda componente do nome do arquivo ou preenchimento de zeros
+String z;                         //Terceira componente do nome do arquivo ou Num
+String NomeFinal;                 //Nome final do arquivo do SD
+int sub1 = 0;                     //Variavel auxiliar para contagem de caracteres totais no nome do arquivo do SD;
+int sub2 = 0;                     //Variavel auxiliar para contagem de caracteres totais no nome do arquivo do SD;
 
 const int chipSelect = 53;
 
@@ -72,32 +69,34 @@ void setup() {
       aux = 1;
     }
     else{
-      File dataFile = SD.open(NomeFinal, FILE_WRITE);
-      if (dataFile) {
-        dataFile.println("Temperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)");
-        for (int i = 0; i<qf; i++){
-          dataFile.print("Altura do filtro ");
-          dataFile.print(i);
-          dataFile.print("(m)\t");
-        }
-        dataFile.println("Statu de voo");
-        dataFile.close();
-      }
-      Serial.println("Dados dealtitude de voo");
-      Serial.print("Temperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)\tAltura (m)\tStatu de voo");
-      for (int i = 0; i<qf; i++){
-        Serial.print("Altura do filtro ");
-        Serial.print(i);
-        Serial.print("(m)\t");
-      }
-      Serial.println("Statu de voo");
-      for (int i = 0; i < 100; i++) {                       //Este 'for' serve para definir a altitude da base de lançamento como valor de referência.
-        SomaRef = SomaRef + bmp.readAltitude();
-      }
-      AltitudeRef = SomaRef / 100;
+      Serial.print("Nome do arquivo atual: ");
+      Serial.println(NomeFinal);
       aux = 0;
     }
   }
+  File dataFile = SD.open(NomeFinal, FILE_WRITE);
+  if (dataFile) {
+    dataFile.println("Temperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)");
+    for (int i = 0; i<qf; i++){
+      dataFile.print("Altura do filtro ");
+      dataFile.print(i);
+      dataFile.print("(m)\t");
+    }
+    dataFile.println("Statu de voo");
+    dataFile.close();
+  }
+  Serial.println("Dados dealtitude de voo");
+  Serial.print("Temperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)\tAltura (m)\tStatu de voo");
+  for (int i = 0; i<qf; i++){
+    Serial.print("Altura do filtro ");
+    Serial.print(i);
+    Serial.print("(m)\t");
+  }
+  Serial.println("Statu de voo");
+  for (int i = 0; i < 100; i++) {                       //Este 'for' serve para definir a altitude da base de lançamento como valor de referência.
+    SomaRef = SomaRef + bmp.readAltitude();
+  }
+  AltitudeRef = SomaRef / 100;
 }
 void loop() {
   T = bmp.readTemperature();
