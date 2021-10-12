@@ -4,7 +4,7 @@
 
 #define apg_limiar 60
 
-#define len 10
+#define len 3
 #define lvl 3
 #define coiso vec[lvl][len]
 #define idx(I) vec[(I)][index[(I)]]
@@ -56,6 +56,7 @@ void setup() {
 
 void loop() {
 
+  String datalog = "";
   float temp = bmp.readTemperature();
   int press = bmp.readPressure();
   float alt = bmp.readAltitude()-solo;
@@ -69,40 +70,41 @@ void loop() {
     index[i] = update(index[i]);
   }
 
-//   Serial.print(temp);
-//   Serial.print("\t");
-//   Serial.print(press);
-//   Serial.print("\t");
-  Serial.print(alt);
+//   datalog+=String(temp);
+//   datalog+="\t";
+//   datalog+=String(press);
+//   datalog+="\t";
+  datalog+=String(alt);
+
   for(int i=0; i<lvl; i++)
   {
-    Serial.print("\t");
-    Serial.print(av[i]);
+    datalog+="\t";
+    datalog+=String(av[i]);
   }
-  Serial.print("\t");
+  datalog+="\t";
 
   float curr_val = av[lvl-1];
   if(last_val > curr_val)
   {
-    Serial.print(1);
+    datalog+=String(1);
     digitalWrite(LED_BUILTIN,HIGH);
     apg_counter++;
   }
   else
   {
-    Serial.print(-1);
+    datalog+=String(-1);
     digitalWrite(LED_BUILTIN,LOW);
     apg_counter=0;
   }
   last_val = curr_val;
 
-    Serial.print("\t");
-    Serial.print(float(min(apg_counter,apg_limiar))/apg_limiar);
+  datalog+="\t";
+  datalog+=String(float(min(apg_counter,apg_limiar))/apg_limiar);
 
 #if use_buzzer
   if(apg_counter>=apg_limiar) digitalWrite(A0,LOW);
   else digitalWrite(A0,HIGH);
 #endif
 
-  Serial.println();
+  Serial.println(datalog);
 }
