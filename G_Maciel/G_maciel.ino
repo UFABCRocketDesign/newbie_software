@@ -46,25 +46,55 @@ void setup() {
   while (tmp == false) {
     if (num < 10) {
       nomeArquivo = nome + "000" + String(num) + txt;
+      if (SD.exists(nomeArquivo)) {
+        num = num + 1;
+        tmp = false;
+      }
+      else {
+        File dataFile = SD.open(nomeArquivo, FILE_WRITE);
+        dataFile.println(cabecalho);
+        dataFile.close();
+        tmp = true;
+      }
     }
     if (10 <= num < 100) {
       nomeArquivo = nome + "00" + String(num) + txt;
+      if (SD.exists(nomeArquivo)) {
+        num = num + 1;
+        tmp = false;
+      }
+      else {
+        File dataFile = SD.open(nomeArquivo, FILE_WRITE);
+        dataFile.println(cabecalho);
+        dataFile.close();
+        tmp = true;
+      }
     }
     if (100 <= num < 1000) {
       nomeArquivo = nome + "0" + String(num) + txt;
+      if (SD.exists(nomeArquivo)) {
+        num = num + 1;
+        tmp = false;
+      }
+      else {
+        File dataFile = SD.open(nomeArquivo, FILE_WRITE);
+        dataFile.println(cabecalho);
+        dataFile.close();
+        tmp = true;
+      }
     }
     if (1000 <= num < 10000) {
       nomeArquivo = nome + String(num) + txt;
-    }
-    if (SD.exists(nomeArquivo)) {
-      num = num + 1;
-      tmp = false;
-    }
-    else {
-      File dataFile = SD.open(nomeArquivo, FILE_WRITE);
-      dataFile.println(cabecalho);
-      dataFile.close();
-      tmp = true;
+      if (SD.exists(nomeArquivo)) {
+        num = num + 1;
+        tmp = false;
+      }
+      else {
+        File dataFile = SD.open(nomeArquivo, FILE_WRITE);
+        dataFile.println(cabecalho);
+        dataFile.close();
+        tmp = true;
+      }
     }
   }
   Serial.println("file: " + nomeArquivo);
