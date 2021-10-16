@@ -55,11 +55,11 @@ void setup() {
     bool existente = false;
 
   while(existente == false)
-    if(num < 100){
+    if(cont < 100){
       arquivo = nome + String(num) + txt;
       
       if(SD.exists(arquivo)) {
-        num = num + 1;
+        cont = cont + 1;
         existente = false;
       }
       else {
