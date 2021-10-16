@@ -54,6 +54,9 @@ String parteB;
 int a;
 int b;
 int c;
+int ledState = LOW;               // Estado inicial do LED que indica acionamento do paraquedas
+unsigned long previousMillis = 0; // Guarda o valor de tempo 
+const long interval = 2000;       // O intervalo de tempo que o LED deve ficar ligado em milesegundos
 
 Adafruit_BMP085 bmp;
 
@@ -75,12 +78,11 @@ void setup() {
     while (1);
   }
   do{
-    parteA="PA";
-    a=parteA.length();
+    nome="PA";
+    a=nome.length();
     parteB=String(cont);
     b=parteB.length();
     c=8-(a+b);  // Guarda a quantidade de zeros necessária para se colocar entre "PA" e o nº da versão.
-    nome="PA";
     for(int i = 0; i < c; i++){
       nome+="0";
     }
@@ -89,7 +91,7 @@ void setup() {
     cont=cont+1;
   }
   while (SD.exists(nome));
-  Serial.print(" O arquivo será gravado com nome ");
+  Serial.print("O arquivo será gravado com nome ");
   Serial.println(nome);
   Serial.println("card initialized.");
   Serial.println("Situacao\tApogeu(Hmax)\tAltura filtrada final(H1)\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)");//Cabecalho no acompanhamento
@@ -97,7 +99,6 @@ void setup() {
     dataFile.println("Situacao\tApogeu(Hmax)\tAltura filtrada final(H1)\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)"); //Cabecalho no SD
     dataFile.close();
 
- 
   for (int i = 0; i < 100; i++) {             //Este for serve para definir a altitude da base de lancamento como valor de referencia.
     Soma = Soma + bmp.readAltitude();
   }
@@ -129,9 +130,21 @@ void loop() {
   Delta=Hmax-H1;
   
   if (Delta >= 2) {
-    digitalWrite(LED_BUILTIN, HIGH);   // A partir do momento que a diferença de altitude for acima de 2, provavelmente o foguete está descendo.
-    dataString+=String("Descendo");
-    dataString+="\t";
+    unsigned long currentMillis = millis();   //conta em que instante do tempo está
+      if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;
+    if (ledState == LOW) {
+      ledState = HIGH;
+      dataString+=String("Descendo - Paraquedas On");
+      dataString+="\t";
+    } else {
+      ledState = LOW;
+      dataString+=String("Descendo - Paraquedas Off");
+      dataString+="\t";
+    }
+     digitalWrite(LED_BUILTIN, ledState);   // A partir do momento que a diferença de altitude for acima de 2, provavelmente o foguete está descendo. Acione o paraquedas
+     }
+    
   }
   else {
     //Serial.print("Subindo");
