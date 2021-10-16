@@ -11,6 +11,7 @@ float segundaMediaMovel = 0;
 float matriz[2][10];
 String arquivo = "";
 int num = 0;
+String zero = "";
 
 const int chipSelect = 53;
 
@@ -49,7 +50,7 @@ void setup() {
 
     dataString += ("Real alt.(m)\t");
     
-    String nome = "felix";
+    String nome = "f";
     int cont = 0;
     String aux = (String) cont;
     String txt = ".txt";
@@ -57,12 +58,15 @@ void setup() {
 
   while(existente == false){
     if(cont < 1000){
-      if(aux.length() + nome.length() == 6){
-        arquivo = nome + "00" + String(cont) + txt;
+      
+      String aux = (String) cont;
+      int tamanho = 8 - (aux.length() + nome.length());
+
+      for( int i = 0; i < tamanho; i++){
+        String zero = zero + "0";
       }
-      else if (aux.length() + nome.length() == 7) {
-        arquivo = nome + "0" + String(cont) + txt;
-      }
+
+      arquivo = nome + zero + aux + txt;
       
       if(SD.exists(arquivo)) {
         cont = cont + 1;
