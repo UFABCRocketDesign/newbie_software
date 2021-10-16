@@ -6,6 +6,7 @@ float alt_anterior = 0;
 float media = 0;
 float leitura = 0;
 float num_leitura = 0;
+float delta = 0;
 
 void setup() { 
   pinMode(LED_BUILTIN, OUTPUT);
@@ -22,27 +23,21 @@ void setup() {
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
-  
   }
+  alt_anterior =  bmp.readAltitude(); 
 }
 
 void loop() {
   digitalWrite(LED_BUILTIN, HIGH);
-  if (leitura == 1){
-      alt_atual = bmp.readTemperature();  
-      if (num_leitura >= 1){
-        media = (alt_atual - alt_anterior);
-        Serial.print(media);
+  alt_atual = bmp.readAltitude();  
+    if (num_leitura >= 1){
+        delta = (alt_atual - alt_anterior);
+        Serial.print(delta);
         Serial.print("\t");
       }
-      leitura = 1;
-      alt_anterior = alt_atual;
-    }  
-  leitura = 1;
+      alt_anterior = alt_atual;  
   num_leitura += 1;
   
-  //Serial.print("\t");
-  //digitalWrite(LED_BUILTIN, LOW);
 
   //digitalWrite(LED_BUILTIN, HIGH);
   //Serial.print(bmp.readPressure());
@@ -65,5 +60,4 @@ void loop() {
   //Serial.print("\t");
 
   Serial.println();
-  delay(500);
 }
