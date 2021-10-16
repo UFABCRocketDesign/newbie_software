@@ -49,13 +49,13 @@ void setup() {
 
     dataString += ("Real alt.(m)\t");
     
-    String nome = "fernanda";
+    String nome = "felix";
     int cont = 0;
     String txt = ".txt";
     bool existente = false;
 
   while(existente == false)
-    if(num < 10000){
+    if(num < 100){
       arquivo = nome + String(num) + txt;
       
       if(SD.exists(arquivo)) {
