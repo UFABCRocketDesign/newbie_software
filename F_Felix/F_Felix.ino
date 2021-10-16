@@ -51,12 +51,18 @@ void setup() {
     
     String nome = "felix";
     int cont = 0;
+    String aux = (String) cont;
     String txt = ".txt";
     bool existente = false;
 
   while(existente == false){
-    if(cont < 100){
-      arquivo = nome + String(cont) + txt;
+    if(cont < 1000){
+      if(aux.length() + nome.length() == 6){
+        arquivo = nome + "00" + String(cont) + txt;
+      }
+      else if (aux.length() + nome.length() == 7) {
+        arquivo = nome + "0" + String(cont) + txt;
+      }
       
       if(SD.exists(arquivo)) {
         cont = cont + 1;
@@ -69,7 +75,7 @@ void setup() {
         existente = true;
       }
     }
-    Serial.print(arquivo);
+    Serial.println(arquivo);
   }
 
    // Serial.print("Temp.(*C)\t");
