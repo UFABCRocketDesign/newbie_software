@@ -11,7 +11,8 @@ float segundaMediaMovel = 0;
 float matriz[2][10];
 String arquivo = "";
 int num = 0;
-int led = LOW; 
+int led = LOW;
+int led2 = LOW; 
 unsigned long tempoInicial = 0;       
 unsigned long tempoAtual = 0;        
 const long intervalo = 10000;  
@@ -216,6 +217,7 @@ void loop() {
     if(diferenca >= 1 && led == LOW){
       dataString += String("caindo\t");
       digitalWrite(LED_BUILTIN, HIGH);
+      led2 = HIGH;
       led = HIGH;
       tempoInicial = millis();
     }
@@ -223,17 +225,19 @@ void loop() {
       dataString += String("subindo\t");
     }
 
-    if(led == HIGH){
+    if(led2 == HIGH){
        tempoAtual = millis();
        if ((tempoAtual - tempoInicial) >= intervalo) {
         
           dataString += String("caindo\t");
           digitalWrite(LED_BUILTIN, LOW);
-          led = LOW;
+          led2 = LOW;
+          led = HIGH;
        }
        else{
-          dataString += String("caindo");
+          dataString += String("caindo\t");
           digitalWrite(LED_BUILTIN, HIGH);
+          led2 = HIGH;
           led = HIGH;
       }
     }
