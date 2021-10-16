@@ -9,6 +9,8 @@ float soma = 0;
 float mediaMovel = 0;
 float segundaMediaMovel = 0;
 float matriz[2][10];
+String arquivo = "";
+int num = 0;
 
 const int chipSelect = 53;
 
@@ -46,21 +48,27 @@ void setup() {
     dataString += ("Alt.(m)\t");
 
     dataString += ("Real alt.(m)\t");
+    
+    String nome = "fernanda";
+    int cont = 0;
+    String txt = ".txt";
+    bool existente = false;
 
-    File dataFile = SD.open("fernanda.txt", FILE_WRITE);
-  
-    // if the file is available, write to it:
-    if (dataFile) {
-      dataFile.println(dataString);
-      dataFile.close();
+  while(existente == false)
+    if(num < 10000){
+      arquivo = nome + String(num) + txt;
       
-      Serial.println(dataString);
+      if(SD.exists(arquivo)) {
+        num = num + 1;
+        existente = false;
+      }
+      else {
+        File dataFile = SD.open(arquivo, FILE_WRITE);
+        dataFile.println(dataString);
+        dataFile.close();
+        existente = true;
+      }
     }
-  // if the file isn't open, pop up an error:
-    else {
-      Serial.println("error opening fernanda.txt");
-    }
-  
 
    // Serial.print("Temp.(*C)\t");
    // Serial.print("Pres.(Pa)\t");
@@ -170,7 +178,7 @@ void loop() {
     dataString += String(altRelativa);
     dataString += ("\t");
 
-    File dataFile = SD.open("fernanda.txt", FILE_WRITE);
+    File dataFile = SD.open(arquivo, FILE_WRITE);
   
     // if the file is available, write to it:
     if (dataFile) {
@@ -181,7 +189,7 @@ void loop() {
     }
   // if the file isn't open, pop up an error:
     else {
-      Serial.println("error opening fernanda.txt");
+      Serial.println("error opening" + arquivo);
     }
       
     aux = alt;
