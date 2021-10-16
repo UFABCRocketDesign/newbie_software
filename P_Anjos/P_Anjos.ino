@@ -2,33 +2,8 @@
 #include <SPI.h>
 #include <SD.h>
 
-/*
-  Blink
 
-  Turns an LED on for one second, then off for one second, repeatedly.
-
-  Most Arduinos have an on-board LED you can control. On the UNO, MEGA and ZERO
-  it is attached to digital pin 13, on MKR1000 on pin 6. LED_BUILTIN is set to
-  the correct LED pin independent of which board is used.
-  If you want to know what pin the on-board LED is connected to on your Arduino
-  model, check the Technical Specs of your board at:
-  https://www.arduino.cc/en/Main/Products
-
-  modified 8 May 2014
-  by Scott Fitzgerald
-  modified 2 Sep 2016
-  by Arturo Guadalupi
-  modified 8 Sep 2016
-  by Colby Newman
-
-  This example code is in the public domain.
-
-  https://www.arduino.cc/en/Tutorial/BuiltInExamples/Blink
-*/
-
-// the setup function runs once when you press reset or power the board
-
-// Código para detecção do apogeu de um foguete que utiliza sensor de pressão.
+// Código para detecção do apogeu de um foguete que utiliza sensor de pressão. Inclui gravação de dados no cartão SD e acionamento de paraquedas
 
 const int chipSelect = 53;   //Define o pino para o chipselect para gravar no cartão SD
 float H1 = 0;               // Variável global - Não é ressetada a cada loop. Armazena o dado.
@@ -58,6 +33,7 @@ int ledState = LOW;               // Estado inicial do LED que indica acionament
 unsigned long previousMillis = 0; // Guarda o valor de tempo
 const long interval = 2000;       // O intervalo de tempo que o LED deve ficar ligado em milesegundos
 bool Aceso = false;               // A variável booleana para verificar se o LED ta ligado
+bool Fim = true;                  // A variável booleana para parar a verificação do paraquedas
 
 Adafruit_BMP085 bmp;
 
@@ -132,22 +108,26 @@ void loop() {
   if (ledState == HIGH) {
     Aceso = true;                             // Para garantir que após o acionamento do paraquedas, ele irá executar o próximo if
   }
-  if (Delta >= 2 || Aceso == true) {
-    unsigned long currentMillis = millis();   //conta em que instante do tempo está
-    if (currentMillis - previousMillis >= interval) {
-      previousMillis = currentMillis;
-      if (ledState == LOW) {
-        ledState = HIGH;
-        dataString += String("Descendo - Paraquedas On");
-        dataString += "\t";
-      } else {
-        ledState = LOW;
-        dataString += String("Descendo - Paraquedas Off");
-        dataString += "\t";
+  if (Delta > 0) {
+    if (Delta >= 2 || Aceso == true && Fim == true) {
+      unsigned long currentMillis = millis();   //conta em que instante do tempo está
+      if (currentMillis - previousMillis >= interval) {
+        previousMillis = currentMillis;
+        if (ledState == LOW) {
+          ledState = HIGH;
+          dataString += String("Descendo - Paraquedas On");
+          dataString += "\t";
+        } else {
+          ledState = LOW;
+          dataString += String("Descendo - Paraquedas Off");
+          dataString += "\t";
+          Fim = false;                // Finaliza a verificação do acionamento do paraquedas
+        }
+        digitalWrite(LED_BUILTIN, ledState);   // A partir do momento que a diferença de altitude for acima de 2, provavelmente o foguete está descendo. Acione o paraquedas
       }
-      digitalWrite(LED_BUILTIN, ledState);   // A partir do momento que a diferença de altitude for acima de 2, provavelmente o foguete está descendo. Acione o paraquedas
     }
-
+    dataString += String("Descendo");
+    dataString += "\t";
   }
   else {
     dataString += String("Subindo");
