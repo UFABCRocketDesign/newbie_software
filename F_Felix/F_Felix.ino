@@ -11,7 +11,6 @@ float segundaMediaMovel = 0;
 float matriz[2][10];
 String arquivo = "";
 int num = 0;
-String zero = "";
 
 const int chipSelect = 53;
 
@@ -61,9 +60,10 @@ void setup() {
       
       String aux = (String) cont;
       int tamanho = 8 - (aux.length() + nome.length());
-
+      String zero = "";
+      
       for( int i = 0; i < tamanho; i++){
-        String zero = zero + "0";
+        zero = zero + "0";
       }
 
       arquivo = nome + zero + aux + txt;
