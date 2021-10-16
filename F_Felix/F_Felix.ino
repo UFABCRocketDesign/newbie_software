@@ -54,7 +54,7 @@ void setup() {
     String txt = ".txt";
     bool existente = false;
 
-  while(existente == false)
+  while(existente == false){
     if(cont < 100){
       arquivo = nome + String(num) + txt;
       
@@ -69,6 +69,8 @@ void setup() {
         existente = true;
       }
     }
+    Serial.print(arquivo);
+  }
 
    // Serial.print("Temp.(*C)\t");
    // Serial.print("Pres.(Pa)\t");
