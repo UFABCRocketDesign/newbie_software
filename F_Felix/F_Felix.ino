@@ -11,6 +11,11 @@ float segundaMediaMovel = 0;
 float matriz[2][10];
 String arquivo = "";
 int num = 0;
+int led = LOW; 
+unsigned long tempoInicial = 0;       
+unsigned long tempoAtual = 0;        
+const long intervalo = 10000;  
+float apogeu = 0;                   
 
 const int chipSelect = 53;
 
@@ -47,7 +52,17 @@ void setup() {
 
     dataString += ("Alt.(m)\t");
 
+    dataString += ("Pres. sealevel(Pa)\t");
+
     dataString += ("Real alt.(m)\t");
+
+    dataString += ("Foguete\t");
+    
+    dataString += ("Variação\t");
+    
+    dataString += ("Média\t");
+    
+    dataString += ("Média 2\t");
     
     String nome = "f";
     int cont = 0;
@@ -56,7 +71,6 @@ void setup() {
     bool existente = false;
 
   while(existente == false){
-    if(cont < 1000){
       
       String aux = (String) cont;
       int tamanho = 8 - (aux.length() + nome.length());
@@ -78,8 +92,8 @@ void setup() {
         dataFile.close();
         existente = true;
       }
-    }
-    Serial.println(arquivo);
+      
+      Serial.println(arquivo);
   }
 
    // Serial.print("Temp.(*C)\t");
@@ -178,16 +192,60 @@ void loop() {
 
     String dataString = "";
     
-    dataString+=String(bmp.readTemperature());
+    dataString+= String(bmp.readTemperature());
     dataString+= ("\t");
 
-    dataString+=String(bmp.readPressure());
+    dataString+= String(bmp.readPressure());
     dataString+= ("\t");
 
-    dataString+=String(bmp.readAltitude(101500));
+    dataString+= String(bmp.readAltitude(101500));
     dataString+= ("\t");
+
+    dataString += String (bmp.readSealevelPressure());
+    dataString += ("\t");
 
     dataString += String(altRelativa);
+    dataString += ("\t");
+
+    if (apogeu < segundaMediaMovel) {                                    
+        apogeu = segundaMediaMovel;
+    }
+
+    float diferenca = apogeu - segundaMediaMovel;
+
+    if(diferenca >= 1 && led == LOW){
+      dataString += String("caindo\t");
+      digitalWrite(LED_BUILTIN, HIGH);
+      led = HIGH;
+      tempoInicial = millis();
+    }
+    else if (led == LOW){
+      dataString += String("subindo\t");
+    }
+
+    if(led == HIGH){
+       tempoAtual = millis();
+       if ((tempoAtual - tempoInicial) >= intervalo) {
+        
+          dataString += String("caindo\t");
+          digitalWrite(LED_BUILTIN, LOW);
+          led = LOW;
+       }
+       else{
+          dataString += String("caindo");
+          digitalWrite(LED_BUILTIN, HIGH);
+          led = HIGH;
+      }
+    }
+    
+  
+    dataString += String(altRelativa);
+    dataString += ("\t");
+
+    dataString += String(mediaMovel);
+    dataString += ("\t");
+
+    dataString += String(segundaMediaMovel);
     dataString += ("\t");
 
     File dataFile = SD.open(arquivo, FILE_WRITE);
