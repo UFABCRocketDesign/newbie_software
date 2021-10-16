@@ -56,7 +56,7 @@ void setup() {
 
   while(existente == false){
     if(cont < 100){
-      arquivo = nome + String(num) + txt;
+      arquivo = nome + String(cont) + txt;
       
       if(SD.exists(arquivo)) {
         cont = cont + 1;
