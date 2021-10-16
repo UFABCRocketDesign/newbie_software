@@ -57,7 +57,7 @@ int c;
 int ledState = LOW;               // Estado inicial do LED que indica acionamento do paraquedas
 unsigned long previousMillis = 0; // Guarda o valor de tempo
 const long interval = 2000;       // O intervalo de tempo que o LED deve ficar ligado em milesegundos
-bool Aceso= false;                // A variável booleana para verificar se o LED ta ligado
+bool Aceso = false;               // A variável booleana para verificar se o LED ta ligado
 
 Adafruit_BMP085 bmp;
 
@@ -130,9 +130,9 @@ void loop() {
   }
   Delta = Hmax - H1;
   if (ledState == HIGH) {
-    Aceso=true;                               // Para garantir que após o acionamento do paraquedas, ele irá executar o próximo if
+    Aceso = true;                             // Para garantir que após o acionamento do paraquedas, ele irá executar o próximo if
   }
-  if (Delta >= 2|| Aceso == true) {
+  if (Delta >= 2 || Aceso == true) {
     unsigned long currentMillis = millis();   //conta em que instante do tempo está
     if (currentMillis - previousMillis >= interval) {
       previousMillis = currentMillis;
@@ -150,7 +150,6 @@ void loop() {
 
   }
   else {
-    //Serial.print("Subindo");
     dataString += String("Subindo");
     dataString += "\t";
   }
