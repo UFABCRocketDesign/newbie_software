@@ -121,6 +121,7 @@ void loop() {
   dataString += String(bmp.readPressure());
   dataString += "\t";
   dataString += String(bmp.readSealevelPressure());
+  dataString += "\t";
   if (Delta > 0) {
     if ((Delta >= 2 || Aceso == true) && Fim == true) {
       unsigned long currentMillis = millis();   //conta em que instante do tempo está
@@ -135,24 +136,23 @@ void loop() {
           Fim = false;                // Finaliza a verificação do acionamento do paraquedas
         }
         digitalWrite(LED_BUILTIN, ledState);   // A partir do momento que a diferença de altitude for acima de 2, provavelmente o foguete está descendo. Acione o paraquedas
-      }
-    dataString += String("Descendo");
+      }}
+      dataString += String("Descendo");
+    } else {
+      dataString += String("Subindo");
     }
-  }else {
-    dataString += String("Subindo");
-  }
 
-  File dataFile = SD.open(nome, FILE_WRITE);
+    File dataFile = SD.open(nome, FILE_WRITE);
 
-  // if the file is available, write to it:
-  if (dataFile) {
-    dataFile.println(dataString);
-    dataFile.close();
-    // print to the serial port too:
-    Serial.println(dataString);
+    // if the file is available, write to it:
+    if (dataFile) {
+      dataFile.println(dataString);
+      dataFile.close();
+      // print to the serial port too:
+      Serial.println(dataString);
+    }
+    // if the file isn't open, pop up an error:
+    else {
+      Serial.println("error opening P_ANJOS.txt");
+    }
   }
-  // if the file isn't open, pop up an error:
-  else {
-    Serial.println("error opening P_ANJOS.txt");
-  }
-}
