@@ -109,7 +109,7 @@ void loop() {
     Aceso = true;                             // Para garantir que após o acionamento do paraquedas, ele irá executar o próximo if
   }
   if (Delta > 0) {
-    if (Delta >= 2 || Aceso == true && Fim == true) {
+    if ((Delta >= 2 || Aceso == true) && Fim == true) {
       unsigned long currentMillis = millis();   //conta em que instante do tempo está
       if (currentMillis - previousMillis >= interval) {
         previousMillis = currentMillis;
