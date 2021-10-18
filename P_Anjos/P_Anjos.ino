@@ -71,9 +71,9 @@ void setup() {
   Serial.print("O arquivo será gravado com nome ");
   Serial.println(nome);
   Serial.println("card initialized.");
-  Serial.println("Situacao\tApogeu(Hmax)\tAltura filtrada final(H1)\tDelta\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)");//Cabecalho no acompanhamento
+  Serial.println("Apogeu(Hmax)\tAltura filtrada final(H1)\tDelta\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)\tSituacao");//Cabecalho no acompanhamento
   File dataFile = SD.open(nome, FILE_WRITE);
-  dataFile.println("Situacao\tApogeu(Hmax)\tAltura filtrada final(H1)\tDelta\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)"); //Cabecalho no SD
+  dataFile.println("Apogeu(Hmax)\tAltura filtrada final(H1)\tDelta\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)\tSituacao"); //Cabecalho no SD
   dataFile.close();
 
   for (int i = 0; i < 100; i++) {             //Este for serve para definir a altitude da base de lancamento como valor de referencia.
@@ -108,31 +108,6 @@ void loop() {
   if (ledState == HIGH) {
     Aceso = true;                             // Para garantir que após o acionamento do paraquedas, ele irá executar o próximo if
   }
-  if (Delta > 0) {
-    if ((Delta >= 2 || Aceso == true) && Fim == true) {
-      unsigned long currentMillis = millis();   //conta em que instante do tempo está
-      if (currentMillis - previousMillis >= interval) {
-        previousMillis = currentMillis;
-        if (ledState == LOW) {
-          ledState = HIGH;
-          dataString += String("Descendo - Paraquedas On");
-          dataString += "\t";
-        } else {
-          ledState = LOW;
-          dataString += String("Descendo - Paraquedas Off");
-          dataString += "\t";
-          Fim = false;                // Finaliza a verificação do acionamento do paraquedas
-        }
-        digitalWrite(LED_BUILTIN, ledState);   // A partir do momento que a diferença de altitude for acima de 2, provavelmente o foguete está descendo. Acione o paraquedas
-      }
-    }
-    dataString += String("Descendo");
-    dataString += "\t";
-  }
-  else {
-    dataString += String("Subindo");
-    dataString += "\t";
-  }
   dataString += String(Hmax);
   dataString += "\t";
   dataString += String(H1);
@@ -146,6 +121,26 @@ void loop() {
   dataString += String(bmp.readPressure());
   dataString += "\t";
   dataString += String(bmp.readSealevelPressure());
+  if (Delta > 0) {
+    if ((Delta >= 2 || Aceso == true) && Fim == true) {
+      unsigned long currentMillis = millis();   //conta em que instante do tempo está
+      if (currentMillis - previousMillis >= interval) {
+        previousMillis = currentMillis;
+        if (ledState == LOW) {
+          ledState = HIGH;
+          dataString += String("Descendo - Paraquedas On");
+        } else {
+          ledState = LOW;
+          dataString += String("Descendo - Paraquedas Off");
+          Fim = false;                // Finaliza a verificação do acionamento do paraquedas
+        }
+        digitalWrite(LED_BUILTIN, ledState);   // A partir do momento que a diferença de altitude for acima de 2, provavelmente o foguete está descendo. Acione o paraquedas
+      }
+    dataString += String("Descendo");
+    }
+  }else {
+    dataString += String("Subindo");
+  }
 
   File dataFile = SD.open(nome, FILE_WRITE);
 
