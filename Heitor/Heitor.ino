@@ -1,10 +1,11 @@
 #include <Adafruit_BMP085.h>
+#include "../pinos.h"
 
 #define use_buzzer 1
 
 #define apg_limiar 60
 
-#define len 3
+#define len 15
 #define lvl 3
 #define coiso vec[lvl][len]
 #define idx(I) vec[(I)][index[(I)]]
