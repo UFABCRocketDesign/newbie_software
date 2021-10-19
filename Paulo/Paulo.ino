@@ -28,6 +28,7 @@ boolean condition;
 int interval = 5000;
 unsigned long currentMillis;
 unsigned long previousMillis = 0;
+String acionamento = "\tDesligado";
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -77,10 +78,10 @@ void setup() {
   // Inicia inserindo essa informação no FILE nomeado
   File dataFile = SD.open(file, FILE_WRITE);
   if (dataFile) {
-    dataFile.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tApogeu");
+    dataFile.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tApogeu\tParaquedas");
     dataFile.close();
     // print to the serial port too:
-    Serial.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tApogeu");
+    Serial.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tApogeu\tParaquedas");
   }
   
   // Medicao
@@ -195,21 +196,21 @@ void loop() {
   // Identificação de subida/descida/apogeu
   if (cont_sub > 10) {
     estado = "\tSubindo";
-    cont_subidas += 1;
+    cont_subidas = 1;
     ult_subida = nova_altLeitura;
   }
   else if (cont_desc > 10) {
     estado = "\tDescendo";
-    cont_descidas += 1;
   }
   dataString += estado;
-  if (cont_subidas > 0 and cont_descidas == 1) {
+  if (cont_subidas > 0 and cont_desc >= 1) {
     dataString += "\tApogeu em:";
     dataString += String(ult_subida);
 
     // Aciona paraquedas
-    if (cont_descidas == 1) {
+    if (cont_desc == 1) {
       digitalWrite(LED_BUILTIN, HIGH);
+      acionamento = "\tAcionado";
       previousMillis = currentMillis;
     }
   }
@@ -217,7 +218,9 @@ void loop() {
   // Desliga o "curto" para o paraquedas
   if ((currentMillis - previousMillis) >= interval) {
     digitalWrite(LED_BUILTIN, LOW);
+    acionamento = "\tDesligado";
   }
+  dataString += acionamento;
 
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
