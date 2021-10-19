@@ -5,7 +5,9 @@
 //VALORES DE ENTRADA
 #define tam 10                    //Tamanho da matriz do filtro
 #define qf 2                      //Quantidade de filtros
-#define NomeArq "apm"               //Nome do arquivo para o cartão SD
+#define NomeArq "apm"             //Nome do arquivo para o cartão SD
+#define esperaux 1                //1 para ter tempo de espera e qualquer outro número para não ter
+#define esperatempo 5000          //tempo de espera para acionamento do foguete (ms)
 //////////////////////////////////////////////////////////////////////
 
 float Hmax = 0;                   //Valor máximo filtrado
@@ -159,7 +161,10 @@ void loop() {
   }
   Delta=Hmax-MediaMov;                                     //Compara o valor máximo do filtro1 com o valor atual do filtro1
   
-  if (Delta >= 2 && auxled ==0) {                                        //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
+  if (Delta >= 2 && auxled ==0) {                          //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
+    if(esperaux == 1){
+      delay(esperatempo);
+    }
     if (dataFile) {
       dataFile.println("Descendo");
       dataFile.close();
@@ -179,6 +184,7 @@ void loop() {
     Serial.print("Subindo");
     Serial.print("\t");
   }
+  
   if(auxled == 1){
     tempoAtual = millis();
     if ((tempoAtual - tempo0) >= intervalo) {
