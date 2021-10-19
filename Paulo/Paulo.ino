@@ -14,7 +14,7 @@ float altura_inicio, media_alt_inicio;
 int j, i;
 float media_movel, nova_media_movel, antiga_media_movel;
 float media_movel_lg, nova_media_movel_lg;
-String estado;
+String estado, str_apogeu1, str_apogeu2;
 
 // Filtro dos dados
 float list_med_movel[2][filt_i];
@@ -81,10 +81,10 @@ void setup() {
   // Inicia inserindo essa informação no FILE nomeado
   File dataFile = SD.open(file, FILE_WRITE);
   if (dataFile) {
-    dataFile.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tApogeu\tParaquedas");
+    dataFile.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tParaquedas\tApogeu");
     dataFile.close();
     // print to the serial port too:
-    Serial.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tApogeu\tParaquedas");
+    Serial.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tParaquedas\tApogeu");
   }
   
   // Medicao
@@ -207,8 +207,8 @@ void loop() {
   dataString += estado;
   currentMillis = millis();
   if (cont_subidas > 0 && cont_desc == 1) {
-    dataString += "\tApogeu em:";
-    dataString += String(ult_subida);
+    str_apogeu1 += "\tApogeu em:";
+    str_apogeu2 += String(ult_subida);
 
     // Inicia processo de acionamento paraquedas
     if (cont_acionar == 0) {
@@ -219,7 +219,7 @@ void loop() {
   }
 
   // Aciona paraquedas
-  if (cont_acionar == 1 && (currentMillis - previousMillis_p_acionar >= intervalo_p_acionar)) {
+  if (currentMillis - previousMillis_p_acionar >= intervalo_p_acionar && cont_acionar == 1) {
       digitalWrite(LED_BUILTIN, HIGH);
       acionamento = "\tAcionado";
       previousMillis_acionado = currentMillis;
@@ -232,6 +232,8 @@ void loop() {
     acionamento = "\tDesligado";
   }
   dataString += acionamento;
+  dataString += str_apogeu1;
+  dataString += str_apogeu2;
 
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
