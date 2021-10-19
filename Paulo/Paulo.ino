@@ -8,6 +8,7 @@ const int chipSelect = 53; // Declaração de CS
 #define filt_i 10
 #define filt_f 20
 
+// Variáveis para detecção de apogeu
 float nova_altLeitura, cont_sub, cont_subidas, cont_desc, ult_subida;
 float altura_inicio, media_alt_inicio;
 int j, i;
@@ -15,11 +16,18 @@ float media_movel, nova_media_movel, antiga_media_movel;
 float media_movel_lg, nova_media_movel_lg;
 String estado;
 
+// Filtro dos dados
 float list_med_movel[2][filt_i];
 
+// Variáveis para utilizaçao de cartao SD
 String nome_arq, txt, file, arq_number;
 int number, len_nome, len_number;
 boolean condition;
+
+// Variáveis para acionamento do paraquedas
+int interval = 30000;
+unsigned long currentMillis;
+unsigned long previousMillis = 0;
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -110,6 +118,7 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
+  currentMillis = millis();
   // Cria uma string para ser adicionada ao cartao
   String dataString = "";
   
@@ -195,6 +204,15 @@ void loop() {
   if (cont_subidas > 0 and cont_desc == 10) {
     dataString += "\tApogeu em:";
     dataString += String(ult_subida);
+
+    // Aciona paraquedas
+    digitalWrite(LED_BUILTIN, HIGH);
+    previousMillis = currentMillis;
+  }
+
+  // Desliga o "curto" para o paraquedas
+  if ((currentMillis - previousMillis) >= interval) {
+    digitalWrite(LED_BUILTIN, LOW);
   }
 
   // open the file. note that only one file can be open at a time,
