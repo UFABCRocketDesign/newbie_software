@@ -25,7 +25,7 @@ int number, len_nome, len_number;
 boolean condition;
 
 // Variáveis para acionamento do paraquedas
-const long intervalo_p_acionar = 2000;
+const long intervalo_p_acionar = 5000;
 const long intervalo_acionado = 5000;
 unsigned long currentMillis;
 unsigned long previousMillis_p_acionar = 0;
@@ -213,6 +213,7 @@ void loop() {
     // Inicia processo de acionamento paraquedas
     if (cont_acionar == 0) {
       previousMillis_p_acionar = currentMillis;
+      acionamento = "\tA Acionar";
       cont_acionar = 1;
     }
   }
