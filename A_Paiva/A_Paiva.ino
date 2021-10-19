@@ -176,6 +176,7 @@ void loop() {
     Serial.print("Descendo");
     Serial.print("\t");
     tempo0 = millis();
+    digitalWrite(IGN_1, OUTPUT);
     auxled = 1;   
   }
   else if(auxled == 0){
@@ -195,43 +196,18 @@ void loop() {
     Serial.print("Descendo");
     Serial.print("\t");
     //digitalWrite(LED_BUILTIN, LOW);
-    digitalWrite(IGN_1, LOW);
+    digitalWrite(IGN_1, HIGH);
+    digitalWrite(IGN_2, LOW);
     led = 0;
     if((tempoAtual-tempo0) >= espera){ 
-      digitalWrite(IGN_1, HIGH);
+      digitalWrite(IGN_2, HIGH);
+      digitalWrite(IGN_1, LOW);
       led = 1;
       tempo0 = millis();
       auxled = 2;
     }
   }
   if(auxled == 2){
-    tempoAtual = millis();
-    if ((tempoAtual - tempo0) >= intervalo) {
-      if (dataFile) {
-        dataFile.println("Descendo2");
-        dataFile.close();
-      }
-      Serial.print("Descendo");
-      Serial.print("\t");
-      digitalWrite(IGN_1, LOW);
-      digitalWrite(IGN_2, HIGH);
-      tempo0 = millis();
-      led = 0;
-      auxled = 3;
-    }
-    else{
-      if (dataFile) {
-        dataFile.println("Descendo1");
-        dataFile.close();
-      }
-      Serial.print("Descendo");
-      Serial.print("\t");
-      digitalWrite(IGN_1, HIGH);
-      led = 1;
-      auxled = 2;
-    }
-  }
-  if(auxled == 3){
     tempoAtual = millis();
     if ((tempoAtual - tempo0) >= intervalo) {
       if (dataFile) {
@@ -244,18 +220,19 @@ void loop() {
       digitalWrite(IGN_2, LOW);
       tempo0 = millis();
       led = 0;
-      auxled = 3;
+      auxled = 2;
     }
     else{
       if (dataFile) {
-        dataFile.println("Descendo2");
+        dataFile.println("Descendo1");
         dataFile.close();
       }
       Serial.print("Descendo");
       Serial.print("\t");
       digitalWrite(IGN_2, HIGH);
+      digitalWrite(IGN_1, LOW);
       led = 1;
-      auxled = 3;
+      auxled = 2;
     }
   }
   Serial.print(led);
