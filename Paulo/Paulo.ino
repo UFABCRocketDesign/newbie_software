@@ -25,9 +25,11 @@ int number, len_nome, len_number;
 boolean condition;
 
 // Variáveis para acionamento do paraquedas
-const long intervalo = 5000;
+const long intervalo_p_acionar = 2000;
+const long intervalo_acionado = 5000;
 unsigned long currentMillis;
-unsigned long previousMillis = 0;
+unsigned long previousMillis_p_acionar = 0;
+unsigned long previousMillis_acionado = 0;
 int cont_acionar = 0;
 String acionamento = "\tDesligado";
 
@@ -208,17 +210,23 @@ void loop() {
     dataString += "\tApogeu em:";
     dataString += String(ult_subida);
 
-    // Aciona paraquedas
+    // Inicia processo de acionamento paraquedas
     if (cont_acionar == 0) {
-      digitalWrite(LED_BUILTIN, HIGH);
-      acionamento = "\tAcionado";
-      previousMillis = currentMillis;
+      previousMillis_p_acionar = currentMillis;
       cont_acionar = 1;
     }
   }
 
-  // Desliga o "curto" para o paraquedas
-  if (currentMillis - previousMillis >= intervalo) {
+  // Aciona paraquedas
+  if (cont_acionar == 1 && (currentMillis - previousMillis_p_acionar >= intervalo_p_acionar)) {
+      digitalWrite(LED_BUILTIN, HIGH);
+      acionamento = "\tAcionado";
+      previousMillis_acionado = currentMillis;
+      cont_acionar = 2;
+    }
+
+  // Desliga o "curto" do paraquedas
+  if (currentMillis - previousMillis_acionado >= intervalo_acionado) {
     digitalWrite(LED_BUILTIN, LOW);
     acionamento = "\tDesligado";
   }
