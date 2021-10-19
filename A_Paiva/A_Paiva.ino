@@ -3,11 +3,15 @@
 #include <SD.h>
 
 //VALORES DE ENTRADA
-#define tam 10                    //Tamanho da matriz do filtro
+#define tam 10                    //Tamanho da matriz do filtro(quantidade de valores usado)
 #define qf 2                      //Quantidade de filtros
-#define NomeArq "apm"             //Nome do arquivo para o cartão SD
+#define NomeArq "apm"             //Nome do arquivo para o cartão SD entre aspas
 #define espera 5000               //Tempo de espera para acionamento do paraquedas (ms)
 //////////////////////////////////////////////////////////////////////
+#define IGN_1 36  /*act1*/
+#define IGN_2 61  /*act2*/
+#define IGN_3 46  /*act3*/
+#define IGN_4 55  /*act4*/
 
 float Hmax = 0;                   //Valor máximo filtrado
 float SomaRef = 0;                //Soma valores iniciais(foguete parado na base)
@@ -44,6 +48,10 @@ Adafruit_BMP085 bmp;              //Cria variável 'bmp' para a biblioteca Adafr
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(IGN_1, OUTPUT);//PINOS DA MACRO pinos.h
+  pinMode(IGN_2, OUTPUT);
+  pinMode(IGN_3, OUTPUT);
+  pinMode(IGN_4, OUTPUT);
   Serial.begin(115200);
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
@@ -68,8 +76,8 @@ void setup() {
     }
     NomeFinal = x+y+z+".txt";
     if (SD.exists(NomeFinal)) {
-      Serial.print(NomeFinal);
-      Serial.println(" ja existe");
+      //Serial.print(NomeFinal);
+      //Serial.println(" ja existe");
       Num++;
       aux = 1;
     }
@@ -186,10 +194,11 @@ void loop() {
     }
     Serial.print("Descendo");
     Serial.print("\t");
-    digitalWrite(LED_BUILTIN, LOW);
+    //digitalWrite(LED_BUILTIN, LOW);
+    digitalWrite(IGN_1, LOW);
     led = 0;
     if((tempoAtual-tempo0) >= espera){ 
-      digitalWrite(LED_BUILTIN, HIGH);
+      digitalWrite(IGN_1, HIGH);
       led = 1;
       tempo0 = millis();
       auxled = 2;
@@ -199,25 +208,54 @@ void loop() {
     tempoAtual = millis();
     if ((tempoAtual - tempo0) >= intervalo) {
       if (dataFile) {
-        dataFile.println("Descendo");
+        dataFile.println("Descendo2");
         dataFile.close();
       }
       Serial.print("Descendo");
       Serial.print("\t");
-      digitalWrite(LED_BUILTIN, LOW);
+      digitalWrite(IGN_1, LOW);
+      digitalWrite(IGN_2, HIGH);
+      tempo0 = millis();
       led = 0;
-      auxled = 2;
+      auxled = 3;
     }
     else{
+      if (dataFile) {
+        dataFile.println("Descendo1");
+        dataFile.close();
+      }
+      Serial.print("Descendo");
+      Serial.print("\t");
+      digitalWrite(IGN_1, HIGH);
+      led = 1;
+      auxled = 2;
+    }
+  }
+  if(auxled == 3){
+    tempoAtual = millis();
+    if ((tempoAtual - tempo0) >= intervalo) {
       if (dataFile) {
         dataFile.println("Descendo");
         dataFile.close();
       }
       Serial.print("Descendo");
       Serial.print("\t");
-      digitalWrite(LED_BUILTIN, HIGH);
+      digitalWrite(IGN_1, LOW);
+      digitalWrite(IGN_2, LOW);
+      tempo0 = millis();
+      led = 0;
+      auxled = 3;
+    }
+    else{
+      if (dataFile) {
+        dataFile.println("Descendo2");
+        dataFile.close();
+      }
+      Serial.print("Descendo");
+      Serial.print("\t");
+      digitalWrite(IGN_2, HIGH);
       led = 1;
-      auxled = 2;
+      auxled = 3;
     }
   }
   Serial.print(led);
