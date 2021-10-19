@@ -206,7 +206,7 @@ void loop() {
   }
   dataString += estado;
   currentMillis = millis();
-  if (cont_subidas > 0 && cont_desc == 1) {
+  if (cont_subidas > 0 && cont_desc >= 1) {
     str_apogeu1 += "\tApogeu em:";
     str_apogeu2 += String(ult_subida);
 
@@ -220,11 +220,11 @@ void loop() {
 
   // Aciona paraquedas
   if (currentMillis - previousMillis_p_acionar >= intervalo_p_acionar && cont_acionar == 1) {
-      digitalWrite(LED_BUILTIN, HIGH);
-      acionamento = "\tAcionado";
-      previousMillis_acionado = currentMillis;
-      cont_acionar = 2;
-    }
+    digitalWrite(LED_BUILTIN, HIGH);
+    acionamento = "\tAcionado";
+    previousMillis_acionado = currentMillis;
+    cont_acionar = 2;
+  }
 
   // Desliga o "curto" do paraquedas
   if (currentMillis - previousMillis_acionado >= intervalo_acionado) {
