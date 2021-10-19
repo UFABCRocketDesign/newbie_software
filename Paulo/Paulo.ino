@@ -25,7 +25,7 @@ int number, len_nome, len_number;
 boolean condition;
 
 // Variáveis para acionamento do paraquedas
-const long interval = 5000;
+const long intervalo = 5000;
 unsigned long currentMillis;
 unsigned long previousMillis = 0;
 int cont_acionar = 0;
@@ -213,12 +213,12 @@ void loop() {
       digitalWrite(LED_BUILTIN, HIGH);
       acionamento = "\tAcionado";
       previousMillis = currentMillis;
-      cont_acionar == 1;
+      cont_acionar = 1;
     }
   }
 
   // Desliga o "curto" para o paraquedas
-  if ((currentMillis - previousMillis) >= interval) {
+  if (currentMillis - previousMillis >= intervalo) {
     digitalWrite(LED_BUILTIN, LOW);
     acionamento = "\tDesligado";
   }
