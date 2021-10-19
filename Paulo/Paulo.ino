@@ -25,9 +25,10 @@ int number, len_nome, len_number;
 boolean condition;
 
 // Variáveis para acionamento do paraquedas
-int interval = 5000;
+const long interval = 5000;
 unsigned long currentMillis;
 unsigned long previousMillis = 0;
+int cont_acionar = 0;
 String acionamento = "\tDesligado";
 
 // the setup function runs once when you press reset or power the board
@@ -120,7 +121,6 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-  currentMillis = millis();
   // Cria uma string para ser adicionada ao cartao
   String dataString = "";
   
@@ -203,15 +203,17 @@ void loop() {
     estado = "\tDescendo";
   }
   dataString += estado;
-  if (cont_subidas > 0 and cont_desc >= 1) {
+  currentMillis = millis();
+  if (cont_subidas > 0 && cont_desc == 1) {
     dataString += "\tApogeu em:";
     dataString += String(ult_subida);
 
     // Aciona paraquedas
-    if (cont_desc == 1) {
+    if (cont_acionar == 0) {
       digitalWrite(LED_BUILTIN, HIGH);
       acionamento = "\tAcionado";
       previousMillis = currentMillis;
+      cont_acionar == 1;
     }
   }
 
