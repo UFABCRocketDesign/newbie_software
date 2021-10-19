@@ -6,8 +6,7 @@
 #define tam 10                    //Tamanho da matriz do filtro
 #define qf 2                      //Quantidade de filtros
 #define NomeArq "apm"             //Nome do arquivo para o cartão SD
-#define esperaux 1                //1 para ter tempo de espera e qualquer outro número para não ter
-#define esperatempo 5000          //tempo de espera para acionamento do foguete (ms)
+#define espera 5000               //Tempo de espera para acionamento do paraquedas (ms)
 //////////////////////////////////////////////////////////////////////
 
 float Hmax = 0;                   //Valor máximo filtrado
@@ -162,19 +161,14 @@ void loop() {
   Delta=Hmax-MediaMov;                                     //Compara o valor máximo do filtro1 com o valor atual do filtro1
   
   if (Delta >= 2 && auxled ==0) {                          //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
-    if(esperaux == 1){
-      delay(esperatempo);
-    }
     if (dataFile) {
       dataFile.println("Descendo");
       dataFile.close();
     }
     Serial.print("Descendo");
     Serial.print("\t");
-    digitalWrite(LED_BUILTIN, HIGH);
-    led = 1;
-    auxled = 1;
     tempo0 = millis();
+    auxled = 1;   
   }
   else if(auxled == 0){
     if (dataFile) {
@@ -184,30 +178,46 @@ void loop() {
     Serial.print("Subindo");
     Serial.print("\t");
   }
-  
   if(auxled == 1){
+    tempoAtual = millis();
+    if (dataFile) {
+        dataFile.println("Descendo");
+        dataFile.close();
+    }
+    Serial.print("Descendo");
+    Serial.print("\t");
+    digitalWrite(LED_BUILTIN, LOW);
+    led = 0;
+    if((tempoAtual-tempo0) >= espera){ 
+      digitalWrite(LED_BUILTIN, HIGH);
+      led = 1;
+      tempo0 = millis();
+      auxled = 2;
+    }
+  }
+  if(auxled == 2){
     tempoAtual = millis();
     if ((tempoAtual - tempo0) >= intervalo) {
       if (dataFile) {
-      dataFile.println("Descendo");
-      dataFile.close();
+        dataFile.println("Descendo");
+        dataFile.close();
       }
       Serial.print("Descendo");
       Serial.print("\t");
       digitalWrite(LED_BUILTIN, LOW);
       led = 0;
-      auxled = 1;
+      auxled = 2;
     }
     else{
       if (dataFile) {
-      dataFile.println("Descendo");
-      dataFile.close();
+        dataFile.println("Descendo");
+        dataFile.close();
       }
       Serial.print("Descendo");
       Serial.print("\t");
       digitalWrite(LED_BUILTIN, HIGH);
       led = 1;
-      auxled = 1;
+      auxled = 2;
     }
   }
   Serial.print(led);
