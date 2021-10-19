@@ -9,7 +9,7 @@ const int chipSelect = 53; // Declaração de CS
 #define filt_f 20
 
 // Variáveis para detecção de apogeu
-float nova_altLeitura, cont_sub, cont_subidas, cont_desc, ult_subida;
+float nova_altLeitura, cont_sub, cont_subidas, cont_desc, cont_descidas, ult_subida;
 float altura_inicio, media_alt_inicio;
 int j, i;
 float media_movel, nova_media_movel, antiga_media_movel;
@@ -25,7 +25,7 @@ int number, len_nome, len_number;
 boolean condition;
 
 // Variáveis para acionamento do paraquedas
-int interval = 30000;
+int interval = 5000;
 unsigned long currentMillis;
 unsigned long previousMillis = 0;
 
@@ -107,6 +107,7 @@ void setup() {
   cont_sub = 0; 
   cont_subidas = 0;
   cont_desc = 0;
+  cont_descidas = 0;
   ult_subida = 0;
   nova_media_movel = 0;
   antiga_media_movel = 0;
@@ -194,20 +195,23 @@ void loop() {
   // Identificação de subida/descida/apogeu
   if (cont_sub > 10) {
     estado = "\tSubindo";
-    cont_subidas = 1;
+    cont_subidas += 1;
     ult_subida = nova_altLeitura;
   }
   else if (cont_desc > 10) {
     estado = "\tDescendo";
+    cont_descidas += 1;
   }
   dataString += estado;
-  if (cont_subidas > 0 and cont_desc == 10) {
+  if (cont_subidas > 0 and cont_descidas == 1) {
     dataString += "\tApogeu em:";
     dataString += String(ult_subida);
 
     // Aciona paraquedas
-    digitalWrite(LED_BUILTIN, HIGH);
-    previousMillis = currentMillis;
+    if (cont_descidas == 1) {
+      digitalWrite(LED_BUILTIN, HIGH);
+      previousMillis = currentMillis;
+    }
   }
 
   // Desliga o "curto" para o paraquedas
