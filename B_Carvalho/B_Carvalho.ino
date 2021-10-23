@@ -8,7 +8,7 @@ float leitura = 0;
 float num_leitura = 0;
 float delta = 0;
 int i = 0;
-int soma = 0;
+float soma = 0;
 
 void setup() { 
   pinMode(LED_BUILTIN, OUTPUT);
@@ -36,13 +36,11 @@ void setup() {
 void loop(){
   digitalWrite(LED_BUILTIN, HIGH);
   alt_atual = bmp.readAltitude();  
-    if (num_leitura >= 1){
-        delta = (alt_anterior - media);
-        Serial.print(delta);
-        Serial.print("\t");
-      }
-      alt_anterior = alt_atual;  
-  num_leitura += 1;
+  delta = (alt_anterior - media);
+  Serial.print(delta);
+  Serial.print("\t");
+  alt_anterior = alt_atual;  
+  
   
 
   //digitalWrite(LED_BUILTIN, HIGH);
