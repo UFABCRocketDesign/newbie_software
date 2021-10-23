@@ -7,8 +7,12 @@ float media = 0;
 float leitura = 0;
 float num_leitura = 0;
 float delta = 0;
-int i = 0;
 float soma = 0;
+int altitude[10];
+int i = 0;
+float soma_mm = 0;
+float media_movel = 0;
+
 
 void setup() { 
   pinMode(LED_BUILTIN, OUTPUT);
@@ -37,6 +41,14 @@ void loop(){
   digitalWrite(LED_BUILTIN, HIGH);
   alt_atual = bmp.readAltitude();  
   delta = (alt_atual - media);
+  for (int i= 10; i>0; i--) altitude[i] = altitude [i+1];{
+    altitude[0] = alt_atual;
+    for (int i=0; i<10; i++){
+     soma_mm += altitude[i]; 
+     }
+    media_movel = soma_mm/10;
+ }
+  Serial.print(media_movel);
   Serial.print(delta);
   Serial.print("\t");
   
