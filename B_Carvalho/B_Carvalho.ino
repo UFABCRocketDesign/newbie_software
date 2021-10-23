@@ -8,7 +8,7 @@ float leitura = 0;
 float num_leitura = 0;
 float delta = 0;
 float soma = 0;
-int altitude[10];
+float altitude[10];
 int i = 0;
 float soma_mm = 0;
 float media_movel = 0;
