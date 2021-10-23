@@ -43,10 +43,10 @@ void loop(){
   delta = (alt_atual - media);
   for (int i= 9; i>0; i--){ 
     altitude[i] = altitude [i-1];
-    altitude[0] = alt_atual;
-    for (int i=0; i<10; i++){
+  altitude[0] = alt_atual;
+  for (int i=0; i<10; i++){
      soma_mm += altitude[i]; 
-     }
+    }
     media_movel = soma_mm/10;
  }
   Serial.print(media_movel);
