@@ -21,7 +21,7 @@ void setup() {
   Serial.print("Pressure at sealevel (calculated as Pa) = ");
   Serial.print("\t");
   Serial.print("Real altitude(m) = ");
-  Serial.print("\t");
+  Serial.println("\t");
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
@@ -36,10 +36,10 @@ void setup() {
 void loop(){
   digitalWrite(LED_BUILTIN, HIGH);
   alt_atual = bmp.readAltitude();  
-  delta = (alt_anterior - media);
+  delta = (alt_atual - media);
   Serial.print(delta);
   Serial.print("\t");
-  alt_anterior = alt_atual;  
+  
   
   
 
