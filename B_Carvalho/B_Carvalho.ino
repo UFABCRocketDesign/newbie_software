@@ -41,7 +41,8 @@ void loop(){
   digitalWrite(LED_BUILTIN, HIGH);
   alt_atual = bmp.readAltitude();  
   delta = (alt_atual - media);
-  for (int i= 10; i>0; i--) altitude[i] = altitude [i+1];{
+  for (int i= 9; i>0; i--){ 
+    altitude[i] = altitude [i-1];
     altitude[0] = alt_atual;
     for (int i=0; i<10; i++){
      soma_mm += altitude[i]; 
@@ -49,6 +50,7 @@ void loop(){
     media_movel = soma_mm/10;
  }
   Serial.print(media_movel);
+  Serial.print("\t");
   Serial.print(delta);
   Serial.print("\t");
   
