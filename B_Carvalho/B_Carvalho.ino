@@ -26,7 +26,7 @@ void setup() {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
-  for(i = 0; i <= 97; i++){
+  for(i = 0; i < 97; i++){
     alt_atual =  bmp.readAltitude(); 
     soma += alt_atual; 
     }
