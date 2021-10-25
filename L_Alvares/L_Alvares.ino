@@ -17,7 +17,7 @@ float FF = 0.0;
 float VTeste[11];
 int A = 0;
 
-const int chipSelect = 4;
+const int chipSelect = 53;
 String dataString = "";
 
 
@@ -74,12 +74,12 @@ void loop()
     Serial.println();
 
    dataString += String(FF);
+   Serial.println(dataString);
    File dataFile = SD.open("Alvares.txt", FILE_WRITE);
    if (dataFile) 
    {
     dataFile.println(dataString);
     dataFile.close();
-    Serial.println(dataString);
    }
    else 
    {
