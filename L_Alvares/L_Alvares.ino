@@ -18,7 +18,7 @@ float VTeste[11];
 int A = 0;
 
 const int chipSelect = 53;
-String dataString = "";
+
 
 
 void setup() 
@@ -34,6 +34,7 @@ void setup()
   while (1) {}
   }
 
+  
   while (!Serial) 
   {
     ;
@@ -45,6 +46,7 @@ void setup()
     while (1);
   }
   Serial.println("card initialized.");
+  
 
   for( i = 0; i < 11; i++)
   {
@@ -69,12 +71,12 @@ void loop()
       A = 0;
      }
     FF = F/11;
+    String dataString = "";
+    dataString += String(FF);
     Serial.print(FF);
     Serial.print("\t");
     Serial.println();
-
-   dataString += String(FF);
-   Serial.println(dataString);
+   
    File dataFile = SD.open("Alvares.txt", FILE_WRITE);
    if (dataFile) 
    {
