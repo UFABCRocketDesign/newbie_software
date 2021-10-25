@@ -26,17 +26,21 @@ int apogeu_detectado = false;
 int led_On_Off = 0;      // variavel para entrar no laço LedON e LedOFF apenas 1 vez
 
 const int ledPin =  LED_BUILTIN;
-int ledState = LOW;    // ledState used to set the LED
+int ledState1 = LOW;    // ledState used to set the LED
+int ledState2 = LOW; 
 // Generally, you should use "unsigned long" for variables that hold time
 // The value will quickly become too large for an int to store
-unsigned long ledOnMillis = 0;        // quando o led tem que acender
-unsigned long ledOffMillis = 0;        // quando o led tem que desligar após o apogeu
+unsigned long ledOnMillis2 = 0;        // quando o led tem que acender
+unsigned long ledOffMillis1 = 0; 
+unsigned long ledOffMillis2 = 0; // quando o led tem que desligar após o apogeu
 const long intervaloOff = 10000;      // interval at which to blink (milliseconds)
 const long intervaloOn = 3000;
 
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
   pinMode(ledPin, OUTPUT);
+  pinMode(IGN_1, OUTPUT);
+  pinMode(IGN_2, OUTPUT);
   Serial.begin(115200);
   if (!bmp.begin()) {
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
@@ -147,23 +151,30 @@ void loop() {
   if (encontra_apogeu == 5) { 
     dataString += "Apogeu Detectado!";
     if (apogeu_detectado == false) {
-      ledOnMillis = t_atual + intervaloOn;
+      ledState1 = HIGH;
+      ledOffMillis1 = t_atual + intervaloOff;
+      ledOnMillis2 = t_atual + intervaloOn;
       apogeu_detectado = true;
       led_On_Off = 1;
     }
   }
 
-  if (t_atual >= ledOnMillis && led_On_Off == 1){
-    ledState = HIGH;
-    ledOffMillis = ledOnMillis + intervaloOff;
+  if (t_atual >= ledOnMillis2 && led_On_Off == 1){
+    ledState2 = HIGH;
+    ledOffMillis2 = ledOnMillis2 + intervaloOff;
     led_On_Off = 2;
   }
 
-  if (t_atual >= ledOffMillis && led_On_Off == 2) {
-    ledState = LOW;
+  if (t_atual >= ledOffMillis1 && led_On_Off == 2) {
+    ledState1 = LOW;
+  }
+  if (t_atual >= ledOffMillis2 && led_On_Off == 2) {
+    ledState2 = LOW;
     led_On_Off = 0;
   }
-  digitalWrite(ledPin, ledState);
+  
+  digitalWrite(IGN_1, ledState1);
+  digitalWrite(IGN_2, ledState2);
 
   Serial.println(dataString);
   
