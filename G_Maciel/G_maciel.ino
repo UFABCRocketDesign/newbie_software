@@ -155,22 +155,22 @@ void loop() {
       ledOffMillis1 = t_atual + intervaloOff;
       ledOnMillis2 = t_atual + intervaloOn;
       apogeu_detectado = true;
-      led_On_Off = 1;
+      // led_On_Off = 1;
     }
   }
 
-  if (t_atual >= ledOnMillis2 && led_On_Off == 1){
+  if (t_atual >= ledOnMillis2){
     ledState2 = HIGH;
-    ledOffMillis2 = ledOnMillis2 + intervaloOff;
-    led_On_Off = 2;
+    ledOffMillis2 = t_atual + intervaloOff;
+    // led_On_Off = 2;
   }
 
-  if (t_atual >= ledOffMillis1 && led_On_Off == 2) {
+  if (t_atual >= ledOffMillis1) {
     ledState1 = LOW;
   }
-  if (t_atual >= ledOffMillis2 && led_On_Off == 2) {
+  if (t_atual >= ledOffMillis2) {
     ledState2 = LOW;
-    led_On_Off = 0;
+    // led_On_Off = 0;
   }
   
   digitalWrite(IGN_1, ledState1);
