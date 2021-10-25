@@ -33,8 +33,8 @@ int ledState2 = LOW;
 unsigned long ledOnMillis2 = 0;        // quando o led tem que acender
 unsigned long ledOffMillis1 = 0; 
 unsigned long ledOffMillis2 = 0; // quando o led tem que desligar após o apogeu
-const long intervaloOff = 10000;      // interval at which to blink (milliseconds)
-const long intervaloOn = 3000;
+const long intervaloOff = 7000;      // interval at which to blink (milliseconds)
+const long intervaloOn = 15000;
 
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
