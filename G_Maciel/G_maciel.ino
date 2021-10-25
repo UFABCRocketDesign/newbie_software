@@ -24,7 +24,6 @@ String nomeArquivo = "";
 int encontra_apogeu=0;
 int apogeu_detectado = false;
 int led_On_Off = 0;      // variavel para entrar no laço LedON e LedOFF apenas 1 vez
-unsigned long t_atual = millis();
 
 const int ledPin =  LED_BUILTIN;
 int ledState = LOW;    // ledState used to set the LED
@@ -86,6 +85,7 @@ void setup() {
 }
 
 void loop() {
+  unsigned long t_atual = millis();
   // make a string for assembling the data to log:
   String dataString = "";
   
@@ -144,9 +144,9 @@ void loop() {
     encontra_apogeu = 0;
   }
 
-  if (apogeu_detectado == false) {
-    if (encontra_apogeu == 5) {
-      dataString += "Apogeu Detectado!";
+  if (encontra_apogeu == 5) { 
+    dataString += "Apogeu Detectado!";
+    if (apogeu_detectado == false) {
       ledOnMillis = t_atual + intervaloOn;
       apogeu_detectado = true;
       led_On_Off = 1;
