@@ -21,6 +21,8 @@ float media_mov2 = 0;
 const int chipSelect = 53;
 String cabecalho = "Altitude [m]\tAltura [m]\tFiltro1 (h)\tFiltro2 (h)\tTemperatura [*C]\tPressao [Pa]\tPressao no nivel do mar [Pa]\tApogeu";
 String nomeArquivo = "";
+int encontra_apogeu=0;
+int apogeu_detectado = false;
 
 const int ledPin =  LED_BUILTIN;
 int ledState = LOW;    // ledState used to set the LED
@@ -131,10 +133,20 @@ void loop() {
     
   // encontrando apogeu 
 
-  if (lista2[l-1] < lista2[l-2] && lista2[l-2] < lista2[l-3] && lista2[l-3] < lista2[l-4] && lista2[l-4] < lista2[l-5]) {
-    dataString += "Apogeu Detectado!";
-    ledOffMillis = millis() + intervalo;
-    ledState = HIGH;
+  if (media_mov2 < velhaAlt) {
+    encontra_apogeu += 1;
+  }
+  else {
+    encontra_apogeu = 0;
+  }
+
+  if (apogeu_detectado == false) {
+    if (encontra_apogeu == 5) {
+      dataString += "Apogeu Detectado!";
+      ledOffMillis = millis() + intervalo;
+      ledState = HIGH;
+      apogeu_detectado = true;
+    }
   }
 
   if (millis() >= ledOffMillis) {
@@ -156,7 +168,7 @@ void loop() {
     Serial.println("error opening datalog.txt");
   }
 
-  // velhaAlt = media_mov2;
+  velhaAlt = media_mov2;
   media_mov = 0;
   media_mov2 = 0;
 }
