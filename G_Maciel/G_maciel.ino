@@ -23,13 +23,17 @@ String cabecalho = "Altitude [m]\tAltura [m]\tFiltro1 (h)\tFiltro2 (h)\tTemperat
 String nomeArquivo = "";
 int encontra_apogeu=0;
 int apogeu_detectado = false;
+int led_On_Off = 0;      // variavel para entrar no laço LedON e LedOFF apenas 1 vez
+unsigned long t_atual = millis();
 
 const int ledPin =  LED_BUILTIN;
 int ledState = LOW;    // ledState used to set the LED
 // Generally, you should use "unsigned long" for variables that hold time
 // The value will quickly become too large for an int to store
+unsigned long ledOnMillis = 0;        // quando o led tem que acender
 unsigned long ledOffMillis = 0;        // quando o led tem que desligar após o apogeu
-const long intervalo = 10000;      // interval at which to blink (milliseconds)
+const long intervaloOff = 10000;      // interval at which to blink (milliseconds)
+const long intervaloOn = 3000;
 
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
@@ -143,14 +147,21 @@ void loop() {
   if (apogeu_detectado == false) {
     if (encontra_apogeu == 5) {
       dataString += "Apogeu Detectado!";
-      ledOffMillis = millis() + intervalo;
-      ledState = HIGH;
+      ledOnMillis = t_atual + intervaloOn;
+      ledOffMillis = ledOnMillis + intervaloOff;
       apogeu_detectado = true;
+      led_On_Off = 1;
     }
   }
 
-  if (millis() >= ledOffMillis) {
+  if (t_atual >= ledOnMillis && led_On_Off == 1){
+    ledState = HIGH;
+    led_On_Off = 2;
+  }
+
+  if (t_atual >= ledOffMillis && led_On_Off == 2) {
     ledState = LOW;
+    led_On_Off = 0;
   }
   digitalWrite(ledPin, ledState);
 
