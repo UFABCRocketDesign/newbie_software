@@ -161,7 +161,8 @@ void loop() {
 
   if (t_atual >= ledOnMillis2 && led_On_Off == 1){
     ledState2 = HIGH;
-    ledOffMillis2 = t_atual + intervaloOff;
+    ledOffMillis2 = ledOnMillis2 + intervaloOff;
+    led_On_Off = 0;
   }
 
   if (t_atual >= ledOffMillis1) {
