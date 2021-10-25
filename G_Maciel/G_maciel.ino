@@ -148,7 +148,6 @@ void loop() {
     if (encontra_apogeu == 5) {
       dataString += "Apogeu Detectado!";
       ledOnMillis = t_atual + intervaloOn;
-      ledOffMillis = ledOnMillis + intervaloOff;
       apogeu_detectado = true;
       led_On_Off = 1;
     }
@@ -156,6 +155,7 @@ void loop() {
 
   if (t_atual >= ledOnMillis && led_On_Off == 1){
     ledState = HIGH;
+    ledOffMillis = ledOnMillis + intervaloOff;
     led_On_Off = 2;
   }
 
