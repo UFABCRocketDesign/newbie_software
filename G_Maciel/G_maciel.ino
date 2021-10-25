@@ -34,7 +34,7 @@ unsigned long ledOnMillis2 = 0;        // quando o led tem que acender
 unsigned long ledOffMillis1 = 0; 
 unsigned long ledOffMillis2 = 0; // quando o led tem que desligar após o apogeu
 const long intervaloOff = 7000;      // interval at which to blink (milliseconds)
-const long intervaloOn = 12000;
+const long intervaloOn = 0;
 
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
@@ -161,7 +161,7 @@ void loop() {
 
   if (t_atual >= ledOnMillis2 && led_On_Off == 1){
     ledState2 = HIGH;
-    ledOffMillis2 = ledOnMillis2 + intervaloOff;
+    ledOffMillis2 = t_atual + intervaloOff;
     led_On_Off = 0;
   }
 
