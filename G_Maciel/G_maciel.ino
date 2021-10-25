@@ -26,7 +26,7 @@ const int ledPin =  LED_BUILTIN;
 int ledState = LOW;    // ledState used to set the LED
 // Generally, you should use "unsigned long" for variables that hold time
 // The value will quickly become too large for an int to store
-unsigned long previousMillis = 0;        // will store last time LED was updated
+unsigned long ledOffMillis = 0;        // quando o led tem que desligar após o apogeu
 const long intervalo = 10000;      // interval at which to blink (milliseconds)
 
 void setup() {
@@ -82,8 +82,6 @@ void setup() {
 void loop() {
   // make a string for assembling the data to log:
   String dataString = "";
-
-  unsigned long currentMillis = millis();
   
   // Calculate altitude assuming 'standard' barometric
   // pressure of 1013.25 millibar = 101325 Pascal
@@ -132,19 +130,15 @@ void loop() {
   dataString += "\t";
     
   // encontrando apogeu 
-  
-  if (h < velhaAlt) {
+
+  if (lista2[l-1] < lista2[l-2] && lista2[l-2] < lista2[l-3] && lista2[l-3] < lista2[l-4] && lista2[l-4] < lista2[l-5]) {
     dataString += "Apogeu Detectado!";
-    previousMillis = millis();
+    ledOffMillis = millis() + intervalo;
     ledState = HIGH;
   }
-  else {
-    dataString += " ";   
-  }
-  if (previousMillis != 0) {
-    if (currentMillis - previousMillis >= intervalo) {
-      ledState = LOW;
-    }
+
+  if (millis() >= ledOffMillis) {
+    ledState = LOW;
   }
   digitalWrite(ledPin, ledState);
 
@@ -161,8 +155,8 @@ void loop() {
   else {
     Serial.println("error opening datalog.txt");
   }
-  
+
+  // velhaAlt = media_mov2;
   media_mov = 0;
   media_mov2 = 0;
-  velhaAlt = h;
 }
