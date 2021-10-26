@@ -35,8 +35,8 @@ void setup() {
 
   for (float k = 0; k < numReads; k++){
     
-   current_Altitude = bmp.readAltitude();
-   accAltbase = accAltbase + current_Altitude;
+    
+   accAltbase = accAltbase + bmp.readAltitude();
    }
    Altbase = accAltbase/numReads;
    Serial.print(Altbase);
@@ -73,7 +73,7 @@ float current_high;
   Serial.print('\t');
 
   
-    Serial.print(current_Altitude);
+    Serial.print(bmp.readAltitude());
     Serial.print('\t');
 
     
