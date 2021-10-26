@@ -178,7 +178,7 @@ void loop() {
     dataString += "\t";
     dataString += "Led 3!";
     desliga_led3 = t_atual + interv_desliga_led;
-    laco_led_3 == false;
+    laco_led_3 = false;
   }
 
   if (t_atual >= desliga_led1) {
