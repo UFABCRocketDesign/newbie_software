@@ -1,7 +1,8 @@
 #include <Adafruit_BMP085.h>
-#include "../pinos.h"
+// #include "../pinos.h"
 
 #define use_buzzer 1
+#define print_aux 0
 
 #define apg_limiar 60
 
@@ -47,8 +48,10 @@ void setup() {
     Serial.print("\tav");
     Serial.print(i);
   }
+#if print_aux
   Serial.print("\testado");
   Serial.print("\tdetector");
+#endif
   Serial.println();
 
   for(int i=0; i<100; i++) solo += bmp.readAltitude();
@@ -82,25 +85,34 @@ void loop() {
     datalog+="\t";
     datalog+=String(av[i]);
   }
+
+#if print_aux
   datalog+="\t";
+#endif
 
   float curr_val = av[lvl-1];
   if(last_val > curr_val)
   {
+#if print_aux
     datalog+=String(1);
+#endif
     digitalWrite(LED_BUILTIN,HIGH);
     apg_counter++;
   }
   else
   {
+#if print_aux
     datalog+=String(-1);
+#endif
     digitalWrite(LED_BUILTIN,LOW);
     apg_counter=0;
   }
   last_val = curr_val;
 
+#if print_aux
   datalog+="\t";
   datalog+=String(float(min(apg_counter,apg_limiar))/apg_limiar);
+#endif
 
 #if use_buzzer
   if(apg_counter>=apg_limiar) digitalWrite(A0,LOW);
