@@ -25,14 +25,16 @@ int number, len_nome, len_number;
 boolean condition;
 
 // Variáveis para acionamento do paraquedas
-const long intervalo_p_acionar = 5000;
+const long intervalo_p_acionar1 = 5000;
+const long intervalo_p_acionar2 = 12000;
 const long intervalo_acionado = 5000;
 unsigned long currentMillis;
 unsigned long previousMillis_p_acionar = 0;
 unsigned long previousMillis_p_acionar2 = 0;
 unsigned long previousMillis_acionado = 0;
 unsigned long previousMillis_acionado2 = 0;
-int cont_acionar = 0;
+int cont_acionar1 = 0;
+int cont_acionar2 = 0;
 String acionamento1 = "\tDesligado";
 String acionamento2 = "\tDesligado";
 
@@ -215,22 +217,22 @@ void loop() {
     str_apogeu2 += String(ult_subida);
 
     // Inicia processo de acionamento paraquedas
-    if (cont_acionar == 0) {
+    if (cont_acionar1 == 0) {
       previousMillis_p_acionar = currentMillis;
+      previousMillis_p_acionar2 = currentMillis;
       acionamento1 = "\tA Acionar";
-      cont_acionar = 1;
+      cont_acionar1 = 1;
+      cont_acionar2 = 1;
     }
   }
   
-  // Timers de Paraquedas -----------------------------------------------------------------------
   // Primeira Estratégia de Acionamento de Paraquedas
   // Aciona primeiro paraquedas
-  if (currentMillis - previousMillis_p_acionar >= intervalo_p_acionar && cont_acionar == 1) {
+  if (currentMillis - previousMillis_p_acionar >= intervalo_p_acionar1 && cont_acionar1 == 1) {
     digitalWrite(LED_BUILTIN, HIGH);
     acionamento1 = "\tAcionado 1";
     previousMillis_acionado = currentMillis;
-    previousMillis_p_acionar2 = previousMillis_acionado;
-    cont_acionar = 2;
+    cont_acionar1 = 2;
   }
   // Desliga o "curto" do primeiro paraquedas
   if (currentMillis - previousMillis_acionado >= intervalo_acionado) {
@@ -238,85 +240,17 @@ void loop() {
     acionamento1 = "\tDesligado 1";
   }
   // Aciona segundo paraquedas
-  if (currentMillis - previousMillis_p_acionar2 >= intervalo_p_acionar && cont_acionar == 2) {
+  if (currentMillis - previousMillis_p_acionar2 >= intervalo_p_acionar2 && cont_acionar2 == 1) {
     digitalWrite(36, HIGH);
     acionamento2 = "\tAcionado 2";
     previousMillis_acionado2 = currentMillis;
-    cont_acionar = 3;
+    cont_acionar2 = 2;
   }
   // Desliga o "curto" do segundo paraquedas
   if (currentMillis - previousMillis_acionado2 >= intervalo_acionado) {
     digitalWrite(36, LOW);
     acionamento2 = "\tDesligado 2";
   }
-
-  /*
-  // Segunda Estratégia de Acionamento de Paraquedas
-  // Aciona primeiro paraquedas
-  if (currentMillis - previousMillis_p_acionar >= intervalo_p_acionar && cont_acionar == 1) {
-    digitalWrite(LED_BUILTIN, HIGH);
-    acionamento1 = "\tAcionado 1";
-    previousMillis_acionado = currentMillis;
-    cont_acionar = 2;
-  }
-  // Desliga o "curto" do primeiro paraquedas
-  if (currentMillis - previousMillis_acionado >= intervalo_acionado) {
-    digitalWrite(LED_BUILTIN, LOW);
-    acionamento1 = "\tDesligado 1";
-    previousMillis_p_acionar2 = currentMillis;
-  }
-  // Aciona segundo paraquedas
-  if (currentMillis - previousMillis_p_acionar2 >= intervalo_p_acionar && cont_acionar == 2) {
-    digitalWrite(36, HIGH);
-    acionamento2 = "\tAcionado 2";
-    previousMillis_acionado2 = currentMillis;
-    cont_acionar = 3;
-  }
-  // Desliga o "curto" do segundo paraquedas
-  if (currentMillis - previousMillis_acionado2 >= intervalo_acionado) {
-    digitalWrite(36, LOW);
-    acionamento2 = "\tDesligado 2";
-  }
-
-  // Terceira Estratégia de Acionamento de Paraquedas
-  // Aciona paraquedas simultaneamente
-  if (currentMillis - previousMillis_p_acionar >= intervalo_p_acionar && cont_acionar == 1) {
-    digitalWrite(LED_BUILTIN, HIGH);
-    digitalWrite(36, HIGH);
-    acionamento1 = "\tAcionado 1";
-    acionamento2 = "\tAcionado 2";
-    previousMillis_acionado = currentMillis;
-    cont_acionar = 2;
-  }
-  // Desliga o "curto" do paraquedas simultaneamente
-  if (currentMillis - previousMillis_acionado >= intervalo_acionado) {
-    digitalWrite(LED_BUILTIN, LOW);
-    digitalWrite(36, LOW);
-    acionamento1 = "\tDesligado 1";
-    acionamento2 = "\tDesligado 2";
-  }
-
-  // Quarta Estratégia de Acionamento de Paraquedas
-  // Aciona paraquedas simultaneamente
-  if (currentMillis - previousMillis_p_acionar >= intervalo_p_acionar && cont_acionar == 1) {
-    digitalWrite(LED_BUILTIN, HIGH);
-    acionamento1 = "\tAcionado 1";
-    previousMillis_acionado = currentMillis;
-    cont_acionar = 2;
-  }
-  // Desliga o "curto" do paraquedas simultaneamente
-  if (currentMillis - previousMillis_acionado >= intervalo_acionado) {
-    digitalWrite(LED_BUILTIN, LOW);
-    acionamento1 = "\tDesligado 1";
-    digitalWrite(36, HIGH);
-    acionamento2 = "\tAcionado 2";
-    previousMillis_acionado2 = currentMillis;
-  }
-  if (currentMillis - previousMillis_acionado2 >= intervalor_acionado) {
-    digitalWrite(36, LOW);
-    acionamento1 = "\tDesligado 2";
-  }
-  */
   // ---------------------------------------------------------------------------------------------
   
   dataString += acionamento1;
