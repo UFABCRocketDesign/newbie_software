@@ -28,6 +28,7 @@ int auxled1 = 0;
 int auxled2 = 0;
 unsigned long inicio1 = 0;        // will store last time LED was updated
 unsigned long inicio2 = 0;        // will store last time LED was updated
+unsigned long inicio3 = 0;        // will store last time LED was updated
 unsigned long tempoAtual = 0;        // will store last time LED was updated
 //const long intervalo = 10000;           // interval at which to blink (milliseconds)
 //const long intervalo = 10000;           // interval at which to blink (milliseconds)
@@ -185,11 +186,18 @@ void loop() {
     }
     Serial.print("Descendo");
     Serial.print("\t");
-    if(tempoAtual >= inicio1){
+    if(tempoAtual >= inicio1 && auxled1 == 0){
       digitalWrite(IGN_1, LOW);
+      auxled1 = 1;
     }
-    if(tempoAtual >= inicio2){
+    if(tempoAtual >= inicio2 && auxled2 == 0){
       digitalWrite(IGN_2, HIGH);
+      inicio3 = millis()+duracao;
+      auxled2 = 1;
+    }
+    if(tempoAtual >= inicio3 && auxled2 == 1){
+      digitalWrite(IGN_2, LOW);
+      auxled2 = 2;
     }
   }
   if (Delta >= 2 && auxled ==0) {                          //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
