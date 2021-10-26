@@ -38,10 +38,13 @@ unsigned long previousMillis_p_acionar = 0;
 unsigned long previousMillis_p_acionar2 = 0;
 unsigned long previousMillis_acionado = 0;
 unsigned long previousMillis_acionado2 = 0;
+unsigned long previousMillis_acionado3 = 0;
 int cont_acionar1 = 0;
 int cont_acionar2 = 0;
+int cont_acionar3 = 0;
 String acionamento1 = "\tDesligado 1";
 String acionamento2 = "\tDesligado 2";
+String acionamento3 = "\tDesligado 3";
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -231,7 +234,6 @@ void loop() {
     }
   }
   
-  // Primeira Estratégia de Acionamento de Paraquedas
   // Aciona primeiro paraquedas
   if (currentMillis - previousMillis_p_acionar >= intervalo_p_acionar1 && cont_acionar1 == 1) {
     digitalWrite(LED_BUILTIN, HIGH);
@@ -256,10 +258,22 @@ void loop() {
     digitalWrite(IGN_1, LOW);
     acionamento2 = "\tDesligado 2";
   }
+  // Aciona terceiro paraquedas
+  if (nova_altLeitura >= 10 && cont_acionar3 == 0) {
+    digitalWrite(IGN_2, HIGH);
+    acionamento3 = "\tAcionado 3";
+    previousMillis_acionado3 = currentMillis;
+    cont_acionar2 = 1;
+  }
+  if (currentMillis - previousMillis_acionado3 >= intervalo_acionado) {
+    digitalWrite(IGN_1, LOW);
+    acionamento3 = "\tDesligado 3";
+  }
   // ---------------------------------------------------------------------------------------------
   
   dataString += acionamento1;
   dataString += acionamento2;
+  dataString += acionamento3;
   dataString += str_apogeu1;
   dataString += str_apogeu2;
 
