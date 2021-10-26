@@ -7,6 +7,7 @@
 #define IGN_2 61  /*act2*/
 #define IGN_3 46  /*act3*/
 #define IGN_4 55  /*act4*/
+#define h_paraquedas_2 10  // altura para acionar 2º paraquedas (led2)
 
 Adafruit_BMP085 bmp;
 
@@ -33,8 +34,8 @@ int ledState2 = LOW;
 unsigned long ledOnMillis2 = 0;        // quando o led tem que acender
 unsigned long ledOffMillis1 = 0; 
 unsigned long ledOffMillis2 = 0; // quando o led tem que desligar após o apogeu
-const long intervaloOff = 7000;      // interval at which to blink (milliseconds)
-const long intervaloOn = 0;
+const long interv_desliga_led = 7000;      // interval at which to blink (milliseconds)
+const long interv_liga_led2 = 4000;
 
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
@@ -152,16 +153,17 @@ void loop() {
     dataString += "Apogeu Detectado!";
     if (apogeu_detectado == false) {
       ledState1 = HIGH;
-      ledOffMillis1 = t_atual + intervaloOff;
-      ledOnMillis2 = t_atual + intervaloOn;
+      ledOffMillis1 = t_atual + interv_desliga_led;
+      // ledOnMillis2 = t_atual + interv_liga_led2;
       apogeu_detectado = true;
       led_On_Off = 1;
     }
   }
 
-  if (t_atual >= ledOnMillis2 && led_On_Off == 1){
+  //if (t_atual >= ledOnMillis2 && led_On_Off == 1){
+  if (media_mov2 <= h_paraquedas_2 && led_On_Off == 1) {
     ledState2 = HIGH;
-    ledOffMillis2 = t_atual + intervaloOff;
+    ledOffMillis2 = t_atual + interv_desliga_led;
     led_On_Off = 0;
   }
 
