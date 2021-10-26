@@ -15,7 +15,7 @@ int j, i;
 float media_movel, nova_media_movel, antiga_media_movel;
 float media_movel_lg, nova_media_movel_lg;
 String estado, str_apogeu1, str_apogeu2;
-boolean cont_apogeu;
+boolean cont_apogeu = true;
 
 // Filtro dos dados
 float list_med_movel[2][filt_i];
@@ -36,8 +36,8 @@ unsigned long previousMillis_acionado = 0;
 unsigned long previousMillis_acionado2 = 0;
 int cont_acionar1 = 0;
 int cont_acionar2 = 0;
-String acionamento1 = "\tDesligado";
-String acionamento2 = "\tDesligado";
+String acionamento1 = "\tDesligado 1";
+String acionamento2 = "\tDesligado 2";
 
 // the setup function runs once when you press reset or power the board
 void setup() {
