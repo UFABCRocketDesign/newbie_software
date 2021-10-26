@@ -6,7 +6,8 @@
 #define tam 10                    //Tamanho da matriz do filtro(quantidade de valores usado)
 #define qf 2                      //Quantidade de filtros
 #define NomeArq "apm"             //Nome do arquivo para o cartão SD entre aspas
-#define espera 5000               //Tempo de espera para acionamento do paraquedas (ms)
+#define espera 5000               //Tempo de espera para acionamento do paraquedas 2 (ms)
+#define duracao 5000              //Tempo de duracao do acionamento dos paraquedas (ms)
 //////////////////////////////////////////////////////////////////////
 #define IGN_1 36  /*act1*/
 #define IGN_2 61  /*act2*/
@@ -23,7 +24,10 @@ float MatrizFiltros[qf][tam];     //Vetor para guardar os valores para as média
 
 int led = 0;                      //Variável para funcionamento do LED
 int auxled = 0;
-unsigned long tempo0 = 0;        // will store last time LED was updated
+int auxled1 = 0;
+int auxled2 = 0;
+unsigned long inicio1 = 0;        // will store last time LED was updated
+unsigned long inicio2 = 0;        // will store last time LED was updated
 unsigned long tempoAtual = 0;        // will store last time LED was updated
 const long intervalo = 10000;           // interval at which to blink (milliseconds)
 
@@ -52,6 +56,10 @@ void setup() {
   pinMode(IGN_2, OUTPUT);
   pinMode(IGN_3, OUTPUT);
   pinMode(IGN_4, OUTPUT);
+  digitalWrite(IGN_1, LOW);//PINOS DA MACRO pinos.h
+  digitalWrite(IGN_2, LOW);
+  digitalWrite(IGN_3, LOW);
+  digitalWrite(IGN_4, LOW);
   Serial.begin(115200);
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
@@ -168,6 +176,31 @@ void loop() {
   }
   Delta=Hmax-MediaMov;                                     //Compara o valor máximo do filtro1 com o valor atual do filtro1
   
+  if(auxled == 1){
+    tempoAtual = millis();
+    if (dataFile) {
+        dataFile.println("Descendo");
+        dataFile.close();
+    }
+    Serial.print("Descendo");
+    Serial.print("\t");
+    if(auxled1 ==0){
+      digitalWrite(IGN_1, HIGH);
+    }
+    if((tempoAtual-inicio1) >= duracao && auxled1 == 0){ 
+      digitalWrite(IGN_1, LOW);
+      auxled1 = 1;
+    }
+    if((tempoAtual-inicio1) >= espera && auxled2 == 0){
+      digitalWrite(IGN_2, HIGH);
+      inicio2 = millis();
+      auxled2 = 1;
+    }
+    if((tempoAtual-inicio2) >= duracao && auxled2 == 1){ 
+      digitalWrite(IGN_2, LOW);
+      auxled1 = 2;
+    }
+  }
   if (Delta >= 2 && auxled ==0) {                          //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
     if (dataFile) {
       dataFile.println("Descendo");
@@ -175,8 +208,7 @@ void loop() {
     }
     Serial.print("Descendo");
     Serial.print("\t");
-    tempo0 = millis();
-    digitalWrite(IGN_1, OUTPUT);
+    inicio1 = millis();
     auxled = 1;   
   }
   else if(auxled == 0){
@@ -187,54 +219,6 @@ void loop() {
     Serial.print("Subindo");
     Serial.print("\t");
   }
-  if(auxled == 1){
-    tempoAtual = millis();
-    if (dataFile) {
-        dataFile.println("Descendo");
-        dataFile.close();
-    }
-    Serial.print("Descendo");
-    Serial.print("\t");
-    //digitalWrite(LED_BUILTIN, LOW);
-    digitalWrite(IGN_1, HIGH);
-    digitalWrite(IGN_2, LOW);
-    led = 0;
-    if((tempoAtual-tempo0) >= espera){ 
-      digitalWrite(IGN_2, HIGH);
-      digitalWrite(IGN_1, LOW);
-      led = 1;
-      tempo0 = millis();
-      auxled = 2;
-    }
-  }
-  if(auxled == 2){
-    tempoAtual = millis();
-    if ((tempoAtual - tempo0) >= intervalo) {
-      if (dataFile) {
-        dataFile.println("Descendo");
-        dataFile.close();
-      }
-      Serial.print("Descendo");
-      Serial.print("\t");
-      digitalWrite(IGN_1, LOW);
-      digitalWrite(IGN_2, LOW);
-      tempo0 = millis();
-      led = 0;
-      auxled = 2;
-    }
-    else{
-      if (dataFile) {
-        dataFile.println("Descendo1");
-        dataFile.close();
-      }
-      Serial.print("Descendo");
-      Serial.print("\t");
-      digitalWrite(IGN_2, HIGH);
-      digitalWrite(IGN_1, LOW);
-      led = 1;
-      auxled = 2;
-    }
-  }
-  Serial.print(led);
+  //Serial.print(led);
   Serial.println();
 }
