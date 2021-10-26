@@ -2,31 +2,50 @@
 #include <SPI.h>
 #include <SD.h>
 
-#define tam 10                    //Tamanho da matriz do filtro
+//VALORES DE ENTRADA
+#define tam 10                    //Tamanho da matriz do filtro(quantidade de valores usado)
 #define qf 2                      //Quantidade de filtros
+#define NomeArq "apm"             //Nome do arquivo para o cartão SD entre aspas
+#define espera 5000               //Tempo de espera para acionamento do paraquedas 2 (ms)
+#define duracao 5000              //Tempo de duracao do acionamento dos paraquedas (ms)
+//////////////////////////////////////////////////////////////////////
+#define IGN_1 36  /*act1*/
+#define IGN_2 61  /*act2*/
+#define IGN_3 46  /*act3*/
+#define IGN_4 55  /*act4*/
 
 float Hmax = 0;                   //Valor máximo filtrado
-
 float SomaRef = 0;                //Soma valores iniciais(foguete parado na base)
 float AltitudeRef = 0;            //É o valor da média dos valores iniciais(foguete parado na base)
-
 float SomaMov = 0;                //Soma dos valores do vetor do filtro1
-
 float MediaMov = 0;               //É o valor da média dos valores do vetor do filtro1
-
 float Delta;                      //Diferença entre valor máximo do filtro1 (Hmax1) e valor atual referênciado (H11)
-
 float MatrizFiltros[qf][tam];     //Vetor para guardar os valores para as médias utilizadas pelos filtros
 
-int led = 0;                      //Variável para funcionamento do LED  
+//int led = 0;                      //Variável para funcionamento do LED
+int auxled = 0;
+int auxled1 = 0;
+int auxled2 = 0;
+unsigned long inicio1 = 0;        // will store last time LED was updated
+unsigned long inicio2 = 0;        // will store last time LED was updated
+unsigned long tempoAtual = 0;        // will store last time LED was updated
+//const long intervalo = 10000;           // interval at which to blink (milliseconds)
+//const long intervalo = 10000;           // interval at which to blink (milliseconds)
 
-float T;
-float P;
-float Pm;
+float T;                          //Valor da Temperatura
+float P;                          //Valor da Pressão
+float Pm;                         //Valor da Pressão ao nivel do Mar
 
-String NomeArq;
-int aux = 1;
-float x = 0.00001;
+int aux = 1;                      //Variavel auxiliar do while para criação de nome de arquivo do SD
+int tamNomeArq = 0;               //Valor da quantidade de caracteres da variavel NomeArq
+int Num = 0;                      //Valor da variavel que se somará e irá compor o nome do arquivo do SD
+int tamNum = 0;                   //Valor da quantidade de caracteres da variavel Num
+String x;                         //Primeira componente do nome do arquivo ou NomeArq
+String y;                         //Segunda componente do nome do arquivo ou preenchimento de zeros
+String z;                         //Terceira componente do nome do arquivo ou Num
+String NomeFinal;                 //Nome final do arquivo do SD
+int sub1 = 0;                     //Variavel auxiliar para contagem de caracteres totais no nome do arquivo do SD;
+int sub2 = 0;                     //Variavel auxiliar para contagem de caracteres totais no nome do arquivo do SD;
 
 const int chipSelect = 53;
 
@@ -34,6 +53,14 @@ Adafruit_BMP085 bmp;              //Cria variável 'bmp' para a biblioteca Adafr
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(IGN_1, OUTPUT);//PINOS DA MACRO pinos.h
+  pinMode(IGN_2, OUTPUT);
+  //pinMode(IGN_3, OUTPUT);
+  //pinMode(IGN_4, OUTPUT);
+  //digitalWrite(IGN_1, LOW);
+  //digitalWrite(IGN_2, LOW);
+  //digitalWrite(IGN_3, LOW);
+  //digitalWrite(IGN_4, LOW);
   Serial.begin(115200);
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
@@ -45,49 +72,59 @@ void setup() {
     while (1);
   }
   Serial.println("card initialized.");
+  x = NomeArq;
+  tamNomeArq = x.length();
+  sub1 = 8-tamNomeArq;
   while(aux==1){
-    String y = String(x,5);
-    String z = y.substring(2,5);
-    NomeArq = "apm"+z+".txt";
-    if (SD.exists(NomeArq)) {
-      Serial.print(NomeArq);
-      Serial.println(" ja existe");
+    z = String(Num);
+    tamNum = z.length();
+    sub2 = sub1-tamNum;
+    y = "";
+    for(int i=0; i<sub2; i++){
+      y = y+"0";
+    }
+    NomeFinal = x+y+z+".txt";
+    if (SD.exists(NomeFinal)) {
+      //Serial.print(NomeFinal);
+      //Serial.println(" ja existe");
+      Num++;
       aux = 1;
     }
     else{
-      File dataFile = SD.open(NomeArq, FILE_WRITE);
-      if (dataFile) {
-        dataFile.println("Temperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)");
-        for (int i = 0; i<qf; i++){
-          dataFile.print("Altura do filtro ");
-          dataFile.print(i);
-          dataFile.print("(m)\t");
-        }
-        dataFile.println("Statu de voo");
-        dataFile.close();
-      }
-      Serial.println("Dados dealtitude de voo");
-      Serial.print("Temperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)\tAltura (m)\tStatu de voo");
-      for (int i = 0; i<qf; i++){
-        Serial.print("Altura do filtro ");
-        Serial.print(i);
-        Serial.print("(m)\t");
-      }
-      Serial.println("Statu de voo");
-      for (int i = 0; i < 100; i++) {                       //Este 'for' serve para definir a altitude da base de lançamento como valor de referência.
-        SomaRef = SomaRef + bmp.readAltitude();
-      }
-      AltitudeRef = SomaRef / 100;
+      Serial.print("Nome do arquivo atual: ");
+      Serial.println(NomeFinal);
       aux = 0;
     }
-    x = x+0.00001;
   }
+  File dataFile = SD.open(NomeFinal, FILE_WRITE);
+  if (dataFile) {
+    dataFile.println("Temperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)");
+    for (int i = 0; i<qf; i++){
+      dataFile.print("Altura do filtro ");
+      dataFile.print(i);
+      dataFile.print("(m)\t");
+    }
+    dataFile.println("Statu de voo");
+    dataFile.close();
+  }
+  Serial.println("Dados dealtitude de voo");
+  Serial.print("Temperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)\tAltura (m)\tStatu de voo");
+  for (int i = 0; i<qf; i++){
+    Serial.print("Altura do filtro ");
+    Serial.print(i);
+    Serial.print("(m)\t");
+  }
+  Serial.println("Statu de voo");
+  for (int i = 0; i < 100; i++) {                       //Este 'for' serve para definir a altitude da base de lançamento como valor de referência.
+    SomaRef = SomaRef + bmp.readAltitude();
+  }
+  AltitudeRef = SomaRef / 100;
 }
 void loop() {
   T = bmp.readTemperature();
   P = bmp.readPressure();
   Pm = bmp.readSealevelPressure();
-  File dataFile = SD.open(NomeArq, FILE_WRITE);
+  File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
     dataFile.print(T);
     dataFile.print("\t");
@@ -139,27 +176,42 @@ void loop() {
     Hmax = MediaMov;
   }
   Delta=Hmax-MediaMov;                                     //Compara o valor máximo do filtro1 com o valor atual do filtro1
-  if (Delta >= 2) {                                    //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
+  
+  if(auxled == 1){
+    tempoAtual = millis();
+    if (dataFile) {
+        dataFile.println("Descendo");
+        dataFile.close();
+    }
+    Serial.print("Descendo");
+    Serial.print("\t");
+    if(tempoAtual >= inicio1){
+      digitalWrite(IGN_1, LOW);
+    }
+    if(tempoAtual >= inicio2){
+      digitalWrite(IGN_2, HIGH);
+    }
+  }
+  if (Delta >= 2 && auxled ==0) {                          //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
     if (dataFile) {
       dataFile.println("Descendo");
       dataFile.close();
     }
-    digitalWrite(LED_BUILTIN, HIGH);
-    led = 1;
     Serial.print("Descendo");
     Serial.print("\t");
-    Serial.print(led);
+    inicio1 = millis()+duracao;
+    inicio2 = millis()+espera;
+    digitalWrite(IGN_1, HIGH);
+    auxled = 1;   
   }
-  else {
+  else if(auxled == 0){
     if (dataFile) {
       dataFile.println("Subindo");
       dataFile.close();
     }
-    digitalWrite(LED_BUILTIN, LOW);
-    led = 0;
     Serial.print("Subindo");
     Serial.print("\t");
-    Serial.print(led);
   }
+  //Serial.print(led);
   Serial.println();
 }

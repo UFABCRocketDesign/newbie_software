@@ -3,9 +3,19 @@
 #include <SD.h>
 
 #define l 20 // tamanho
+#define IGN_1 36  /*act1*/
+#define IGN_2 61  /*act2*/
+#define IGN_3 46  /*act3*/
+#define IGN_4 55  /*act4*/
+#define h_paraquedas_2 10  // altura para acionar 2º paraquedas (led2)
+#define ledPin LED_BUILTIN
+#define interv_desliga_led 7000      // interval at which to blink (milliseconds)
+#define interv_liga_led2 4000
+
 Adafruit_BMP085 bmp;
 
 float novaAlt=0.0;
+float velhaAlt=0.0;
 float media=0.0;
 float h = 0.0;
 float lista[l];
@@ -13,13 +23,28 @@ float lista2[l];
 float media_mov = 0;
 float media_mov2 = 0;
 const int chipSelect = 53;
-String cabecalho = "Altitude [m]\tAltura [m]\tFiltro1 (h)\tFiltro2 (h)\tTemperatura [*C]\tPressao [Pa]\tPressao no nivel do mar [Pa]";
-// float velhaAlt=0.0;
+String cabecalho = "Altitude [m]\tAltura [m]\tFiltro1 (h)\tFiltro2 (h)\tTemperatura [*C]\tPressao [Pa]\tPressao no nivel do mar [Pa]\tApogeu";
 String nomeArquivo = "";
+int encontra_apogeu=0;
+int apogeu_detectado = false;
+int laco_led_2 = false;      // variavel para entrar no laço liga led 2 
+int laco_led_3 = false;      // variavel para entrar no laço liga led 3 (built in)
+
+int ledState1 = LOW;    // ledState used to set the LED
+int ledState2 = LOW; 
+int ledState3 = LOW;
+// Generally, you should use "unsigned long" for variables that hold time
+// The value will quickly become too large for an int to store
+unsigned long liga_led2 = 0;        // quando o led tem que acender
+unsigned long desliga_led1 = 0; 
+unsigned long desliga_led2 = 0; // quando o led tem que desligar após o apogeu
+unsigned long desliga_led3 = 0;
 
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
-  // pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(ledPin, OUTPUT);
+  pinMode(IGN_1, OUTPUT);
+  pinMode(IGN_2, OUTPUT);
   Serial.begin(115200);
   if (!bmp.begin()) {
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
@@ -39,23 +64,19 @@ void setup() {
   }
   Serial.println("card initialized."); 
 
-  String nome = "gabi"; // nome precisa ter 4 letras
+  String nome = "gabi"; 
+  int tamNome = nome.length();
   int num = 0;
   String txt = ".txt";
   bool tmp = false;
   while (tmp == false) {
-    if (num < 10) {
-      nomeArquivo = nome + "000" + String(num) + txt;
+    String zeros = "";
+    int tamNum = String(num).length();
+    int tamTotal = tamNome + tamNum;
+    for (int j=0; j < (8-tamTotal); j++) {
+      zeros = zeros + "0";
     }
-    if (10 <= num < 100) {
-      nomeArquivo = nome + "00" + String(num) + txt;
-    }
-    if (100 <= num < 1000) {
-      nomeArquivo = nome + "0" + String(num) + txt;
-    }
-    if (1000 <= num < 10000) {
-      nomeArquivo = nome + String(num) + txt;
-    }
+    nomeArquivo = nome + zeros + String(num) + txt;
     if (SD.exists(nomeArquivo)) {
       num = num + 1;
       tmp = false;
@@ -72,6 +93,7 @@ void setup() {
 }
 
 void loop() {
+  unsigned long t_atual = millis();
   // make a string for assembling the data to log:
   String dataString = "";
   
@@ -108,25 +130,72 @@ void loop() {
   dataString += String(media_mov2);
   dataString += "\t";
 
-  float temp =  bmp.readTemperature(); //temperatura
+  //temperatura
+  float temp =  bmp.readTemperature(); 
   dataString += String(temp);
   dataString += "\t";
-  float pressao = bmp.readPressure(); //pressão
+  //pressão
+  float pressao = bmp.readPressure(); 
   dataString += String(pressao);
   dataString += "\t";
-  float pressaoNivelMar = bmp.readSealevelPressure(); //pressão no nível do mar
+  //pressão no nível do mar
+  float pressaoNivelMar = bmp.readSealevelPressure(); 
   dataString += String(pressaoNivelMar);
+  dataString += "\t";
+    
+  // encontrando apogeu 
+
+  if (media_mov2 < velhaAlt) {
+    encontra_apogeu += 1;
+  }
+  else {
+    encontra_apogeu = 0;
+  }
+
+  if (encontra_apogeu == 5) { 
+    dataString += "Apogeu Detectado! Led 1";
+    if (apogeu_detectado == false) {
+      // LED 1
+      ledState1 = HIGH;
+      desliga_led1 = t_atual + interv_desliga_led;
+      liga_led2 = t_atual + interv_liga_led2;
+      apogeu_detectado = true;
+      laco_led_2 = true;
+      laco_led_3 = true;
+    }
+  }
+  // LED 2
+  if (t_atual >= liga_led2 && laco_led_2 == true){
+    ledState2 = HIGH;
+    dataString += "\t";
+    dataString += "Led 2!";
+    desliga_led2 = t_atual + interv_desliga_led;
+    laco_led_2 = false;
+  }
+  // LED 3
+  if (media_mov2 <= h_paraquedas_2 && laco_led_3 == true) {
+    ledState3 = HIGH;
+    dataString += "\t";
+    dataString += "Led 3!";
+    desliga_led3 = t_atual + interv_desliga_led;
+    laco_led_3 = false;
+  }
+
+  if (t_atual >= desliga_led1) {
+    ledState1 = LOW;
+  }
+  if (t_atual >= desliga_led2) {
+    ledState2 = LOW;
+  }
+  if (t_atual >= desliga_led3) {
+    ledState3 = LOW;
+  }
   
+  digitalWrite(IGN_1, ledState1);
+  digitalWrite(IGN_2, ledState2);
+  digitalWrite(ledPin, ledState3);
+
   Serial.println(dataString);
-  // Serial.print("\t");
-  //if (h < velhaAlt) {
-    //Serial.println("caindo");
-    //velhaAlt = h;
-  //}
-  //if (h > velhaAlt) {
-    //Serial.println("subindo");
-    //velhaAlt = h;
-  //}
   
   File dataFile = SD.open(nomeArquivo, FILE_WRITE);
 
@@ -139,7 +208,8 @@ void loop() {
   else {
     Serial.println("error opening datalog.txt");
   }
-  
+
+  velhaAlt = media_mov2;
   media_mov = 0;
   media_mov2 = 0;
 }

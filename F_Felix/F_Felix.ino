@@ -9,6 +9,14 @@ float soma = 0;
 float mediaMovel = 0;
 float segundaMediaMovel = 0;
 float matriz[2][10];
+String arquivo = "";
+int num = 0;
+int led = LOW;
+int led2 = LOW; 
+unsigned long tempoInicial = 0;       
+unsigned long tempoAtual = 0;        
+const long intervalo = 10000;  
+float apogeu = 0;                   
 
 const int chipSelect = 53;
 
@@ -45,22 +53,49 @@ void setup() {
 
     dataString += ("Alt.(m)\t");
 
+    dataString += ("Pres. sealevel(Pa)\t");
+
     dataString += ("Real alt.(m)\t");
 
-    File dataFile = SD.open("fernanda.txt", FILE_WRITE);
-  
-    // if the file is available, write to it:
-    if (dataFile) {
-      dataFile.println(dataString);
-      dataFile.close();
+    dataString += ("Foguete\t");
+    
+    dataString += ("Variação\t");
+    
+    dataString += ("Média\t");
+    
+    dataString += ("Média 2\t");
+    
+    String nome = "f";
+    int cont = 0;
+    String aux = (String) cont;
+    String txt = ".txt";
+    bool existente = false;
+
+  while(existente == false){
       
-      Serial.println(dataString);
-    }
-  // if the file isn't open, pop up an error:
-    else {
-      Serial.println("error opening fernanda.txt");
-    }
-  
+      String aux = (String) cont;
+      int tamanho = 8 - (aux.length() + nome.length());
+      String zero = "";
+      
+      for( int i = 0; i < tamanho; i++){
+        zero = zero + "0";
+      }
+
+      arquivo = nome + zero + aux + txt;
+      
+      if(SD.exists(arquivo)) {
+        cont = cont + 1;
+        existente = false;
+      }
+      else {
+        File dataFile = SD.open(arquivo, FILE_WRITE);
+        dataFile.println(dataString);
+        dataFile.close();
+        existente = true;
+      }
+      
+      Serial.println(arquivo);
+  }
 
    // Serial.print("Temp.(*C)\t");
    // Serial.print("Pres.(Pa)\t");
@@ -158,19 +193,66 @@ void loop() {
 
     String dataString = "";
     
-    dataString+=String(bmp.readTemperature());
+    dataString+= String(bmp.readTemperature());
     dataString+= ("\t");
 
-    dataString+=String(bmp.readPressure());
+    dataString+= String(bmp.readPressure());
     dataString+= ("\t");
 
-    dataString+=String(bmp.readAltitude(101500));
+    dataString+= String(bmp.readAltitude(101500));
     dataString+= ("\t");
+
+    dataString += String (bmp.readSealevelPressure());
+    dataString += ("\t");
 
     dataString += String(altRelativa);
     dataString += ("\t");
 
-    File dataFile = SD.open("fernanda.txt", FILE_WRITE);
+    if (apogeu < segundaMediaMovel) {                                    
+        apogeu = segundaMediaMovel;
+    }
+
+    float diferenca = apogeu - segundaMediaMovel;
+
+    if(diferenca >= 1 && led == LOW){
+      dataString += String("caindo\t");
+      digitalWrite(LED_BUILTIN, HIGH);
+      led2 = HIGH;
+      led = HIGH;
+      tempoInicial = millis();
+    }
+    else if (led == LOW){
+      dataString += String("subindo\t");
+    }
+
+    if(led2 == HIGH){
+       tempoAtual = millis();
+       if ((tempoAtual - tempoInicial) >= intervalo) {
+        
+          dataString += String("caindo\t");
+          digitalWrite(LED_BUILTIN, LOW);
+          led2 = LOW;
+          led = HIGH;
+       }
+       else{
+          dataString += String("caindo\t");
+          digitalWrite(LED_BUILTIN, HIGH);
+          led2 = HIGH;
+          led = HIGH;
+      }
+    }
+    
+  
+    dataString += String(altRelativa);
+    dataString += ("\t");
+
+    dataString += String(mediaMovel);
+    dataString += ("\t");
+
+    dataString += String(segundaMediaMovel);
+    dataString += ("\t");
+
+    File dataFile = SD.open(arquivo, FILE_WRITE);
   
     // if the file is available, write to it:
     if (dataFile) {
@@ -181,7 +263,7 @@ void loop() {
     }
   // if the file isn't open, pop up an error:
     else {
-      Serial.println("error opening fernanda.txt");
+      Serial.println("error opening" + arquivo);
     }
       
     aux = alt;
