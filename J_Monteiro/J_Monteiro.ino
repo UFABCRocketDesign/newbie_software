@@ -78,7 +78,7 @@ void loop() {
 
     
     
-  for ( float i = 0;i > n ; i ++) {
+  for ( float i = 0;i < n ; i ++) {
 
    current_Altitude = bmp.readAltitude();
    altitude = altitude + current_Altitude;
