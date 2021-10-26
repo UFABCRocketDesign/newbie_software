@@ -8,6 +8,9 @@
 #define IGN_3 46  /*act3*/
 #define IGN_4 55  /*act4*/
 #define h_paraquedas_2 10  // altura para acionar 2º paraquedas (led2)
+#define ledPin LED_BUILTIN
+#define interv_desliga_led 7000      // interval at which to blink (milliseconds)
+#define interv_liga_led2 4000
 
 Adafruit_BMP085 bmp;
 
@@ -24,18 +27,18 @@ String cabecalho = "Altitude [m]\tAltura [m]\tFiltro1 (h)\tFiltro2 (h)\tTemperat
 String nomeArquivo = "";
 int encontra_apogeu=0;
 int apogeu_detectado = false;
-int led_On_Off = 0;      // variavel para entrar no laço LedON e LedOFF apenas 1 vez
+int laco_led_2 = false;      // variavel para entrar no laço liga led 2 
+int laco_led_3 = false;      // variavel para entrar no laço liga led 3 (built in)
 
-const int ledPin =  LED_BUILTIN;
 int ledState1 = LOW;    // ledState used to set the LED
 int ledState2 = LOW; 
+int ledState3 = LOW;
 // Generally, you should use "unsigned long" for variables that hold time
 // The value will quickly become too large for an int to store
-unsigned long ledOnMillis2 = 0;        // quando o led tem que acender
-unsigned long ledOffMillis1 = 0; 
-unsigned long ledOffMillis2 = 0; // quando o led tem que desligar após o apogeu
-const long interv_desliga_led = 7000;      // interval at which to blink (milliseconds)
-const long interv_liga_led2 = 4000;
+unsigned long liga_led2 = 0;        // quando o led tem que acender
+unsigned long desliga_led1 = 0; 
+unsigned long desliga_led2 = 0; // quando o led tem que desligar após o apogeu
+unsigned long desliga_led3 = 0;
 
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
@@ -152,30 +155,41 @@ void loop() {
   if (encontra_apogeu == 5) { 
     dataString += "Apogeu Detectado!";
     if (apogeu_detectado == false) {
+      // LED 1
       ledState1 = HIGH;
-      ledOffMillis1 = t_atual + interv_desliga_led;
-      // ledOnMillis2 = t_atual + interv_liga_led2;
+      desliga_led1 = t_atual + interv_desliga_led;
+      liga_led2 = t_atual + interv_liga_led2;
       apogeu_detectado = true;
-      led_On_Off = 1;
+      laco_led_2 = true;
+      laco_led_3 == true;
     }
   }
-
-  //if (t_atual >= ledOnMillis2 && led_On_Off == 1){
-  if (media_mov2 <= h_paraquedas_2 && led_On_Off == 1) {
+  // LED 2
+  if (t_atual >= liga_led2 && laco_led_2 == true){
     ledState2 = HIGH;
-    ledOffMillis2 = t_atual + interv_desliga_led;
-    led_On_Off = 0;
+    desliga_led2 = t_atual + interv_desliga_led;
+    laco_led_2 = false;
+  }
+  // LED 3
+  if (media_mov2 <= h_paraquedas_2 && laco_led_3 == true) {
+    ledState3 = HIGH;
+    desliga_led3 = t_atual + interv_desliga_led;
+    laco_led_3 == false;
   }
 
-  if (t_atual >= ledOffMillis1) {
+  if (t_atual >= desliga_led1) {
     ledState1 = LOW;
   }
-  if (t_atual >= ledOffMillis2) {
+  if (t_atual >= desliga_led2) {
     ledState2 = LOW;
+  }
+  if (t_atual >= desliga_led3) {
+    ledState3 = LOW;
   }
   
   digitalWrite(IGN_1, ledState1);
   digitalWrite(IGN_2, ledState2);
+  digitalWrite(ledPin, ledState3);
 
   Serial.println(dataString);
   
