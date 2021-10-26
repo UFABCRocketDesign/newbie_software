@@ -45,10 +45,10 @@ void setup() {
 
 void loop() {
 
- current_Altitude = bmp.readAltitude();
-  altitude = 0; 
-  High = current_Altitude - Altbase;
-   Serial.print(High);
+float current_high;
+ current_high = bmp.readAltitude() - Altbase;
+ altitude = 0; 
+   Serial.print(current_high);
    Serial.print('\t');
   previous_altitude = altitude;
   
