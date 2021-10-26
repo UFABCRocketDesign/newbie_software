@@ -40,7 +40,7 @@ void setup() {
    }
    Altbase = accAltbase/numReads;
    Serial.print(Altbase);
-   Serial.print('\t');
+   Serial.println('\t');
 }
 
 void loop() {
@@ -48,6 +48,8 @@ void loop() {
  current_Altitude = bmp.readAltitude();
   altitude = 0; 
   High = current_Altitude - Altbase;
+   Serial.print(High);
+   Serial.print('\t');
   previous_altitude = altitude;
   
   Serial.print(bmp.readTemperature() );
