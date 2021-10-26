@@ -58,6 +58,8 @@ void loop() {
 
   
     Serial.print(current_Altitude);
+    Serial.print('\t');
+
     
     
   for ( float i = 0;i > n ; i ++) {
@@ -83,8 +85,7 @@ void loop() {
     }
   
         Serial.println();
-        Serial.print('\t');
-
+       
 }
 
      
