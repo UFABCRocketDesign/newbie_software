@@ -29,7 +29,8 @@ int auxled2 = 0;
 unsigned long inicio1 = 0;        // will store last time LED was updated
 unsigned long inicio2 = 0;        // will store last time LED was updated
 unsigned long tempoAtual = 0;        // will store last time LED was updated
-const long intervalo = 10000;           // interval at which to blink (milliseconds)
+//const long intervalo = 10000;           // interval at which to blink (milliseconds)
+//const long intervalo = 10000;           // interval at which to blink (milliseconds)
 
 float T;                          //Valor da Temperatura
 float P;                          //Valor da Pressão
@@ -186,10 +187,11 @@ void loop() {
     Serial.print("\t");
     if(auxled1 ==0){
       digitalWrite(IGN_1, HIGH);
-    }
-    if((tempoAtual-inicio1) >= duracao && auxled1 == 0){ 
-      digitalWrite(IGN_1, LOW);
       auxled1 = 1;
+    }
+    if((tempoAtual-inicio1) >= duracao && auxled1 == 1){ 
+      digitalWrite(IGN_1, LOW);
+      auxled1 = 2;
     }
     if((tempoAtual-inicio1) >= espera && auxled2 == 0){
       digitalWrite(IGN_2, HIGH);

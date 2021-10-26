@@ -7,6 +7,10 @@ const int chipSelect = 53; // Declaração de CS
 
 #define filt_i 10
 #define filt_f 20
+#define IGN_1 36
+#define IGN_2 61
+#define IGN_3 46
+#define IGN_4 55
 
 // Variáveis para detecção de apogeu
 float nova_altLeitura, cont_sub, cont_subidas, cont_desc, cont_descidas, ult_subida;
@@ -26,8 +30,8 @@ int number, len_nome, len_number;
 boolean condition;
 
 // Variáveis para acionamento do paraquedas
-const long intervalo_p_acionar1 = 5000;
-const long intervalo_p_acionar2 = 12000;
+const long intervalo_p_acionar1 = 0;
+const long intervalo_p_acionar2 = 0;
 const long intervalo_acionado = 5000;
 unsigned long currentMillis;
 unsigned long previousMillis_p_acionar = 0;
@@ -43,7 +47,7 @@ String acionamento2 = "\tDesligado 2";
 void setup() {
   // Inicializando o led embutido no arduino
   pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(13, OUTPUT);
+  pinMode(IGN_1, OUTPUT);
   
   // INICIALIZA O MONITOR SERIAL E PUXA BIBLIOTECA
   Serial.begin(115200);
@@ -74,8 +78,8 @@ void setup() {
     }
     file = nome_arq + arq_number + txt;
     if (SD.exists(file)) {
-      Serial.print(file);
-      Serial.println(" exists.");
+      //Serial.print(file);
+      //Serial.println(" exists.");
       condition = false;
     } else {
       Serial.print("Creating file: ");
@@ -212,7 +216,7 @@ void loop() {
   }
   dataString += estado;
   currentMillis = millis();
-  if (cont_desc >= 1 && cont_apogeu == true) {
+  if (cont_desc >= 10 && cont_apogeu == true) {
     str_apogeu1 += "\tApogeu em:";
     str_apogeu2 += String(ult_subida);
     cont_apogeu = false;
@@ -242,14 +246,14 @@ void loop() {
   }
   // Aciona segundo paraquedas
   if (currentMillis - previousMillis_p_acionar2 >= intervalo_p_acionar2 && cont_acionar2 == 1) {
-    digitalWrite(36, HIGH);
+    digitalWrite(IGN_1, HIGH);
     acionamento2 = "\tAcionado 2";
     previousMillis_acionado2 = currentMillis;
     cont_acionar2 = 2;
   }
   // Desliga o "curto" do segundo paraquedas
   if (currentMillis - previousMillis_acionado2 >= intervalo_acionado) {
-    digitalWrite(36, LOW);
+    digitalWrite(IGN_1, LOW);
     acionamento2 = "\tDesligado 2";
   }
   // ---------------------------------------------------------------------------------------------
