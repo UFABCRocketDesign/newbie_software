@@ -33,7 +33,7 @@ void setup() {
   Serial.print("  Real altitude = \t");
   Serial.println(" meters \t");
 
-  for (float k = 0; k >= numReads; k++){
+  for (float k = 0; k > numReads; k++){
     
    current_Altitude = bmp.readAltitude();
    accAltbase = accAltbase + current_Altitude;
