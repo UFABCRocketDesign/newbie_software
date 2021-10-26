@@ -153,7 +153,7 @@ void loop() {
   }
 
   if (encontra_apogeu == 5) { 
-    dataString += "Apogeu Detectado!";
+    dataString += "Apogeu Detectado! Led 1";
     if (apogeu_detectado == false) {
       // LED 1
       ledState1 = HIGH;
@@ -161,18 +161,22 @@ void loop() {
       liga_led2 = t_atual + interv_liga_led2;
       apogeu_detectado = true;
       laco_led_2 = true;
-      laco_led_3 == true;
+      laco_led_3 = true;
     }
   }
   // LED 2
   if (t_atual >= liga_led2 && laco_led_2 == true){
     ledState2 = HIGH;
+    dataString += "\t";
+    dataString += "Led 2!";
     desliga_led2 = t_atual + interv_desliga_led;
     laco_led_2 = false;
   }
   // LED 3
   if (media_mov2 <= h_paraquedas_2 && laco_led_3 == true) {
     ledState3 = HIGH;
+    dataString += "\t";
+    dataString += "Led 3!";
     desliga_led3 = t_atual + interv_desliga_led;
     laco_led_3 == false;
   }
