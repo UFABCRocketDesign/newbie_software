@@ -1,14 +1,18 @@
 #include <Adafruit_BMP085.h>
 
+//========================================================
  #define n 2
 Adafruit_BMP085 bmp;
 
- float altitude = 0;
- float relative_average;
- float  current_Altitude;
- float vet[n] ;
+//========================================================
+//-----Variáveis Globais-----
 
+ float altitude = 0;         //Altitude inicial
+ float relative_average;    //Média Relativa
+ float  current_Altitude;  //Altitude Atual
+ float vet[n] ;           //Vetor
 
+//========================================================
 void setup() {
   Serial.begin(115200);
   if (!bmp.begin()) {
@@ -55,22 +59,24 @@ void loop() {
     Serial.print(current_Altitude);
     Serial.println();
     
-  for ( float i = 1;i > n ; i ++) {
+  for ( float i = 0;i > n ; i ++) {
 
    current_Altitude = bmp.readAltitude();
    altitude = altitude + current_Altitude;
 }
-   relative_average = altitude/2;
+   relative_average = altitude/n;
+   Serial.print(relative_average);
+   Serial.print('\t');
    
     if (relative_average  < current_Altitude) {
 
-      //Serial.print("Subida \t");
+      Serial.print("Subida \t");
       digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
 
     }
     else {
 
-      //Serial.print("Descida \t");
+      Serial.print("Descida \t");
       digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (LOW is the voltage level);
 
     }
