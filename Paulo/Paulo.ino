@@ -30,8 +30,8 @@ int number, len_nome, len_number;
 boolean condition;
 
 // Variáveis para acionamento do paraquedas
-const long intervalo_p_acionar1 = 5000;
-const long intervalo_p_acionar2 = 12000;
+const long intervalo_p_acionar1 = 0;
+const long intervalo_p_acionar2 = 0;
 const long intervalo_acionado = 5000;
 unsigned long currentMillis;
 unsigned long previousMillis_p_acionar = 0;
