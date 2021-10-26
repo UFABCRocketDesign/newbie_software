@@ -2,16 +2,20 @@
 
 //========================================================
  #define n 2
+ #define numReads 10
 Adafruit_BMP085 bmp;
 
 //========================================================
 //-----Variáveis Globais-----
 
- float altitude;         //Altitude inicial
+ float altitude = 0;          //Altitude 
  float relative_average;    //Média Relativa
- float  current_Altitude;  //Altitude Atual
+ float current_Altitude;  //Altitude Atual
  float vet[n] ;           //Vetor
-
+ float Altbase;          // altitude no solo
+ float accAltbase = 0;      // altitude inicial base acumulativa 
+ float High;                // Altura na base
+ float previous_altitude;   //altitude anterior
 //========================================================
 void setup() {
   Serial.begin(115200);
@@ -28,14 +32,24 @@ void setup() {
   Serial.print(" Pa \t");
   Serial.print("  Real altitude = \t");
   Serial.println(" meters \t");
+
+  for (float k = 0; k >= numReads; k++){
+    
+   current_Altitude = bmp.readAltitude();
+   accAltbase = accAltbase + current_Altitude;
+   }
+   Altbase = accAltbase/numReads;
+   Serial.print(Altbase);
+   Serial.print('\t');
 }
 
 void loop() {
 
-  current_Altitude = bmp.readAltitude();
-  float altitude = 0; 
+ current_Altitude = bmp.readAltitude();
+  altitude = 0; 
+  High = current_Altitude - Altbase;
+  previous_altitude = altitude;
   
-
   Serial.print(bmp.readTemperature() );
   Serial.print('\t');
 
