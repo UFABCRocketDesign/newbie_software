@@ -213,6 +213,7 @@ void loop() {
   // Identificação de subida/descida/apogeu
   if (cont_sub > 1) {
     estado = "\tSubindo";
+    cont_subidas = 1;
     ult_subida = nova_altLeitura;
   }
   else if (cont_desc > 10) {
@@ -220,7 +221,7 @@ void loop() {
   }
   dataString += estado;
   currentMillis = millis();
-  if (cont_desc >= 10 && cont_apogeu == true) {
+  if (cont_subidas > 0 && cont_desc >= 10 && cont_apogeu == true) {
     str_apogeu1 += "\tApogeu em:";
     str_apogeu2 += String(ult_subida);
     cont_apogeu = false;
@@ -261,11 +262,11 @@ void loop() {
     acionamento2 = "\tDesligado 2";
   }
   // Aciona terceiro paraquedas
-  if (nova_altLeitura <= 10 && cont_acionar3 == 1) {
+  if (nova_media_movel_lg <= 10 && cont_acionar3 == 1) {
     digitalWrite(IGN_2, HIGH);
     acionamento3 = "\tAcionado 3";
     previousMillis_acionado3 = currentMillis;
-    cont_acionar2 = 2;
+    cont_acionar3 = 2;
   }
   if (currentMillis - previousMillis_acionado3 >= intervalo_acionado) {
     digitalWrite(IGN_2, LOW);
