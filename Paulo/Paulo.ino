@@ -51,6 +51,7 @@ void setup() {
   // Inicializando o led embutido no arduino
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(IGN_1, OUTPUT);
+  pinMode(IGN_2, OUTPUT);
   
   // INICIALIZA O MONITOR SERIAL E PUXA BIBLIOTECA
   Serial.begin(115200);
@@ -95,10 +96,10 @@ void setup() {
   // Inicia inserindo essa informação no FILE nomeado
   File dataFile = SD.open(file, FILE_WRITE);
   if (dataFile) {
-    dataFile.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tApogeu");
+    dataFile.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tParaquedas 3\tApogeu");
     dataFile.close();
     // print to the serial port too:
-    Serial.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tApogeu");
+    Serial.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tParaquedas 3\tApogeu");
   }
   
   // Medicao
@@ -231,6 +232,7 @@ void loop() {
       acionamento1 = "\tA Acionar";
       cont_acionar1 = 1;
       cont_acionar2 = 1;
+      cont_acionar3 = 1;
     }
   }
   
@@ -259,14 +261,14 @@ void loop() {
     acionamento2 = "\tDesligado 2";
   }
   // Aciona terceiro paraquedas
-  if (nova_altLeitura >= 10 && cont_acionar3 == 0) {
+  if (nova_altLeitura <= 10 && cont_acionar3 == 1) {
     digitalWrite(IGN_2, HIGH);
     acionamento3 = "\tAcionado 3";
     previousMillis_acionado3 = currentMillis;
-    cont_acionar2 = 1;
+    cont_acionar2 = 2;
   }
   if (currentMillis - previousMillis_acionado3 >= intervalo_acionado) {
-    digitalWrite(IGN_1, LOW);
+    digitalWrite(IGN_2, LOW);
     acionamento3 = "\tDesligado 3";
   }
   // ---------------------------------------------------------------------------------------------
