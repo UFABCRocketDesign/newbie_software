@@ -56,7 +56,7 @@ void setup() {
   pinMode(IGN_2, OUTPUT);
   pinMode(IGN_3, OUTPUT);
   pinMode(IGN_4, OUTPUT);
-  digitalWrite(IGN_1, LOW);//PINOS DA MACRO pinos.h
+  digitalWrite(IGN_1, LOW);
   digitalWrite(IGN_2, LOW);
   digitalWrite(IGN_3, LOW);
   digitalWrite(IGN_4, LOW);
@@ -198,7 +198,7 @@ void loop() {
     }
     if((tempoAtual-inicio2) >= duracao && auxled2 == 1){ 
       digitalWrite(IGN_2, LOW);
-      auxled1 = 2;
+      auxled2 = 2;
     }
   }
   if (Delta >= 2 && auxled ==0) {                          //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
