@@ -7,7 +7,7 @@ Adafruit_BMP085 bmp;
 //========================================================
 //-----Variáveis Globais-----
 
- float altitude = 0;         //Altitude inicial
+ float altitude;         //Altitude inicial
  float relative_average;    //Média Relativa
  float  current_Altitude;  //Altitude Atual
  float vet[n] ;           //Vetor
@@ -33,6 +33,7 @@ void setup() {
 void loop() {
 
   current_Altitude = bmp.readAltitude();
+  float altitude = 0; 
   
 
   Serial.print(bmp.readTemperature() );
@@ -84,5 +85,7 @@ void loop() {
 
 
 }
+
+     
 
      
