@@ -22,7 +22,7 @@ float MediaMov = 0;               //É o valor da média dos valores do vetor do
 float Delta;                      //Diferença entre valor máximo do filtro1 (Hmax1) e valor atual referênciado (H11)
 float MatrizFiltros[qf][tam];     //Vetor para guardar os valores para as médias utilizadas pelos filtros
 
-int led = 0;                      //Variável para funcionamento do LED
+//int led = 0;                      //Variável para funcionamento do LED
 int auxled = 0;
 int auxled1 = 0;
 int auxled2 = 0;
@@ -55,12 +55,12 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(IGN_1, OUTPUT);//PINOS DA MACRO pinos.h
   pinMode(IGN_2, OUTPUT);
-  pinMode(IGN_3, OUTPUT);
-  pinMode(IGN_4, OUTPUT);
-  digitalWrite(IGN_1, LOW);
-  digitalWrite(IGN_2, LOW);
-  digitalWrite(IGN_3, LOW);
-  digitalWrite(IGN_4, LOW);
+  //pinMode(IGN_3, OUTPUT);
+  //pinMode(IGN_4, OUTPUT);
+  //digitalWrite(IGN_1, LOW);
+  //digitalWrite(IGN_2, LOW);
+  //digitalWrite(IGN_3, LOW);
+  //digitalWrite(IGN_4, LOW);
   Serial.begin(115200);
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
@@ -185,22 +185,11 @@ void loop() {
     }
     Serial.print("Descendo");
     Serial.print("\t");
-    if(auxled1 ==0){
-      digitalWrite(IGN_1, HIGH);
-      auxled1 = 1;
-    }
-    if((tempoAtual-inicio1) >= duracao && auxled1 == 1){ 
+    if(tempoAtual >= inicio1){
       digitalWrite(IGN_1, LOW);
-      auxled1 = 2;
     }
-    if((tempoAtual-inicio1) >= espera && auxled2 == 0){
+    if(tempoAtual >= inicio2){
       digitalWrite(IGN_2, HIGH);
-      inicio2 = millis();
-      auxled2 = 1;
-    }
-    if((tempoAtual-inicio2) >= duracao && auxled2 == 1){ 
-      digitalWrite(IGN_2, LOW);
-      auxled2 = 2;
     }
   }
   if (Delta >= 2 && auxled ==0) {                          //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
@@ -210,7 +199,9 @@ void loop() {
     }
     Serial.print("Descendo");
     Serial.print("\t");
-    inicio1 = millis();
+    inicio1 = millis()+duracao;
+    inicio2 = millis()+espera;
+    digitalWrite(IGN_1, HIGH);
     auxled = 1;   
   }
   else if(auxled == 0){
