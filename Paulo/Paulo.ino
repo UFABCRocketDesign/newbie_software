@@ -15,6 +15,7 @@ int j, i;
 float media_movel, nova_media_movel, antiga_media_movel;
 float media_movel_lg, nova_media_movel_lg;
 String estado, str_apogeu1, str_apogeu2;
+boolean cont_apogeu;
 
 // Filtro dos dados
 float list_med_movel[2][filt_i];
@@ -202,9 +203,8 @@ void loop() {
   dataString += String(bmp.readSealevelPressure());
   
   // Identificação de subida/descida/apogeu
-  if (cont_sub > 10) {
+  if (cont_sub > 1) {
     estado = "\tSubindo";
-    cont_subidas = 1;
     ult_subida = nova_altLeitura;
   }
   else if (cont_desc > 10) {
@@ -212,10 +212,11 @@ void loop() {
   }
   dataString += estado;
   currentMillis = millis();
-  if (cont_subidas > 0 && cont_desc >= 1) {
+  if (cont_desc >= 1 && cont_apogeu == true) {
     str_apogeu1 += "\tApogeu em:";
     str_apogeu2 += String(ult_subida);
-
+    cont_apogeu = false;
+    
     // Inicia processo de acionamento paraquedas
     if (cont_acionar1 == 0) {
       previousMillis_p_acionar = currentMillis;
