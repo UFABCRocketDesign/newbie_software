@@ -29,14 +29,18 @@ const long intervalo_p_acionar = 5000;
 const long intervalo_acionado = 5000;
 unsigned long currentMillis;
 unsigned long previousMillis_p_acionar = 0;
+unsigned long previousMillis_p_acionar2 = 0;
 unsigned long previousMillis_acionado = 0;
+unsigned long previousMillis_acionado2 = 0;
 int cont_acionar = 0;
-String acionamento = "\tDesligado";
+String acionamento1 = "\tDesligado";
+String acionamento2 = "\tDesligado";
 
 // the setup function runs once when you press reset or power the board
 void setup() {
   // Inicializando o led embutido no arduino
   pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(13, OUTPUT);
   
   // INICIALIZA O MONITOR SERIAL E PUXA BIBLIOTECA
   Serial.begin(115200);
@@ -81,10 +85,10 @@ void setup() {
   // Inicia inserindo essa informação no FILE nomeado
   File dataFile = SD.open(file, FILE_WRITE);
   if (dataFile) {
-    dataFile.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tParaquedas\tApogeu");
+    dataFile.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tApogeu");
     dataFile.close();
     // print to the serial port too:
-    Serial.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tParaquedas\tApogeu");
+    Serial.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tApogeu");
   }
   
   // Medicao
@@ -156,7 +160,7 @@ void loop() {
     i += 1;
   }
   if (i = filt_i) {
-    for (j=0; j<filt_i; j++) {
+    for (j=0; j<(filt_i-1); j++) {
       list_med_movel[1][j] = list_med_movel[1][j+1];
     }
     list_med_movel[1][filt_i-1] = nova_media_movel;
@@ -213,25 +217,110 @@ void loop() {
     // Inicia processo de acionamento paraquedas
     if (cont_acionar == 0) {
       previousMillis_p_acionar = currentMillis;
-      acionamento = "\tA Acionar";
+      acionamento1 = "\tA Acionar";
       cont_acionar = 1;
     }
   }
-
-  // Aciona paraquedas
+  
+  // Timers de Paraquedas -----------------------------------------------------------------------
+  // Primeira Estratégia de Acionamento de Paraquedas
+  // Aciona primeiro paraquedas
   if (currentMillis - previousMillis_p_acionar >= intervalo_p_acionar && cont_acionar == 1) {
     digitalWrite(LED_BUILTIN, HIGH);
-    acionamento = "\tAcionado";
+    acionamento1 = "\tAcionado 1";
+    previousMillis_acionado = currentMillis;
+    previousMillis_p_acionar2 = previousMillis_acionado;
+    cont_acionar = 2;
+  }
+  // Desliga o "curto" do primeiro paraquedas
+  if (currentMillis - previousMillis_acionado >= intervalo_acionado) {
+    digitalWrite(LED_BUILTIN, LOW);
+    acionamento1 = "\tDesligado 1";
+  }
+  // Aciona segundo paraquedas
+  if (currentMillis - previousMillis_p_acionar2 >= intervalo_p_acionar && cont_acionar == 2) {
+    digitalWrite(36, HIGH);
+    acionamento2 = "\tAcionado 2";
+    previousMillis_acionado2 = currentMillis;
+    cont_acionar = 3;
+  }
+  // Desliga o "curto" do segundo paraquedas
+  if (currentMillis - previousMillis_acionado2 >= intervalo_acionado) {
+    digitalWrite(36, LOW);
+    acionamento2 = "\tDesligado 2";
+  }
+
+  /*
+  // Segunda Estratégia de Acionamento de Paraquedas
+  // Aciona primeiro paraquedas
+  if (currentMillis - previousMillis_p_acionar >= intervalo_p_acionar && cont_acionar == 1) {
+    digitalWrite(LED_BUILTIN, HIGH);
+    acionamento1 = "\tAcionado 1";
     previousMillis_acionado = currentMillis;
     cont_acionar = 2;
   }
-
-  // Desliga o "curto" do paraquedas
+  // Desliga o "curto" do primeiro paraquedas
   if (currentMillis - previousMillis_acionado >= intervalo_acionado) {
     digitalWrite(LED_BUILTIN, LOW);
-    acionamento = "\tDesligado";
+    acionamento1 = "\tDesligado 1";
+    previousMillis_p_acionar2 = currentMillis;
   }
-  dataString += acionamento;
+  // Aciona segundo paraquedas
+  if (currentMillis - previousMillis_p_acionar2 >= intervalo_p_acionar && cont_acionar == 2) {
+    digitalWrite(36, HIGH);
+    acionamento2 = "\tAcionado 2";
+    previousMillis_acionado2 = currentMillis;
+    cont_acionar = 3;
+  }
+  // Desliga o "curto" do segundo paraquedas
+  if (currentMillis - previousMillis_acionado2 >= intervalo_acionado) {
+    digitalWrite(36, LOW);
+    acionamento2 = "\tDesligado 2";
+  }
+
+  // Terceira Estratégia de Acionamento de Paraquedas
+  // Aciona paraquedas simultaneamente
+  if (currentMillis - previousMillis_p_acionar >= intervalo_p_acionar && cont_acionar == 1) {
+    digitalWrite(LED_BUILTIN, HIGH);
+    digitalWrite(36, HIGH);
+    acionamento1 = "\tAcionado 1";
+    acionamento2 = "\tAcionado 2";
+    previousMillis_acionado = currentMillis;
+    cont_acionar = 2;
+  }
+  // Desliga o "curto" do paraquedas simultaneamente
+  if (currentMillis - previousMillis_acionado >= intervalo_acionado) {
+    digitalWrite(LED_BUILTIN, LOW);
+    digitalWrite(36, LOW);
+    acionamento1 = "\tDesligado 1";
+    acionamento2 = "\tDesligado 2";
+  }
+
+  // Quarta Estratégia de Acionamento de Paraquedas
+  // Aciona paraquedas simultaneamente
+  if (currentMillis - previousMillis_p_acionar >= intervalo_p_acionar && cont_acionar == 1) {
+    digitalWrite(LED_BUILTIN, HIGH);
+    acionamento1 = "\tAcionado 1";
+    previousMillis_acionado = currentMillis;
+    cont_acionar = 2;
+  }
+  // Desliga o "curto" do paraquedas simultaneamente
+  if (currentMillis - previousMillis_acionado >= intervalo_acionado) {
+    digitalWrite(LED_BUILTIN, LOW);
+    acionamento1 = "\tDesligado 1";
+    digitalWrite(36, HIGH);
+    acionamento2 = "\tAcionado 2";
+    previousMillis_acionado2 = currentMillis;
+  }
+  if (currentMillis - previousMillis_acionado2 >= intervalor_acionado) {
+    digitalWrite(36, LOW);
+    acionamento1 = "\tDesligado 2";
+  }
+  */
+  // ---------------------------------------------------------------------------------------------
+  
+  dataString += acionamento1;
+  dataString += acionamento2;
   dataString += str_apogeu1;
   dataString += str_apogeu2;
 
