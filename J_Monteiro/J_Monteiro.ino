@@ -1,21 +1,22 @@
 #include <Adafruit_BMP085.h>
 
 //========================================================
- #define n 2
- #define numReads 10
+#define n 25
+#define numReads 15
 Adafruit_BMP085 bmp;
 
 //========================================================
 //-----Variáveis Globais-----
 
- float altitude = 0;          //Altitude 
- float relative_average;    //Média Relativa
- float current_Altitude;  //Altitude Atual
- float vet[n] ;           //Vetor
- float Altbase;          // altitude no solo
- float accAltbase = 0;      // altitude inicial base acumulativa 
- float High;                // Altura na base
- float previous_altitude;   //altitude anterior
+float altitude = 0;              //Altitude
+float relative_average;         //Média Relativa
+float current_Altitude;       //Altitude Atual
+float vet[n] ;               //Vetor
+float Altbase;              // altitude no solo
+float accAltbase = 0;      // altitude inicial base acumulativa
+float High;               // Altura na base
+float previous_altitude; //altitude anterior
+
 //========================================================
 void setup() {
   Serial.begin(115200);
@@ -33,25 +34,29 @@ void setup() {
   Serial.print("  Real altitude = \t");
   Serial.println(" meters \t");
 
-  for (float k = 0; k < numReads; k++){
-    
-    
-   accAltbase = accAltbase + bmp.readAltitude();
-   }
-   Altbase = accAltbase/numReads;
-   Serial.print(Altbase);
-   Serial.println('\t');
+  for (float k = 0; k < numReads; k++) {
+
+
+    accAltbase = accAltbase + bmp.readAltitude();
+  }
+  Altbase = accAltbase / numReads;
+  Serial.print(Altbase);
+  Serial.println('\t');
 }
 
 void loop() {
 
-float current_high;
- current_high = bmp.readAltitude() - Altbase;
- altitude = 0; 
-   Serial.print(current_high);
-   Serial.print('\t');
-  previous_altitude = altitude;
-  
+  float previous = 0;
+  float High = 0;
+  float current_high;
+
+  current_high = bmp.readAltitude() - Altbase;
+  altitude = 0;
+  Serial.print(current_high);
+  Serial.print('\t');
+
+
+
   Serial.print(bmp.readTemperature() );
   Serial.print('\t');
 
@@ -72,38 +77,42 @@ float current_high;
   Serial.print( bmp.readAltitude(101500));
   Serial.print('\t');
 
+
+  Serial.print(current_high);
+  Serial.print('\t');
+
+
+  for ( int i = n - 1; i > 0 ; i --) {
+
+    vet[i]  =  vet [i - 1];
+
+  }
+  vet[0] = current_high;
+
+    High = 0;
+
+  for ( int i = 0; i < n ; i ++) {
   
-    Serial.print(bmp.readAltitude());
-    Serial.print('\t');
+    High = High + vet[i];
+  }
+  relative_average = High / n;
+  Serial.print(relative_average);
+  Serial.print('\t');
 
-    
-    
-  for ( float i = 0;i < n ; i ++) {
 
-   current_Altitude = bmp.readAltitude();
-   altitude = altitude + current_Altitude;
-}
-   relative_average = altitude/n;
-   Serial.print(relative_average);
-   Serial.print('\t');
-   
-    if (relative_average  < current_Altitude) {
+   if (relative_average < current_high ) {
 
-      Serial.print("Subida \t");
-      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+    Serial.print("Subida \t");
+    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
 
-    }
+  }
     else {
 
-      Serial.print("Descida \t");
-      digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (LOW is the voltage level);
+    Serial.print("Descida \t");
+    digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (LOW is the voltage level);
 
-    }
-  
-        Serial.println();
-       
+  }
+
+  Serial.println();
+
 }
-
-     
-
-     
