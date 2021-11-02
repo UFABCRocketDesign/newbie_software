@@ -178,6 +178,16 @@ void loop() {
 
   if (Delta >= 2 && apogeu == 0) {                         //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
     apogeu = 1;
+    tempoAtual = millis();
+    inicio1 = tempoAtual + duracao;
+    Serial.print(inicio1);
+    Serial.print("\t");
+    inicio2 = tempoAtual + espera;
+    Serial.print(inicio2);
+    Serial.print("\t");
+    inicio3 = inicio2 + duracao;
+    Serial.print(inicio3);
+    Serial.print("\t");
   }
   else if (apogeu == 0) {
     if (dataFile) {
@@ -195,15 +205,6 @@ void loop() {
       dataFile.println("Descendo");
       dataFile.close();
     }
-    inicio1 = tempoAtual + duracao;
-    Serial.print(inicio1);
-    Serial.print("\t");
-    inicio2 = tempoAtual + espera;
-    Serial.print(inicio2);
-    Serial.print("\t");
-    inicio3 = inicio2 + duracao;
-    Serial.print(inicio3);
-    Serial.print("\t");
     Serial.print("Descendo");
     if (auxled1 == 0) {
       digitalWrite(IGN_1, HIGH);
