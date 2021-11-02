@@ -121,14 +121,14 @@ void setup() {
 }
 void loop() {
   tempoAtual = millis();
-  Serial.print(tempoAtual);
+  Serial.print(tempoAtual/1000.0);
   Serial.print("\t");
   T = bmp.readTemperature();
   P = bmp.readPressure();
   Pm = bmp.readSealevelPressure();
   File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
-    dataFile.print(tempoAtual);
+    dataFile.print(tempoAtual/1000.0);
     dataFile.print("\t");
     dataFile.print(T);
     dataFile.print("\t");
