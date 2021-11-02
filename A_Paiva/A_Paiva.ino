@@ -8,6 +8,7 @@
 #define NomeArq "apm"             //Nome do arquivo para o cartão SD entre aspas
 #define espera 0000               //Tempo de espera para acionamento do paraquedas 2 (ms)
 #define duracao 5000              //Tempo de duracao do acionamento dos paraquedas (ms)
+#define altura 10                 //Altura para abertura do terceiro paraquedas
 //////////////////////////////////////////////////////////////////////
 #define IGN_1 36  /*act1*/
 #define IGN_2 61  /*act2*/
@@ -223,7 +224,7 @@ void loop() {
       auxled2 = 2;
       Serial.print("02");
     }
-    if (MediaMov <= 10 && auxled3 == 0) {
+    if (MediaMov <= altura && auxled3 == 0) {
       digitalWrite(LED_BUILTIN, HIGH);
       auxled3 = 1;
       inicio4 = tempoAtual + duracao;
