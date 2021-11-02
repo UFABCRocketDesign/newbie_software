@@ -204,6 +204,8 @@ void loop() {
     if (tempoAtual >= inicio1 && auxled1 == 1) {
       digitalWrite(IGN_1, LOW);
       auxled1 = 2;
+      Serial.print("01");
+      Serial.print(tempoAtual);
     }
     if (tempoAtual >= inicio2 && auxled2 == 0) {
       digitalWrite(IGN_2, HIGH);
@@ -214,6 +216,7 @@ void loop() {
     if (tempoAtual >= inicio3 && auxled2 == 1) {
       digitalWrite(IGN_2, LOW);
       auxled2 = 2;
+      Serial.print("02");
     }
     Serial.print("\t");
   }
