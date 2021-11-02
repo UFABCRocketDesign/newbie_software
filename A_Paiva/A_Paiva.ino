@@ -189,13 +189,22 @@ void loop() {
   }
   if (apogeu == 1) {
     tempoAtual = millis();
+    Serial.print(tempoAtual);
+    Serial.print("\t");
     if (dataFile) {
       dataFile.println("Descendo");
       dataFile.close();
     }
-    Serial.print("Descendo");
     inicio1 = tempoAtual + duracao;
+    Serial.print(inicio1);
+    Serial.print("\t");
     inicio2 = tempoAtual + espera;
+    Serial.print(inicio2);
+    Serial.print("\t");
+    inicio3 = inicio2 + duracao;
+    Serial.print(inicio3);
+    Serial.print("\t");
+    Serial.print("Descendo");
     if (auxled1 == 0) {
       digitalWrite(IGN_1, HIGH);
       auxled1 = 1;
@@ -205,11 +214,9 @@ void loop() {
       digitalWrite(IGN_1, LOW);
       auxled1 = 2;
       Serial.print("01");
-      Serial.print(tempoAtual);
     }
     if (tempoAtual >= inicio2 && auxled2 == 0) {
       digitalWrite(IGN_2, HIGH);
-      inicio3 = tempoAtual + duracao;
       auxled2 = 1;
       Serial.print("2");
     }
