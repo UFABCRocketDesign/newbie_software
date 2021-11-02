@@ -97,7 +97,7 @@ void setup() {
   }
   File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
-    dataFile.println("Temperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)");
+    dataFile.println("Tempo\tTemperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)");
     for (int i = 0; i < qf; i++) {
       dataFile.print("Altura do filtro ");
       dataFile.print(i);
@@ -107,7 +107,7 @@ void setup() {
     dataFile.close();
   }
   Serial.println("Dados dealtitude de voo");
-  Serial.print("Temperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)\tAltura (m)\tStatu de voo");
+  Serial.print("Tempo\tTemperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)\tAltura (m)\tStatu de voo");
   for (int i = 0; i < qf; i++) {
     Serial.print("Altura do filtro ");
     Serial.print(i);
@@ -120,11 +120,16 @@ void setup() {
   AltitudeRef = SomaRef / 100;
 }
 void loop() {
+  tempoAtual = millis();
+  Serial.print(tempoAtual);
+  Serial.print("\t");
   T = bmp.readTemperature();
   P = bmp.readPressure();
   Pm = bmp.readSealevelPressure();
   File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
+    dataFile.print(tempoAtual);
+    dataFile.print("\t");
     dataFile.print(T);
     dataFile.print("\t");
     dataFile.print(P);
@@ -178,16 +183,8 @@ void loop() {
 
   if (Delta >= 2 && apogeu == 0) {                         //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
     apogeu = 1;
-    tempoAtual = millis();
     inicio1 = tempoAtual + duracao;
-    Serial.print(inicio1);
-    Serial.print("\t");
     inicio2 = tempoAtual + espera;
-    Serial.print(inicio2);
-    Serial.print("\t");
-    inicio3 = inicio2 + duracao;
-    Serial.print(inicio3);
-    Serial.print("\t");
   }
   else if (apogeu == 0) {
     if (dataFile) {
@@ -198,9 +195,6 @@ void loop() {
     Serial.print("\t");
   }
   if (apogeu == 1) {
-    tempoAtual = millis();
-    Serial.print(tempoAtual);
-    Serial.print("\t");
     if (dataFile) {
       dataFile.println("Descendo");
       dataFile.close();
@@ -209,7 +203,7 @@ void loop() {
     if (auxled1 == 0) {
       digitalWrite(IGN_1, HIGH);
       auxled1 = 1;
-      Serial.print("1");
+      Serial.print("11");
     }
     if (tempoAtual >= inicio1 && auxled1 == 1) {
       digitalWrite(IGN_1, LOW);
@@ -219,7 +213,8 @@ void loop() {
     if (tempoAtual >= inicio2 && auxled2 == 0) {
       digitalWrite(IGN_2, HIGH);
       auxled2 = 1;
-      Serial.print("2");
+      inicio3 = tempoAtual + duracao;
+      Serial.print("12");
     }
     if (tempoAtual >= inicio3 && auxled2 == 1) {
       digitalWrite(IGN_2, LOW);
