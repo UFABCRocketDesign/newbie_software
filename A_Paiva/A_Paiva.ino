@@ -178,13 +178,26 @@ void loop() {
   }
   Delta=Hmax-MediaMov;                                     //Compara o valor máximo do filtro1 com o valor atual do filtro1
   
+  if (Delta >= 2 && auxled ==0) {                          //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
+    auxled = 1;   
+  }
+  else if(auxled == 0){
+    if (dataFile) {
+      dataFile.println("Subindo");
+      dataFile.close();
+    }
+    Serial.print("Subindo");
+    Serial.print("\t");
+  }
   if(auxled == 1){
     tempoAtual = millis();
     if (dataFile) {
-        dataFile.println("Descendo");
-        dataFile.close();
+      dataFile.println("Descendo");
+      dataFile.close();
     }
     Serial.print("Descendo");
+    inicio1 = tempoAtual+duracao;
+    inicio2 = tempoAtual+espera;
     if(auxled1 == 0){
       digitalWrite(IGN_1, HIGH);
       auxled1 = 1;
@@ -204,26 +217,6 @@ void loop() {
       digitalWrite(IGN_2, LOW);
       auxled2 = 2;
     }
-    Serial.print("\t");
-  }
-  if (Delta >= 2 && auxled ==0) {                          //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
-    tempoAtual = millis();
-    if (dataFile) {
-      dataFile.println("Descendo");
-      dataFile.close();
-    }
-    Serial.print("Descendo");
-    Serial.print("\t");
-    inicio1 = tempoAtual+duracao;
-    inicio2 = tempoAtual+espera;
-    auxled = 1;   
-  }
-  else if(auxled == 0){
-    if (dataFile) {
-      dataFile.println("Subindo");
-      dataFile.close();
-    }
-    Serial.print("Subindo");
     Serial.print("\t");
   }
   //Serial.print(led);
