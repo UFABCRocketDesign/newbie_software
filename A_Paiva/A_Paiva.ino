@@ -73,23 +73,23 @@ void setup() {
   Serial.println("card initialized.");
   x = NomeArq;
   tamNomeArq = x.length();
-  sub1 = 8-tamNomeArq;
-  while(aux==1){
+  sub1 = 8 - tamNomeArq;
+  while (aux == 1) {
     z = String(Num);
     tamNum = z.length();
-    sub2 = sub1-tamNum;
+    sub2 = sub1 - tamNum;
     y = "";
-    for(int i=0; i<sub2; i++){
-      y = y+"0";
+    for (int i = 0; i < sub2; i++) {
+      y = y + "0";
     }
-    NomeFinal = x+y+z+".txt";
+    NomeFinal = x + y + z + ".txt";
     if (SD.exists(NomeFinal)) {
       //Serial.print(NomeFinal);
       //Serial.println(" ja existe");
       Num++;
       aux = 1;
     }
-    else{
+    else {
       Serial.print("Nome do arquivo atual: ");
       Serial.println(NomeFinal);
       aux = 0;
@@ -98,7 +98,7 @@ void setup() {
   File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
     dataFile.println("Temperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)");
-    for (int i = 0; i<qf; i++){
+    for (int i = 0; i < qf; i++) {
       dataFile.print("Altura do filtro ");
       dataFile.print(i);
       dataFile.print("(m)\t");
@@ -108,7 +108,7 @@ void setup() {
   }
   Serial.println("Dados dealtitude de voo");
   Serial.print("Temperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)\tAltura (m)\tStatu de voo");
-  for (int i = 0; i<qf; i++){
+  for (int i = 0; i < qf; i++) {
     Serial.print("Altura do filtro ");
     Serial.print(i);
     Serial.print("(m)\t");
@@ -130,7 +130,7 @@ void loop() {
     dataFile.print(P);
     dataFile.print("\t");
     dataFile.print(Pm);
-    dataFile.print("\t");    
+    dataFile.print("\t");
     dataFile.print(Hmax);
     dataFile.print("\t");
   }
@@ -142,44 +142,44 @@ void loop() {
   Serial.print("\t");
   Serial.print(Hmax);
   Serial.print("\t");
-  SomaMov=0;                                           //Zera o SomaMov1 em todo loop
-  for (int j = 0; j<qf; j++){
-      for (int i = tam-2; i>=0; i--){                      //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1
-        MatrizFiltros[j][i+1]= MatrizFiltros[j][i];                    
-      }
-      if(j==0){
-        MatrizFiltros[0][0]=bmp.readAltitude()-AltitudeRef;   //Esse é o valor mais atualizado do filtro1
-        Serial.print(MatrizFiltros[0][0]);
-        Serial.print("\t");
-        if (dataFile) {
-          dataFile.print(MatrizFiltros[0][0]);
-          dataFile.print("\t");
-        }
-      }
-      else{
-        MatrizFiltros[j][0] = MediaMov;
-      }
-      SomaMov=0;
-      for (int i = 0; i <= tam-1; i++) {                      //Esse 'for' faz a soma dos últimos valores medidos, para a média do filtro1
-        SomaMov=SomaMov+MatrizFiltros[j][i];
-      }
-      MediaMov=SomaMov/tam;
-      Serial.print(MediaMov);
+  SomaMov = 0;                                         //Zera o SomaMov1 em todo loop
+  for (int j = 0; j < qf; j++) {
+    for (int i = tam - 2; i >= 0; i--) {                 //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1
+      MatrizFiltros[j][i + 1] = MatrizFiltros[j][i];
+    }
+    if (j == 0) {
+      MatrizFiltros[0][0] = bmp.readAltitude() - AltitudeRef; //Esse é o valor mais atualizado do filtro1
+      Serial.print(MatrizFiltros[0][0]);
       Serial.print("\t");
       if (dataFile) {
-        dataFile.print(MediaMov);
+        dataFile.print(MatrizFiltros[0][0]);
         dataFile.print("\t");
       }
-  }                    
+    }
+    else {
+      MatrizFiltros[j][0] = MediaMov;
+    }
+    SomaMov = 0;
+    for (int i = 0; i <= tam - 1; i++) {                    //Esse 'for' faz a soma dos últimos valores medidos, para a média do filtro1
+      SomaMov = SomaMov + MatrizFiltros[j][i];
+    }
+    MediaMov = SomaMov / tam;
+    Serial.print(MediaMov);
+    Serial.print("\t");
+    if (dataFile) {
+      dataFile.print(MediaMov);
+      dataFile.print("\t");
+    }
+  }
   if (Hmax < MediaMov) {                                    //Pega o valor máximo da média/filtro2
     Hmax = MediaMov;
   }
-  Delta=Hmax-MediaMov;                                     //Compara o valor máximo do filtro1 com o valor atual do filtro1
-  
-  if (Delta >= 2 && apogeu ==0) {                          //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
-    apogeu = 1;   
+  Delta = Hmax - MediaMov;                                 //Compara o valor máximo do filtro1 com o valor atual do filtro1
+
+  if (Delta >= 2 && apogeu == 0) {                         //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
+    apogeu = 1;
   }
-  else if(apogeu == 0){
+  else if (apogeu == 0) {
     if (dataFile) {
       dataFile.println("Subindo");
       dataFile.close();
@@ -187,31 +187,31 @@ void loop() {
     Serial.print("Subindo");
     Serial.print("\t");
   }
-  if(apogeu == 1){
+  if (apogeu == 1) {
     tempoAtual = millis();
     if (dataFile) {
       dataFile.println("Descendo");
       dataFile.close();
     }
     Serial.print("Descendo");
-    inicio1 = tempoAtual+duracao;
-    inicio2 = tempoAtual+espera;
-    if(auxled1 == 0){
+    inicio1 = tempoAtual + duracao;
+    inicio2 = tempoAtual + espera;
+    if (auxled1 == 0) {
       digitalWrite(IGN_1, HIGH);
       auxled1 = 1;
       Serial.print("1");
     }
-    if(tempoAtual >= inicio1 && auxled1 == 1){
+    if (tempoAtual >= inicio1 && auxled1 == 1) {
       digitalWrite(IGN_1, LOW);
       auxled1 = 2;
     }
-    if(tempoAtual >= inicio2 && auxled2 == 0){
+    if (tempoAtual >= inicio2 && auxled2 == 0) {
       digitalWrite(IGN_2, HIGH);
-      inicio3 = tempoAtual+duracao;
+      inicio3 = tempoAtual + duracao;
       auxled2 = 1;
       Serial.print("2");
     }
-    if(tempoAtual >= inicio3 && auxled2 == 1){
+    if (tempoAtual >= inicio3 && auxled2 == 1) {
       digitalWrite(IGN_2, LOW);
       auxled2 = 2;
     }
