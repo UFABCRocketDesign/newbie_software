@@ -6,7 +6,7 @@
 #define tam 10                    //Tamanho da matriz do filtro(quantidade de valores usado)
 #define qf 2                      //Quantidade de filtros
 #define NomeArq "apm"             //Nome do arquivo para o cartão SD entre aspas
-#define espera 7000               //Tempo de espera para acionamento do paraquedas 2 (ms)
+#define espera 3000               //Tempo de espera para acionamento do paraquedas 2 (ms)
 #define duracao 5000              //Tempo de duracao do acionamento dos paraquedas (ms)
 //////////////////////////////////////////////////////////////////////
 #define IGN_1 36  /*act1*/
