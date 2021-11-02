@@ -26,9 +26,11 @@ float MatrizFiltros[qf][tam];     //Vetor para guardar os valores para as média
 int apogeu = 0;
 int auxled1 = 0;
 int auxled2 = 0;
+int auxled3 = 0;
 unsigned long inicio1 = 0;        // will store last time LED was updated
 unsigned long inicio2 = 0;        // will store last time LED was updated
 unsigned long inicio3 = 0;        // will store last time LED was updated
+unsigned long inicio4 = 0;        // will store last time LED was updated
 unsigned long tempoAtual = 0;        // will store last time LED was updated
 
 float T;                          //Valor da Temperatura
@@ -220,6 +222,17 @@ void loop() {
       digitalWrite(IGN_2, LOW);
       auxled2 = 2;
       Serial.print("02");
+    }
+    if (MediaMov <= 10 && auxled3 == 0) {
+      digitalWrite(LED_BUILTIN, HIGH);
+      auxled3 = 1;
+      inicio4 = tempoAtual + duracao;
+      Serial.print("13");
+    }
+    if (tempoAtual >= inicio4 && auxled3 == 1) {
+      digitalWrite(LED_BUILTIN, LOW);
+      auxled3 = 2;
+      Serial.print("03");
     }
     Serial.print("\t");
   }
