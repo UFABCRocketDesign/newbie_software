@@ -6,7 +6,7 @@
 #define tam 10                    //Tamanho da matriz do filtro(quantidade de valores usado)
 #define qf 2                      //Quantidade de filtros
 #define NomeArq "apm"             //Nome do arquivo para o cartão SD entre aspas
-#define espera 5000               //Tempo de espera para acionamento do paraquedas 2 (ms)
+#define espera 7000               //Tempo de espera para acionamento do paraquedas 2 (ms)
 #define duracao 5000              //Tempo de duracao do acionamento dos paraquedas (ms)
 //////////////////////////////////////////////////////////////////////
 #define IGN_1 36  /*act1*/
@@ -185,7 +185,6 @@ void loop() {
         dataFile.close();
     }
     Serial.print("Descendo");
-    Serial.print("\t");
     if(tempoAtual >= inicio1 && auxled1 == 0){
       digitalWrite(IGN_1, LOW);
       auxled1 = 1;
@@ -194,18 +193,20 @@ void loop() {
       digitalWrite(IGN_2, HIGH);
       inicio3 = millis()+duracao;
       auxled2 = 1;
+      Serial.print("2");
     }
     if(tempoAtual >= inicio3 && auxled2 == 1){
       digitalWrite(IGN_2, LOW);
       auxled2 = 2;
     }
+    Serial.print("\t");
   }
   if (Delta >= 2 && auxled ==0) {                          //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
     if (dataFile) {
       dataFile.println("Descendo");
       dataFile.close();
     }
-    Serial.print("Descendo");
+    Serial.print("Descendo1");
     Serial.print("\t");
     inicio1 = millis()+duracao;
     inicio2 = millis()+espera;
