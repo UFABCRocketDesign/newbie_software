@@ -23,15 +23,13 @@ float Delta;                      //Diferença entre valor máximo do filtro1 (H
 float MatrizFiltros[qf][tam];     //Vetor para guardar os valores para as médias utilizadas pelos filtros
 
 //int led = 0;                      //Variável para funcionamento do LED
-int auxled = 0;
+int apogeu = 0;
 int auxled1 = 0;
 int auxled2 = 0;
 unsigned long inicio1 = 0;        // will store last time LED was updated
 unsigned long inicio2 = 0;        // will store last time LED was updated
 unsigned long inicio3 = 0;        // will store last time LED was updated
 unsigned long tempoAtual = 0;        // will store last time LED was updated
-//const long intervalo = 10000;           // interval at which to blink (milliseconds)
-//const long intervalo = 10000;           // interval at which to blink (milliseconds)
 
 float T;                          //Valor da Temperatura
 float P;                          //Valor da Pressão
@@ -178,10 +176,10 @@ void loop() {
   }
   Delta=Hmax-MediaMov;                                     //Compara o valor máximo do filtro1 com o valor atual do filtro1
   
-  if (Delta >= 2 && auxled ==0) {                          //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
-    auxled = 1;   
+  if (Delta >= 2 && apogeu ==0) {                          //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
+    apogeu = 1;   
   }
-  else if(auxled == 0){
+  else if(apogeu == 0){
     if (dataFile) {
       dataFile.println("Subindo");
       dataFile.close();
@@ -189,7 +187,7 @@ void loop() {
     Serial.print("Subindo");
     Serial.print("\t");
   }
-  if(auxled == 1){
+  if(apogeu == 1){
     tempoAtual = millis();
     if (dataFile) {
       dataFile.println("Descendo");
