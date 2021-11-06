@@ -2,8 +2,13 @@
 #include <SPI.h>
 #include <SD.h>
 
+#define IGN_1 36  /*act1*/
+#define IGN_2 61  /*act2*/
+#define IGN_3 46  /*act3*/
+#define IGN_4 55  /*act4*/
+
 Adafruit_BMP085 bmp;
-float aux = 0;
+float auxiliar = 0;
 float media = 0;
 float soma = 0;
 float mediaMovel = 0;
@@ -13,15 +18,23 @@ String arquivo = "";
 int num = 0;
 int led = LOW;
 int led2 = LOW; 
+int led3 = LOW;
+int led4 = LOW;
+const long intervalo = 0;
+const long intervalo2 = 0; 
 unsigned long tempoInicial = 0;       
-unsigned long tempoAtual = 0;        
-const long intervalo = 10000;  
+unsigned long tempoAtual = 0; 
+unsigned long tempoaux = 0;  
+unsigned long tempoComeco = 0;
+unsigned long tempoAgora = 0;    
 float apogeu = 0;                   
 
 const int chipSelect = 53;
 
 void setup() {
     pinMode(LED_BUILTIN, OUTPUT);
+    pinMode(IGN_1, OUTPUT);
+    pinMode(IGN_2, OUTPUT);
 
     Serial.begin(115200);
   
@@ -214,12 +227,15 @@ void loop() {
 
     float diferenca = apogeu - segundaMediaMovel;
 
-    if(diferenca >= 1 && led == LOW){
+    if(diferenca >= 1){
       dataString += String("caindo\t");
-      digitalWrite(LED_BUILTIN, HIGH);
-      led2 = HIGH;
-      led = HIGH;
-      tempoInicial = millis();
+
+      if(led == LOW){
+        digitalWrite(IGN_1, HIGH);
+        led2 = HIGH;
+        led = HIGH;
+        tempoInicial = millis();
+      }
     }
     else if (led == LOW){
       dataString += String("subindo\t");
@@ -227,21 +243,36 @@ void loop() {
 
     if(led2 == HIGH){
        tempoAtual = millis();
-       if ((tempoAtual - tempoInicial) >= intervalo) {
-        
+       if((tempoAtual - tempoInicial) >= intervalo){
           dataString += String("caindo\t");
-          digitalWrite(LED_BUILTIN, LOW);
-          led2 = LOW;
-          led = HIGH;
+          digitalWrite(IGN_1, LOW);
+          led2 = LOW; 
        }
        else{
           dataString += String("caindo\t");
-          digitalWrite(LED_BUILTIN, HIGH);
-          led2 = HIGH;
-          led = HIGH;
-      }
+          digitalWrite(IGN_1, HIGH);
+       }
     }
-    
+
+    tempoaux = (tempoAtual-tempoInicial) + intervalo2;
+
+    if(led3 == LOW && tempoAtual >= tempoaux ){
+        digitalWrite(LED_BUILTIN, HIGH);
+        led4 = HIGH;
+        led3 = HIGH;
+        tempoComeco = millis();
+    }
+      
+    if(led3 == HIGH){
+       tempoAgora = millis();
+       if ((tempoAgora - tempoComeco) >= intervalo) {
+          digitalWrite(IGN_2, LOW);
+          led4 = LOW;
+       }
+       else{
+            digitalWrite(IGN_2, HIGH);
+        }
+    }
   
     dataString += String(altRelativa);
     dataString += ("\t");
@@ -266,7 +297,7 @@ void loop() {
       Serial.println("error opening" + arquivo);
     }
       
-    aux = alt;
+    auxiliar = alt;
    
     // delay(100);
 }
