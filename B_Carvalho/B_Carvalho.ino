@@ -15,7 +15,9 @@ float media_movel = 0;
 float soma_mm2 = 0;
 float altitude2[10];
 int j = 0;
-float media_movel2 = 0;
+int media_movel2 = 0;
+float medicao[30];
+int queda = 0;
 
 
 void setup() { 
@@ -73,6 +75,20 @@ void loop(){
   //Serial.print(altitude2);
   //Serial.print("\t");
   Serial.println("\t");
+
+  for (int k=30; k>0; k--){
+    medicao[k] = medicao[k-1];  
+  }
+  medicao[0] = media_movel2;
+  queda = 0;
+  for (int k=0; k<30; k++){
+    if (medicao[k] > medicao[k+1]){
+      queda += 1;
+    }
+  }
+  if (queda >= 25){
+    Serial.print("O foguete está caindo");
+  }
   }
   
   
