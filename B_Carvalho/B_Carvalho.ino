@@ -72,7 +72,9 @@ void loop(){
   Serial.print("\t");
   //Serial.print(altitude2);
   //Serial.print("\t");
+  Serial.println("\t");
   }
+  
   
   
   
