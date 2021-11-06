@@ -81,9 +81,10 @@ void loop(){
   }
   medicao[0] = media_movel2;
   queda = 0;
-  for (int k=0; k<30; k++){
+  for (int k=0; k<29; k++){
     if (medicao[k] > medicao[k+1]){
       queda += 1;
+      Serial.println(queda);
     }
   }
   if (queda >= 25){
