@@ -208,7 +208,7 @@ void loop() {
       }
     }
 
-    if (led3 == LOW && tempoAtual > ligaLED2 ) {
+    if (led3 == LOW && tempoAtual >= ligaLED2 ) {
       digitalWrite(IGN_2, HIGH);
       led4 = HIGH;
       led3 = HIGH;
