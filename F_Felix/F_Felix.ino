@@ -24,7 +24,8 @@ int led3 = LOW;
 int led4 = LOW;
 unsigned long tempoInicial = 0;       
 unsigned long tempoAtual = 0; 
-unsigned long tempoaux = 0;  
+unsigned long tempoFinal = 0;
+unsigned long tempoFinal2 = 0;  
 unsigned long tempoComeco = 0;
 unsigned long tempoAgora = 0;    
 float apogeu = 0;                   
@@ -110,17 +111,6 @@ void setup() {
       Serial.println(arquivo);
   }
 
-   // Serial.print("Temp.(*C)\t");
-   // Serial.print("Pres.(Pa)\t");
-   // Serial.print("Alt.(m)\t");
-  //  Serial.print("Pres. sealevel(Pa)\t");
-  //  Serial.print("Real alt.(m)\t");
-  //  Serial.print("Foguete\t");
-  //  Serial.print("Variação\t");
-  //  Serial.print("Média\t");
-  //  Serial.print("Média 2\t");
-  //  Serial.println();
-
     float alt = bmp.readAltitude();
 
     for (int j = 0; j < 100; j++){
@@ -164,45 +154,6 @@ void loop() {
       }
 
     segundaMediaMovel = somaVet2/10.0;
-     
-  
-   // Serial.print(bmp.readTemperature());
-  //  Serial.print("\t");
-    
-  //  Serial.print(bmp.readPressure());
-  //  Serial.print("\t");
-    
-   // Serial.print(alt);
-  //  Serial.print("\t");
-   
-  //  Serial.print(bmp.readSealevelPressure());
-  //  Serial.print("\t");
-  //  
-  //  Serial.print(bmp.readAltitude(101500));
-  //  Serial.print("\t");
-
-    /*if(alt > aux){
-      Serial.print("subindo\t");
-      digitalWrite(LED_BUILTIN, LOW);
-    }
-    else if (alt == aux){
-      Serial.print("parado\t");
-    }
-    else{
-      Serial.print("caindo\t");
-      digitalWrite(LED_BUILTIN, HIGH);
-    } */
-  
-  //  Serial.print(altRelativa);
-  //  Serial.print("\t");
-
-  //  Serial.print(mediaMovel);
-  //  Serial.print("\t");
-
-  //  Serial.print(segundaMediaMovel);
-  //  Serial.print("\t");
-    
- //   Serial.println();
 
     String dataString = "";
     
@@ -235,6 +186,7 @@ void loop() {
         led2 = HIGH;
         led = HIGH;
         tempoInicial = millis();
+        tempoFinal = intervalo + tempoInicial;
       }
     }
     else if (led == LOW){
@@ -243,35 +195,27 @@ void loop() {
 
     if(led2 == HIGH){
        tempoAtual = millis();
-       if((tempoAtual - tempoInicial) >= intervalo){
+       if(tempoAtual >= tempoFinal){
           dataString += String("caindo if\t");
           digitalWrite(IGN_1, LOW);
           led2 = LOW; 
        }
-       else{
-          dataString += String("caindo else\t");
-          digitalWrite(IGN_1, HIGH);
-       }
     }
 
-    tempoaux = (tempoAtual-tempoInicial) + intervalo2;
-
-    if(led3 == LOW && tempoAtual >= tempoaux ){
+    if(led3 == LOW && tempoAtual >= intervalo2 ){
         digitalWrite(LED_BUILTIN, HIGH);
         led4 = HIGH;
         led3 = HIGH;
         tempoComeco = millis();
     }
       
-    if(led3 == HIGH){
+    if(led4 == HIGH){
        tempoAgora = millis();
-       if ((tempoAgora - tempoComeco) >= intervalo) {
+       tempoFinal2 = tempoComeco + intervalo;
+       if (tempoAgora >= tempoFinal2) {
           digitalWrite(IGN_2, LOW);
           led4 = LOW;
        }
-       else{
-            digitalWrite(IGN_2, HIGH);
-        }
     }
   
     dataString += String(altRelativa);
