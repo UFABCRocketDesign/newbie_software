@@ -16,7 +16,7 @@ float soma_mm2 = 0;
 float altitude2[10];
 int j = 0;
 float media_movel2 = 0;
-float medicao[30];
+float medicao[50];
 int queda = 0;
 
 
@@ -75,19 +75,19 @@ void loop() {
   //Serial.print(altitude2);
   //Serial.print("\t");
 
-  for (int k = 29; k > 0; k--) {
+  for (int k = 49; k > 0; k--) {
     medicao[k] = medicao[k - 1];
   }
   medicao[0] = media_movel2;
   queda = 0;
-  for (int k = 0; k < 29; k++) {
-    if (medicao[k] > medicao[k + 1]) {
+  for (int k = 0; k < 49; k++) {
+    if (medicao[k] < medicao[k + 1]) {
       queda += 1;
     }
   }
   Serial.print(queda);
   Serial.print("\t");
-  if (queda >= 25) {
+  if (queda >= 45) {
     Serial.print("1");
   }
   else{
