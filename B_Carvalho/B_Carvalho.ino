@@ -86,8 +86,12 @@ void loop() {
     }
   }
   Serial.print(queda);
+  Serial.print("\t");
   if (queda >= 25) {
-    Serial.print("O foguete está caindo");
+    Serial.print("1");
+  else{
+    Serial.print("0");
+  }
   }
 Serial.println("\t");  
 }
