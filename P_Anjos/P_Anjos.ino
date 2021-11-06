@@ -2,7 +2,10 @@
 #include <SPI.h>
 #include <SD.h>
 
-
+#define IGN_1 36  /*act1*/
+#define IGN_2 61  /*act2*/
+#define IGN_3 46  /*act3*/
+#define IGN_4 55  /*act4*/
 // Código para detecção do apogeu de um foguete que utiliza sensor de pressão. Inclui gravação de dados no cartão SD e acionamento de paraquedas
 
 const int chipSelect = 53;   //Define o pino para o chipselect para gravar no cartão SD
@@ -30,11 +33,14 @@ int a;
 int b;
 int c;
 int ledState = LOW;               // Estado inicial do LED que indica acionamento do paraquedas
+int ledState2 = LOW;              // Outra LED para verificar o timer antes de acionar o paraquedas
+float Timer=0;                    // Guarda o tempo do timer
 unsigned long previousMillis = 0; // Guarda o valor de tempo
+unsigned long previousMillis2 = 0; // Guarda o valor de tempo para outro timer
 const long interval = 2000;       // O intervalo de tempo que o LED deve ficar ligado em milesegundos
 bool Aceso = false;               // A variável booleana para verificar se o LED ta ligado
 bool Fim = true;                  // A variável booleana para parar a verificação do paraquedas
-
+float dfaltura = 2;               // Define o delta de altura que serve de critério para a determinação do apogeu
 Adafruit_BMP085 bmp;
 
 void setup() {
@@ -123,20 +129,29 @@ void loop() {
   dataString += String(bmp.readSealevelPressure());
   dataString += "\t";
   if (Delta > 0) {
-    if ((Delta >= 2 || Aceso == true) && Fim == true) {
-      unsigned long currentMillis = millis();   //conta em que instante do tempo está
-      if (currentMillis - previousMillis >= interval) {
-        previousMillis = currentMillis;
-        if (ledState == LOW) {
-          ledState = HIGH;
-          dataString += String("Descendo - Paraquedas On");
-        } else {
-          ledState = LOW;
-          dataString += String("Descendo - Paraquedas Off");
-          Fim = false;                // Finaliza a verificação do acionamento do paraquedas
-        }
-        digitalWrite(LED_BUILTIN, ledState);   // A partir do momento que a diferença de altitude for acima de 2, provavelmente o foguete está descendo. Acione o paraquedas
+    if (Delta >= dfaltura) {
+      unsigned long currentMillis = millis(); //conta em que instante do tempo está
+      if (currentMillis - previousMillis2 >= interval) {
+          ledState2 = HIGH;
+          dataString += String("Ligando o LED");
+        digitalWrite(IGN_1, ledState2);
+        Timer=interval;
       }}
+      if (((Delta >= dfaltura || Aceso == true)&& Timer>0) && Fim == true) { // Só excute esse if depois do Timer de 2s
+        unsigned long currentMillis = millis();   //conta em que instante do tempo está
+        if (currentMillis - previousMillis >= interval) {
+          previousMillis = currentMillis;
+          if (ledState == LOW) {
+            ledState = HIGH;
+            dataString += String("Descendo - Paraquedas On");
+          } else {
+            ledState = LOW;
+            dataString += String("Descendo - Paraquedas Off");
+            Fim = false;                // Finaliza a verificação do acionamento do paraquedas
+          }
+          digitalWrite(LED_BUILTIN, ledState);   // A partir do momento que a diferença de altitude for acima de 2, provavelmente o foguete está descendo. Acione o paraquedas
+        }
+      }
       dataString += String("Descendo");
     } else {
       dataString += String("Subindo");
@@ -156,3 +171,5 @@ void loop() {
       Serial.println("error opening P_ANJOS.txt");
     }
   }
+
+  // Colocar um timer antes de contar o tempo para acionar o paraquedas. Lembre-se de deixar o define em tudo que você for utilizar
