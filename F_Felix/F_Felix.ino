@@ -6,7 +6,7 @@
 #define IGN_2 61  /*act2*/
 #define IGN_3 46  /*act3*/
 #define IGN_4 55  /*act4*/
-#define intervalo 0
+#define intervalo 5000
 #define intervalo2 0
 
 Adafruit_BMP085 bmp;
