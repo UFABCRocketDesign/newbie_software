@@ -85,7 +85,7 @@ void loop() {
       queda += 1;
     }
   }
-  Serial.print(float(queda/50));
+  Serial.print(queda/float (50));
   Serial.print("\t");
   if (queda >= 45) {
     Serial.print("1");
