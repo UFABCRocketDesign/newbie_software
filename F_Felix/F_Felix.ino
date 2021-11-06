@@ -22,10 +22,13 @@ int led = LOW;
 int led2 = LOW;
 int led3 = LOW;
 int led4 = LOW;
+int led5 = LOW;
+int led6 = LOW;
 unsigned long tempoAtual = 0;
 unsigned long desligaLED = 0;
 unsigned long desligaLED2 = 0;
 unsigned long ligaLED2 = 0;
+unsigned long desligaLED3 = 0;
 float apogeu = 0;
 boolean detectaApogeu = false;
 
@@ -216,6 +219,20 @@ void loop() {
       if (tempoAtual >= desligaLED2 ) {
         digitalWrite(IGN_2, LOW);
         led4 = LOW;
+      }
+    }
+
+    if (led5 == LOW && segundaMediaMovel <= 10 ) {
+      digitalWrite(LED_BUILTIN , HIGH);
+      led6 = HIGH;
+      led5 = HIGH;
+      desligaLED3 = tempoAtual + intervalo;
+    }
+
+    if (led6 == HIGH) {
+      if (tempoAtual >= desligaLED3 ) {
+        digitalWrite(LED_BUILTIN, LOW);
+        led6 = LOW;
       }
     }
   }
