@@ -244,12 +244,12 @@ void loop() {
     if(led2 == HIGH){
        tempoAtual = millis();
        if((tempoAtual - tempoInicial) >= intervalo){
-          dataString += String("caindo\t");
+          dataString += String("caindo if\t");
           digitalWrite(IGN_1, LOW);
           led2 = LOW; 
        }
        else{
-          dataString += String("caindo\t");
+          dataString += String("caindo else\t");
           digitalWrite(IGN_1, HIGH);
        }
     }
