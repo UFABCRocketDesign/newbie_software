@@ -21,17 +21,12 @@ int num = 0;
 int led = LOW;
 int led2 = LOW; 
 int led3 = LOW;
-int led4 = LOW;
-unsigned long tempoInicial = 0;       
+int led4 = LOW;       
 unsigned long tempoAtual = 0; 
 unsigned long tempoFinal = 0;
-unsigned long tempoFinal2 = 0;
-unsigned long tempoLed = 0; 
-unsigned long tempoComeco = 0;
-unsigned long tempoAgora = 0; 
-unsigned long tempoAux = 0; 
-unsigned long tempoPrimeiro = 0;   
-float apogeu = 0;                   
+unsigned long tempoComeco = 0;   
+float apogeu = 0;   
+boolean detectaApogeu = false;                
 
 const int chipSelect = 53;
 
@@ -125,6 +120,8 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() { 
+
+    tempoAtual = millis();
     
     float alt = bmp.readAltitude();
     float somaVet = 0;
@@ -180,36 +177,32 @@ void loop() {
     }
 
     float diferenca = apogeu - segundaMediaMovel;
-
+    
     if(diferenca >= 1){
       dataString += String("caindo\t");
       
-      tempoPrimeiro = millis();
-      tempoLed = intervalo2 + tempoPrimeiro;
-      
-      if(led == LOW){
-        digitalWrite(IGN_1, HIGH);
-        led2 = HIGH;
-        led = HIGH;
-        tempoInicial = millis();
-        tempoAux = millis();
+      if(detectaApogeu == false){
+        if(led == LOW){
+          digitalWrite(IGN_1, HIGH);
+          led2 = HIGH;
+          led = HIGH;
+          detectaApogeu = true;
+        }
       }
-    }
-    else if (led == LOW){
-      dataString += String("subindo\t");
+      else if (led == LOW){
+        dataString += String("subindo\t");
+      }
     }
 
     if(led2 == HIGH){
-       tempoAtual = millis();
-       tempoFinal = intervalo + tempoInicial;
-       if(tempoAtual >= tempoFinal){
-          dataString += String("caindo if\t");
+       if(tempoAtual >= intervalo){
+          dataString += String("caindo\t");
           digitalWrite(IGN_1, LOW);
           led2 = LOW; 
        }
     }
-    if (diferenca >= 1){
-      if(led3 == LOW && tempoAux >= tempoLed ){
+    if (detectaApogeu == true){
+      if(led3 == LOW && tempoAtual >= intervalo2 ){
           digitalWrite(LED_BUILTIN, HIGH);
           led4 = HIGH;
           led3 = HIGH;
@@ -217,9 +210,7 @@ void loop() {
       }
         
       if(led4 == HIGH){
-         tempoAgora = millis();
-         tempoFinal2 = tempoComeco + intervalo;
-         if (tempoAgora >= tempoFinal2) {
+         if (tempoComeco >= intervalo ) {
             digitalWrite(IGN_2, LOW);
             led4 = LOW;
          }
