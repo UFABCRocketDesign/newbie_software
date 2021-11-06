@@ -12,6 +12,10 @@ float altitude[10];
 int i = 0;
 float soma_mm = 0;
 float media_movel = 0;
+float soma_mm2 = 0;
+float altitude2[10];
+int j = 0;
+float media_movel2 = 0;
 
 
 void setup() { 
@@ -54,6 +58,21 @@ void loop(){
   Serial.print("\t");
   Serial.print(alt_atual);
   Serial.print("\t");
+
+  for (int j=9; j>0; j--){
+    altitude2[j] = altitude2 [j-1];
+  }
+  altitude2[0] = media_movel;
+  soma_mm2 = 0;
+  for (int j=0; j<10; j++){
+    soma_mm2 += altitude2[j];
+    }
+  media_movel2 = soma_mm2/10;
+  Serial.print(media_movel2);
+  Serial.print("\t");
+  //Serial.print(altitude2);
+  //Serial.print("\t");
+  }
   
   
   
@@ -77,6 +96,3 @@ void loop(){
   // that is equal to 101500 Pascals.
   //Serial.print(bmp.readAltitude(101500));
   //Serial.print("\t");
-
-  Serial.println();
-}
