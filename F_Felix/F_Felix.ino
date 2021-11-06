@@ -23,8 +23,9 @@ int led2 = LOW;
 int led3 = LOW;
 int led4 = LOW;       
 unsigned long tempoAtual = 0; 
-unsigned long tempoFinal = 0;
-unsigned long tempoComeco = 0;   
+unsigned long desligaLED = 0; 
+unsigned long desligaLED2 = 0;     
+unsigned long ligaLED2 = 0;
 float apogeu = 0;   
 boolean detectaApogeu = false;                
 
@@ -187,6 +188,7 @@ void loop() {
           led2 = HIGH;
           led = HIGH;
           detectaApogeu = true;
+          desligaLED = tempoAtual + intervalo;
         }
       }
       else if (led == LOW){
@@ -195,22 +197,23 @@ void loop() {
     }
 
     if(led2 == HIGH){
-       if(tempoAtual >= intervalo){
+       if(tempoAtual >= desligaLED){
           dataString += String("caindo\t");
           digitalWrite(IGN_1, LOW);
           led2 = LOW; 
+          ligaLED2 = tempoAtual + intervalo2;
        }
     }
     if (detectaApogeu == true){
-      if(led3 == LOW && tempoAtual >= intervalo2 ){
+      if(led3 == LOW && tempoAtual >ligaLED2 ){
           digitalWrite(LED_BUILTIN, HIGH);
           led4 = HIGH;
           led3 = HIGH;
-          tempoComeco = millis();
+          desligaLED2 = tempoAtual + desligaLED2;
       }
         
       if(led4 == HIGH){
-         if (tempoComeco >= intervalo ) {
+         if (tempoAtual >= desligaLED2 ) {
             digitalWrite(IGN_2, LOW);
             led4 = LOW;
          }
