@@ -25,9 +25,12 @@ int led4 = LOW;
 unsigned long tempoInicial = 0;       
 unsigned long tempoAtual = 0; 
 unsigned long tempoFinal = 0;
-unsigned long tempoFinal2 = 0;  
+unsigned long tempoFinal2 = 0;
+unsigned long tempoLed = 0; 
 unsigned long tempoComeco = 0;
-unsigned long tempoAgora = 0;    
+unsigned long tempoAgora = 0; 
+unsigned long tempoAux = 0; 
+unsigned long tempoPrimeiro = 0;   
 float apogeu = 0;                   
 
 const int chipSelect = 53;
@@ -180,13 +183,16 @@ void loop() {
 
     if(diferenca >= 1){
       dataString += String("caindo\t");
-
+      
+      tempoPrimeiro = millis();
+      tempoLed = intervalo2 + tempoPrimeiro;
+      
       if(led == LOW){
         digitalWrite(IGN_1, HIGH);
         led2 = HIGH;
         led = HIGH;
         tempoInicial = millis();
-        tempoFinal = intervalo + tempoInicial;
+        tempoAux = millis();
       }
     }
     else if (led == LOW){
@@ -195,27 +201,29 @@ void loop() {
 
     if(led2 == HIGH){
        tempoAtual = millis();
+       tempoFinal = intervalo + tempoInicial;
        if(tempoAtual >= tempoFinal){
           dataString += String("caindo if\t");
           digitalWrite(IGN_1, LOW);
           led2 = LOW; 
        }
     }
-
-    if(led3 == LOW && tempoAtual >= intervalo2 ){
-        digitalWrite(LED_BUILTIN, HIGH);
-        led4 = HIGH;
-        led3 = HIGH;
-        tempoComeco = millis();
-    }
-      
-    if(led4 == HIGH){
-       tempoAgora = millis();
-       tempoFinal2 = tempoComeco + intervalo;
-       if (tempoAgora >= tempoFinal2) {
-          digitalWrite(IGN_2, LOW);
-          led4 = LOW;
-       }
+    if (diferenca >= 1){
+      if(led3 == LOW && tempoAux >= tempoLed ){
+          digitalWrite(LED_BUILTIN, HIGH);
+          led4 = HIGH;
+          led3 = HIGH;
+          tempoComeco = millis();
+      }
+        
+      if(led4 == HIGH){
+         tempoAgora = millis();
+         tempoFinal2 = tempoComeco + intervalo;
+         if (tempoAgora >= tempoFinal2) {
+            digitalWrite(IGN_2, LOW);
+            led4 = LOW;
+         }
+      }
     }
   
     dataString += String(altRelativa);
