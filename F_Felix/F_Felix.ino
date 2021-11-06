@@ -189,6 +189,7 @@ void loop() {
           led = HIGH;
           detectaApogeu = true;
           desligaLED = tempoAtual + intervalo;
+          ligaLED2 = tempoAtual + intervalo2;
         }
       }
       else if (led == LOW){
@@ -201,7 +202,6 @@ void loop() {
           dataString += String("caindo\t");
           digitalWrite(IGN_1, LOW);
           led2 = LOW; 
-          ligaLED2 = tempoAtual + intervalo2;
        }
     }
     if (detectaApogeu == true){
