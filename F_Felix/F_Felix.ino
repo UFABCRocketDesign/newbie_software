@@ -7,7 +7,7 @@
 #define IGN_3 46  /*act3*/
 #define IGN_4 55  /*act4*/
 #define intervalo 5000
-#define intervalo2 0
+#define intervalo2 1000
 
 Adafruit_BMP085 bmp;
 float auxiliar = 0;
