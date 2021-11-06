@@ -183,30 +183,30 @@ void loop() {
       dataString += String("caindo\t");
       
       if(detectaApogeu == false){
-        if(led == LOW){
           digitalWrite(IGN_1, HIGH);
           led2 = HIGH;
           led = HIGH;
           detectaApogeu = true;
           desligaLED = tempoAtual + intervalo;
           ligaLED2 = tempoAtual + intervalo2;
-        }
       }
       else if (led == LOW){
         dataString += String("subindo\t");
       }
     }
 
-    if(led2 == HIGH){
+    if (detectaApogeu == true){
+
+      if(led2 == HIGH){
        if(tempoAtual >= desligaLED){
           dataString += String("caindo\t");
           digitalWrite(IGN_1, LOW);
           led2 = LOW; 
        }
-    }
-    if (detectaApogeu == true){
+      }
+    
       if(led3 == LOW && tempoAtual >ligaLED2 ){
-          digitalWrite(LED_BUILTIN, HIGH);
+          digitalWrite(IGN_2, HIGH);
           led4 = HIGH;
           led3 = HIGH;
           desligaLED2 = tempoAtual + desligaLED2;
