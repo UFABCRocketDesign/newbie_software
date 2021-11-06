@@ -6,6 +6,8 @@
 #define IGN_2 61  /*act2*/
 #define IGN_3 46  /*act3*/
 #define IGN_4 55  /*act4*/
+#define intervalo 10000
+#define intervalo2 12000
 
 Adafruit_BMP085 bmp;
 float auxiliar = 0;
@@ -20,8 +22,6 @@ int led = LOW;
 int led2 = LOW; 
 int led3 = LOW;
 int led4 = LOW;
-const long intervalo = 0;
-const long intervalo2 = 0; 
 unsigned long tempoInicial = 0;       
 unsigned long tempoAtual = 0; 
 unsigned long tempoaux = 0;  
