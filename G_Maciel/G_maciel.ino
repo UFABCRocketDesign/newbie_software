@@ -2,6 +2,12 @@
 #include <SPI.h>
 #include <SD.h>
 
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_HMC5883_U.h>
+/* Assign a unique ID to this sensor at the same time */
+Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
+
 #define l 20 // tamanho
 #define IGN_1 36  /*act1*/
 #define IGN_2 61  /*act2*/
@@ -23,12 +29,16 @@ float lista2[l];
 float media_mov = 0;
 float media_mov2 = 0;
 const int chipSelect = 53;
-String cabecalho = "Altitude [m]\tAltura [m]\tFiltro1 (h)\tFiltro2 (h)\tTemperatura [*C]\tPressao [Pa]\tPressao no nivel do mar [Pa]\tApogeu";
+String cabecalho = "";
 String nomeArquivo = "";
 int encontra_apogeu=0;
 int apogeu_detectado = false;
 int laco_led_2 = false;      // variavel para entrar no laço liga led 2 
 int laco_led_3 = false;      // variavel para entrar no laço liga led 3 (built in)
+String mag_X;
+String mag_Y;
+String mag_Z;
+
 
 int ledState1 = LOW;    // ledState used to set the LED
 int ledState2 = LOW; 
@@ -46,10 +56,19 @@ void setup() {
   pinMode(IGN_1, OUTPUT);
   pinMode(IGN_2, OUTPUT);
   Serial.begin(115200);
+  
   if (!bmp.begin()) {
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   while (1) {}
   }
+    /* Initialise the mag sensor */
+  if(!mag.begin())
+  {
+    /* There was a problem detecting the HMC5883 ... check your connections */
+    Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
+    while(1);
+  }
+  
   for (int i=0; i<20; i++) {
     media =  media + bmp.readAltitude();
   }
@@ -63,6 +82,12 @@ void setup() {
     while (1);
   }
   Serial.println("card initialized."); 
+
+  cabecalho += "Altitude [m]\tAltura [m]\tFiltro1 (h)\tFiltro2 (h)";
+  cabecalho += "\tTemperatura [*C]";
+  cabecalho += "\tPressao [Pa]\tPressao no nivel do mar [Pa]";
+  cabecalho += "\tApogeu";
+  cabecalho += "\tMag eixo X [uT]\t Mag eixo Y [uT]\tMag eixo Z [uT]";
 
   String nome = "gabi"; 
   int tamNome = nome.length();
@@ -195,6 +220,20 @@ void loop() {
   digitalWrite(IGN_2, ledState2);
   digitalWrite(ledPin, ledState3);
 
+  // Magnetometro
+  /* Get a new sensor event */ 
+  sensors_event_t event; 
+  mag.getEvent(&event);
+  mag_X = event.magnetic.x;
+  dataString += "\t";
+  dataString += String(mag_X);
+  mag_Y = event.magnetic.y;
+  dataString += "\t";
+  dataString += String(mag_Y);
+  mag_Z = event.magnetic.z;
+  dataString += "\t";
+  dataString += String(mag_Z);
+ 
   Serial.println(dataString);
   
   File dataFile = SD.open(nomeArquivo, FILE_WRITE);
