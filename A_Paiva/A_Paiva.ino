@@ -6,8 +6,9 @@
 #define tam 10                    //Tamanho da matriz do filtro(quantidade de valores usado)
 #define qf 2                      //Quantidade de filtros
 #define NomeArq "apm"             //Nome do arquivo para o cartão SD entre aspas
-#define espera 5000               //Tempo de espera para acionamento do paraquedas 2 (ms)
+#define espera 0000               //Tempo de espera para acionamento do paraquedas 2 (ms)
 #define duracao 5000              //Tempo de duracao do acionamento dos paraquedas (ms)
+#define altura 10                 //Altura para abertura do terceiro paraquedas
 //////////////////////////////////////////////////////////////////////
 #define IGN_1 36  /*act1*/
 #define IGN_2 61  /*act2*/
@@ -22,15 +23,16 @@ float MediaMov = 0;               //É o valor da média dos valores do vetor do
 float Delta;                      //Diferença entre valor máximo do filtro1 (Hmax1) e valor atual referênciado (H11)
 float MatrizFiltros[qf][tam];     //Vetor para guardar os valores para as médias utilizadas pelos filtros
 
-int led = 0;                      //Variável para funcionamento do LED
-int auxled = 0;
+//int led = 0;                      //Variável para funcionamento do LED
+int apogeu = 0;
 int auxled1 = 0;
 int auxled2 = 0;
+int auxled3 = 0;
 unsigned long inicio1 = 0;        // will store last time LED was updated
 unsigned long inicio2 = 0;        // will store last time LED was updated
+unsigned long inicio3 = 0;        // will store last time LED was updated
+unsigned long inicio4 = 0;        // will store last time LED was updated
 unsigned long tempoAtual = 0;        // will store last time LED was updated
-//const long intervalo = 10000;           // interval at which to blink (milliseconds)
-//const long intervalo = 10000;           // interval at which to blink (milliseconds)
 
 float T;                          //Valor da Temperatura
 float P;                          //Valor da Pressão
@@ -55,12 +57,12 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(IGN_1, OUTPUT);//PINOS DA MACRO pinos.h
   pinMode(IGN_2, OUTPUT);
-  pinMode(IGN_3, OUTPUT);
-  pinMode(IGN_4, OUTPUT);
-  digitalWrite(IGN_1, LOW);
-  digitalWrite(IGN_2, LOW);
-  digitalWrite(IGN_3, LOW);
-  digitalWrite(IGN_4, LOW);
+  //pinMode(IGN_3, OUTPUT);
+  //pinMode(IGN_4, OUTPUT);
+  //digitalWrite(IGN_1, LOW);
+  //digitalWrite(IGN_2, LOW);
+  //digitalWrite(IGN_3, LOW);
+  //digitalWrite(IGN_4, LOW);
   Serial.begin(115200);
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
@@ -74,23 +76,23 @@ void setup() {
   Serial.println("card initialized.");
   x = NomeArq;
   tamNomeArq = x.length();
-  sub1 = 8-tamNomeArq;
-  while(aux==1){
+  sub1 = 8 - tamNomeArq;
+  while (aux == 1) {
     z = String(Num);
     tamNum = z.length();
-    sub2 = sub1-tamNum;
+    sub2 = sub1 - tamNum;
     y = "";
-    for(int i=0; i<sub2; i++){
-      y = y+"0";
+    for (int i = 0; i < sub2; i++) {
+      y = y + "0";
     }
-    NomeFinal = x+y+z+".txt";
+    NomeFinal = x + y + z + ".txt";
     if (SD.exists(NomeFinal)) {
       //Serial.print(NomeFinal);
       //Serial.println(" ja existe");
       Num++;
       aux = 1;
     }
-    else{
+    else {
       Serial.print("Nome do arquivo atual: ");
       Serial.println(NomeFinal);
       aux = 0;
@@ -98,8 +100,8 @@ void setup() {
   }
   File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
-    dataFile.println("Temperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)");
-    for (int i = 0; i<qf; i++){
+    dataFile.println("Tempo\tTemperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)");
+    for (int i = 0; i < qf; i++) {
       dataFile.print("Altura do filtro ");
       dataFile.print(i);
       dataFile.print("(m)\t");
@@ -108,8 +110,8 @@ void setup() {
     dataFile.close();
   }
   Serial.println("Dados dealtitude de voo");
-  Serial.print("Temperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)\tAltura (m)\tStatu de voo");
-  for (int i = 0; i<qf; i++){
+  Serial.print("Tempo\tTemperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)\tAltura (m)\tStatu de voo");
+  for (int i = 0; i < qf; i++) {
     Serial.print("Altura do filtro ");
     Serial.print(i);
     Serial.print("(m)\t");
@@ -121,17 +123,22 @@ void setup() {
   AltitudeRef = SomaRef / 100;
 }
 void loop() {
+  tempoAtual = millis();
+  Serial.print(tempoAtual/1000.0);
+  Serial.print("\t");
   T = bmp.readTemperature();
   P = bmp.readPressure();
   Pm = bmp.readSealevelPressure();
   File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
+    dataFile.print(tempoAtual/1000.0);
+    dataFile.print("\t");
     dataFile.print(T);
     dataFile.print("\t");
     dataFile.print(P);
     dataFile.print("\t");
     dataFile.print(Pm);
-    dataFile.print("\t");    
+    dataFile.print("\t");
     dataFile.print(Hmax);
     dataFile.print("\t");
   }
@@ -143,82 +150,91 @@ void loop() {
   Serial.print("\t");
   Serial.print(Hmax);
   Serial.print("\t");
-  SomaMov=0;                                           //Zera o SomaMov1 em todo loop
-  for (int j = 0; j<qf; j++){
-      for (int i = tam-2; i>=0; i--){                      //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1
-        MatrizFiltros[j][i+1]= MatrizFiltros[j][i];                    
-      }
-      if(j==0){
-        MatrizFiltros[0][0]=bmp.readAltitude()-AltitudeRef;   //Esse é o valor mais atualizado do filtro1
-        Serial.print(MatrizFiltros[0][0]);
-        Serial.print("\t");
-        if (dataFile) {
-          dataFile.print(MatrizFiltros[0][0]);
-          dataFile.print("\t");
-        }
-      }
-      else{
-        MatrizFiltros[j][0] = MediaMov;
-      }
-      SomaMov=0;
-      for (int i = 0; i <= tam-1; i++) {                      //Esse 'for' faz a soma dos últimos valores medidos, para a média do filtro1
-        SomaMov=SomaMov+MatrizFiltros[j][i];
-      }
-      MediaMov=SomaMov/tam;
-      Serial.print(MediaMov);
+  SomaMov = 0;                                         //Zera o SomaMov1 em todo loop
+  for (int j = 0; j < qf; j++) {
+    for (int i = tam - 2; i >= 0; i--) {                 //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1
+      MatrizFiltros[j][i + 1] = MatrizFiltros[j][i];
+    }
+    if (j == 0) {
+      MatrizFiltros[0][0] = bmp.readAltitude() - AltitudeRef; //Esse é o valor mais atualizado do filtro1
+      Serial.print(MatrizFiltros[0][0]);
       Serial.print("\t");
       if (dataFile) {
-        dataFile.print(MediaMov);
+        dataFile.print(MatrizFiltros[0][0]);
         dataFile.print("\t");
       }
-  }                    
+    }
+    else {
+      MatrizFiltros[j][0] = MediaMov;
+    }
+    SomaMov = 0;
+    for (int i = 0; i <= tam - 1; i++) {                    //Esse 'for' faz a soma dos últimos valores medidos, para a média do filtro1
+      SomaMov = SomaMov + MatrizFiltros[j][i];
+    }
+    MediaMov = SomaMov / tam;
+    Serial.print(MediaMov);
+    Serial.print("\t");
+    if (dataFile) {
+      dataFile.print(MediaMov);
+      dataFile.print("\t");
+    }
+  }
   if (Hmax < MediaMov) {                                    //Pega o valor máximo da média/filtro2
     Hmax = MediaMov;
   }
-  Delta=Hmax-MediaMov;                                     //Compara o valor máximo do filtro1 com o valor atual do filtro1
-  
-  if(auxled == 1){
-    tempoAtual = millis();
-    if (dataFile) {
-        dataFile.println("Descendo");
-        dataFile.close();
-    }
-    Serial.print("Descendo");
-    Serial.print("\t");
-    if(auxled1 ==0){
-      digitalWrite(IGN_1, HIGH);
-      auxled1 = 1;
-    }
-    if((tempoAtual-inicio1) >= duracao && auxled1 == 1){ 
-      digitalWrite(IGN_1, LOW);
-      auxled1 = 2;
-    }
-    if((tempoAtual-inicio1) >= espera && auxled2 == 0){
-      digitalWrite(IGN_2, HIGH);
-      inicio2 = millis();
-      auxled2 = 1;
-    }
-    if((tempoAtual-inicio2) >= duracao && auxled2 == 1){ 
-      digitalWrite(IGN_2, LOW);
-      auxled2 = 2;
-    }
+  Delta = Hmax - MediaMov;                                 //Compara o valor máximo do filtro1 com o valor atual do filtro1
+
+  if (Delta >= 2 && apogeu == 0) {                         //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
+    apogeu = 1;
+    inicio1 = tempoAtual + duracao;
+    inicio2 = tempoAtual + espera;
   }
-  if (Delta >= 2 && auxled ==0) {                          //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
-    if (dataFile) {
-      dataFile.println("Descendo");
-      dataFile.close();
-    }
-    Serial.print("Descendo");
-    Serial.print("\t");
-    inicio1 = millis();
-    auxled = 1;   
-  }
-  else if(auxled == 0){
+  else if (apogeu == 0) {
     if (dataFile) {
       dataFile.println("Subindo");
       dataFile.close();
     }
     Serial.print("Subindo");
+    Serial.print("\t");
+  }
+  if (apogeu == 1) {
+    if (dataFile) {
+      dataFile.println("Descendo");
+      dataFile.close();
+    }
+    Serial.print("Descendo");
+    if (auxled1 == 0) {
+      digitalWrite(IGN_1, HIGH);
+      auxled1 = 1;
+      Serial.print("11");
+    }
+    if (tempoAtual >= inicio1 && auxled1 == 1) {
+      digitalWrite(IGN_1, LOW);
+      auxled1 = 2;
+      Serial.print("01");
+    }
+    if (tempoAtual >= inicio2 && auxled2 == 0) {
+      digitalWrite(IGN_2, HIGH);
+      auxled2 = 1;
+      inicio3 = tempoAtual + duracao;
+      Serial.print("12");
+    }
+    if (tempoAtual >= inicio3 && auxled2 == 1) {
+      digitalWrite(IGN_2, LOW);
+      auxled2 = 2;
+      Serial.print("02");
+    }
+    if (MediaMov <= altura && auxled3 == 0) {
+      digitalWrite(LED_BUILTIN, HIGH);
+      auxled3 = 1;
+      inicio4 = tempoAtual + duracao;
+      Serial.print("13");
+    }
+    if (tempoAtual >= inicio4 && auxled3 == 1) {
+      digitalWrite(LED_BUILTIN, LOW);
+      auxled3 = 2;
+      Serial.print("03");
+    }
     Serial.print("\t");
   }
   //Serial.print(led);

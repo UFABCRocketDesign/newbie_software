@@ -38,16 +38,20 @@ unsigned long previousMillis_p_acionar = 0;
 unsigned long previousMillis_p_acionar2 = 0;
 unsigned long previousMillis_acionado = 0;
 unsigned long previousMillis_acionado2 = 0;
+unsigned long previousMillis_acionado3 = 0;
 int cont_acionar1 = 0;
 int cont_acionar2 = 0;
+int cont_acionar3 = 0;
 String acionamento1 = "\tDesligado 1";
 String acionamento2 = "\tDesligado 2";
+String acionamento3 = "\tDesligado 3";
 
 // the setup function runs once when you press reset or power the board
 void setup() {
   // Inicializando o led embutido no arduino
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(IGN_1, OUTPUT);
+  pinMode(IGN_2, OUTPUT);
   
   // INICIALIZA O MONITOR SERIAL E PUXA BIBLIOTECA
   Serial.begin(115200);
@@ -92,10 +96,10 @@ void setup() {
   // Inicia inserindo essa informação no FILE nomeado
   File dataFile = SD.open(file, FILE_WRITE);
   if (dataFile) {
-    dataFile.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tApogeu");
+    dataFile.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tParaquedas 3\tApogeu");
     dataFile.close();
     // print to the serial port too:
-    Serial.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tApogeu");
+    Serial.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tParaquedas 3\tApogeu");
   }
   
   // Medicao
@@ -209,6 +213,7 @@ void loop() {
   // Identificação de subida/descida/apogeu
   if (cont_sub > 1) {
     estado = "\tSubindo";
+    cont_subidas = 1;
     ult_subida = nova_altLeitura;
   }
   else if (cont_desc > 10) {
@@ -216,7 +221,7 @@ void loop() {
   }
   dataString += estado;
   currentMillis = millis();
-  if (cont_desc >= 10 && cont_apogeu == true) {
+  if (cont_subidas > 0 && cont_desc >= 10 && cont_apogeu == true) {
     str_apogeu1 += "\tApogeu em:";
     str_apogeu2 += String(ult_subida);
     cont_apogeu = false;
@@ -228,10 +233,10 @@ void loop() {
       acionamento1 = "\tA Acionar";
       cont_acionar1 = 1;
       cont_acionar2 = 1;
+      cont_acionar3 = 1;
     }
   }
   
-  // Primeira Estratégia de Acionamento de Paraquedas
   // Aciona primeiro paraquedas
   if (currentMillis - previousMillis_p_acionar >= intervalo_p_acionar1 && cont_acionar1 == 1) {
     digitalWrite(LED_BUILTIN, HIGH);
@@ -256,10 +261,22 @@ void loop() {
     digitalWrite(IGN_1, LOW);
     acionamento2 = "\tDesligado 2";
   }
+  // Aciona terceiro paraquedas
+  if (nova_media_movel_lg <= 10 && cont_acionar3 == 1) {
+    digitalWrite(IGN_2, HIGH);
+    acionamento3 = "\tAcionado 3";
+    previousMillis_acionado3 = currentMillis;
+    cont_acionar3 = 2;
+  }
+  if (currentMillis - previousMillis_acionado3 >= intervalo_acionado) {
+    digitalWrite(IGN_2, LOW);
+    acionamento3 = "\tDesligado 3";
+  }
   // ---------------------------------------------------------------------------------------------
   
   dataString += acionamento1;
   dataString += acionamento2;
+  dataString += acionamento3;
   dataString += str_apogeu1;
   dataString += str_apogeu2;
 
