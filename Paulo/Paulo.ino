@@ -169,8 +169,6 @@ void setup() {
   nova_media_movel_lg = 0;
   i = 0;
 
-  Serial.println("Final de Setup");
-
 }
 
 // LOOP DA SOLUÇÃO
@@ -239,25 +237,21 @@ void loop() {
   dataString += String(nova_media_movel_lg); // Filtro 2
   dataString += "\t";
 
-  Serial.println("Final de 'Escrevendo - Altura'");
   // ---------------------------------------------------------------------------------------------
   // Escrevendo - Temperatura
   dataString += String(bmp.readTemperature());
   dataString += "\t";
 
-  Serial.println("Final de 'Escrevendo - Temperatura'");
   // ---------------------------------------------------------------------------------------------
   // Escrevendo - Pressão
   dataString += String(bmp.readPressure());
   dataString += "\t";
 
-  Serial.println("Final de 'Escrevendo - Pressão'");
   // ---------------------------------------------------------------------------------------------
   // Escrevendo - Pressão ao nivel do mar
   dataString += String(bmp.readSealevelPressure());
   dataString += "\t";
 
-  Serial.println("Final de 'Escrevendo - nivel do mar'");
   // ---------------------------------------------------------------------------------------------
   // Magnetômetro
     /* Get a new sensor event */
@@ -274,7 +268,6 @@ void loop() {
   dataString += String(event_mag.magnetic.z);
   dataString += "\t";
 
-  Serial.println("Final de 'Escrevendo - Magnetometro'");
   // ---------------------------------------------------------------------------------------------
   // Giroscópio
   gyro.read();
@@ -289,7 +282,6 @@ void loop() {
   dataString += String((int)gyro.g.z);
   dataString += "\t";
 
-  Serial.println("Final de 'Escrevendo - Giroscopio'");
   // ---------------------------------------------------------------------------------------------
   // Acelerômetro
   sensors_event_t event_accel; 
@@ -304,7 +296,6 @@ void loop() {
     // Eixo Z
   dataString += String(event_accel.acceleration.z);
 
-  Serial.println("Final de 'Escrevendo - Acelerometro'");
   // ---------------------------------------------------------------------------------------------
   // Escrevendo - Identificação de subida/descida/apogeu
   if (cont_sub > 1) {
@@ -332,7 +323,6 @@ void loop() {
       cont_acionar3 = 1;
     }
   }
-  Serial.println("Final de 'Escrevendo - Identificação de subida/descida/apogeu'");
 
   // ---------------------------------------------------------------------------------------------
   // Escreve e Apresenta - Paraquedas
@@ -372,7 +362,6 @@ void loop() {
     acionamento3 = "\tDesligado 3";
   }
   // ---------------------------------------------------------------------------------------------
-  Serial.println("Final de 'Escrevendo - Paraquedas'");
   
   dataString += acionamento1;
   dataString += acionamento2;
