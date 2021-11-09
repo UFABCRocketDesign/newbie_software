@@ -3,6 +3,8 @@
 Adafruit_BMP085 bmp;
 
 // the setup function runs once when you press reset or power the board
+
+float media = 0;
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
   //pinMode(LED_BUILTIN, OUTPUT);
@@ -11,7 +13,14 @@ void setup() {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
-  Serial.println("Temperature\tPressure\tAltitude\tPressure at sealevel (calculated)\tReal Altitude"); 
+  
+  for(int i = 0;i<10;i++){
+    float valor = bmp.readAltitude();
+    media = media + valor;
+  }
+  media = media/10;
+  
+  //Serial.println("Temperature\tPressure\tAltitude\tPressure at sealevel (calculated)\tReal Altitude"); 
 }
 
 // the loop function runs over and over again forever
@@ -27,7 +36,8 @@ void loop() {
   // Calculate altitude assuming 'standard' barometric
   // pressure of 1013.25 millibar = 101325 Pascal
   //Serial.print("Altitude = ");
-  Serial.print(bmp.readAltitude());
+  
+  Serial.print(bmp.readAltitude() - media);
   Serial.print("\t");
 
   //Serial.print("Pressure at sealevel (calculated) = ");
