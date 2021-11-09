@@ -1,12 +1,14 @@
 #include <Wire.h>
 #include <SPI.h>
 #include <SD.h>
+#include <L3G.h> // Biblioteca de giroscópio
 #include <Adafruit_BMP085.h> // Biblioteca de altitude
 #include <Adafruit_Sensor.h>
 #include <Adafruit_HMC5883_U.h> // Biblioteca de magnetometro
 
 Adafruit_BMP085 bmp; // Declaração da biblioteca para altitude
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345); // Assign a unique ID to this sensor at the same time
+L3G gyro; // Declaração da biblioetca para giroscópio
 const int chipSelect = 53; // Declaração de CS
 
 #define filt_i 10 // Quantidade de valores Filtro 1
@@ -109,14 +111,23 @@ void setup() {
   Serial.print  ("Resolution:   "); Serial.print(sensor.resolution); Serial.println(" uT");  
   Serial.println("------------------------------------");
   Serial.println("");
+
+  // Verificar se giroscópio está conectado
+  Wire.begin();
+  if (!gyro.init())
+  {
+    Serial.println("Failed to autodetect gyro type!");
+    while (1);
+  }
+  gyro.enableDefault();
   
   // Inicia inserindo essa informação no FILE nomeado
   File dataFile = SD.open(file, FILE_WRITE);
   if (dataFile) {
-    dataFile.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tMagnetômetro (X)\tMagnetômetro (Y)\tMagnetômetro (Z)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tParaquedas 3\tApogeu");
+    dataFile.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tMagnetômetro (X)\tMagnetômetro (Y)\tMagnetômetro (Z)\tGiroscópio (X)\tGiroscópio (Y)\tGiroscópio (Z)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tParaquedas 3\tApogeu");
     dataFile.close();
     // print to the serial port too:
-    Serial.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tMagnetômetro (X)\tMagnetômetro (Y)\tMagnetômetro (Z)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tParaquedas 3\tApogeu");
+    Serial.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tMagnetômetro (X)\tMagnetômetro (Y)\tMagnetômetro (Z)\tGiroscópio (X)\tGiroscópio (Y)\tGiroscópio (Z)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tParaquedas 3\tApogeu");
   }
   
   // Medicao
@@ -232,6 +243,7 @@ void loop() {
   // ---------------------------------------------------------------------------------------------
   // Escrevendo - Pressão ao nivel do mar
   dataString += String(bmp.readSealevelPressure());
+  dataString += "\t";
 
   // ---------------------------------------------------------------------------------------------
   // Magnetômetro
@@ -241,10 +253,26 @@ void loop() {
   // Escrevendo - Magnetômetro
     // Eixo X
   dataString += String(event.magnetic.x);
+  dataString += "\t";
     // Eixo Y
   dataString += String(event.magnetic.y);
+  dataString += "\t";
     // Eixo Z
   dataString += String(event.magnetic.z);
+  dataString += "\t";
+
+  // ---------------------------------------------------------------------------------------------
+  // Giroscópio
+  gyro.read();
+  // Escrevendo - Giroscópio
+    // Eixo X
+  dataString += String((int)gyro.g.x);
+  dataString += "\t";
+    // Eixo Y
+  dataString += String((int)gyro.g.y);
+  dataString += "\t";
+    // Eixo Z
+  dataString += String((int)gyro.g.z);
   
   // ---------------------------------------------------------------------------------------------
   // Escrevendo - Identificação de subida/descida/apogeu
