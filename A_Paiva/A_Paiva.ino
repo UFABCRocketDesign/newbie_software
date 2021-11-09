@@ -1,4 +1,9 @@
 #include <Adafruit_BMP085.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_ADXL345_U.h>
+#include <Adafruit_HMC5883_U.h>
+#include <L3G.h>
+#include <Wire.h>
 #include <SPI.h>
 #include <SD.h>
 
@@ -14,6 +19,8 @@
 #define IGN_2 61  /*act2*/
 #define IGN_3 46  /*act3*/
 #define IGN_4 55  /*act4*/
+
+L3G giro;
 
 float Hmax = 0;                   //Valor máximo filtrado
 float SomaRef = 0;                //Soma valores iniciais(foguete parado na base)
@@ -37,6 +44,9 @@ unsigned long tempoAtual = 0;        // will store last time LED was updated
 float T;                          //Valor da Temperatura
 float P;                          //Valor da Pressão
 float Pm;                         //Valor da Pressão ao nivel do Mar
+int Gx;                           //Giroscópio em x
+int Gy;                           //Giroscópio em y
+int Gz;                           //Giroscópio em z
 
 int aux = 1;                      //Variavel auxiliar do while para criação de nome de arquivo do SD
 int tamNomeArq = 0;               //Valor da quantidade de caracteres da variavel NomeArq
@@ -64,6 +74,12 @@ void setup() {
   //digitalWrite(IGN_3, LOW);
   //digitalWrite(IGN_4, LOW);
   Serial.begin(115200);
+  Wire.begin();
+  if (!giro.init()) {
+    Serial.println("Failed to autodetect gyro type!");
+    while (1);
+  }
+  giro.enableDefault();
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
@@ -100,7 +116,7 @@ void setup() {
   }
   File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
-    dataFile.println("Tempo\tTemperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)");
+    dataFile.println("Tempo\tGx\tGy\tGz\tTemperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)");
     for (int i = 0; i < qf; i++) {
       dataFile.print("Altura do filtro ");
       dataFile.print(i);
@@ -110,7 +126,7 @@ void setup() {
     dataFile.close();
   }
   Serial.println("Dados dealtitude de voo");
-  Serial.print("Tempo\tTemperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)\tAltura (m)\tStatu de voo");
+  Serial.print("Tempo\tGx\tGy\tGz\tTemperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)");
   for (int i = 0; i < qf; i++) {
     Serial.print("Altura do filtro ");
     Serial.print(i);
@@ -128,10 +144,20 @@ void loop() {
   Serial.print("\t");
   T = bmp.readTemperature();
   P = bmp.readPressure();
+  giro.read();
+  Gx = (int)giro.g.x;
+  Gy = (int)giro.g.y;
+  Gz = (int)giro.g.z;
   Pm = bmp.readSealevelPressure();
   File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
     dataFile.print(tempoAtual/1000.0);
+    dataFile.print("\t");
+    dataFile.print(Gx);
+    dataFile.print("\t");
+    dataFile.print(Gy);
+    dataFile.print("\t");
+    dataFile.print(Gz);
     dataFile.print("\t");
     dataFile.print(T);
     dataFile.print("\t");
@@ -142,6 +168,12 @@ void loop() {
     dataFile.print(Hmax);
     dataFile.print("\t");
   }
+  Serial.print(Gx);
+  Serial.print("\t");
+  Serial.print(Gy);
+  Serial.print("\t");
+  Serial.print(Gz);
+  Serial.print("\t");
   Serial.print(T);
   Serial.print("\t");
   Serial.print(P);
@@ -157,12 +189,12 @@ void loop() {
     }
     if (j == 0) {
       MatrizFiltros[0][0] = bmp.readAltitude() - AltitudeRef; //Esse é o valor mais atualizado do filtro1
-      Serial.print(MatrizFiltros[0][0]);
+      /*Serial.print(MatrizFiltros[0][0]);
       Serial.print("\t");
       if (dataFile) {
         dataFile.print(MatrizFiltros[0][0]);
         dataFile.print("\t");
-      }
+      }*/
     }
     else {
       MatrizFiltros[j][0] = MediaMov;
