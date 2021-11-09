@@ -84,31 +84,25 @@ void setup() {
   Serial.begin(115200);
   Wire.begin();
   if (!giro.init()) {
-    Serial.println("Failed to autodetect gyro type!");
-    while (1);
+    Serial.println("FALHA AO ENCONTRAR GIROSCÓPIO!");
   }
   giro.enableDefault();
   if(!mag.begin())
   {
-    Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
-    while(1);
+    Serial.println("FALHA AO ENCONTRAR MAGNETÔMETRO!");
   }
   if(!accel.begin())
   {
-    Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
-    while(1);
+    Serial.println("FALHA AO ENCONTRAR ACELERÔMETRO");
   }
   accel.setRange(ADXL345_RANGE_16_G);
   if (!bmp.begin()) {
-    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-    while (1) {}
+    Serial.println("FALHA AO ENCONTRAR O SENSOR BMP085!");
   }
-  Serial.println("Initializing SD card...");
+  Serial.println("Inicializando cartão SD...");
   if (!SD.begin(chipSelect)) {
-    Serial.println("Card failed, or not present");
-    while (1);
+    Serial.println("FALHA NO CARTÃO SD");
   }
-  Serial.println("card initialized.");
   x = NomeArq;
   tamNomeArq = x.length();
   sub1 = 8 - tamNomeArq;
@@ -135,7 +129,7 @@ void setup() {
   }
   File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
-    dataFile.println("Tempo\tGx\tGy\tGz\tMx\tMy\tMz\tAx\tAy\tAz\tTemperatura(°C)\tPressao(Pa)\tAltura máxima(m)");
+    dataFile.println("Tempo\tGx\tGy\tGz\tMx(uT)\tMy(uT)\tMz(uT)\tAx(m/s^2)\tAy(m/s^2)\tAz(m/s^2)\tTemperatura(°C)\tPressao(Pa)\tAltura máxima(m)");
     for (int i = 0; i < qf; i++) {
       dataFile.print("Altura do filtro ");
       dataFile.print(i);
@@ -145,7 +139,7 @@ void setup() {
     dataFile.close();
   }
   Serial.println("Dados dealtitude de voo");
-  Serial.print("Tempo\tGx\tGy\tGz\tMx\tMy\tMz\tAx\tAy\tAz\tTemperatura(°C)\tPressao(Pa)\tAltura máxima(m)");
+  Serial.print("Tempo\tGx\tGy\tGz\tMx(uT)\tMy(uT)\tMz(uT)\tAx(m/s^2)\tAy(m/s^2)\tAz(m/s^2)\tTemperatura(°C)\tPressao(Pa)\tAltura máxima(m)");
   for (int i = 0; i < qf; i++) {
     Serial.print("Altura do filtro ");
     Serial.print(i);
