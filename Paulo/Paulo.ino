@@ -104,6 +104,14 @@ void setup() {
     number += 1;
   }
 
+  // Verificar se magnetômetro está conectado
+  if(!mag.begin())
+  {
+    /* There was a problem detecting the HMC5883 ... check your connections */
+    Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
+    while(1);
+  }
+
   // Verificar se giroscópio está conectado
   Wire.begin();
   if (!gyro.init())
@@ -112,6 +120,14 @@ void setup() {
     while (1);
   }
   gyro.enableDefault();
+
+  // Verificar se acelerometro está conectado
+  if(!accel.begin())
+  {
+    /* There was a problem detecting the ADXL345 ... check your connections */
+    Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
+    while(1);
+  }
   
   // Inicia inserindo essa informação no FILE nomeado
   File dataFile = SD.open(file, FILE_WRITE);
