@@ -21,8 +21,8 @@
 #define IGN_4 55  /*act4*/
 
 L3G giro;
-Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
-Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
+Adafruit_HMC5883_Unified mag;// = Adafruit_HMC5883_Unified(12345);
+Adafruit_ADXL345_Unified accel;// = Adafruit_ADXL345_Unified(12345);
 
 float Hmax = 0;                   //Valor máximo filtrado
 float SomaRef = 0;                //Soma valores iniciais(foguete parado na base)
@@ -98,7 +98,7 @@ void setup() {
     Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
     while(1);
   }
-  accel.setRange(ADXL345_RANGE_16_G);////////////////////////////////////////////////////////
+  accel.setRange(ADXL345_RANGE_16_G);
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
@@ -135,7 +135,7 @@ void setup() {
   }
   File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
-    dataFile.println("Tempo\tGx\tGy\tGz\tMx\tMy\tMz\tAx\tAy\tAz\tTemperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)");
+    dataFile.println("Tempo\tGx\tGy\tGz\tMx\tMy\tMz\tAx\tAy\tAz\tTemperatura(°C)\tPressao(Pa)\tAltura máxima(m)");
     for (int i = 0; i < qf; i++) {
       dataFile.print("Altura do filtro ");
       dataFile.print(i);
@@ -145,7 +145,7 @@ void setup() {
     dataFile.close();
   }
   Serial.println("Dados dealtitude de voo");
-  Serial.print("Tempo\tGx\tGy\tGz\tMx\tMy\tMz\tAx\tAy\tAz\tTemperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)");
+  Serial.print("Tempo\tGx\tGy\tGz\tMx\tMy\tMz\tAx\tAy\tAz\tTemperatura(°C)\tPressao(Pa)\tAltura máxima(m)");
   for (int i = 0; i < qf; i++) {
     Serial.print("Altura do filtro ");
     Serial.print(i);
@@ -177,7 +177,7 @@ void loop() {
   Ax = eventA.acceleration.x;
   Ay = eventA.acceleration.y;
   Az = eventA.acceleration.z;
-  Pm = bmp.readSealevelPressure();
+  //Pm = bmp.readSealevelPressure();
   File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
     dataFile.print(tempoAtual/1000.0);
@@ -204,8 +204,6 @@ void loop() {
     dataFile.print("\t");
     dataFile.print(P);
     dataFile.print("\t");
-    dataFile.print(Pm);
-    dataFile.print("\t");
     dataFile.print(Hmax);
     dataFile.print("\t");
   }
@@ -230,8 +228,6 @@ void loop() {
   Serial.print(T);
   Serial.print("\t");
   Serial.print(P);
-  Serial.print("\t");
-  Serial.print(Pm);
   Serial.print("\t");
   Serial.print(Hmax);
   Serial.print("\t");
