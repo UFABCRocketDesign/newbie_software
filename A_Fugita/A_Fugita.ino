@@ -40,6 +40,6 @@ void loop() {
   // that is equal to 101500 Pascals.
   //Serial.print("Real altitude = ");
   //Serial.print(bmp.readAltitude(101500));
- // Serial.println();
+  Serial.println();
   
 }
