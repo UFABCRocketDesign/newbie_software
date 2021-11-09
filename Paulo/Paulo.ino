@@ -126,7 +126,6 @@ void setup() {
   for (j=0; j<filt_i; j++) {
     altura_inicio = bmp.readAltitude();
     media_alt_inicio = media_alt_inicio + altura_inicio;
-    delay (100);
     list_med_movel[0][j] = altura_inicio;
   }
   media_alt_inicio = media_alt_inicio / filt_i;
@@ -153,6 +152,8 @@ void setup() {
   media_movel_lg = 0;
   nova_media_movel_lg = 0;
   i = 0;
+
+  Serial.println("Final de Setup");
 
 }
 
@@ -222,21 +223,25 @@ void loop() {
   dataString += String(nova_media_movel_lg); // Filtro 2
   dataString += "\t";
 
+  Serial.println("Final de 'Escrevendo - Altura'");
   // ---------------------------------------------------------------------------------------------
   // Escrevendo - Temperatura
   dataString += String(bmp.readTemperature());
   dataString += "\t";
 
+  Serial.println("Final de 'Escrevendo - Temperatura'");
   // ---------------------------------------------------------------------------------------------
   // Escrevendo - Pressão
   dataString += String(bmp.readPressure());
   dataString += "\t";
 
+  Serial.println("Final de 'Escrevendo - Pressão'");
   // ---------------------------------------------------------------------------------------------
   // Escrevendo - Pressão ao nivel do mar
   dataString += String(bmp.readSealevelPressure());
   dataString += "\t";
 
+  Serial.println("Final de 'Escrevendo - nivel do mar'");
   // ---------------------------------------------------------------------------------------------
   // Magnetômetro
     /* Get a new sensor event */
@@ -253,6 +258,7 @@ void loop() {
   dataString += String(event.magnetic.z);
   dataString += "\t";
 
+  Serial.println("Final de 'Escrevendo - Magnetometro'");
   // ---------------------------------------------------------------------------------------------
   // Giroscópio
   gyro.read();
@@ -267,6 +273,7 @@ void loop() {
   dataString += String((int)gyro.g.z);
   dataString += "\t";
 
+  Serial.println("Final de 'Escrevendo - Giroscopio'");
   // ---------------------------------------------------------------------------------------------
   // Acelerômetro
   accel.getEvent(&event);
@@ -279,7 +286,8 @@ void loop() {
   dataString += "\t";
     // Eixo Z
   dataString += String(event.acceleration.z);
-  
+
+  Serial.println("Final de 'Escrevendo - Acelerometro'");
   // ---------------------------------------------------------------------------------------------
   // Escrevendo - Identificação de subida/descida/apogeu
   if (cont_sub > 1) {
@@ -307,6 +315,7 @@ void loop() {
       cont_acionar3 = 1;
     }
   }
+  Serial.println("Final de 'Escrevendo - Identificação de subida/descida/apogeu'");
 
   // ---------------------------------------------------------------------------------------------
   // Escreve e Apresenta - Paraquedas
@@ -346,6 +355,7 @@ void loop() {
     acionamento3 = "\tDesligado 3";
   }
   // ---------------------------------------------------------------------------------------------
+  Serial.println("Final de 'Escrevendo - Paraquedas'");
   
   dataString += acionamento1;
   dataString += acionamento2;
