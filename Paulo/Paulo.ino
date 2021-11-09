@@ -245,17 +245,17 @@ void loop() {
   // ---------------------------------------------------------------------------------------------
   // Magnetômetro
     /* Get a new sensor event */
-  sensors_event_t event; 
-  mag.getEvent(&event);
+  sensors_event_t event_mag; 
+  mag.getEvent(&event_mag);
   // Escrevendo - Magnetômetro
     // Eixo X
-  dataString += String(event.magnetic.x);
+  dataString += String(event_mag.magnetic.x);
   dataString += "\t";
     // Eixo Y
-  dataString += String(event.magnetic.y);
+  dataString += String(event_mag.magnetic.y);
   dataString += "\t";
     // Eixo Z
-  dataString += String(event.magnetic.z);
+  dataString += String(event_mag.magnetic.z);
   dataString += "\t";
 
   Serial.println("Final de 'Escrevendo - Magnetometro'");
@@ -276,16 +276,17 @@ void loop() {
   Serial.println("Final de 'Escrevendo - Giroscopio'");
   // ---------------------------------------------------------------------------------------------
   // Acelerômetro
-  accel.getEvent(&event);
+  sensors_event_t event_accel; 
+  accel.getEvent(&event_accel);
   // Escrevendo - Acelerômetro
     // Eixo X
-  dataString += String(event.acceleration.x);
+  dataString += String(event_accel.acceleration.x);
   dataString += "\t";
     // Eixo Y
-  dataString += String(event.acceleration.y);
+  dataString += String(event_accel.acceleration.y);
   dataString += "\t";
     // Eixo Z
-  dataString += String(event.acceleration.z);
+  dataString += String(event_accel.acceleration.z);
 
   Serial.println("Final de 'Escrevendo - Acelerometro'");
   // ---------------------------------------------------------------------------------------------
