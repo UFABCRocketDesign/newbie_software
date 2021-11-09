@@ -21,6 +21,8 @@
 #define IGN_4 55  /*act4*/
 
 L3G giro;
+Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
+Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
 
 float Hmax = 0;                   //Valor máximo filtrado
 float SomaRef = 0;                //Soma valores iniciais(foguete parado na base)
@@ -47,6 +49,12 @@ float Pm;                         //Valor da Pressão ao nivel do Mar
 int Gx;                           //Giroscópio em x
 int Gy;                           //Giroscópio em y
 int Gz;                           //Giroscópio em z
+float Mx;                         //Magnetometro em x
+float My;                         //Magnetometro em y
+float Mz;                         //Magnetometro em z
+float Ax;                         //Acelerometro em x
+float Ay;                         //Acelerometro em y
+float Az;                         //Acelerometro em z
 
 int aux = 1;                      //Variavel auxiliar do while para criação de nome de arquivo do SD
 int tamNomeArq = 0;               //Valor da quantidade de caracteres da variavel NomeArq
@@ -80,6 +88,17 @@ void setup() {
     while (1);
   }
   giro.enableDefault();
+  if(!mag.begin())
+  {
+    Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
+    while(1);
+  }
+  if(!accel.begin())
+  {
+    Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
+    while(1);
+  }
+  accel.setRange(ADXL345_RANGE_16_G);////////////////////////////////////////////////////////
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
@@ -116,7 +135,7 @@ void setup() {
   }
   File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
-    dataFile.println("Tempo\tGx\tGy\tGz\tTemperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)");
+    dataFile.println("Tempo\tGx\tGy\tGz\tMx\tMy\tMz\tAx\tAy\tAz\tTemperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)");
     for (int i = 0; i < qf; i++) {
       dataFile.print("Altura do filtro ");
       dataFile.print(i);
@@ -126,7 +145,7 @@ void setup() {
     dataFile.close();
   }
   Serial.println("Dados dealtitude de voo");
-  Serial.print("Tempo\tGx\tGy\tGz\tTemperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)");
+  Serial.print("Tempo\tGx\tGy\tGz\tMx\tMy\tMz\tAx\tAy\tAz\tTemperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)");
   for (int i = 0; i < qf; i++) {
     Serial.print("Altura do filtro ");
     Serial.print(i);
@@ -147,7 +166,17 @@ void loop() {
   giro.read();
   Gx = (int)giro.g.x;
   Gy = (int)giro.g.y;
-  Gz = (int)giro.g.z;
+  Gz = (int)giro.g.z; 
+  sensors_event_t eventM; 
+  mag.getEvent(&eventM);
+  Mx = eventM.magnetic.x;
+  My = eventM.magnetic.y;
+  Mz = eventM.magnetic.z;
+  sensors_event_t eventA; 
+  accel.getEvent(&eventA);
+  Ax = eventA.acceleration.x;
+  Ay = eventA.acceleration.y;
+  Az = eventA.acceleration.z;
   Pm = bmp.readSealevelPressure();
   File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
@@ -158,6 +187,18 @@ void loop() {
     dataFile.print(Gy);
     dataFile.print("\t");
     dataFile.print(Gz);
+    dataFile.print("\t");
+    dataFile.print(Mx);
+    dataFile.print("\t");
+    dataFile.print(My);
+    dataFile.print("\t");
+    dataFile.print(Mz);
+    dataFile.print("\t");
+    dataFile.print(Ax);
+    dataFile.print("\t");
+    dataFile.print(Ay);
+    dataFile.print("\t");
+    dataFile.print(Az);
     dataFile.print("\t");
     dataFile.print(T);
     dataFile.print("\t");
@@ -173,6 +214,18 @@ void loop() {
   Serial.print(Gy);
   Serial.print("\t");
   Serial.print(Gz);
+  Serial.print("\t");
+  Serial.print(Mx);
+  Serial.print("\t");
+  Serial.print(My);
+  Serial.print("\t");
+  Serial.print(Mz);
+  Serial.print("\t");
+  Serial.print(Ax);
+  Serial.print("\t");
+  Serial.print(Ay);
+  Serial.print("\t");
+  Serial.print(Az);
   Serial.print("\t");
   Serial.print(T);
   Serial.print("\t");
