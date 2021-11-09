@@ -1,16 +1,20 @@
-#include <Adafruit_BMP085.h>
+#include <Wire.h>
 #include <SPI.h>
 #include <SD.h>
+#include <Adafruit_BMP085.h> // Biblioteca de altitude
+#include <Adafruit_Sensor.h>
+#include <Adafruit_HMC5883_U.h> // Biblioteca de magnetometro
 
-Adafruit_BMP085 bmp; // Declaração da biblioteca
+Adafruit_BMP085 bmp; // Declaração da biblioteca para altitude
+Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345); // Assign a unique ID to this sensor at the same time
 const int chipSelect = 53; // Declaração de CS
 
-#define filt_i 10
-#define filt_f 20
-#define IGN_1 36
-#define IGN_2 61
-#define IGN_3 46
-#define IGN_4 55
+#define filt_i 10 // Quantidade de valores Filtro 1
+#define filt_f 20 // Quantidade de valores Filtro 2
+#define IGN_1 36 // LED 1
+#define IGN_2 61 // LED 2
+#define IGN_3 46 // LED 3
+#define IGN_4 55 // LED 4
 
 // Variáveis para detecção de apogeu
 float nova_altLeitura, cont_sub, cont_subidas, cont_desc, cont_descidas, ult_subida;
@@ -92,14 +96,27 @@ void setup() {
     }
     number += 1;
   }
+
+  // Verifica se magnetômetro está conectado
+  sensor_t sensor;
+  mag.getSensor(&sensor);
+  Serial.println("------------------------------------");
+  Serial.print  ("Sensor:       "); Serial.println(sensor.name);
+  Serial.print  ("Driver Ver:   "); Serial.println(sensor.version);
+  Serial.print  ("Unique ID:    "); Serial.println(sensor.sensor_id);
+  Serial.print  ("Max Value:    "); Serial.print(sensor.max_value); Serial.println(" uT");
+  Serial.print  ("Min Value:    "); Serial.print(sensor.min_value); Serial.println(" uT");
+  Serial.print  ("Resolution:   "); Serial.print(sensor.resolution); Serial.println(" uT");  
+  Serial.println("------------------------------------");
+  Serial.println("");
   
   // Inicia inserindo essa informação no FILE nomeado
   File dataFile = SD.open(file, FILE_WRITE);
   if (dataFile) {
-    dataFile.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tParaquedas 3\tApogeu");
+    dataFile.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tMagnetômetro (X)\tMagnetômetro (Y)\tMagnetômetro (Z)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tParaquedas 3\tApogeu");
     dataFile.close();
     // print to the serial port too:
-    Serial.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tParaquedas 3\tApogeu");
+    Serial.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tMagnetômetro (X)\tMagnetômetro (Y)\tMagnetômetro (Z)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tParaquedas 3\tApogeu");
   }
   
   // Medicao
@@ -140,7 +157,8 @@ void setup() {
 void loop() {
   // Cria uma string para ser adicionada ao cartao
   String dataString = "";
-  
+
+  // ---------------------------------------------------------------------------------------------
   // Zerar contagem de altitude
   if (cont_sub > 0 and cont_desc == 1) {
     cont_sub = 0;
@@ -148,12 +166,13 @@ void loop() {
   if (cont_desc > 0 and cont_sub == 1) {
     cont_desc = 0;
   }
-  
+
+  // ---------------------------------------------------------------------------------------------
   // Detecção de Apogeu
   nova_altLeitura = bmp.readAltitude() - media_alt_inicio;
-  
-  antiga_media_movel = nova_media_movel;
+
   // Media Movel
+  antiga_media_movel = nova_media_movel;
     // Filtro 1
   for (j=0; j<9; j++) {
     list_med_movel[0][j] = list_med_movel[0][j+1];
@@ -190,27 +209,45 @@ void loop() {
   else if (nova_media_movel < antiga_media_movel) {
     cont_desc += 1;
   }
-  
-  // Altura
+
+  // ---------------------------------------------------------------------------------------------
+  // Escrevendo - Altura
   dataString += String(nova_altLeitura);
   dataString += "\t";
-  dataString += String(nova_media_movel);
+  dataString += String(nova_media_movel); // Filtro 1
   dataString += "\t";
-  dataString += String(nova_media_movel_lg);
+  dataString += String(nova_media_movel_lg); // Filtro 2
   dataString += "\t";
 
-  // Temperatura
+  // ---------------------------------------------------------------------------------------------
+  // Escrevendo - Temperatura
   dataString += String(bmp.readTemperature());
   dataString += "\t";
 
-  // Pressão
+  // ---------------------------------------------------------------------------------------------
+  // Escrevendo - Pressão
   dataString += String(bmp.readPressure());
   dataString += "\t";
 
-  // Pressão ao nivel do mar
+  // ---------------------------------------------------------------------------------------------
+  // Escrevendo - Pressão ao nivel do mar
   dataString += String(bmp.readSealevelPressure());
+
+  // ---------------------------------------------------------------------------------------------
+  // Magnetômetro
+    /* Get a new sensor event */
+  sensors_event_t event; 
+  mag.getEvent(&event);
+  // Escrevendo - Magnetômetro
+    // Eixo X
+  dataString += String(event.magnetic.x);
+    // Eixo Y
+  dataString += String(event.magnetic.y);
+    // Eixo Z
+  dataString += String(event.magnetic.z);
   
-  // Identificação de subida/descida/apogeu
+  // ---------------------------------------------------------------------------------------------
+  // Escrevendo - Identificação de subida/descida/apogeu
   if (cont_sub > 1) {
     estado = "\tSubindo";
     cont_subidas = 1;
@@ -236,7 +273,9 @@ void loop() {
       cont_acionar3 = 1;
     }
   }
-  
+
+  // ---------------------------------------------------------------------------------------------
+  // Escreve e Apresenta - Paraquedas
   // Aciona primeiro paraquedas
   if (currentMillis - previousMillis_p_acionar >= intervalo_p_acionar1 && cont_acionar1 == 1) {
     digitalWrite(LED_BUILTIN, HIGH);
@@ -280,6 +319,8 @@ void loop() {
   dataString += str_apogeu1;
   dataString += str_apogeu2;
 
+  // ---------------------------------------------------------------------------------------------
+  // Escrevendo - Informações indo para dentro do cartão SD
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
   File dataFile = SD.open(file, FILE_WRITE);
@@ -296,6 +337,8 @@ void loop() {
     Serial.println("error opening datalog.txt");
   }
 
+  // ---------------------------------------------------------------------------------------------
+  // Reinicia variáveis das médias móveis dos filtros
   media_movel = 0;
   media_movel_lg = 0;  
 }
