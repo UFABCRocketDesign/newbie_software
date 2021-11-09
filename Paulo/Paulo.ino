@@ -1,16 +1,21 @@
+// Bibliotecas
 #include <Wire.h>
 #include <SPI.h>
 #include <SD.h>
-#include <L3G.h> // Biblioteca de giroscópio
-#include <Adafruit_BMP085.h> // Biblioteca de altitude
 #include <Adafruit_Sensor.h>
-#include <Adafruit_HMC5883_U.h> // Biblioteca de magnetometro
+#include <L3G.h> // Giroscópio
+#include <Adafruit_ADXL345_U.h> // Acelerômetro
+#include <Adafruit_BMP085.h> // Altitude
+#include <Adafruit_HMC5883_U.h> // Magnetometro
 
-Adafruit_BMP085 bmp; // Declaração da biblioteca para altitude
-Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345); // Assign a unique ID to this sensor at the same time
-L3G gyro; // Declaração da biblioetca para giroscópio
+// Declaração dos bibliotecas
+Adafruit_BMP085 bmp; // Altitude
+Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345); // Magnetômetro
+L3G gyro; // Giroscópio
+Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345); // Acelerômetro
 const int chipSelect = 53; // Declaração de CS
 
+// Constantes universais
 #define filt_i 10 // Quantidade de valores Filtro 1
 #define filt_f 20 // Quantidade de valores Filtro 2
 #define IGN_1 36 // LED 1
@@ -52,7 +57,7 @@ String acionamento1 = "\tDesligado 1";
 String acionamento2 = "\tDesligado 2";
 String acionamento3 = "\tDesligado 3";
 
-// the setup function runs once when you press reset or power the board
+// SETUP DA APLICAÇÃO
 void setup() {
   // Inicializando o led embutido no arduino
   pinMode(LED_BUILTIN, OUTPUT);
@@ -103,6 +108,7 @@ void setup() {
   sensor_t sensor;
   mag.getSensor(&sensor);
   Serial.println("------------------------------------");
+  Serial.println("Magnetômetro");
   Serial.print  ("Sensor:       "); Serial.println(sensor.name);
   Serial.print  ("Driver Ver:   "); Serial.println(sensor.version);
   Serial.print  ("Unique ID:    "); Serial.println(sensor.sensor_id);
@@ -120,14 +126,27 @@ void setup() {
     while (1);
   }
   gyro.enableDefault();
+
+  // Verificar se o acelerômetro está conectado
+  accel.getSensor(&sensor);
+  Serial.println("------------------------------------");
+  Serial.println("Acelerômetro");
+  Serial.print  ("Sensor:       "); Serial.println(sensor.name);
+  Serial.print  ("Driver Ver:   "); Serial.println(sensor.version);
+  Serial.print  ("Unique ID:    "); Serial.println(sensor.sensor_id);
+  Serial.print  ("Max Value:    "); Serial.print(sensor.max_value); Serial.println(" m/s^2");
+  Serial.print  ("Min Value:    "); Serial.print(sensor.min_value); Serial.println(" m/s^2");
+  Serial.print  ("Resolution:   "); Serial.print(sensor.resolution); Serial.println(" m/s^2");  
+  Serial.println("------------------------------------");
+  Serial.println("");
   
   // Inicia inserindo essa informação no FILE nomeado
   File dataFile = SD.open(file, FILE_WRITE);
   if (dataFile) {
-    dataFile.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tMagnetômetro (X)\tMagnetômetro (Y)\tMagnetômetro (Z)\tGiroscópio (X)\tGiroscópio (Y)\tGiroscópio (Z)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tParaquedas 3\tApogeu");
+    dataFile.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tMag (X)\tMag (Y)\tMag (Z)\tGiros (X)\tGiros (Y)\tGiros (Z)\tAcel (X)\tAcel (Y)\tAcel (Z)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tParaquedas 3\tApogeu");
     dataFile.close();
     // print to the serial port too:
-    Serial.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tMagnetômetro (X)\tMagnetômetro (Y)\tMagnetômetro (Z)\tGiroscópio (X)\tGiroscópio (Y)\tGiroscópio (Z)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tParaquedas 3\tApogeu");
+    Serial.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tMag (X)\tMag (Y)\tMag (Z)\tGiros (X)\tGiros (Y)\tGiros (Z)\tAcel (X)\tAcel (Y)\tAcel (Z)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tParaquedas 3\tApogeu");
   }
   
   // Medicao
@@ -164,7 +183,7 @@ void setup() {
 
 }
 
-// the loop function runs over and over again forever
+// LOOP DA SOLUÇÃO
 void loop() {
   // Cria uma string para ser adicionada ao cartao
   String dataString = "";
@@ -273,6 +292,20 @@ void loop() {
   dataString += "\t";
     // Eixo Z
   dataString += String((int)gyro.g.z);
+  dataString += "\t";
+
+  // ---------------------------------------------------------------------------------------------
+  // Acelerômetro
+  accel.getEvent(&event);
+  // Escrevendo - Acelerômetro
+    // Eixo X
+  dataString += String(event.acceleration.x);
+  dataString += "\t";
+    // Eixo Y
+  dataString += String(event.acceleration.y);
+  dataString += "\t";
+    // Eixo Z
+  dataString += String(event.acceleration.z);
   
   // ---------------------------------------------------------------------------------------------
   // Escrevendo - Identificação de subida/descida/apogeu
