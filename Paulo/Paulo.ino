@@ -10,9 +10,9 @@
 
 // Declaração dos bibliotecas
 Adafruit_BMP085 bmp; // Altitude
-Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345); // Magnetômetro
+Adafruit_HMC5883_Unified mag; // Magnetômetro
 L3G gyro; // Giroscópio
-Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345); // Acelerômetro
+Adafruit_ADXL345_Unified accel; // Acelerômetro
 const int chipSelect = 53; // Declaração de CS
 
 // Constantes universais
@@ -104,20 +104,6 @@ void setup() {
     number += 1;
   }
 
-  // Verifica se magnetômetro está conectado
-  sensor_t sensor;
-  mag.getSensor(&sensor);
-  Serial.println("------------------------------------");
-  Serial.println("Magnetômetro");
-  Serial.print  ("Sensor:       "); Serial.println(sensor.name);
-  Serial.print  ("Driver Ver:   "); Serial.println(sensor.version);
-  Serial.print  ("Unique ID:    "); Serial.println(sensor.sensor_id);
-  Serial.print  ("Max Value:    "); Serial.print(sensor.max_value); Serial.println(" uT");
-  Serial.print  ("Min Value:    "); Serial.print(sensor.min_value); Serial.println(" uT");
-  Serial.print  ("Resolution:   "); Serial.print(sensor.resolution); Serial.println(" uT");  
-  Serial.println("------------------------------------");
-  Serial.println("");
-
   // Verificar se giroscópio está conectado
   Wire.begin();
   if (!gyro.init())
@@ -126,19 +112,6 @@ void setup() {
     while (1);
   }
   gyro.enableDefault();
-
-  // Verificar se o acelerômetro está conectado
-  accel.getSensor(&sensor);
-  Serial.println("------------------------------------");
-  Serial.println("Acelerômetro");
-  Serial.print  ("Sensor:       "); Serial.println(sensor.name);
-  Serial.print  ("Driver Ver:   "); Serial.println(sensor.version);
-  Serial.print  ("Unique ID:    "); Serial.println(sensor.sensor_id);
-  Serial.print  ("Max Value:    "); Serial.print(sensor.max_value); Serial.println(" m/s^2");
-  Serial.print  ("Min Value:    "); Serial.print(sensor.min_value); Serial.println(" m/s^2");
-  Serial.print  ("Resolution:   "); Serial.print(sensor.resolution); Serial.println(" m/s^2");  
-  Serial.println("------------------------------------");
-  Serial.println("");
   
   // Inicia inserindo essa informação no FILE nomeado
   File dataFile = SD.open(file, FILE_WRITE);
