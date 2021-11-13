@@ -5,6 +5,7 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_ADXL345_U.h> //acelerometro
 #include <Adafruit_HMC5883_U.h> //magnetometro
+#include <L3G.h> //giroscopio
 
 #define IGN_1 36  /*act1*/
 #define IGN_2 61  /*act2*/
@@ -16,6 +17,7 @@
 Adafruit_BMP085 bmp;
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
+L3G gyro;
 
 float auxiliar = 0;
 float media = 0;
@@ -47,6 +49,7 @@ void setup() {
   pinMode(IGN_2, OUTPUT);
 
   Serial.begin(115200);
+  Wire.begin();
 
   if(!accel.begin())
   {
@@ -61,6 +64,14 @@ void setup() {
     Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
     while(1);
   }
+
+  if (!gyro.init())
+  {
+    Serial.println("Failed to autodetect gyro type!");
+    while (1);
+  }
+  
+  gyro.enableDefault();
 
   accel.setRange(ADXL345_RANGE_16_G);
   
@@ -158,6 +169,12 @@ void loop() {
   Serial.print("Xmag: "); Serial.print(eventMag.magnetic.x); Serial.print("\t");
   Serial.print("Ymag: "); Serial.print(eventMag.magnetic.y); Serial.print("\t");
   Serial.print("Zmag: "); Serial.print(eventMag.magnetic.z); Serial.print("\t");Serial.println();
+
+  gyro.read();
+
+  Serial.print("Xgyro: "); Serial.print((int)gyro.g.x); Serial.print("\t");
+  Serial.print("Ygyro: "); Serial.print((int)gyro.g.y); Serial.print("\t");
+  Serial.print("Zgyro: "); Serial.println((int)gyro.g.z); Serial.print("\t");Serial.println();
 
   tempoAtual = millis();
 
