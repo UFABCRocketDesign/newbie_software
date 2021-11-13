@@ -74,7 +74,6 @@ void setup() {
     ;
   }
 
-
   Serial.print("Initializing SD card...");
 
   if (!SD.begin(chipSelect)) {
@@ -132,8 +131,6 @@ void setup() {
       dataFile.close();
       existente = true;
     }
-
-    Serial.println(arquivo);
   }
 
   float alt = bmp.readAltitude();
@@ -148,18 +145,19 @@ void setup() {
 // the loop function runs over and over again forever
 void loop() {
    
-  sensors_event_t event; 
-  accel.getEvent(&event);
-  mag.getEvent(&event);
+  sensors_event_t eventAcc; 
+  sensors_event_t eventMag;
+  accel.getEvent(&eventAcc);
+  mag.getEvent(&eventMag);
  
   
-  Serial.print("Xacc: "); Serial.print(event.acceleration.x); Serial.print("\t");
-  Serial.print("Yacc: "); Serial.print(event.acceleration.y); Serial.print("\t");
-  Serial.print("Zacc: "); Serial.print(event.acceleration.z); Serial.print("\t");Serial.println();
+  Serial.print("Xacc: "); Serial.print(eventAcc.acceleration.x); Serial.print("\t");
+  Serial.print("Yacc: "); Serial.print(eventAcc.acceleration.y); Serial.print("\t");
+  Serial.print("Zacc: "); Serial.print(eventAcc.acceleration.z); Serial.print("\t");Serial.println();
 
-  Serial.print("Xmag: "); Serial.print(event.magnetic.x); Serial.print("\t");
-  Serial.print("Ymag: "); Serial.print(event.magnetic.y); Serial.print("\t");
-  Serial.print("Zmag: "); Serial.print(event.magnetic.z); Serial.print("\t");Serial.println();
+  Serial.print("Xmag: "); Serial.print(eventMag.magnetic.x); Serial.print("\t");
+  Serial.print("Ymag: "); Serial.print(eventMag.magnetic.y); Serial.print("\t");
+  Serial.print("Zmag: "); Serial.print(eventMag.magnetic.z); Serial.print("\t");Serial.println();
 
   tempoAtual = millis();
 
