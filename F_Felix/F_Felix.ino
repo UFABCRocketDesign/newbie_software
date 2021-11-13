@@ -3,7 +3,8 @@
 #include <SD.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
-#include <Adafruit_ADXL345_U.h>
+#include <Adafruit_ADXL345_U.h> //acelerometro
+#include <Adafruit_HMC5883_U.h> //magnetometro
 
 #define IGN_1 36  /*act1*/
 #define IGN_2 61  /*act2*/
@@ -14,6 +15,8 @@
 
 Adafruit_BMP085 bmp;
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
+Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
+
 float auxiliar = 0;
 float media = 0;
 float soma = 0;
@@ -49,6 +52,13 @@ void setup() {
   {
     /* There was a problem detecting the ADXL345 ... check your connections */
     Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
+    while(1);
+  }
+
+  if(!mag.begin())
+  {
+    /* There was a problem detecting the HMC5883 ... check your connections */
+    Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
     while(1);
   }
 
@@ -140,11 +150,16 @@ void loop() {
    
   sensors_event_t event; 
   accel.getEvent(&event);
+  mag.getEvent(&event);
  
-  /* Display the results (acceleration is measured in m/s^2) */
-  Serial.print("X: "); Serial.print(event.acceleration.x); Serial.print("\t");
-  Serial.print("Y: "); Serial.print(event.acceleration.y); Serial.print("\t");
-  Serial.print("Z: "); Serial.print(event.acceleration.z); Serial.print("\t");Serial.println();
+  
+  Serial.print("Xacc: "); Serial.print(event.acceleration.x); Serial.print("\t");
+  Serial.print("Yacc: "); Serial.print(event.acceleration.y); Serial.print("\t");
+  Serial.print("Zacc: "); Serial.print(event.acceleration.z); Serial.print("\t");Serial.println();
+
+  Serial.print("Xmag: "); Serial.print(event.magnetic.x); Serial.print("\t");
+  Serial.print("Ymag: "); Serial.print(event.magnetic.y); Serial.print("\t");
+  Serial.print("Zmag: "); Serial.print(event.magnetic.z); Serial.print("\t");Serial.println();
 
   tempoAtual = millis();
 
@@ -283,5 +298,5 @@ void loop() {
 
   auxiliar = alt;
 
-  delay(100);
+ // delay(100);
 }
