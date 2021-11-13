@@ -1,4 +1,8 @@
 #include <Adafruit_BMP085.h>
+#include <SPI.h>
+#include <SD.h>
+
+const int chipSelect = 53;
 
 Adafruit_BMP085 bmp;
 float alt_atual = 0;
@@ -21,6 +25,14 @@ int queda = 0;
 
 
 void setup() {
+  while (!Serial) {
+  }
+  Serial.print("Initializing SD card...");
+  if (!SD.begin(chipSelect)) {
+    Serial.println("Card failed, or not present");
+    while (1);
+  }
+  Serial.println("card initialized.");
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
   Serial.print("Temperature(°C ) = ");
@@ -44,6 +56,8 @@ void setup() {
 }
 
 void loop() {
+  String dataString = "";
+  File dataFile = SD.open("datalog.txt", FILE_WRITE);
   digitalWrite(LED_BUILTIN, HIGH);
   alt_atual = bmp.readAltitude() - media;
   for (int i = 9; i > 0; i--) {
@@ -113,9 +127,5 @@ Serial.println("\t");
 //Serial.print(bmp.readSealevelPressure());
 //Serial.print("\t");
 
-// you can get a more precise measurement of altitude
-// if you know the current sea level pressure which will
-// vary with weather and such. If it is 1015 millibars
-// that is equal to 101500 Pascals.
 //Serial.print(bmp.readAltitude(101500));
 //Serial.print("\t");
