@@ -40,7 +40,6 @@ unsigned long ligaLED2 = 0;
 unsigned long desligaLED3 = 0;
 float apogeu = 0;
 boolean detectaApogeu = false;
-unsigned long relogio = 0;
 
 const int chipSelect = 53;
 
@@ -184,9 +183,7 @@ void loop() {
   
   tempoAtual = millis();
 
-  relogio = tempoAtual/1000.0;
-
-  dataString += String(relogio);
+  dataString += String(tempoAtual/1000.0);
   dataString += ("\t");
 
   float alt = bmp.readAltitude();
