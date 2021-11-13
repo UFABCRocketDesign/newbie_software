@@ -108,6 +108,15 @@ void loop() {
     Serial.print("0");
   }
 Serial.println("\t");  
+
+  if (dataFile) {
+    dataFile.println(dataString);
+    dataFile.close();
+    Serial.println(dataString);
+}
+  else {
+    Serial.println("error opening datalog.txt");
+}
 }
 
 
