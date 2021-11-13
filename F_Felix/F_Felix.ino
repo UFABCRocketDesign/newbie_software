@@ -40,6 +40,7 @@ unsigned long ligaLED2 = 0;
 unsigned long desligaLED3 = 0;
 float apogeu = 0;
 boolean detectaApogeu = false;
+unsigned long relogio = 0;
 
 const int chipSelect = 53;
 
@@ -95,6 +96,8 @@ void setup() {
   Serial.println("card initialized.");
 
   String dataString = "";
+
+  dataString += ("Relógio\t");
 
   dataString += ("Temp.(*C)\t");
 
@@ -156,13 +159,14 @@ void setup() {
     }
   }
 
-  float alt = bmp.readAltitude();
-
   for (int j = 0; j < 100; j++) {
+    float alt = bmp.readAltitude();
     soma += alt;
   }
 
   media = soma / 100.0;
+
+  Serial.println(dataString);
 }
 
 // the loop function runs over and over again forever
@@ -175,8 +179,15 @@ void loop() {
   mag.getEvent(&eventMag);
 
   gyro.read();
+
+  String dataString = "";
   
   tempoAtual = millis();
+
+  relogio = tempoAtual/1000;
+
+  dataString += String(relogio);
+  dataString += ("\t");
 
   float alt = bmp.readAltitude();
   float somaVet = 0;
@@ -210,8 +221,6 @@ void loop() {
 
   segundaMediaMovel = somaVet2 / 10.0;
 
-  String dataString = "";
-
   dataString += String(bmp.readTemperature());
   dataString += ("\t");
 
@@ -225,6 +234,36 @@ void loop() {
   dataString += ("\t");
 
   dataString += String(altRelativa);
+  dataString += ("\t");
+    
+  dataString += String(altRelativa);
+  dataString += ("\t");
+
+  dataString += String(mediaMovel);
+  dataString += ("\t");
+
+  dataString += String(segundaMediaMovel);
+  dataString += ("\t");
+
+  dataString += String(eventAcc.acceleration.x);
+  dataString += ("\t");
+  dataString += String(eventAcc.acceleration.y);
+  dataString += ("\t");
+  dataString += String(eventAcc.acceleration.z);
+  dataString += ("\t");
+
+  dataString += String(eventMag.magnetic.x);
+  dataString += ("\t");
+  dataString += String(eventMag.magnetic.y);
+  dataString += ("\t");
+  dataString += String(eventMag.magnetic.z);
+  dataString += ("\t");
+
+  dataString += String((int)gyro.g.x);
+  dataString += ("\t");
+  dataString += String((int)gyro.g.y);
+  dataString += ("\t");
+  dataString += String((int)gyro.g.z);
   dataString += ("\t");
 
   if (apogeu < segundaMediaMovel) {
@@ -288,35 +327,6 @@ void loop() {
     }
   }
 
-  dataString += String(altRelativa);
-  dataString += ("\t");
-
-  dataString += String(mediaMovel);
-  dataString += ("\t");
-
-  dataString += String(segundaMediaMovel);
-  dataString += ("\t");
-
-  dataString += String(eventAcc.acceleration.x);
-  dataString += ("\t");
-  dataString += String(eventAcc.acceleration.y);
-  dataString += ("\t");
-  dataString += String(eventAcc.acceleration.z);
-  dataString += ("\t");
-
-  dataString += String(eventMag.magnetic.x);
-  dataString += ("\t");
-  dataString += String(eventMag.magnetic.y);
-  dataString += ("\t");
-  dataString += String(eventMag.magnetic.z);
-  dataString += ("\t");
-
-  dataString += String((int)gyro.g.x);
-  dataString += ("\t");
-  dataString += String((int)gyro.g.y);
-  dataString += ("\t");
-  dataString += String((int)gyro.g.z);
-  dataString += ("\t");
 
   File dataFile = SD.open(arquivo, FILE_WRITE);
 
@@ -325,12 +335,13 @@ void loop() {
     dataFile.println(dataString);
     dataFile.close();
     // print to the serial port too:
-    Serial.println(dataString);
   }
   // if the file isn't open, pop up an error:
   else {
     Serial.println("error opening" + arquivo);
   }
+
+  Serial.println(dataString);
 
   auxiliar = alt;
 
