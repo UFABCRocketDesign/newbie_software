@@ -114,6 +114,18 @@ void setup() {
 
   dataString += ("Média 2\t");
 
+  dataString += ("AceleromêtroX\t");
+  dataString += ("AceleromêtroY\t");
+  dataString += ("AceleromêtroZ\t");
+
+  dataString += ("MagnetromêtroX\t");
+  dataString += ("MagnetromêtroY\t");
+  dataString += ("MagnetromêtroZ\t");
+
+  dataString += ("GiroscópioX\t");
+  dataString += ("GiroscópioY\t");
+  dataString += ("GiroscópioZ\t");
+
   String nome = "f";
   int cont = 0;
   String aux = (String) cont;
@@ -157,25 +169,13 @@ void setup() {
 void loop() {
    
   sensors_event_t eventAcc; 
-  sensors_event_t eventMag;
   accel.getEvent(&eventAcc);
-  mag.getEvent(&eventMag);
- 
   
-  Serial.print("Xacc: "); Serial.print(eventAcc.acceleration.x); Serial.print("\t");
-  Serial.print("Yacc: "); Serial.print(eventAcc.acceleration.y); Serial.print("\t");
-  Serial.print("Zacc: "); Serial.print(eventAcc.acceleration.z); Serial.print("\t");Serial.println();
-
-  Serial.print("Xmag: "); Serial.print(eventMag.magnetic.x); Serial.print("\t");
-  Serial.print("Ymag: "); Serial.print(eventMag.magnetic.y); Serial.print("\t");
-  Serial.print("Zmag: "); Serial.print(eventMag.magnetic.z); Serial.print("\t");Serial.println();
+  sensors_event_t eventMag;
+  mag.getEvent(&eventMag);
 
   gyro.read();
-
-  Serial.print("Xgyro: "); Serial.print((int)gyro.g.x); Serial.print("\t");
-  Serial.print("Ygyro: "); Serial.print((int)gyro.g.y); Serial.print("\t");
-  Serial.print("Zgyro: "); Serial.println((int)gyro.g.z); Serial.print("\t");Serial.println();
-
+  
   tempoAtual = millis();
 
   float alt = bmp.readAltitude();
@@ -295,6 +295,27 @@ void loop() {
   dataString += ("\t");
 
   dataString += String(segundaMediaMovel);
+  dataString += ("\t");
+
+  dataString += String(eventAcc.acceleration.x);
+  dataString += ("\t");
+  dataString += String(eventAcc.acceleration.y);
+  dataString += ("\t");
+  dataString += String(eventAcc.acceleration.z);
+  dataString += ("\t");
+
+  dataString += String(eventMag.magnetic.x);
+  dataString += ("\t");
+  dataString += String(eventMag.magnetic.y);
+  dataString += ("\t");
+  dataString += String(eventMag.magnetic.z);
+  dataString += ("\t");
+
+  dataString += String((int)gyro.g.x);
+  dataString += ("\t");
+  dataString += String((int)gyro.g.y);
+  dataString += ("\t");
+  dataString += String((int)gyro.g.z);
   dataString += ("\t");
 
   File dataFile = SD.open(arquivo, FILE_WRITE);
