@@ -70,10 +70,12 @@ void loop() {
   }
   media_movel = soma_mm / 10;
 
-  Serial.print(media_movel);
-  Serial.print("\t");
-  Serial.print(alt_atual);
-  Serial.print("\t");
+  //Serial.print(media_movel);
+  //Serial.print("\t");
+  dataString += String(media_movel);
+  //Serial.print(alt_atual);
+  //Serial.print("\t");
+  dataString += String(alt_atual);
 
   for (int j = 9; j > 0; j--) {
     altitude2[j] = altitude2 [j - 1];
