@@ -184,7 +184,7 @@ void loop() {
   
   tempoAtual = millis();
 
-  relogio = tempoAtual/1000;
+  relogio = tempoAtual/1000.0;
 
   dataString += String(relogio);
   dataString += ("\t");
