@@ -1,4 +1,9 @@
 #include <Adafruit_BMP085.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_ADXL345_U.h>
+#include <Adafruit_HMC5883_U.h>
+#include <L3G.h>
+#include <Wire.h>
 #include <SPI.h>
 #include <SD.h>
 
@@ -14,6 +19,10 @@
 #define IGN_2 61  /*act2*/
 #define IGN_3 46  /*act3*/
 #define IGN_4 55  /*act4*/
+
+L3G giro;
+Adafruit_HMC5883_Unified mag;// = Adafruit_HMC5883_Unified(12345);
+Adafruit_ADXL345_Unified accel;// = Adafruit_ADXL345_Unified(12345);
 
 float Hmax = 0;                   //Valor máximo filtrado
 float SomaRef = 0;                //Soma valores iniciais(foguete parado na base)
@@ -37,6 +46,15 @@ unsigned long tempoAtual = 0;        // will store last time LED was updated
 float T;                          //Valor da Temperatura
 float P;                          //Valor da Pressão
 float Pm;                         //Valor da Pressão ao nivel do Mar
+int Gx;                           //Giroscópio em x
+int Gy;                           //Giroscópio em y
+int Gz;                           //Giroscópio em z
+float Mx;                         //Magnetometro em x
+float My;                         //Magnetometro em y
+float Mz;                         //Magnetometro em z
+float Ax;                         //Acelerometro em x
+float Ay;                         //Acelerometro em y
+float Az;                         //Acelerometro em z
 
 int aux = 1;                      //Variavel auxiliar do while para criação de nome de arquivo do SD
 int tamNomeArq = 0;               //Valor da quantidade de caracteres da variavel NomeArq
@@ -64,16 +82,27 @@ void setup() {
   //digitalWrite(IGN_3, LOW);
   //digitalWrite(IGN_4, LOW);
   Serial.begin(115200);
+  Wire.begin();
+  if (!giro.init()) {
+    Serial.println("FALHA AO ENCONTRAR GIROSCÓPIO!");
+  }
+  giro.enableDefault();
+  if(!mag.begin())
+  {
+    Serial.println("FALHA AO ENCONTRAR MAGNETÔMETRO!");
+  }
+  if(!accel.begin())
+  {
+    Serial.println("FALHA AO ENCONTRAR ACELERÔMETRO");
+  }
+  accel.setRange(ADXL345_RANGE_16_G);
   if (!bmp.begin()) {
-    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-    while (1) {}
+    Serial.println("FALHA AO ENCONTRAR O SENSOR BMP085!");
   }
-  Serial.println("Initializing SD card...");
+  Serial.println("Inicializando cartão SD...");
   if (!SD.begin(chipSelect)) {
-    Serial.println("Card failed, or not present");
-    while (1);
+    Serial.println("FALHA NO CARTÃO SD");
   }
-  Serial.println("card initialized.");
   x = NomeArq;
   tamNomeArq = x.length();
   sub1 = 8 - tamNomeArq;
@@ -100,7 +129,7 @@ void setup() {
   }
   File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
-    dataFile.println("Tempo\tTemperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)");
+    dataFile.println("Tempo\tGx\tGy\tGz\tMx(uT)\tMy(uT)\tMz(uT)\tAx(m/s^2)\tAy(m/s^2)\tAz(m/s^2)\tTemperatura(°C)\tPressao(Pa)\tAltura máxima(m)");
     for (int i = 0; i < qf; i++) {
       dataFile.print("Altura do filtro ");
       dataFile.print(i);
@@ -110,7 +139,7 @@ void setup() {
     dataFile.close();
   }
   Serial.println("Dados dealtitude de voo");
-  Serial.print("Tempo\tTemperatura(°C)\tPressao(Pa)\tPressao ao nivel do mar(Pa)\tAltura máxima(m)\tAltura (m)\tStatu de voo");
+  Serial.print("Tempo\tGx\tGy\tGz\tMx(uT)\tMy(uT)\tMz(uT)\tAx(m/s^2)\tAy(m/s^2)\tAz(m/s^2)\tTemperatura(°C)\tPressao(Pa)\tAltura máxima(m)");
   for (int i = 0; i < qf; i++) {
     Serial.print("Altura do filtro ");
     Serial.print(i);
@@ -128,25 +157,71 @@ void loop() {
   Serial.print("\t");
   T = bmp.readTemperature();
   P = bmp.readPressure();
-  Pm = bmp.readSealevelPressure();
+  giro.read();
+  Gx = (int)giro.g.x;
+  Gy = (int)giro.g.y;
+  Gz = (int)giro.g.z; 
+  sensors_event_t eventM; 
+  mag.getEvent(&eventM);
+  Mx = eventM.magnetic.x;
+  My = eventM.magnetic.y;
+  Mz = eventM.magnetic.z;
+  sensors_event_t eventA; 
+  accel.getEvent(&eventA);
+  Ax = eventA.acceleration.x;
+  Ay = eventA.acceleration.y;
+  Az = eventA.acceleration.z;
+  //Pm = bmp.readSealevelPressure();
   File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
     dataFile.print(tempoAtual/1000.0);
+    dataFile.print("\t");
+    dataFile.print(Gx);
+    dataFile.print("\t");
+    dataFile.print(Gy);
+    dataFile.print("\t");
+    dataFile.print(Gz);
+    dataFile.print("\t");
+    dataFile.print(Mx);
+    dataFile.print("\t");
+    dataFile.print(My);
+    dataFile.print("\t");
+    dataFile.print(Mz);
+    dataFile.print("\t");
+    dataFile.print(Ax);
+    dataFile.print("\t");
+    dataFile.print(Ay);
+    dataFile.print("\t");
+    dataFile.print(Az);
     dataFile.print("\t");
     dataFile.print(T);
     dataFile.print("\t");
     dataFile.print(P);
     dataFile.print("\t");
-    dataFile.print(Pm);
-    dataFile.print("\t");
     dataFile.print(Hmax);
     dataFile.print("\t");
   }
+  Serial.print(Gx);
+  Serial.print("\t");
+  Serial.print(Gy);
+  Serial.print("\t");
+  Serial.print(Gz);
+  Serial.print("\t");
+  Serial.print(Mx);
+  Serial.print("\t");
+  Serial.print(My);
+  Serial.print("\t");
+  Serial.print(Mz);
+  Serial.print("\t");
+  Serial.print(Ax);
+  Serial.print("\t");
+  Serial.print(Ay);
+  Serial.print("\t");
+  Serial.print(Az);
+  Serial.print("\t");
   Serial.print(T);
   Serial.print("\t");
   Serial.print(P);
-  Serial.print("\t");
-  Serial.print(Pm);
   Serial.print("\t");
   Serial.print(Hmax);
   Serial.print("\t");
@@ -157,12 +232,12 @@ void loop() {
     }
     if (j == 0) {
       MatrizFiltros[0][0] = bmp.readAltitude() - AltitudeRef; //Esse é o valor mais atualizado do filtro1
-      Serial.print(MatrizFiltros[0][0]);
+      /*Serial.print(MatrizFiltros[0][0]);
       Serial.print("\t");
       if (dataFile) {
         dataFile.print(MatrizFiltros[0][0]);
         dataFile.print("\t");
-      }
+      }*/
     }
     else {
       MatrizFiltros[j][0] = MediaMov;

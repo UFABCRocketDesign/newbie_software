@@ -1,4 +1,8 @@
 #include <Adafruit_BMP085.h>
+#include <SPI.h>
+#include <SD.h>
+
+const int chipSelect = 53;
 
 Adafruit_BMP085 bmp;
 float alt_atual = 0;
@@ -21,6 +25,14 @@ int queda = 0;
 
 
 void setup() {
+  while (!Serial) {
+  }
+  Serial.print("Initializing SD card...");
+  if (!SD.begin(chipSelect)) {
+    Serial.println("Card failed, or not present");
+    while (1);
+  }
+  Serial.println("card initialized.");
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
   Serial.print("Temperature(°C ) = ");
@@ -44,6 +56,8 @@ void setup() {
 }
 
 void loop() {
+  String dataString = "";
+  File dataFile = SD.open("rkflight.txt", FILE_WRITE);
   digitalWrite(LED_BUILTIN, HIGH);
   alt_atual = bmp.readAltitude() - media;
   for (int i = 9; i > 0; i--) {
@@ -56,9 +70,14 @@ void loop() {
   }
   media_movel = soma_mm / 10;
 
-  Serial.print(media_movel);
+  //Serial.print(media_movel);
+  //Serial.print("\t");
+  dataString += String(media_movel);
+  dataString += ("\t");
+  //Serial.print(alt_atual);
   Serial.print("\t");
-  Serial.print(alt_atual);
+  dataString += String(alt_atual);
+  dataString += ("\t");
   Serial.print("\t");
 
   for (int j = 9; j > 0; j--) {
@@ -70,10 +89,12 @@ void loop() {
     soma_mm2 += altitude2[j];
   }
   media_movel2 = soma_mm2 / 10;
-  Serial.print(media_movel2);
-  Serial.print("\t");
-  //Serial.print(altitude2);
+  //Serial.print(media_movel2);
   //Serial.print("\t");
+  dataString += String(media_movel2);
+  dataString += ("\t");
+  //Serial.print(altitude2);
+  Serial.print("\t");
 
   for (int k = 49; k > 0; k--) {
     medicao[k] = medicao[k - 1];
@@ -85,15 +106,29 @@ void loop() {
       queda += 1;
     }
   }
-  Serial.print(queda/float (50));
+  //Serial.print(queda/float (50));
+  dataString += String(queda / float(50));
+  dataString += ("\t");
   Serial.print("\t");
   if (queda >= 45) {
-    Serial.print("1");
+    //Serial.print("1");
+    dataString += String("1");
+    dataString += ("\t");
   }
-  else{
-    Serial.print("0");
+  else {
+    //Serial.print("0");
+    dataString += String("0");
+    dataString += ("\t");
   }
-Serial.println("\t");  
+  Serial.println(dataString);
+
+  if (dataFile) {
+    dataFile.println(dataString);
+    dataFile.close();
+  }
+  else {
+    Serial.println("error opening datalog.txt");
+  }
 }
 
 
@@ -113,9 +148,5 @@ Serial.println("\t");
 //Serial.print(bmp.readSealevelPressure());
 //Serial.print("\t");
 
-// you can get a more precise measurement of altitude
-// if you know the current sea level pressure which will
-// vary with weather and such. If it is 1015 millibars
-// that is equal to 101500 Pascals.
 //Serial.print(bmp.readAltitude(101500));
 //Serial.print("\t");
