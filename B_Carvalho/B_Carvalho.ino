@@ -73,11 +73,11 @@ void loop() {
   //Serial.print(media_movel);
   //Serial.print("\t");
   dataString += String(media_movel);
-  dataString += String("\t");
+  dataString += ("\t");
   //Serial.print(alt_atual);
   Serial.print("\t");
   dataString += String(alt_atual);
-  dataString += String("\t");
+  dataString += ("\t");
   Serial.print("\t");
 
   for (int j = 9; j > 0; j--) {
@@ -92,7 +92,7 @@ void loop() {
   //Serial.print(media_movel2);
   //Serial.print("\t");
   dataString += String(media_movel2);
-  dataString += String("\t");
+  dataString += ("\t");
   //Serial.print(altitude2);
   Serial.print("\t");
 
@@ -107,29 +107,28 @@ void loop() {
     }
   }
   //Serial.print(queda/float (50));
-  dataString += String(queda/float(50));
-  dataString += String("\t");
+  dataString += String(queda / float(50));
+  dataString += ("\t");
   Serial.print("\t");
   if (queda >= 45) {
     //Serial.print("1");
     dataString += String("1");
-    dataString += String("\t");
+    dataString += ("\t");
   }
-  else{
+  else {
     //Serial.print("0");
     dataString += String("0");
-    dataString += String("\t");
+    dataString += ("\t");
   }
-Serial.println("\t");  
+  Serial.println(dataString);
 
   if (dataFile) {
     dataFile.println(dataString);
     dataFile.close();
-    Serial.println(dataString);
-}
+  }
   else {
     Serial.println("error opening datalog.txt");
-}
+  }
 }
 
 
