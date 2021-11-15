@@ -7,12 +7,7 @@
 #define IGN_2 61  /*act2*/
 #define IGN_3 46  /*act3*/
 #define IGN_4 55  /*act4*/
-#define Intervalo 3000                //Intervalo de tempo do Timer antes do acionamento do paraquedas
-#define Apogeu false
-#define Tia false                     //Tempo inicial do paraquedas A
-#define InterA 1000                   //Intervalo de tempo do paraquedas A em segundos
-#define Tib false                     //Tempo inicial do paraquedas B
-#define InterB 2000                   //Intervalo de tempo do paraquedas B em segundos
+
 
 
 const int chipSelect = 53;            //Define o pino para o chipselect para gravar no cartão SD
@@ -39,11 +34,17 @@ String parteB;
 int a;
 int b;
 int c;
-int ledState = LOW;                   // Estado inicial do LED que indica acionamento do paraquedas
+int ledState1 = LOW;                   // Estado inicial do LED que indica acionamento do paraquedas
 int ledState2 = LOW;                  // Outra LED para verificar o timer antes de acionar o paraquedas
 float Timer = 0;                      // Guarda o tempo do timer
 unsigned long previousMillis = 0;     // Guarda o valor de tempo
 const long interval = 2000;           // O intervalo de tempo que o LED deve ficar ligado em milesegundos
+int Intervalo = 3000;                //Intervalo de tempo do Timer antes do acionamento do paraquedas
+bool Apogeu = false;
+bool Tia = false;                     //Tempo inicial do paraquedas A
+int InterA = 1000;                   //Intervalo de tempo do paraquedas A em segundos
+bool Tib = false;                     //Tempo inicial do paraquedas B
+int InterB = 2000;                   //Intervalo de tempo do paraquedas B em segundos
 bool Aceso = false;                   // A variável booleana para verificar se o LED ta ligado
 bool Fim = true;                      // A variável booleana para parar a verificação do paraquedas
 float dfaltura = 2;                   // Define o delta de altura que serve de critério para a determinação do apogeu
@@ -117,7 +118,7 @@ void loop() {
     Hmax = H1;
   }
   Delta = Hmax - H1;
-  if (ledState == HIGH) {
+  if (ledState1 == HIGH) {
     Aceso = true;                                                                               // Para garantir que após o acionamento do paraquedas, ele irá executar o próximo if
   }
   dataString += String(Hmax);
@@ -139,11 +140,8 @@ void loop() {
     if (Delta >= dfaltura || Apogeu == true) {                                                    // Se a diferença for maior ou igual ao delta de ref. ou A detecção de apogeu tenha acontecido
       Apogeu = true;                                                                              // Encontrou o apogeu
       unsigned long currentMillis = millis();                                                     // Regsitra em que instante do tempo está
-      if (Tia = false && Tib = false && currentMillis - previousMillis >= Intervalo) {            // Contabiliza o tempo de espera até acionar o(s) paraqueda(s)
-        previousMillis = currentMillis;
-        Tia = true;                                                                               // Inicia a contagem de tempo do paraquedas A
-        Tib = true;                                                                               // Inicia a contagem de tempo do paraquedas B
-      }
+      Tia = true;                                                                                 // Inicia a contagem de tempo do paraquedas A
+      Tib = true;                                                                                 // Inicia a contagem de tempo do paraquedas B
       if (Tia == true ) {
         if (ledState1 == LOW) {
           ledState1 = HIGH;
