@@ -74,8 +74,9 @@ void loop() {
   //Serial.print("\t");
   dataString += String(media_movel);
   //Serial.print(alt_atual);
-  //Serial.print("\t");
+  Serial.print("\t");
   dataString += String(alt_atual);
+  Serial.print("\t");
 
   for (int j = 9; j > 0; j--) {
     altitude2[j] = altitude2 [j - 1];
@@ -86,10 +87,11 @@ void loop() {
     soma_mm2 += altitude2[j];
   }
   media_movel2 = soma_mm2 / 10;
-  Serial.print(media_movel2);
-  Serial.print("\t");
-  //Serial.print(altitude2);
+  //Serial.print(media_movel2);
   //Serial.print("\t");
+  dataString += String(media_movel2);
+  //Serial.print(altitude2);
+  Serial.print("\t");
 
   for (int k = 49; k > 0; k--) {
     medicao[k] = medicao[k - 1];
@@ -101,13 +103,16 @@ void loop() {
       queda += 1;
     }
   }
-  Serial.print(queda/float (50));
+  //Serial.print(queda/float (50));
+  dataString += String(queda/float(50));
   Serial.print("\t");
   if (queda >= 45) {
-    Serial.print("1");
+    //Serial.print("1");
+    dataString += String("1");
   }
   else{
-    Serial.print("0");
+    //Serial.print("0");
+    dataString += String("0");
   }
 Serial.println("\t");  
 
