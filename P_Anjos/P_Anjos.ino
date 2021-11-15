@@ -1,3 +1,4 @@
+// Código para detecção do apogeu de um foguete que utiliza sensor de pressão. Inclui gravação de dados no cartão SD e acionamento de paraquedas
 #include <Adafruit_BMP085.h>
 #include <SPI.h>
 #include <SD.h>
@@ -6,10 +7,16 @@
 #define IGN_2 61  /*act2*/
 #define IGN_3 46  /*act3*/
 #define IGN_4 55  /*act4*/
-// Código para detecção do apogeu de um foguete que utiliza sensor de pressão. Inclui gravação de dados no cartão SD e acionamento de paraquedas
+#define Intervalo 3000                //Intervalo de tempo do Timer antes do acionamento do paraquedas
+#define Apogeu false
+#define Tia false                     //Tempo inicial do paraquedas A
+#define InterA 1000                   //Intervalo de tempo do paraquedas A em segundos
+#define Tib false                     //Tempo inicial do paraquedas B
+#define InterB 2000                   //Intervalo de tempo do paraquedas B em segundos
 
-const int chipSelect = 53;   //Define o pino para o chipselect para gravar no cartão SD
-float H1 = 0;               // Variável global - Não é ressetada a cada loop. Armazena o dado.
+
+const int chipSelect = 53;            //Define o pino para o chipselect para gravar no cartão SD
+float H1 = 0;                         // Variável global - Não é ressetada a cada loop. Armazena o dado.
 float H2 = 0;
 float Hmax = 0;
 float Soma = 0;
@@ -18,10 +25,10 @@ float AltitudeRef = 0;
 float MediaMov = 0;
 float MediaMA = 0;
 float MediaMB = 0;
-float Delta;                //Diferença da altitude anterior com a nova que foi medida
-float Vetor[3][10];         //Vetor para guardar os últimos 10 valores para a média móvel
-float FiltroA[10];          //Segunda filtragem para a média móvel
-float FiltroB[10];          // terceira filtragem para a média móvel
+float Delta;                          //Diferença da altitude anterior com a nova que foi medida
+float Vetor[3][10];                   //Vetor para guardar os últimos 10 valores para a média móvel
+float FiltroA[10];                    //Segunda filtragem para a média móvel
+float FiltroB[10];                    // terceira filtragem para a média móvel
 float SomaFA = 0;
 float SomaFB = 0;
 float Aux = 0;
@@ -32,15 +39,14 @@ String parteB;
 int a;
 int b;
 int c;
-int ledState = LOW;               // Estado inicial do LED que indica acionamento do paraquedas
-int ledState2 = LOW;              // Outra LED para verificar o timer antes de acionar o paraquedas
-float Timer=0;                    // Guarda o tempo do timer
-unsigned long previousMillis = 0; // Guarda o valor de tempo
-unsigned long previousMillis2 = 0; // Guarda o valor de tempo para outro timer
-const long interval = 2000;       // O intervalo de tempo que o LED deve ficar ligado em milesegundos
-bool Aceso = false;               // A variável booleana para verificar se o LED ta ligado
-bool Fim = true;                  // A variável booleana para parar a verificação do paraquedas
-float dfaltura = 2;               // Define o delta de altura que serve de critério para a determinação do apogeu
+int ledState = LOW;                   // Estado inicial do LED que indica acionamento do paraquedas
+int ledState2 = LOW;                  // Outra LED para verificar o timer antes de acionar o paraquedas
+float Timer = 0;                      // Guarda o tempo do timer
+unsigned long previousMillis = 0;     // Guarda o valor de tempo
+const long interval = 2000;           // O intervalo de tempo que o LED deve ficar ligado em milesegundos
+bool Aceso = false;                   // A variável booleana para verificar se o LED ta ligado
+bool Fim = true;                      // A variável booleana para parar a verificação do paraquedas
+float dfaltura = 2;                   // Define o delta de altura que serve de critério para a determinação do apogeu
 Adafruit_BMP085 bmp;
 
 void setup() {
@@ -48,7 +54,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
   while (!Serial) {
-    ; // wait for serial port to connect. Needed for native USB port only
+    ;                                 // wait for serial port to connect. Needed for native USB port only
   }
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
@@ -65,7 +71,7 @@ void setup() {
     a = nome.length();
     parteB = String(cont);
     b = parteB.length();
-    c = 8 - (a + b); // Guarda a quantidade de zeros necessária para se colocar entre "PA" e o nº da versão.
+    c = 8 - (a + b);                                                                            // Guarda a quantidade de zeros necessária para se colocar entre "PA" e o nº da versão.
     for (int i = 0; i < c; i++) {
       nome += "0";
     }
@@ -82,7 +88,7 @@ void setup() {
   dataFile.println("Apogeu(Hmax)\tAltura filtrada final(H1)\tDelta\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)\tSituacao"); //Cabecalho no SD
   dataFile.close();
 
-  for (int i = 0; i < 100; i++) {             //Este for serve para definir a altitude da base de lancamento como valor de referencia.
+  for (int i = 0; i < 100; i++) {                                                               //Este for serve para definir a altitude da base de lancamento como valor de referencia.
     Soma = Soma + bmp.readAltitude();
   }
   AltitudeRef = Soma / 100;
@@ -90,29 +96,29 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-  String dataString = "";                   // Serve para criar a string que vai guardar os dados para que eles sejam gravados no SD
+  String dataString = "";                                                                       // Serve para criar a string que vai guardar os dados para que eles sejam gravados no SD
   SomaMov = 0;
   MediaMov = bmp.readAltitude() - AltitudeRef;
   for (int j = 0; j < 3; j++) {
-    for (int i = 8; i >= 0; i--) {        // Laco apenas para a movimentação
+    for (int i = 8; i >= 0; i--) {                                                              // Laco apenas para a movimentação
       Vetor[j][i + 1] = Vetor[j][i];
     }
     Vetor[j][0] = MediaMov;
     SomaMov = 0;
-    for (int i = 0; i < 10; i++) {        // Laco para a somatoria dos valores
+    for (int i = 0; i < 10; i++) {                                                              // Laco para a somatoria dos valores
       SomaMov = SomaMov + Vetor[j][i];
     }
     MediaMov = SomaMov / 10;
   }
-  H2 = H1;                                    // Guardei a altitude de referencia (medicao anterior)
-  H1 = MediaMov;                               // Nova leitura de altitude
+  H2 = H1;                                                                                      // Guardei a altitude de referencia (medicao anterior)
+  H1 = MediaMov;                                                                                // Nova leitura de altitude
 
   if (Hmax < H1) {
     Hmax = H1;
   }
   Delta = Hmax - H1;
   if (ledState == HIGH) {
-    Aceso = true;                             // Para garantir que após o acionamento do paraquedas, ele irá executar o próximo if
+    Aceso = true;                                                                               // Para garantir que após o acionamento do paraquedas, ele irá executar o próximo if
   }
   dataString += String(Hmax);
   dataString += "\t";
@@ -128,48 +134,76 @@ void loop() {
   dataString += "\t";
   dataString += String(bmp.readSealevelPressure());
   dataString += "\t";
-  if (Delta > 0) {
-    if (Delta >= dfaltura) {
-      unsigned long currentMillis = millis(); //conta em que instante do tempo está
-      if (currentMillis - previousMillis2 >= interval) {
-          ledState2 = HIGH;
-          dataString += String("Ligando o LED");
-        digitalWrite(IGN_1, ledState2);
-        Timer=interval;
-      }}
-      if (((Delta >= dfaltura || Aceso == true)&& Timer>0) && Fim == true) { // Só excute esse if depois do Timer de 2s
-        unsigned long currentMillis = millis();   //conta em que instante do tempo está
-        if (currentMillis - previousMillis >= interval) {
-          previousMillis = currentMillis;
-          if (ledState == LOW) {
-            ledState = HIGH;
-            dataString += String("Descendo - Paraquedas On");
-          } else {
-            ledState = LOW;
-            dataString += String("Descendo - Paraquedas Off");
-            Fim = false;                // Finaliza a verificação do acionamento do paraquedas
-          }
-          digitalWrite(LED_BUILTIN, ledState);   // A partir do momento que a diferença de altitude for acima de 2, provavelmente o foguete está descendo. Acione o paraquedas
+
+  if (Delta > 0 || Apogeu == true) {                                                              // Se a diferença da média móvel com o Hmáx ta aumentando, significa que pode estar descendo
+    if (Delta >= dfaltura || Apogeu == true) {                                                    // Se a diferença for maior ou igual ao delta de ref. ou A detecção de apogeu tenha acontecido
+      Apogeu = true;                                                                              // Encontrou o apogeu
+      unsigned long currentMillis = millis();                                                     // Regsitra em que instante do tempo está
+      if (Tia = false && Tib = false && currentMillis - previousMillis >= Intervalo) {            // Contabiliza o tempo de espera até acionar o(s) paraqueda(s)
+        previousMillis = currentMillis;
+        Tia = true;                                                                               // Inicia a contagem de tempo do paraquedas A
+        Tib = true;                                                                               // Inicia a contagem de tempo do paraquedas B
+      }
+      if (Tia == true ) {
+        if (ledState1 == LOW) {
+          ledState1 = HIGH;
+          dataString += String("Paraquedas A - On");
+          digitalWrite(IGN_1, ledState1);
+        }
+        if (currentMillis - previousMillis >= InterA) {
+          ledState1 = LOW;
+          dataString += String("Paraquedas A - Off");
+          digitalWrite(IGN_1, ledState1);
+          Tia = false;
         }
       }
-      dataString += String("Descendo");
-    } else {
-      dataString += String("Subindo");
+      if (Tib == true ) {
+        if (currentMillis - previousMillis >= InterB) {
+          if (ledState2 == LOW) {
+            ledState2 = HIGH;
+            dataString += String("Paraquedas B - On");
+            digitalWrite(IGN_2, ledState2);
+          } else {
+            ledState2 = LOW;
+            dataString += String("Paraquedas B - Off");
+            digitalWrite(IGN_2, ledState2);
+          }
+        }
+      }
     }
-
-    File dataFile = SD.open(nome, FILE_WRITE);
-
-    // if the file is available, write to it:
-    if (dataFile) {
-      dataFile.println(dataString);
-      dataFile.close();
-      // print to the serial port too:
-      Serial.println(dataString);
-    }
-    // if the file isn't open, pop up an error:
-    else {
-      Serial.println("error opening P_ANJOS.txt");
-    }
+    // ========================================================= PARTE DO CODIGO QUE ESTAVA FUNCIONANDO ========================================================================
+    //    if (((Delta >= dfaltura || Aceso == true) && Timer > 0) && Fim == true) { // Só excute esse if depois do Timer de 2s
+    //      unsigned long currentMillis = millis();   //conta em que instante do tempo está
+    //      if (currentMillis - previousMillis >= interval) {
+    //        previousMillis = currentMillis;
+    //        if (ledState == LOW) {
+    //          ledState = HIGH;
+    //          dataString += String("Descendo - Paraquedas On");
+    //        } else {
+    //          ledState = LOW;
+    //          dataString += String("Descendo - Paraquedas Off");
+    //          Fim = false;                // Finaliza a verificação do acionamento do paraquedas
+    //        }
+    //        digitalWrite(LED_BUILTIN, ledState);   // A partir do momento que a diferença de altitude for acima de 2, provavelmente o foguete está descendo. Acione o paraquedas
+    //      }
+    //    }
+    // ==========================================================================================================================================================================
+    dataString += String("Descendo");
+  } else {
+    dataString += String("Subindo");
   }
 
-  // Colocar um timer antes de contar o tempo para acionar o paraquedas. Lembre-se de deixar o define em tudo que você for utilizar
+  File dataFile = SD.open(nome, FILE_WRITE);
+
+  // if the file is available, write to it:
+  if (dataFile) {
+    dataFile.println(dataString);
+    dataFile.close();
+    // print to the serial port too:
+    Serial.println(dataString);
+  }
+  // if the file isn't open, pop up an error:
+  else {
+    Serial.println("error opening P_ANJOS.txt");
+  }
+}
