@@ -57,7 +57,7 @@ void setup() {
 
 void loop() {
   String dataString = "";
-  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  File dataFile = SD.open("rkflight.txt", FILE_WRITE);
   digitalWrite(LED_BUILTIN, HIGH);
   alt_atual = bmp.readAltitude() - media;
   for (int i = 9; i > 0; i--) {
@@ -73,9 +73,11 @@ void loop() {
   //Serial.print(media_movel);
   //Serial.print("\t");
   dataString += String(media_movel);
+  dataString += String("\t");
   //Serial.print(alt_atual);
   Serial.print("\t");
   dataString += String(alt_atual);
+  dataString += String("\t");
   Serial.print("\t");
 
   for (int j = 9; j > 0; j--) {
@@ -90,6 +92,7 @@ void loop() {
   //Serial.print(media_movel2);
   //Serial.print("\t");
   dataString += String(media_movel2);
+  dataString += String("\t");
   //Serial.print(altitude2);
   Serial.print("\t");
 
@@ -105,14 +108,17 @@ void loop() {
   }
   //Serial.print(queda/float (50));
   dataString += String(queda/float(50));
+  dataString += String("\t");
   Serial.print("\t");
   if (queda >= 45) {
     //Serial.print("1");
     dataString += String("1");
+    dataString += String("\t");
   }
   else{
     //Serial.print("0");
     dataString += String("0");
+    dataString += String("\t");
   }
 Serial.println("\t");  
 
