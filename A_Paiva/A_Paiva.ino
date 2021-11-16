@@ -199,6 +199,7 @@ void loop() {
   dado += String(P);
   dado += "\t";
   dado += String(Hmax);
+  dado += "\t";
   
   SomaMov = 0;                                         //Zera o SomaMov1 em todo loop
   for (int j = 0; j < qf; j++) {
@@ -303,7 +304,8 @@ void loop() {
   //Serial.print(led);
   File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
-    dataFile.print(dado);
+    dataFile.println(dado);
+    dataFile.close();
   }
   Serial.print(dado);
   Serial.println();
