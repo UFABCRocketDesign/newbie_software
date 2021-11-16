@@ -15,6 +15,10 @@ Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
 Adafruit_BMP085 bmp;
 L3G gyro;
 
+#define use_gyro 1
+#define use_mag 1
+#define use_accel 1
+
 #define l 20 // tamanho
 #define IGN_1 36  /*act1*/
 #define IGN_2 61  /*act2*/
@@ -40,15 +44,21 @@ int encontra_apogeu=0;
 int apogeu_detectado = false;
 int laco_led_2 = false;      // variavel para entrar no laço liga led 2 
 int laco_led_3 = false;      // variavel para entrar no laço liga led 3 (built in)
+#if use_mag    // se for usar o magnetometro
 String mag_X;
 String mag_Y;
 String mag_Z;
+#endif
+#if use_accel   // se for usar o acelerometro
 String accel_X;
 String accel_Y;
 String accel_Z;
+#endif
+#if use_gyro   // se for usar o giroscopio
 String gyro_X;
 String gyro_Y;
 String gyro_Z;
+#endif
 
 int ledState1 = LOW;    // ledState used to set the LED
 int ledState2 = LOW; 
@@ -73,24 +83,33 @@ void setup() {
   if (!bmp.begin()) {
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   }
+
+  #if use_mag
     /* Initialise the mag sensor */
   if(!mag.begin())
   {
     /* There was a problem detecting the HMC5883 ... check your connections */
     Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
   }
+  #endif  //mag
+
+  #if use_accel
   /* Initialise the sensor */
   if(!accel.begin())
   {
     /* There was a problem detecting the ADXL345 ... check your connections */
     Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
   }
+  #endif   //accel
+
+  #if use_gyro
   /* gyro */
   if (!gyro.init())
   {
     Serial.println("Failed to autodetect gyro type!");
   }
   gyro.enableDefault();
+  #endif   // gyro
 
   Serial.print("Initializing SD card...");
   // see if the card is present and can be initialized:
@@ -99,6 +118,7 @@ void setup() {
   }
   Serial.println("card initialized."); 
 
+  #if use_accel
   // ACCELEROMETER RANGE
 
   /* Set the range to whatever is appropriate for your project */
@@ -106,6 +126,7 @@ void setup() {
   // accel.setRange(ADXL345_RANGE_8_G);
   // accel.setRange(ADXL345_RANGE_4_G);
   // accel.setRange(ADXL345_RANGE_2_G);
+  #endif
 
   // MÉDIA DE ALTITUDE
   
@@ -118,9 +139,15 @@ void setup() {
   cabecalho += "\tAltitude [m]\tAltura [m]\tFiltro1 (h)\tFiltro2 (h)";
   cabecalho += "\tTemperatura [*C]";
   cabecalho += "\tPressao [Pa]\t";   //Pressao no nivel do mar [Pa]";
+  #if use_mag
   cabecalho += "\tMag eixo X [uT]\tMag eixo Y [uT]\tMag eixo Z [uT]";
+  #endif
+  #if use_accel
   cabecalho += "\tAccel eixo X [m/s^2]\tAccel eixo Y [m/s^2]\tAccel eixo Z [m/s^2]";
+  #endif
+  #if use_gyro
   cabecalho += "\tGyro eixo X\tGyro eixo Y\tGyro eixo Z";
+  #endif
   cabecalho += "\tApogeu";
 
   // CRIANDO UM NOVO ARQUIVO PARA SALVAR NO SD
@@ -172,7 +199,8 @@ void loop() {
   float pressao = bmp.readPressure(); 
      //pressão no nível do mar
      //float pressaoNivelMar = bmp.readSealevelPressure(); 
-  
+
+  #if use_mag
   // Magnetometro
   /* Get a new sensor event */ 
   sensors_event_t event; 
@@ -180,7 +208,9 @@ void loop() {
   mag_X = event.magnetic.x;
   mag_Y = event.magnetic.y;
   mag_Z = event.magnetic.z;
-
+  #endif
+  
+  #if use_accel
   // Acelerometro
   /* Get a new sensor event */ 
   //sensors_event_t event; 
@@ -188,12 +218,15 @@ void loop() {
   accel_X = event.acceleration.x;
   accel_Y = event.acceleration.y;
   accel_Z = event.acceleration.z;
+  #endif
 
+  #if use_gyro
   // Giroscopio
   gyro.read();
   gyro_X = (int)gyro.g.x;
   gyro_Y = (int)gyro.g.y;
   gyro_Z = (int)gyro.g.z;
+  #endif
   
   //// FILTROS DE ALTURA
   
@@ -234,24 +267,30 @@ void loop() {
   dataString += String(pressao);
      //dataString += "\t";
      //dataString += String(pressaoNivelMar);
+  #if use_mag
   dataString += "\t";  
   dataString += String(mag_X);
   dataString += "\t";
   dataString += String(mag_Y);
   dataString += "\t";
   dataString += String(mag_Z);
+  #endif
+  #if use_accel
   dataString += "\t";  
   dataString += String(accel_X);
   dataString += "\t";  
   dataString += String(accel_Y);
   dataString += "\t";  
   dataString += String(accel_Z);
+  #endif
+  #if use_gyro
   dataString += "\t";  
   dataString += String(gyro_X);
   dataString += "\t";  
   dataString += String(gyro_Y);
   dataString += "\t";  
   dataString += String(gyro_Z);
+  #endif
 
   // Encontrando o apogeu 
 
