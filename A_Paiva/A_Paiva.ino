@@ -14,13 +14,19 @@
 #define espera 0000               //Tempo de espera para acionamento do paraquedas 2 (ms)
 #define duracao 5000              //Tempo de duracao do acionamento dos paraquedas (ms)
 #define altura 10                 //Altura para abertura do terceiro paraquedas
+#define usa_bar 0                 //Variavel de escolha do uso de funções
+#define usa_giro 0                //Variavel de escolha do uso de funções
+#define usa_acel 0                //Variavel de escolha do uso de funções
+#define usa_mag 0                 //Variavel de escolha do uso de funções
+#define usa_SD 0                  //Variavel de escolha do uso de funções
 //////////////////////////////////////////////////////////////////////
-#define IGN_1 36  /*act1*/
-#define IGN_2 61  /*act2*/
-#define IGN_3 46  /*act3*/
-#define IGN_4 55  /*act4*/
+#define IGN_1 36  //act1 LED DA PLAQUINHA
+#define IGN_2 61  //act2 LED DA PLAQUINHA
+#define IGN_3 46  //act3 LED DA PLAQUINHA
+#define IGN_4 55  //act4 LED DA PLAQUINHA
 
 String dado = "";
+String cabecalho = "Tempo\t";
 
 float Hmax = 0;                   //Valor máximo filtrado
 float SomaRef = 0;                //Soma valores iniciais(foguete parado na base)
@@ -30,7 +36,6 @@ float MediaMov = 0;               //É o valor da média dos valores do vetor do
 float Delta;                      //Diferença entre valor máximo do filtro1 (Hmax1) e valor atual referênciado (H11)
 float MatrizFiltros[qf][tam];     //Vetor para guardar os valores para as médias utilizadas pelos filtros
 
-//int led = 0;                      //Variável para funcionamento do LED
 int apogeu = 0;
 int auxled1 = 0;
 int auxled2 = 0;
@@ -39,7 +44,7 @@ unsigned long inicio1 = 0;        // will store last time LED was updated
 unsigned long inicio2 = 0;        // will store last time LED was updated
 unsigned long inicio3 = 0;        // will store last time LED was updated
 unsigned long inicio4 = 0;        // will store last time LED was updated
-unsigned long tempoAtual = 0;        // will store last time LED was updated
+unsigned long tempoAtual = 0;     // will store last time LED was updated
 
 float T;                          //Valor da Temperatura
 float P;                          //Valor da Pressão
@@ -84,22 +89,39 @@ void setup() {
   //digitalWrite(IGN_4, LOW);
   Serial.begin(115200);
   Wire.begin();
+  #if usa_giro
   if (!giro.init()) {
     Serial.println("FALHA AO ENCONTRAR GIROSCÓPIO!");
   }
   giro.enableDefault();
+  cabecalho += "Gx\tGy\tGz\t";
+  #endif
+  #if usa_mag
   if(!mag.begin())
   {
     Serial.println("FALHA AO ENCONTRAR MAGNETÔMETRO!");
   }
+  cabecalho += "Mx(uT)\tMy(uT)\tMz(uT)\t";
+  #endif
+  #if usa_acel
   if(!accel.begin())
   {
     Serial.println("FALHA AO ENCONTRAR ACELERÔMETRO");
   }
   accel.setRange(ADXL345_RANGE_16_G);
+  cabecalho += "Ax(m/s^2)\tAy(m/s^2)\tAz(m/s^2)\t";
+  #endif
+  #if usa_bar
   if (!bmp.begin()) {
-    Serial.println("FALHA AO ENCONTRAR O SENSOR BMP085!");
+    Serial.println("FALHA AO ENCONTRAR BARÔMETRO");
   }
+  cabecalho += "Temperatura(°C)\tPressao(Pa)\tAltura máxima(m)";
+  for (int i = 0; i < 100; i++) {                       //Este 'for' serve para definir a altitude da base de lançamento como valor de referência.
+    SomaRef = SomaRef + bmp.readAltitude();
+  }
+  AltitudeRef = SomaRef / 100;
+  #endif
+  #if usa_SD
   Serial.println("Inicializando cartão SD...");
   if (!SD.begin(chipSelect)) {
     Serial.println("FALHA NO CARTÃO SD");
@@ -130,77 +152,81 @@ void setup() {
   }
   File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
-    dataFile.println("Tempo\tGx\tGy\tGz\tMx(uT)\tMy(uT)\tMz(uT)\tAx(m/s^2)\tAy(m/s^2)\tAz(m/s^2)\tTemperatura(°C)\tPressao(Pa)\tAltura máxima(m)");
+    #if usa_bar
     for (int i = 0; i < qf; i++) {
-      dataFile.print("Altura do filtro ");
-      dataFile.print(i);
-      dataFile.print("(m)\t");
+      cabecalho += "Altura do filtro ";
+      cabecalho += i;
+      cabecalho += "(m)\t";
     }
-    dataFile.println("Statu de voo");
+    cabecalho += "Statu de voo";
+    #endif
+    dataFile.println(cabecalho);
     dataFile.close();
   }
-  Serial.println("Dados dealtitude de voo");
-  Serial.print("Tempo\tGx\tGy\tGz\tMx(uT)\tMy(uT)\tMz(uT)\tAx(m/s^2)\tAy(m/s^2)\tAz(m/s^2)\tTemperatura(°C)\tPressao(Pa)\tAltura máxima(m)");
+  #endif
+  Serial.println("Dados de altitude de voo");
   for (int i = 0; i < qf; i++) {
-    Serial.print("Altura do filtro ");
-    Serial.print(i);
-    Serial.print("(m)\t");
-  }
-  Serial.println("Statu de voo");
-  for (int i = 0; i < 100; i++) {                       //Este 'for' serve para definir a altitude da base de lançamento como valor de referência.
-    SomaRef = SomaRef + bmp.readAltitude();
-  }
-  AltitudeRef = SomaRef / 100;
+      cabecalho += "Altura do filtro ";
+      cabecalho += i;
+      cabecalho += "(m)\t";
+    }
+  cabecalho += "Statu de voo";
+  Serial.println(cabecalho);
 }
 void loop() {
   tempoAtual = millis();
-  T = bmp.readTemperature();
-  P = bmp.readPressure();
+  dado = "";
+  dado += String(tempoAtual/1000.0);
+  dado += "\t";
+  #if usa_giro
   giro.read();
   Gx = (int)giro.g.x;
   Gy = (int)giro.g.y;
-  Gz = (int)giro.g.z; 
-  sensors_event_t eventM; 
-  mag.getEvent(&eventM);
-  Mx = eventM.magnetic.x;
-  My = eventM.magnetic.y;
-  Mz = eventM.magnetic.z;
-  sensors_event_t eventA; 
-  accel.getEvent(&eventA);
-  Ax = eventA.acceleration.x;
-  Ay = eventA.acceleration.y;
-  Az = eventA.acceleration.z;
-  //Pm = bmp.readSealevelPressure();
-  
-  dado = "";
-  
-  dado += String(tempoAtual/1000.0);
-  dado += "\t";
+  Gz = (int)giro.g.z;
   dado += String(Gx);
   dado += "\t";
   dado += String(Gy);
   dado += "\t";
   dado += String(Gz);
   dado += "\t";
+  #endif
+  #if usa_mag
+  sensors_event_t eventM; 
+  mag.getEvent(&eventM);
+  Mx = eventM.magnetic.x;
+  My = eventM.magnetic.y;
+  Mz = eventM.magnetic.z;
   dado += String(Mx);
   dado += "\t";
   dado += String(My);
   dado += "\t";
   dado += String(Mz);
   dado += "\t";
+  #endif
+  #if usa_acel
+  sensors_event_t eventA; 
+  accel.getEvent(&eventA);
+  Ax = eventA.acceleration.x;
+  Ay = eventA.acceleration.y;
+  Az = eventA.acceleration.z;
   dado += String(Ax);
   dado += "\t";
   dado += String(Ay);
   dado += "\t";
   dado += String(Az);
   dado += "\t";
+  #endif
+  #if usa_bar
+  T = bmp.readTemperature();
+  P = bmp.readPressure();
+  //Pm = bmp.readSealevelPressure();
   dado += String(T);
   dado += "\t";
   dado += String(P);
   dado += "\t";
   dado += String(Hmax);
   dado += "\t";
-  
+
   SomaMov = 0;                                         //Zera o SomaMov1 em todo loop
   for (int j = 0; j < qf; j++) {
     for (int i = tam - 2; i >= 0; i--) {                 //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1
@@ -208,12 +234,6 @@ void loop() {
     }
     if (j == 0) {
       MatrizFiltros[0][0] = bmp.readAltitude() - AltitudeRef; //Esse é o valor mais atualizado do filtro1
-      /*Serial.print(MatrizFiltros[0][0]);
-      Serial.print("\t");
-      if (dataFile) {
-        dataFile.print(MatrizFiltros[0][0]);
-        dataFile.print("\t");
-      }*/
     }
     else {
       MatrizFiltros[j][0] = MediaMov;
@@ -225,12 +245,6 @@ void loop() {
     MediaMov = SomaMov / tam;
     dado += String(MediaMov);
     dado += "\t";
-//    Serial.print(MediaMov);
-//    Serial.print("\t");
-//    if (dataFile) {
-//      dataFile.print(MediaMov);
-//      dataFile.print("\t");
-//    }
   }
   if (Hmax < MediaMov) {                                    //Pega o valor máximo da média/filtro2
     Hmax = MediaMov;
@@ -245,32 +259,19 @@ void loop() {
   else if (apogeu == 0) {
     dado += "Subindo";
     dado += "\t";
-//    if (dataFile) {
-//      dataFile.println("Subindo");
-//      dataFile.close();
-//    }
-//    Serial.print("Subindo");
-//    Serial.print("\t");
   }
   if (apogeu == 1) {
     dado += "Descendo";
     dado += "\t";
-//    if (dataFile) {
-//      dataFile.println("Descendo");
-//      dataFile.close();
-//    }
-//    Serial.print("Descendo");
     if (auxled1 == 0) {
       digitalWrite(IGN_1, HIGH);
       auxled1 = 1;
       dado += "11";
-      //Serial.print("11");
     }
     if (tempoAtual >= inicio1 && auxled1 == 1) {
       digitalWrite(IGN_1, LOW);
       auxled1 = 2;
       dado += "01";
-      //Serial.print("01");
     }
     if (tempoAtual >= inicio2 && auxled2 == 0) {
       digitalWrite(IGN_2, HIGH);
@@ -283,30 +284,29 @@ void loop() {
       digitalWrite(IGN_2, LOW);
       auxled2 = 2;
       dado += "02";
-      //Serial.print("02");
     }
     if (MediaMov <= altura && auxled3 == 0) {
       digitalWrite(LED_BUILTIN, HIGH);
       auxled3 = 1;
       inicio4 = tempoAtual + duracao;
       dado += "13";
-      //Serial.print("13");
     }
     if (tempoAtual >= inicio4 && auxled3 == 1) {
       digitalWrite(LED_BUILTIN, LOW);
       auxled3 = 2;
       dado += "03";
-      //Serial.print("03");
     }
     dado += "\t";
-    //Serial.print("\t");
   }
-  //Serial.print(led);
+  #endif  
+  
+  #if usa_SD
   File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
     dataFile.println(dado);
     dataFile.close();
   }
+  #endif
   Serial.print(dado);
   Serial.println();
 }
