@@ -15,9 +15,9 @@ Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
 Adafruit_BMP085 bmp;
 L3G gyro;
 
-#define use_gyro 1
-#define use_mag 1
-#define use_accel 1
+#define use_gyro 0
+#define use_mag 0
+#define use_accel 0
 
 #define l 20 // tamanho
 #define IGN_1 36  /*act1*/
@@ -45,19 +45,19 @@ int apogeu_detectado = false;
 int laco_led_2 = false;      // variavel para entrar no laço liga led 2 
 int laco_led_3 = false;      // variavel para entrar no laço liga led 3 (built in)
 #if use_mag    // se for usar o magnetometro
-String mag_X;
-String mag_Y;
-String mag_Z;
+float mag_X;
+float mag_Y;
+float mag_Z;
 #endif
 #if use_accel   // se for usar o acelerometro
-String accel_X;
-String accel_Y;
-String accel_Z;
+float accel_X;
+float accel_Y;
+float accel_Z;
 #endif
 #if use_gyro   // se for usar o giroscopio
-String gyro_X;
-String gyro_Y;
-String gyro_Z;
+float gyro_X;
+float gyro_Y;
+float gyro_Z;
 #endif
 
 int ledState1 = LOW;    // ledState used to set the LED
