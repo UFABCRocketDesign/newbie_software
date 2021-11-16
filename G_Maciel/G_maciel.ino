@@ -317,10 +317,6 @@ void loop() {
     dataFile.println(dataString);
     dataFile.close();
   }
-  // if the file isn't open, pop up an error:
-  else {
-    Serial.println("error opening datalog.txt");
-  }
 
   // Reiniciando variáveis de velha altitude e filtros de altura
   velhaAlt = media_mov2;
