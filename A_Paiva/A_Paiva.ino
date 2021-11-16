@@ -17,7 +17,7 @@
 #define usa_bar 0                 //Variavel de escolha do uso de funções
 #define usa_giro 0                //Variavel de escolha do uso de funções
 #define usa_acel 0                //Variavel de escolha do uso de funções
-#define usa_mag 0                 //Variavel de escolha do uso de funções
+#define usa_mag 1                 //Variavel de escolha do uso de funções
 #define usa_SD 0                  //Variavel de escolha do uso de funções
 //////////////////////////////////////////////////////////////////////
 #define IGN_1 36  //act1 LED DA PLAQUINHA
@@ -27,7 +27,8 @@
 
 String dado = "";
 String cabecalho = "Tempo\t";
-
+unsigned long tempoAtual = 0;     // will store last time LED was updated
+#if usa_bar
 float Hmax = 0;                   //Valor máximo filtrado
 float SomaRef = 0;                //Soma valores iniciais(foguete parado na base)
 float AltitudeRef = 0;            //É o valor da média dos valores iniciais(foguete parado na base)
@@ -35,7 +36,6 @@ float SomaMov = 0;                //Soma dos valores do vetor do filtro1
 float MediaMov = 0;               //É o valor da média dos valores do vetor do filtro1
 float Delta;                      //Diferença entre valor máximo do filtro1 (Hmax1) e valor atual referênciado (H11)
 float MatrizFiltros[qf][tam];     //Vetor para guardar os valores para as médias utilizadas pelos filtros
-
 int apogeu = 0;
 int auxled1 = 0;
 int auxled2 = 0;
@@ -44,21 +44,30 @@ unsigned long inicio1 = 0;        // will store last time LED was updated
 unsigned long inicio2 = 0;        // will store last time LED was updated
 unsigned long inicio3 = 0;        // will store last time LED was updated
 unsigned long inicio4 = 0;        // will store last time LED was updated
-unsigned long tempoAtual = 0;     // will store last time LED was updated
-
 float T;                          //Valor da Temperatura
 float P;                          //Valor da Pressão
 float Pm;                         //Valor da Pressão ao nivel do Mar
+Adafruit_BMP085 bmp;              //Cria variável 'bmp' para a biblioteca Adafruit_BMP085
+#endif
+#if usa_giro
 int Gx;                           //Giroscópio em x
 int Gy;                           //Giroscópio em y
 int Gz;                           //Giroscópio em z
+L3G giro;
+#endif
+#if usa_mag
 float Mx;                         //Magnetometro em x
 float My;                         //Magnetometro em y
 float Mz;                         //Magnetometro em z
+Adafruit_HMC5883_Unified mag;// = Adafruit_HMC5883_Unified(12345);
+#endif
+#if usa_acel
 float Ax;                         //Acelerometro em x
 float Ay;                         //Acelerometro em y
 float Az;                         //Acelerometro em z
-
+Adafruit_ADXL345_Unified accel;// = Adafruit_ADXL345_Unified(12345);
+#endif
+#if usa_SD
 int aux = 1;                      //Variavel auxiliar do while para criação de nome de arquivo do SD
 int tamNomeArq = 0;               //Valor da quantidade de caracteres da variavel NomeArq
 int Num = 0;                      //Valor da variavel que se somará e irá compor o nome do arquivo do SD
@@ -69,13 +78,8 @@ String z;                         //Terceira componente do nome do arquivo ou Nu
 String NomeFinal;                 //Nome final do arquivo do SD
 int sub1 = 0;                     //Variavel auxiliar para contagem de caracteres totais no nome do arquivo do SD;
 int sub2 = 0;                     //Variavel auxiliar para contagem de caracteres totais no nome do arquivo do SD;
-
 const int chipSelect = 53;
-
-Adafruit_BMP085 bmp;              //Cria variável 'bmp' para a biblioteca Adafruit_BMP085
-L3G giro;
-Adafruit_HMC5883_Unified mag;// = Adafruit_HMC5883_Unified(12345);
-Adafruit_ADXL345_Unified accel;// = Adafruit_ADXL345_Unified(12345);
+#endif
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
