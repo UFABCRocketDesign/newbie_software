@@ -20,9 +20,7 @@
 #define IGN_3 46  /*act3*/
 #define IGN_4 55  /*act4*/
 
-L3G giro;
-Adafruit_HMC5883_Unified mag;// = Adafruit_HMC5883_Unified(12345);
-Adafruit_ADXL345_Unified accel;// = Adafruit_ADXL345_Unified(12345);
+String dado = "";
 
 float Hmax = 0;                   //Valor máximo filtrado
 float SomaRef = 0;                //Soma valores iniciais(foguete parado na base)
@@ -70,6 +68,9 @@ int sub2 = 0;                     //Variavel auxiliar para contagem de caractere
 const int chipSelect = 53;
 
 Adafruit_BMP085 bmp;              //Cria variável 'bmp' para a biblioteca Adafruit_BMP085
+L3G giro;
+Adafruit_HMC5883_Unified mag;// = Adafruit_HMC5883_Unified(12345);
+Adafruit_ADXL345_Unified accel;// = Adafruit_ADXL345_Unified(12345);
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
@@ -153,8 +154,8 @@ void setup() {
 }
 void loop() {
   tempoAtual = millis();
-  Serial.print(tempoAtual/1000.0);
-  Serial.print("\t");
+  //Serial.print(tempoAtual/1000.0);
+  //Serial.print("\t");
   T = bmp.readTemperature();
   P = bmp.readPressure();
   giro.read();
@@ -172,59 +173,85 @@ void loop() {
   Ay = eventA.acceleration.y;
   Az = eventA.acceleration.z;
   //Pm = bmp.readSealevelPressure();
-  File dataFile = SD.open(NomeFinal, FILE_WRITE);
-  if (dataFile) {
-    dataFile.print(tempoAtual/1000.0);
-    dataFile.print("\t");
-    dataFile.print(Gx);
-    dataFile.print("\t");
-    dataFile.print(Gy);
-    dataFile.print("\t");
-    dataFile.print(Gz);
-    dataFile.print("\t");
-    dataFile.print(Mx);
-    dataFile.print("\t");
-    dataFile.print(My);
-    dataFile.print("\t");
-    dataFile.print(Mz);
-    dataFile.print("\t");
-    dataFile.print(Ax);
-    dataFile.print("\t");
-    dataFile.print(Ay);
-    dataFile.print("\t");
-    dataFile.print(Az);
-    dataFile.print("\t");
-    dataFile.print(T);
-    dataFile.print("\t");
-    dataFile.print(P);
-    dataFile.print("\t");
-    dataFile.print(Hmax);
-    dataFile.print("\t");
-  }
-  Serial.print(Gx);
-  Serial.print("\t");
-  Serial.print(Gy);
-  Serial.print("\t");
-  Serial.print(Gz);
-  Serial.print("\t");
-  Serial.print(Mx);
-  Serial.print("\t");
-  Serial.print(My);
-  Serial.print("\t");
-  Serial.print(Mz);
-  Serial.print("\t");
-  Serial.print(Ax);
-  Serial.print("\t");
-  Serial.print(Ay);
-  Serial.print("\t");
-  Serial.print(Az);
-  Serial.print("\t");
-  Serial.print(T);
-  Serial.print("\t");
-  Serial.print(P);
-  Serial.print("\t");
-  Serial.print(Hmax);
-  Serial.print("\t");
+  dado += String(tempoAtual/1000.0);
+  dado += "\t";
+  dado += String(Gx);
+  dado += "\t";
+  dado += String(Gy);
+  dado += "\t";
+  dado += String(Gz);
+  dado += "\t";
+  dado += String(Mx);
+  dado += "\t";
+  dado += String(My);
+  dado += "\t";
+  dado += String(Mz);
+  dado += "\t";
+  dado += String(Ax);
+  dado += "\t";
+  dado += String(Ay);
+  dado += "\t";
+  dado += String(Az);
+  dado += "\t";
+  dado += String(T);
+  dado += "\t";
+  dado += String(P);
+  dado += "\t";
+  dado += String(Hmax);
+  
+//  File dataFile = SD.open(NomeFinal, FILE_WRITE);
+//  if (dataFile) {
+//    dataFile.print(tempoAtual/1000.0);
+//    dataFile.print("\t");
+//    dataFile.print(Gx);
+//    dataFile.print("\t");
+//    dataFile.print(Gy);
+//    dataFile.print("\t");
+//    dataFile.print(Gz);
+//    dataFile.print("\t");
+//    dataFile.print(Mx);
+//    dataFile.print("\t");
+//    dataFile.print(My);
+//    dataFile.print("\t");
+//    dataFile.print(Mz);
+//    dataFile.print("\t");
+//    dataFile.print(Ax);
+//    dataFile.print("\t");
+//    dataFile.print(Ay);
+//    dataFile.print("\t");
+//    dataFile.print(Az);
+//    dataFile.print("\t");
+//    dataFile.print(T);
+//    dataFile.print("\t");
+//    dataFile.print(P);
+//    dataFile.print("\t");
+//    dataFile.print(Hmax);
+//    dataFile.print("\t");
+//  }
+//  Serial.print(Gx);
+//  Serial.print("\t");
+//  Serial.print(Gy);
+//  Serial.print("\t");
+//  Serial.print(Gz);
+//  Serial.print("\t");
+//  Serial.print(Mx);
+//  Serial.print("\t");
+//  Serial.print(My);
+//  Serial.print("\t");
+//  Serial.print(Mz);
+//  Serial.print("\t");
+//  Serial.print(Ax);
+//  Serial.print("\t");
+//  Serial.print(Ay);
+//  Serial.print("\t");
+//  Serial.print(Az);
+//  Serial.print("\t");
+//  Serial.print(T);
+//  Serial.print("\t");
+//  Serial.print(P);
+//  Serial.print("\t");
+//  Serial.print(Hmax);
+//  Serial.print("\t");
   SomaMov = 0;                                         //Zera o SomaMov1 em todo loop
   for (int j = 0; j < qf; j++) {
     for (int i = tam - 2; i >= 0; i--) {                 //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1
@@ -247,12 +274,14 @@ void loop() {
       SomaMov = SomaMov + MatrizFiltros[j][i];
     }
     MediaMov = SomaMov / tam;
-    Serial.print(MediaMov);
-    Serial.print("\t");
-    if (dataFile) {
-      dataFile.print(MediaMov);
-      dataFile.print("\t");
-    }
+    dado += String(MediaMov);
+    dado += "\t";
+//    Serial.print(MediaMov);
+//    Serial.print("\t");
+//    if (dataFile) {
+//      dataFile.print(MediaMov);
+//      dataFile.print("\t");
+//    }
   }
   if (Hmax < MediaMov) {                                    //Pega o valor máximo da média/filtro2
     Hmax = MediaMov;
@@ -265,53 +294,69 @@ void loop() {
     inicio2 = tempoAtual + espera;
   }
   else if (apogeu == 0) {
-    if (dataFile) {
-      dataFile.println("Subindo");
-      dataFile.close();
-    }
-    Serial.print("Subindo");
-    Serial.print("\t");
+    dado += "Subindo";
+    dado += "\t";
+//    if (dataFile) {
+//      dataFile.println("Subindo");
+//      dataFile.close();
+//    }
+//    Serial.print("Subindo");
+//    Serial.print("\t");
   }
   if (apogeu == 1) {
-    if (dataFile) {
-      dataFile.println("Descendo");
-      dataFile.close();
-    }
-    Serial.print("Descendo");
+    dado += "Descendo";
+    dado += "\t";
+//    if (dataFile) {
+//      dataFile.println("Descendo");
+//      dataFile.close();
+//    }
+//    Serial.print("Descendo");
     if (auxled1 == 0) {
       digitalWrite(IGN_1, HIGH);
       auxled1 = 1;
-      Serial.print("11");
+      dado += "11";
+      //Serial.print("11");
     }
     if (tempoAtual >= inicio1 && auxled1 == 1) {
       digitalWrite(IGN_1, LOW);
       auxled1 = 2;
-      Serial.print("01");
+      dado += "01";
+      //Serial.print("01");
     }
     if (tempoAtual >= inicio2 && auxled2 == 0) {
       digitalWrite(IGN_2, HIGH);
       auxled2 = 1;
       inicio3 = tempoAtual + duracao;
-      Serial.print("12");
+      dado += "12";
+      //Serial.print("12");
     }
     if (tempoAtual >= inicio3 && auxled2 == 1) {
       digitalWrite(IGN_2, LOW);
       auxled2 = 2;
-      Serial.print("02");
+      dado += "02";
+      //Serial.print("02");
     }
     if (MediaMov <= altura && auxled3 == 0) {
       digitalWrite(LED_BUILTIN, HIGH);
       auxled3 = 1;
       inicio4 = tempoAtual + duracao;
-      Serial.print("13");
+      dado += "13";
+      //Serial.print("13");
     }
     if (tempoAtual >= inicio4 && auxled3 == 1) {
       digitalWrite(LED_BUILTIN, LOW);
       auxled3 = 2;
-      Serial.print("03");
+      dado += "03";
+      //Serial.print("03");
     }
-    Serial.print("\t");
+    dado += "\t";
+    //Serial.print("\t");
   }
   //Serial.print(led);
+  File dataFile = SD.open(NomeFinal, FILE_WRITE);
+  if (dataFile) {
+    dataFile.print(dado);
+  }
+  Serial.print(dado);
   Serial.println();
 }
