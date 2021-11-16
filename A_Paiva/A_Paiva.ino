@@ -154,8 +154,6 @@ void setup() {
 }
 void loop() {
   tempoAtual = millis();
-  //Serial.print(tempoAtual/1000.0);
-  //Serial.print("\t");
   T = bmp.readTemperature();
   P = bmp.readPressure();
   giro.read();
@@ -173,6 +171,9 @@ void loop() {
   Ay = eventA.acceleration.y;
   Az = eventA.acceleration.z;
   //Pm = bmp.readSealevelPressure();
+  
+  dado = "";
+  
   dado += String(tempoAtual/1000.0);
   dado += "\t";
   dado += String(Gx);
@@ -199,59 +200,6 @@ void loop() {
   dado += "\t";
   dado += String(Hmax);
   
-//  File dataFile = SD.open(NomeFinal, FILE_WRITE);
-//  if (dataFile) {
-//    dataFile.print(tempoAtual/1000.0);
-//    dataFile.print("\t");
-//    dataFile.print(Gx);
-//    dataFile.print("\t");
-//    dataFile.print(Gy);
-//    dataFile.print("\t");
-//    dataFile.print(Gz);
-//    dataFile.print("\t");
-//    dataFile.print(Mx);
-//    dataFile.print("\t");
-//    dataFile.print(My);
-//    dataFile.print("\t");
-//    dataFile.print(Mz);
-//    dataFile.print("\t");
-//    dataFile.print(Ax);
-//    dataFile.print("\t");
-//    dataFile.print(Ay);
-//    dataFile.print("\t");
-//    dataFile.print(Az);
-//    dataFile.print("\t");
-//    dataFile.print(T);
-//    dataFile.print("\t");
-//    dataFile.print(P);
-//    dataFile.print("\t");
-//    dataFile.print(Hmax);
-//    dataFile.print("\t");
-//  }
-//  Serial.print(Gx);
-//  Serial.print("\t");
-//  Serial.print(Gy);
-//  Serial.print("\t");
-//  Serial.print(Gz);
-//  Serial.print("\t");
-//  Serial.print(Mx);
-//  Serial.print("\t");
-//  Serial.print(My);
-//  Serial.print("\t");
-//  Serial.print(Mz);
-//  Serial.print("\t");
-//  Serial.print(Ax);
-//  Serial.print("\t");
-//  Serial.print(Ay);
-//  Serial.print("\t");
-//  Serial.print(Az);
-//  Serial.print("\t");
-//  Serial.print(T);
-//  Serial.print("\t");
-//  Serial.print(P);
-//  Serial.print("\t");
-//  Serial.print(Hmax);
-//  Serial.print("\t");
   SomaMov = 0;                                         //Zera o SomaMov1 em todo loop
   for (int j = 0; j < qf; j++) {
     for (int i = tam - 2; i >= 0; i--) {                 //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1
