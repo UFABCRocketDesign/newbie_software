@@ -120,7 +120,8 @@ void setup() {
   }
   media = media / 20;
 
-  cabecalho += "Altitude [m]\tAltura [m]\tFiltro1 (h)\tFiltro2 (h)";
+  cabecalho += "Tempo [s]";
+  cabecalho += "\tAltitude [m]\tAltura [m]\tFiltro1 (h)\tFiltro2 (h)";
   cabecalho += "\tTemperatura [*C]";
   cabecalho += "\tPressao [Pa]\t";   //Pressao no nivel do mar [Pa]";
   cabecalho += "\tMag eixo X [uT]\tMag eixo Y [uT]\tMag eixo Z [uT]";
@@ -160,6 +161,7 @@ void setup() {
 
 void loop() {
   unsigned long t_atual = millis();
+  float t_atual_segundos = t_atual/1000.0;
   // make a string for assembling the data to log:
   String dataString = "";
 
@@ -223,6 +225,8 @@ void loop() {
       
   //// REUNINDO OS DADOS EM UMA STRING
 
+  dataString += String(t_atual_segundos);
+  dataString += "\t";
   dataString += String(novaAlt);
   dataString += "\t";
   dataString += String(h);
