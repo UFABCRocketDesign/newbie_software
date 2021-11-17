@@ -16,11 +16,10 @@ float Altbase;               //Altitude no solo
 float accAltbase = 0;       //Altitude inicial base acumulativa
 float Height;              //Altura na base
 float Maximum_height;     //Altura máxima
-float previous;          //Altitude anterior
+float previous = 0;          //Altitude anterior
 float moving_average;   //Média móvel
 float vet2[n];         //Vetor 2
-float value;          
-float height;
+float height;        //Altura atual
 
 //========================================================
 void setup() {
@@ -51,10 +50,8 @@ void setup() {
 
 void loop() {
 
-  float previous = 0;
   float Height = 0;
   float current_height;
-
 
   current_height = bmp.readAltitude() - Altbase; //Transformar altitude em altura
   altitude = 0;
@@ -125,33 +122,22 @@ void loop() {
   moving_average = Height / n;
   Serial.print(moving_average);
   Serial.print('\t');
- 
-   height = current_height;
-   value = moving_average - height;
-  
-  Serial.print(value);
-  Serial.print('\t');
- 
-  if ( value < 0 ) {
-      
-  
-    Serial.print("Subida \t");
-    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-   }
 
-   if ( value = 0) {
+
+  //Apogee detection
+  if ( moving_average > previous ) {
 
     Serial.print("Subida \t");
     digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-    
   }
+
   else {
 
     Serial.print("Descida \t");
     digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (LOW is the voltage level);
 
   }
-
+  moving_average = previous;
   Serial.println();
 
 }
