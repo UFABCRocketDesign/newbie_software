@@ -10,16 +10,14 @@ Adafruit_BMP085 bmp;
 
 float altitude = 0;              //Altitude
 float relative_average;         //Média Relativa
-float current_Altitude;        //Altitude Atual
 float vet[n] ;                //Vetor 1
 float Altbase;               //Altitude no solo
 float accAltbase = 0;       //Altitude inicial base acumulativa
-float Height;              //Altura na base
 float Maximum_height;     //Altura máxima
-float previous = 0;          //Altitude anterior
+float previous = 0;      //Altitude anterior
 float moving_average;   //Média móvel
 float vet2[n];         //Vetor 2
-float height;        //Altura atual
+
 
 //========================================================
 void setup() {
@@ -41,7 +39,7 @@ void setup() {
   for (float k = 0; k < numReads; k++) {
 
 
-    accAltbase = accAltbase + bmp.readAltitude();
+  accAltbase = accAltbase + bmp.readAltitude();
   }
   Altbase = accAltbase / numReads;   //Média das medições do foguete na base
   Serial.print(Altbase);
@@ -54,8 +52,6 @@ void loop() {
   float current_height;
 
   current_height = bmp.readAltitude() - Altbase; //Transformar altitude em altura
-  altitude = 0;
-  Maximum_height = 0;
   Serial.print(current_height);
   Serial.print('\t');
 
@@ -125,7 +121,7 @@ void loop() {
 
 
   //Apogee detection
-  if ( moving_average > previous ) {
+  if ( moving_average >= previous ) {
 
     Serial.print("Subida \t");
     digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
@@ -137,7 +133,6 @@ void loop() {
     digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (LOW is the voltage level);
 
   }
-  moving_average = previous;
+  previous =  moving_average;
   Serial.println();
-
 }
