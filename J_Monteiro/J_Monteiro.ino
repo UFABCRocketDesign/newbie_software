@@ -1,8 +1,8 @@
 #include <Adafruit_BMP085.h>
 
 //========================================================
-#define n 25
-#define numReads 15
+#define n 25         // Número de medições para a média móvel
+#define numReads 15 //Número de medições para a média da base
 Adafruit_BMP085 bmp;
 
 //========================================================
@@ -10,14 +10,17 @@ Adafruit_BMP085 bmp;
 
 float altitude = 0;              //Altitude
 float relative_average;         //Média Relativa
-float current_Altitude;       //Altitude Atual
-float vet[n] ;               //Vetor 1
-float Altbase;              // altitude no solo
-float accAltbase = 0;      // altitude inicial base acumulativa
-float High;               // Altura na base
-float previous_altitude; //altitude anterior
-float moving_average;   // Média móvel
-float vet2[n];         // Vetor 2
+float current_Altitude;        //Altitude Atual
+float vet[n] ;                //Vetor 1
+float Altbase;               //Altitude no solo
+float accAltbase = 0;       //Altitude inicial base acumulativa
+float Height;              //Altura na base
+float Maximum_height;     //Altura máxima
+float previous;          //Altitude anterior
+float moving_average;   //Média móvel
+float vet2[n];         //Vetor 2
+float value;          
+float height;
 
 //========================================================
 void setup() {
@@ -41,7 +44,7 @@ void setup() {
 
     accAltbase = accAltbase + bmp.readAltitude();
   }
-  Altbase = accAltbase / numReads;
+  Altbase = accAltbase / numReads;   //Média das medições do foguete na base
   Serial.print(Altbase);
   Serial.println('\t');
 }
@@ -49,12 +52,14 @@ void setup() {
 void loop() {
 
   float previous = 0;
-  float High = 0;
-  float current_high;
+  float Height = 0;
+  float current_height;
 
-  current_high = bmp.readAltitude() - Altbase;
+
+  current_height = bmp.readAltitude() - Altbase; //Transformar altitude em altura
   altitude = 0;
-  Serial.print(current_high);
+  Maximum_height = 0;
+  Serial.print(current_height);
   Serial.print('\t');
 
 
@@ -79,26 +84,26 @@ void loop() {
   //  Serial.print( bmp.readAltitude(101500));
   //  Serial.print('\t');
 
+  //
+  //  Serial.print(current_high);
+  //  Serial.print('\t');
 
-  Serial.print(current_high);
-  Serial.print('\t');
-
-  //Primeira cama de filtro
+  //Primeira camada de filtro
 
   for ( int i = n - 1; i > 0 ; i --) {
 
     vet[i]  =  vet [i - 1];
 
   }
-  vet[0] = current_high;
+  vet[0] = current_height;
 
-  High = 0;
+  Height = 0;
 
   for ( int i = 0; i < n ; i ++) {
 
-    High = High + vet [i];
+    Height = Height + vet [i];
   }
-  relative_average = High / n;
+  relative_average = Height / n;
   Serial.print(relative_average);
   Serial.print('\t');
 
@@ -111,21 +116,34 @@ void loop() {
   }
   vet2[0] = relative_average;
 
-  High = 0;
+  Height = 0;
 
   for ( int i = 0; i < n ; i ++) {
 
-    High = High + vet2[i];
+    Height = Height + vet2[i];
   }
-  moving_average = High / n;
+  moving_average = Height / n;
   Serial.print(moving_average);
   Serial.print('\t');
+ 
+   height = current_height;
+   value = moving_average - height;
+  
+  Serial.print(value);
+  Serial.print('\t');
+ 
+  if ( value < 0 ) {
+      
+  
+    Serial.print("Subida \t");
+    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+   }
 
-  if (moving_average < current_high ) {
+   if ( value = 0) {
 
     Serial.print("Subida \t");
     digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-
+    
   }
   else {
 
