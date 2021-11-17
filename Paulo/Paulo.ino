@@ -1,16 +1,27 @@
-#include <Adafruit_BMP085.h>
+// Bibliotecas
+#include <Wire.h>
 #include <SPI.h>
 #include <SD.h>
+#include <Adafruit_Sensor.h>
+#include <L3G.h> // Giroscópio
+#include <Adafruit_ADXL345_U.h> // Acelerômetro
+#include <Adafruit_BMP085.h> // Altitude
+#include <Adafruit_HMC5883_U.h> // Magnetometro
 
-Adafruit_BMP085 bmp; // Declaração da biblioteca
+// Declaração dos bibliotecas
+Adafruit_BMP085 bmp; // Altitude
+Adafruit_HMC5883_Unified mag; // Magnetômetro
+L3G gyro; // Giroscópio
+Adafruit_ADXL345_Unified accel; // Acelerômetro
 const int chipSelect = 53; // Declaração de CS
 
-#define filt_i 10
-#define filt_f 20
-#define IGN_1 36
-#define IGN_2 61
-#define IGN_3 46
-#define IGN_4 55
+// Constantes universais
+#define filt_i 10 // Quantidade de valores Filtro 1
+#define filt_f 20 // Quantidade de valores Filtro 2
+#define IGN_1 36 // LED 1
+#define IGN_2 61 // LED 2
+#define IGN_3 46 // LED 3
+#define IGN_4 55 // LED 4
 
 // Variáveis para detecção de apogeu
 float nova_altLeitura, cont_sub, cont_subidas, cont_desc, cont_descidas, ult_subida;
@@ -46,7 +57,7 @@ String acionamento1 = "\tDesligado 1";
 String acionamento2 = "\tDesligado 2";
 String acionamento3 = "\tDesligado 3";
 
-// the setup function runs once when you press reset or power the board
+// SETUP DA APLICAÇÃO
 void setup() {
   // Inicializando o led embutido no arduino
   pinMode(LED_BUILTIN, OUTPUT);
@@ -92,21 +103,45 @@ void setup() {
     }
     number += 1;
   }
+
+  // Verificar se magnetômetro está conectado
+  if(!mag.begin())
+  {
+    /* There was a problem detecting the HMC5883 ... check your connections */
+    Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
+    while(1);
+  }
+
+  // Verificar se giroscópio está conectado
+  Wire.begin();
+  if (!gyro.init())
+  {
+    Serial.println("Failed to autodetect gyro type!");
+    while (1);
+  }
+  gyro.enableDefault();
+
+  // Verificar se acelerometro está conectado
+  if(!accel.begin())
+  {
+    /* There was a problem detecting the ADXL345 ... check your connections */
+    Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
+    while(1);
+  }
   
   // Inicia inserindo essa informação no FILE nomeado
   File dataFile = SD.open(file, FILE_WRITE);
   if (dataFile) {
-    dataFile.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tParaquedas 3\tApogeu");
+    dataFile.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tMag (X)\tMag (Y)\tMag (Z)\tGiros (X)\tGiros (Y)\tGiros (Z)\tAcel (X)\tAcel (Y)\tAcel (Z)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tParaquedas 3\tApogeu");
     dataFile.close();
     // print to the serial port too:
-    Serial.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tParaquedas 3\tApogeu");
+    Serial.println("Altura\tFiltro 1\tFiltro 2\tTemperatura(oC)\tPressao(Pa)\tPressao Nivel do Mar(Pa)\tMag (X)\tMag (Y)\tMag (Z)\tGiros (X)\tGiros (Y)\tGiros (Z)\tAcel (X)\tAcel (Y)\tAcel (Z)\tEstado(Subida/Descida)\tParaquedas 1\tParaquedas 2\tParaquedas 3\tApogeu");
   }
   
   // Medicao
   for (j=0; j<filt_i; j++) {
     altura_inicio = bmp.readAltitude();
     media_alt_inicio = media_alt_inicio + altura_inicio;
-    delay (100);
     list_med_movel[0][j] = altura_inicio;
   }
   media_alt_inicio = media_alt_inicio / filt_i;
@@ -136,11 +171,12 @@ void setup() {
 
 }
 
-// the loop function runs over and over again forever
+// LOOP DA SOLUÇÃO
 void loop() {
   // Cria uma string para ser adicionada ao cartao
   String dataString = "";
-  
+
+  // ---------------------------------------------------------------------------------------------
   // Zerar contagem de altitude
   if (cont_sub > 0 and cont_desc == 1) {
     cont_sub = 0;
@@ -148,12 +184,13 @@ void loop() {
   if (cont_desc > 0 and cont_sub == 1) {
     cont_desc = 0;
   }
-  
+
+  // ---------------------------------------------------------------------------------------------
   // Detecção de Apogeu
   nova_altLeitura = bmp.readAltitude() - media_alt_inicio;
-  
-  antiga_media_movel = nova_media_movel;
+
   // Media Movel
+  antiga_media_movel = nova_media_movel;
     // Filtro 1
   for (j=0; j<9; j++) {
     list_med_movel[0][j] = list_med_movel[0][j+1];
@@ -190,27 +227,77 @@ void loop() {
   else if (nova_media_movel < antiga_media_movel) {
     cont_desc += 1;
   }
-  
-  // Altura
+
+  // ---------------------------------------------------------------------------------------------
+  // Escrevendo - Altura
   dataString += String(nova_altLeitura);
   dataString += "\t";
-  dataString += String(nova_media_movel);
+  dataString += String(nova_media_movel); // Filtro 1
   dataString += "\t";
-  dataString += String(nova_media_movel_lg);
+  dataString += String(nova_media_movel_lg); // Filtro 2
   dataString += "\t";
 
-  // Temperatura
+  // ---------------------------------------------------------------------------------------------
+  // Escrevendo - Temperatura
   dataString += String(bmp.readTemperature());
   dataString += "\t";
 
-  // Pressão
+  // ---------------------------------------------------------------------------------------------
+  // Escrevendo - Pressão
   dataString += String(bmp.readPressure());
   dataString += "\t";
 
-  // Pressão ao nivel do mar
+  // ---------------------------------------------------------------------------------------------
+  // Escrevendo - Pressão ao nivel do mar
   dataString += String(bmp.readSealevelPressure());
-  
-  // Identificação de subida/descida/apogeu
+  dataString += "\t";
+
+  // ---------------------------------------------------------------------------------------------
+  // Magnetômetro
+    /* Get a new sensor event */
+  sensors_event_t event_mag; 
+  mag.getEvent(&event_mag);
+  // Escrevendo - Magnetômetro
+    // Eixo X
+  dataString += String(event_mag.magnetic.x);
+  dataString += "\t";
+    // Eixo Y
+  dataString += String(event_mag.magnetic.y);
+  dataString += "\t";
+    // Eixo Z
+  dataString += String(event_mag.magnetic.z);
+  dataString += "\t";
+
+  // ---------------------------------------------------------------------------------------------
+  // Giroscópio
+  gyro.read();
+  // Escrevendo - Giroscópio
+    // Eixo X
+  dataString += String((int)gyro.g.x);
+  dataString += "\t";
+    // Eixo Y
+  dataString += String((int)gyro.g.y);
+  dataString += "\t";
+    // Eixo Z
+  dataString += String((int)gyro.g.z);
+  dataString += "\t";
+
+  // ---------------------------------------------------------------------------------------------
+  // Acelerômetro
+  sensors_event_t event_accel; 
+  accel.getEvent(&event_accel);
+  // Escrevendo - Acelerômetro
+    // Eixo X
+  dataString += String(event_accel.acceleration.x);
+  dataString += "\t";
+    // Eixo Y
+  dataString += String(event_accel.acceleration.y);
+  dataString += "\t";
+    // Eixo Z
+  dataString += String(event_accel.acceleration.z);
+
+  // ---------------------------------------------------------------------------------------------
+  // Escrevendo - Identificação de subida/descida/apogeu
   if (cont_sub > 1) {
     estado = "\tSubindo";
     cont_subidas = 1;
@@ -236,7 +323,9 @@ void loop() {
       cont_acionar3 = 1;
     }
   }
-  
+
+  // ---------------------------------------------------------------------------------------------
+  // Escreve e Apresenta - Paraquedas
   // Aciona primeiro paraquedas
   if (currentMillis - previousMillis_p_acionar >= intervalo_p_acionar1 && cont_acionar1 == 1) {
     digitalWrite(LED_BUILTIN, HIGH);
@@ -280,6 +369,8 @@ void loop() {
   dataString += str_apogeu1;
   dataString += str_apogeu2;
 
+  // ---------------------------------------------------------------------------------------------
+  // Escrevendo - Informações indo para dentro do cartão SD
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
   File dataFile = SD.open(file, FILE_WRITE);
@@ -296,6 +387,8 @@ void loop() {
     Serial.println("error opening datalog.txt");
   }
 
+  // ---------------------------------------------------------------------------------------------
+  // Reinicia variáveis das médias móveis dos filtros
   media_movel = 0;
   media_movel_lg = 0;  
 }
