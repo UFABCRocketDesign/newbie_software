@@ -50,6 +50,7 @@ void loop() {
 
   float Height = 0;
   float current_height;
+  float cont;
 
   current_height = bmp.readAltitude() - Altbase; //Transformar altitude em altura
   Serial.print(current_height);
@@ -128,8 +129,10 @@ void loop() {
   }
 
   else {
-    for (int i = 0; i < 1; i ++) {
-      
+    
+   cont = 0;
+    while ( cont == 0) {
+    cont = cont + 1;
     Serial.print(0);                   //descida
     digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (LOW is the voltage level);
     }
