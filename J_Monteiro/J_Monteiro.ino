@@ -137,9 +137,9 @@ void loop() {
 
   Serial.print('\t');
   Serial.print(cont);
-  
+  Serial.print('\t');
+ 
   if (cont == 50) {
-    Serial.print('\t');
     Serial.print(1);             //apogeu detectado
     Serial.print('\t');
      }
