@@ -139,16 +139,14 @@ void loop() {
   Serial.print(cont);
   Serial.print('\t');
  
-  if (cont == 50) {
+  if (cont >= 50) {
     Serial.print(1);             //apogeu detectado
-    Serial.print('\t');
      }
 
   else {
-    Serial.print(0);           
-    Serial.print('\t');
-    
+    Serial.print(0); 
   }
+  Serial.print('\t');
   previous =  moving_average;
   Serial.println();
 }
