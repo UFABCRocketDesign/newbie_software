@@ -17,6 +17,8 @@ float Maximum_height;     //Altura máxima
 float previous = 0;      //Altitude anterior
 float moving_average;   //Média móvel
 float vet2[n];         //Vetor 2
+int cont;
+
 
 
 //========================================================
@@ -50,7 +52,6 @@ void loop() {
 
   float Height = 0;
   float current_height;
-  float cont;
 
   current_height = bmp.readAltitude() - Altbase; //Transformar altitude em altura
   Serial.print(current_height);
@@ -130,8 +131,8 @@ void loop() {
 
   else {
       cont = cont + 1;
-      Serial.print(cont);
       Serial.println('\t');
+      Serial.print(cont);
       Serial.print(0);                   //descida
       digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (LOW is the voltage level);
     }
