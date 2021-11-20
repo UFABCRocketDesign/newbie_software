@@ -132,10 +132,9 @@ void loop() {
       cont = cont + 1;
       Serial.print(cont);
       Serial.println('\t');
-  }
-//    Serial.print(0);                   //descida
-//    digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (LOW is the voltage level);
-//  }
-//  previous =  moving_average;
-//  Serial.println();
+      Serial.print(0);                   //descida
+      digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (LOW is the voltage level);
+    }
+     previous =  moving_average;
+     Serial.println();
 }
