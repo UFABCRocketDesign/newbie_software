@@ -123,13 +123,13 @@ void loop() {
   //Apogee detection
   if ( moving_average >= previous ) {
 
-    Serial.print("Subida \t");
+    Serial.print(1);                    //subida 
     digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
   }
 
   else {
 
-    Serial.print("Descida \t");
+    Serial.print(0);                   //descida
     digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (LOW is the voltage level);
 
   }
