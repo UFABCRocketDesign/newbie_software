@@ -39,7 +39,7 @@ void setup() {
   for (float k = 0; k < numReads; k++) {
 
 
-  accAltbase = accAltbase + bmp.readAltitude();
+    accAltbase = accAltbase + bmp.readAltitude();
   }
   Altbase = accAltbase / numReads;   //Média das medições do foguete na base
   Serial.print(Altbase);
@@ -123,19 +123,15 @@ void loop() {
 
   //Apogee detection
   if ( moving_average >= previous ) {
-
-    Serial.print(1);                    //subida 
+    cont = 0;
+    Serial.print(1);                    //subida
     digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
   }
 
   else {
-    
-   cont = 0;
-    while ( cont == 0) {
     cont = cont + 1;
     Serial.print(0);                   //descida
     digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (LOW is the voltage level);
-    }
   }
   previous =  moving_average;
   Serial.println();
