@@ -130,15 +130,24 @@ void loop() {
   }
 
   else {
-      cont = cont + 1;
-      Serial.print(0);                   //descida
-      digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (LOW is the voltage level);
+    cont = cont + 1;
+    Serial.print(0);                   //descida
+    digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (LOW is the voltage level);
   }
 
-  {   Serial.print('\t');
-      Serial.print(cont);
-           
+  Serial.print('\t');
+  Serial.print(cont);
+  
+  if (cont == 50) {
+    Serial.print(1);             //apogeu detectado
+    Serial.print('\t');
+     }
+
+  else {
+    Serial.print(0);           
+    Serial.print('\t');
+    
   }
-     previous =  moving_average;
-     Serial.println();
+  previous =  moving_average;
+  Serial.println();
 }
