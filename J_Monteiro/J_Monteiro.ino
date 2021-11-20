@@ -131,11 +131,14 @@ void loop() {
 
   else {
       cont = cont + 1;
-      Serial.println('\t');
-      Serial.print(cont);
       Serial.print(0);                   //descida
       digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (LOW is the voltage level);
-    }
+  }
+
+  {   Serial.print('\t');
+      Serial.print(cont);
+           
+  }
      previous =  moving_average;
      Serial.println();
 }
