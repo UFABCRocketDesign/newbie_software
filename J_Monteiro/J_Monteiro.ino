@@ -21,9 +21,11 @@ float vet2[n];         //Vetor 2
 int cont;             //Contador
 
 
+
 void setup() {
   // Open serial communications and wait for port to open:
   Serial.begin(115200);
+  if (!bmp.begin()) {
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
   }
@@ -52,6 +54,7 @@ void setup() {
   Altbase = accAltbase / numReads;   //Média das medições do foguete na base
   Serial.print(Altbase);
   Serial.println('\t');
+ }
 }
 void loop() {
 
@@ -62,7 +65,7 @@ String dataString = "";
 
   current_height = bmp.readAltitude() - Altbase; //Transformar altitude em altura
   dataString += String(current_height);
-  dataString += ",";
+  dataString += "\t";
 
 
 
@@ -108,7 +111,7 @@ String dataString = "";
   }
   relative_average = Height / n;
   dataString += String(relative_average);
-  dataString += ",";
+  dataString += "\t";
   //Segunda camada de Fitro
 
   for ( int i = n - 1; i > 0 ; i --) {
@@ -131,27 +134,27 @@ String dataString = "";
   if ( moving_average >= previous ) {
     cont = 0;
   dataString += String(moving_average);
-  dataString += ",";   // turn the LED on (HIGH is the voltage level)
+  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)           // turn the LED on (HIGH is the voltage level)
   }
 
   else {
     cont = cont + 1;
-  dataString += String("0");     //descida
-  dataString += String(LED_BUILTIN, LOW);  // turn the LED on (LOW is the voltage level);
+  dataString += ("0");     //descida
+  digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (HIGH is the voltage level)  // turn the LED on (LOW is the voltage level);
   }
 
-  dataString += ",";
+  dataString += "\t";
   dataString += String(cont);   
-  dataString += ",";
+  dataString += "\t";
  
   if (cont >= 50) {
-  dataString += String("1");             //apogeu detectado
+  dataString += ("1");             //apogeu detectado
      }
 
   else {
-  dataString += String("0");
+  dataString += ("0");
   }
-  dataString += ",";
+  dataString += "\t";
   previous =  moving_average;
 
   File dataFile = SD.open("JaqueMnt.txt", FILE_WRITE);
