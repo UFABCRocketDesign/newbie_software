@@ -28,8 +28,8 @@ void setup() {
   if (!bmp.begin()) {
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   while (1) {}
-  pinMode(LED_BUILTIN,OUTPUT); 
   while (!Serial) {
+  pinMode(LED_BUILTIN,OUTPUT); 
     ; // wait for serial port to connect. Needed for native USB port only
   }
  }
@@ -132,11 +132,11 @@ String dataString = "";
   }
   moving_average = Height / n;
   dataString += String(moving_average);
-  dataString += ",";
+  dataString += "\t";
   //Apogee detection
   if ( moving_average >= previous ) {
-    cont = 0;
-  dataString += String(moving_average);
+  cont = 0;
+  dataString += ("1");
   digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)           // turn the LED on (HIGH is the voltage level)
   }
 
