@@ -1,34 +1,43 @@
 #include <Adafruit_BMP085.h>
-
+#include <SPI.h>
+#include <SD.h>
+const int chipSelect = 53;
 //========================================================
-#define n 25         // Número de medições para a média móvel
+#define n 25         // Número de medições para da média móvel
 #define numReads 15 //Número de medições para a média da base
 Adafruit_BMP085 bmp;
-
 //========================================================
 //-----Variáveis Globais-----
 
-float altitude = 0;              //Altitude
-float relative_average;         //Média Relativa
-float vet[n] ;                //Vetor 1
-float Altbase;               //Altitude no solo
-float accAltbase = 0;       //Altitude inicial base acumulativa
+float altitude = 0;            //Altitude
+float relative_average;       //Média Relativa
+float vet[n] ;               //Vetor 1
+float Altbase;              //Altitude no solo
+float accAltbase = 0;      //Altitude inicial base acumulativa
 float Maximum_height;     //Altura máxima
 float previous = 0;      //Altitude anterior
 float moving_average;   //Média móvel
 float vet2[n];         //Vetor 2
-int cont;
+int cont;             //Contador
 
 
-
-//========================================================
 void setup() {
+  // Open serial communications and wait for port to open:
   Serial.begin(115200);
-  if (!bmp.begin()) {
-    Serial.println("Could not find a valid BMP085 sensor");
-    while (1) {}
-    pinMode(LED_BUILTIN, OUTPUT);
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for native USB port only
   }
+
+  Serial.print("Initializing SD card...");
+
+  // see if the card is present and can be initialized:
+  if (!SD.begin(chipSelect)) {
+    Serial.println("Card failed, or not present");
+    // don't do anything more:
+    while (1);
+  }
+  Serial.println("card initialized.");
+}
   Serial.print("Temperature =  \t");
   Serial.print(" Pa \t");
   Serial.print("  Pressure = \t");
@@ -37,16 +46,13 @@ void setup() {
   Serial.print(" Pa \t");
   Serial.print("  Real altitude = \t");
   Serial.println(" meters \t");
-
-  for (float k = 0; k < numReads; k++) {
-
-
+ 
+ for (float k = 0; k < numReads; k++) {
     accAltbase = accAltbase + bmp.readAltitude();
   }
   Altbase = accAltbase / numReads;   //Média das medições do foguete na base
   Serial.print(Altbase);
   Serial.println('\t');
-}
 
 void loop() {
 
@@ -136,11 +142,11 @@ void loop() {
   }
 
   Serial.print('\t');
-  Serial.print(cont);
-  Serial.print('\t');
+ Serial.print(cont);
+ Serial.print('\t');
  
   if (cont >= 50) {
-    Serial.print(1);             //apogeu detectado
+  Serial.print(1);             //apogeu detectado
      }
 
   else {
@@ -150,3 +156,20 @@ void loop() {
   previous =  moving_average;
   Serial.println();
 }
+
+  File dataFile = SD.open("JaqueMnt.txt", FILE_WRITE);
+
+  // if the file is available, write to it:
+  if (dataFile) {
+    dataFile.println(dataString);
+    dataFile.close();
+    // print to the serial port too:
+    Serial.println(dataString);
+  }
+  // if the file isn't open, pop up an error:
+  else {
+    Serial.println("error opening datalog.txt");
+  }
+}
+  
+  
