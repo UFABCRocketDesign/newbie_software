@@ -26,10 +26,13 @@ void setup() {
   // Open serial communications and wait for port to open:
   Serial.begin(115200);
   if (!bmp.begin()) {
+  Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+  while (1) {}
+  pinMode(LED_BUILTIN,OUTPUT); 
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
   }
-
+ }
   Serial.print("Initializing SD card...");
 
   // see if the card is present and can be initialized:
@@ -54,7 +57,7 @@ void setup() {
   Altbase = accAltbase / numReads;   //Média das medições do foguete na base
   Serial.print(Altbase);
   Serial.println('\t');
- }
+ 
 }
 void loop() {
 
@@ -170,6 +173,6 @@ String dataString = "";
   else {
     Serial.println("error opening datalog.txt");
   }
-}
-  
+
+} 
   
