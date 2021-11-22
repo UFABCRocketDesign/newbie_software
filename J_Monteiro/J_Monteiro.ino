@@ -37,7 +37,6 @@ void setup() {
     while (1);
   }
   Serial.println("card initialized.");
-}
   Serial.print("Temperature =  \t");
   Serial.print(" Pa \t");
   Serial.print("  Pressure = \t");
@@ -53,15 +52,18 @@ void setup() {
   Altbase = accAltbase / numReads;   //Média das medições do foguete na base
   Serial.print(Altbase);
   Serial.println('\t');
-
+}
 void loop() {
+
+String dataString = "";
 
   float Height = 0;
   float current_height;
 
   current_height = bmp.readAltitude() - Altbase; //Transformar altitude em altura
-  Serial.print(current_height);
-  Serial.print('\t');
+  dataString += String(current_height);
+  dataString += ",";
+
 
 
   //
@@ -105,9 +107,8 @@ void loop() {
     Height = Height + vet [i];
   }
   relative_average = Height / n;
-  Serial.print(relative_average);
-  Serial.print('\t');
-
+  dataString += String(relative_average);
+  dataString += ",";
   //Segunda camada de Fitro
 
   for ( int i = n - 1; i > 0 ; i --) {
@@ -124,38 +125,34 @@ void loop() {
     Height = Height + vet2[i];
   }
   moving_average = Height / n;
-  Serial.print(moving_average);
-  Serial.print('\t');
-
-
+  dataString += String(moving_average);
+  dataString += ",";
   //Apogee detection
   if ( moving_average >= previous ) {
     cont = 0;
-    Serial.print(1);                    //subida
-    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+  dataString += String(moving_average);
+  dataString += ",";   // turn the LED on (HIGH is the voltage level)
   }
 
   else {
     cont = cont + 1;
-    Serial.print(0);                   //descida
-    digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (LOW is the voltage level);
+  dataString += String("0");     //descida
+  dataString += String(LED_BUILTIN, LOW);  // turn the LED on (LOW is the voltage level);
   }
 
-  Serial.print('\t');
- Serial.print(cont);
- Serial.print('\t');
+  dataString += ",";
+  dataString += String(cont);   
+  dataString += ",";
  
   if (cont >= 50) {
-  Serial.print(1);             //apogeu detectado
+  dataString += String("1");             //apogeu detectado
      }
 
   else {
-    Serial.print(0); 
+  dataString += String("0");
   }
-  Serial.print('\t');
+  dataString += ",";
   previous =  moving_average;
-  Serial.println();
-}
 
   File dataFile = SD.open("JaqueMnt.txt", FILE_WRITE);
 
