@@ -33,8 +33,6 @@ void setup() {
     ; // wait for serial port to connect. Needed for native USB port only
   }
  }
-  Serial.print("Initializing SD card...");
-
   // see if the card is present and can be initialized:
   if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present");
@@ -42,15 +40,13 @@ void setup() {
     while (1);
   }
   String dataString = "";
-  dataString += ("card initialized.");
-  dataString += ("Temperature =  \t");
-  dataString += (" Pa \t");
-  dataString += ("  Pressure = \t");
-  dataString += (" Pa \t");
-  dataString += ("  Pressure at sealevel (calculated) = \t");
-  dataString += (" Pa \t");
-  dataString += ("  Real altitude = \t");
-  dataString += (" Pa \t");
+//dataString += ("Temperature = \t");
+//dataString += (" Pa \t");
+// dataString += ("  Pressure = \t");
+//dataString += (" Pa \t");
+//dataString += ("  Pressure at sealevel (calculated) = \t");
+//dataString += (" Pa \t");
+  dataString += (" Real altitude = \t");
   dataString += (" meters \t");
 
   File dataFile = SD.open("JaqueMnt.txt", FILE_WRITE);
