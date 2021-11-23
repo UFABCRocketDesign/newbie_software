@@ -15,32 +15,32 @@
 #define duracao 5000              //Tempo de duracao do acionamento dos paraquedas (ms)
 #define altura 10                 //Altura para abertura do terceiro paraquedas
 
-#define usa_bar 1                 //Variavel de escolha do uso do sensor BMP
-#define usa_pre (usa_bar && 1)    //Variavel de escolha do uso do valor Pressão
-#define usa_alt (usa_bar && 1)    //Variavel de escolha do uso do valor Altura
+#define usa_bar 0                 //Variavel de escolha do uso do sensor BMP
+#define usa_pre (usa_bar && 0)    //Variavel de escolha do uso do valor Pressão
+#define usa_alt (usa_bar && 0)    //Variavel de escolha do uso do valor Altura
 #define usa_altMax (usa_alt && 1) //Variavel de escolha do uso do valor Altura Máxima
-#define usa_temp (usa_bar && 1)   //Variavel de escolha do uso do valor Temperatura
-#define usa_apogeu (usa_bar && 1) //Variavel de escolha do uso da detecção de apogeu
+#define usa_temp (usa_bar && 0)   //Variavel de escolha do uso do valor Temperatura
+#define usa_apogeu (usa_bar && 0) //Variavel de escolha do uso da detecção de apogeu
 #define usa_acpq (usa_apogeu && 1)//Variavel de escolha do uso do acionamento dos paraquedas
 
-#define usa_giro 1                //Variavel de escolha do uso do sensor
-#define usa_gx (usa_giro && 1)    //Variavel de escolha do uso do valor do giroscopio em x
-#define usa_gy (usa_giro && 1)    //Variavel de escolha do uso do valor do giroscopio em y
-#define usa_gz (usa_giro && 1)    //Variavel de escolha do uso do valor do giroscopio em z
+#define usa_giro 0                //Variavel de escolha do uso do sensor
+#define usa_gx (usa_giro && 0)    //Variavel de escolha do uso do valor do giroscopio em x
+#define usa_gy (usa_giro && 0)    //Variavel de escolha do uso do valor do giroscopio em y
+#define usa_gz (usa_giro && 0)    //Variavel de escolha do uso do valor do giroscopio em z
 
-#define usa_acel 1                //Variavel de escolha do uso de funções
-#define usa_ax (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em x
-#define usa_ay (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em y
-#define usa_az (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em z
+#define usa_acel 0                //Variavel de escolha do uso de funções
+#define usa_ax (usa_acel && 0)    //Variavel de escolha do uso do valor do acelerometro em x
+#define usa_ay (usa_acel && 0)    //Variavel de escolha do uso do valor do acelerometro em y
+#define usa_az (usa_acel && 0)    //Variavel de escolha do uso do valor do acelerometro em z
 
-#define usa_mag 1                 //Variavel de escolha do uso de funções
-#define usa_mx (usa_mag && 1)     //Variavel de escolha do uso do valor do magnetometro em x
-#define usa_my (usa_mag && 1)     //Variavel de escolha do uso do valor do magnetometro em y
-#define usa_mz (usa_mag && 1)     //Variavel de escolha do uso do valor do magnetometro em z
+#define usa_mag 0                 //Variavel de escolha do uso de funções
+#define usa_mx (usa_mag && 0)     //Variavel de escolha do uso do valor do magnetometro em x
+#define usa_my (usa_mag && 0)     //Variavel de escolha do uso do valor do magnetometro em y
+#define usa_mz (usa_mag && 0)     //Variavel de escolha do uso do valor do magnetometro em z
 
-#define usa_Tempo 1              //Variavel de escolha do uso da impressão do tempo
-#define usa_impreSerial 1         //Variavel de escolha do uso da impressão na serial
-#define usa_SD 1                  //Variavel de escolha do uso de funções
+#define usa_Tempo 0              //Variavel de escolha do uso da impressão do tempo
+#define usa_impreSerial 0         //Variavel de escolha do uso da impressão na serial
+#define usa_SD 0                  //Variavel de escolha do uso de funções
 //////////////////////////////////////////////////////////////////////
 #define IGN_1 36  //act1 LED DA PLAQUINHA
 #define IGN_2 61  //act2 LED DA PLAQUINHA
@@ -49,9 +49,9 @@
 
 String dado = "";
 String cabecalho = "";
-#if usa_Tempo || usa_alt
-unsigned long tempoAtual = 0;     // will store last time LED was updated
-#endif
+//#if usa_Tempo || usa_alt
+//unsigned long tempoAtual = 0;     // will store last time LED was updated
+//#endif
 #if usa_apogeu || usa_alt
 float SomaRef = 0;                //Soma valores iniciais(foguete parado na base)
 float AltitudeRef = 0;            //É o valor da média dos valores iniciais(foguete parado na base)
@@ -253,7 +253,7 @@ void setup() {
   #endif
 }
 void loop() {
-  tempoAtual = millis();
+  unsigned long tempoAtual = millis();
   dado = "";
   #if usa_Tempo
   dado += String(tempoAtual/1000.0);
@@ -363,8 +363,10 @@ void loop() {
 
   if (Delta >= 2 && apogeu == 0) {                         //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
     apogeu = 1;
+    #if usa_acpq
     inicio1 = tempoAtual + duracao;
     inicio2 = tempoAtual + espera;
+    #endif
   }
   else if (apogeu == 0) {
     dado += "Subindo";
@@ -412,8 +414,7 @@ void loop() {
     }
     dado += "\t";
   }
-  #endif  
-  
+  #endif
   #if usa_SD
   File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
