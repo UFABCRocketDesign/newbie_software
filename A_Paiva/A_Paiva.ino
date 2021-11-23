@@ -14,11 +14,33 @@
 #define espera 0000               //Tempo de espera para acionamento do paraquedas 2 (ms)
 #define duracao 5000              //Tempo de duracao do acionamento dos paraquedas (ms)
 #define altura 10                 //Altura para abertura do terceiro paraquedas
-#define usa_bar 0                 //Variavel de escolha do uso de funções
-#define usa_giro 0                //Variavel de escolha do uso de funções
-#define usa_acel 0                //Variavel de escolha do uso de funções
+
+#define usa_bar 1                 //Variavel de escolha do uso do sensor BMP
+#define usa_pre (usa_bar && 1)    //Variavel de escolha do uso do valor Pressão
+#define usa_alt (usa_bar && 1)    //Variavel de escolha do uso do valor Altura
+#define usa_altMax (usa_alt && 1) //Variavel de escolha do uso do valor Altura Máxima
+#define usa_temp (usa_bar && 1)   //Variavel de escolha do uso do valor Temperatura
+#define usa_apogeu (usa_bar && 1) //Variavel de escolha do uso da detecção de apogeu
+#define usa_acpq (usa_apogeu && 1)//Variavel de escolha do uso do acionamento dos paraquedas
+
+#define usa_giro 1                //Variavel de escolha do uso do sensor
+#define usa_gx (usa_giro && 1)    //Variavel de escolha do uso do valor do giroscopio em x
+#define usa_gy (usa_giro && 1)    //Variavel de escolha do uso do valor do giroscopio em y
+#define usa_gz (usa_giro && 1)    //Variavel de escolha do uso do valor do giroscopio em z
+
+#define usa_acel 1                //Variavel de escolha do uso de funções
+#define usa_ax (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em x
+#define usa_ay (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em y
+#define usa_az (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em z
+
 #define usa_mag 1                 //Variavel de escolha do uso de funções
-#define usa_SD 0                  //Variavel de escolha do uso de funções
+#define usa_mx (usa_mag && 1)     //Variavel de escolha do uso do valor do magnetometro em x
+#define usa_my (usa_mag && 1)     //Variavel de escolha do uso do valor do magnetometro em y
+#define usa_mz (usa_mag && 1)     //Variavel de escolha do uso do valor do magnetometro em z
+
+#define usa_Tempo 1              //Variavel de escolha do uso da impressão do tempo
+#define usa_impreSerial 1         //Variavel de escolha do uso da impressão na serial
+#define usa_SD 1                  //Variavel de escolha do uso de funções
 //////////////////////////////////////////////////////////////////////
 #define IGN_1 36  //act1 LED DA PLAQUINHA
 #define IGN_2 61  //act2 LED DA PLAQUINHA
@@ -26,17 +48,25 @@
 #define IGN_4 55  //act4 LED DA PLAQUINHA
 
 String dado = "";
-String cabecalho = "Tempo\t";
+String cabecalho = "";
+#if usa_Tempo || usa_alt
 unsigned long tempoAtual = 0;     // will store last time LED was updated
-#if usa_bar
-float Hmax = 0;                   //Valor máximo filtrado
+#endif
+#if usa_apogeu || usa_alt
 float SomaRef = 0;                //Soma valores iniciais(foguete parado na base)
 float AltitudeRef = 0;            //É o valor da média dos valores iniciais(foguete parado na base)
 float SomaMov = 0;                //Soma dos valores do vetor do filtro1
-float MediaMov = 0;               //É o valor da média dos valores do vetor do filtro1
-float Delta;                      //Diferença entre valor máximo do filtro1 (Hmax1) e valor atual referênciado (H11)
+float MediaMov = 0;               //É o valor da média dos valores do vetor do filtro1 ou altitude atual
 float MatrizFiltros[qf][tam];     //Vetor para guardar os valores para as médias utilizadas pelos filtros
+#endif
+#if usa_apogeu || usa_altMax
+float Hmax = 0;                   //Valor máximo filtrado
+#endif
+#if usa_apogeu
+float Delta;                      //Diferença entre valor máximo do filtro1 (Hmax1) e valor atual referênciado (H11)
 int apogeu = 0;
+#endif
+#if usa_acpq
 int auxled1 = 0;
 int auxled2 = 0;
 int auxled3 = 0;
@@ -44,9 +74,15 @@ unsigned long inicio1 = 0;        // will store last time LED was updated
 unsigned long inicio2 = 0;        // will store last time LED was updated
 unsigned long inicio3 = 0;        // will store last time LED was updated
 unsigned long inicio4 = 0;        // will store last time LED was updated
+#endif
+#if usa_temp
 float T;                          //Valor da Temperatura
+#endif
+#if usa_pre
 float P;                          //Valor da Pressão
-float Pm;                         //Valor da Pressão ao nivel do Mar
+//float Pm;                         //Valor da Pressão ao nivel do Mar
+#endif
+#if usa_bar
 Adafruit_BMP085 bmp;              //Cria variável 'bmp' para a biblioteca Adafruit_BMP085
 #endif
 #if usa_giro
@@ -82,6 +118,7 @@ const int chipSelect = 53;
 #endif
 
 void setup() {
+  #if usa_acpq
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(IGN_1, OUTPUT);//PINOS DA MACRO pinos.h
   pinMode(IGN_2, OUTPUT);
@@ -91,39 +128,93 @@ void setup() {
   //digitalWrite(IGN_2, LOW);
   //digitalWrite(IGN_3, LOW);
   //digitalWrite(IGN_4, LOW);
+  #endif
+  #if usa_impreSerial
   Serial.begin(115200);
+  #endif
   Wire.begin();
+  #if usa_Tempo
+  cabecalho = "Tempo\t";
+  #endif
   #if usa_giro
   if (!giro.init()) {
     Serial.println("FALHA AO ENCONTRAR GIROSCÓPIO!");
   }
   giro.enableDefault();
-  cabecalho += "Gx\tGy\tGz\t";
+  #endif
+  #if usa_gx
+  cabecalho += "Gx\t";
+  #endif
+  #if usa_gy
+  cabecalho += "Gy\t";
+  #endif
+  #if usa_gz
+  cabecalho += "Gz\t";
   #endif
   #if usa_mag
   if(!mag.begin())
   {
     Serial.println("FALHA AO ENCONTRAR MAGNETÔMETRO!");
   }
-  cabecalho += "Mx(uT)\tMy(uT)\tMz(uT)\t";
   #endif
+  #if usa_mx
+  cabecalho += "Mx(uT)\t";
+  #endif
+  #if usa_my
+  cabecalho += "My(uT)\t";
+  #endif
+  #if usa_mz
+  cabecalho += "Mz(uT)\t";
+  #endif  
   #if usa_acel
   if(!accel.begin())
   {
     Serial.println("FALHA AO ENCONTRAR ACELERÔMETRO");
   }
   accel.setRange(ADXL345_RANGE_16_G);
-  cabecalho += "Ax(m/s^2)\tAy(m/s^2)\tAz(m/s^2)\t";
+  #endif
+  #if usa_ax
+  cabecalho += "Ax(m/s^2)\t";
+  #endif
+  #if usa_ay
+  cabecalho += "Ay(m/s^2)\t";
+  #endif
+  #if usa_az
+  cabecalho += "Az(m/s^2)\t";
   #endif
   #if usa_bar
   if (!bmp.begin()) {
     Serial.println("FALHA AO ENCONTRAR BARÔMETRO");
   }
-  cabecalho += "Temperatura(°C)\tPressao(Pa)\tAltura máxima(m)";
+  #endif
+  #if usa_temp
+  cabecalho += "Temperatura(°C)\t";
+  #endif
+  #if usa_pre
+  cabecalho += "Pressao(Pa)\t";
+  #endif
+  #if usa_altMax
+  cabecalho += "Altura máxima(m)\t";
+  #endif
+  #if usa_alt
+  for (int i = 0; i < qf; i++) {
+    cabecalho += "Altura do filtro ";
+    cabecalho += i;
+    cabecalho += "(m)\t";
+  }
+  #endif
+  #if usa_acpq || usa_apogeu
+  cabecalho += "Statu de voo";
+  #endif
+  #if usa_alt || usa_apogeu
   for (int i = 0; i < 100; i++) {                       //Este 'for' serve para definir a altitude da base de lançamento como valor de referência.
     SomaRef = SomaRef + bmp.readAltitude();
   }
   AltitudeRef = SomaRef / 100;
+  #endif
+  #if usa_impreSerial
+  Serial.println("Dados de altitude de voo");
+  Serial.println(cabecalho);
   #endif
   #if usa_SD
   Serial.println("Inicializando cartão SD...");
@@ -156,81 +247,90 @@ void setup() {
   }
   File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
-    #if usa_bar
-    for (int i = 0; i < qf; i++) {
-      cabecalho += "Altura do filtro ";
-      cabecalho += i;
-      cabecalho += "(m)\t";
-    }
-    cabecalho += "Statu de voo";
-    #endif
     dataFile.println(cabecalho);
     dataFile.close();
   }
   #endif
-  Serial.println("Dados de altitude de voo");
-  for (int i = 0; i < qf; i++) {
-      cabecalho += "Altura do filtro ";
-      cabecalho += i;
-      cabecalho += "(m)\t";
-    }
-  cabecalho += "Statu de voo";
-  Serial.println(cabecalho);
 }
 void loop() {
   tempoAtual = millis();
   dado = "";
+  #if usa_Tempo
   dado += String(tempoAtual/1000.0);
   dado += "\t";
+  #endif
   #if usa_giro
   giro.read();
+  #if usa_gx
   Gx = (int)giro.g.x;
-  Gy = (int)giro.g.y;
-  Gz = (int)giro.g.z;
   dado += String(Gx);
   dado += "\t";
+  #endif
+  #if usa_gy
+  Gy = (int)giro.g.y;
   dado += String(Gy);
   dado += "\t";
+  #endif
+  #if usa_gz
+  Gz = (int)giro.g.z;
   dado += String(Gz);
   dado += "\t";
+  #endif
   #endif
   #if usa_mag
   sensors_event_t eventM; 
   mag.getEvent(&eventM);
+  #if usa_mx
   Mx = eventM.magnetic.x;
-  My = eventM.magnetic.y;
-  Mz = eventM.magnetic.z;
   dado += String(Mx);
   dado += "\t";
+  #endif
+  #if usa_my
+  My = eventM.magnetic.y;
   dado += String(My);
   dado += "\t";
+  #endif
+  #if usa_mz
+  Mz = eventM.magnetic.z;
   dado += String(Mz);
   dado += "\t";
+  #endif
   #endif
   #if usa_acel
   sensors_event_t eventA; 
   accel.getEvent(&eventA);
+  #if usa_ax
   Ax = eventA.acceleration.x;
-  Ay = eventA.acceleration.y;
-  Az = eventA.acceleration.z;
   dado += String(Ax);
   dado += "\t";
+  #endif
+  #if usa_ay
+  Ay = eventA.acceleration.y;
   dado += String(Ay);
   dado += "\t";
+  #endif
+  #if usa_az
+  Az = eventA.acceleration.z;
   dado += String(Az);
   dado += "\t";
   #endif
-  #if usa_bar
+  #endif
+  #if usa_temp
   T = bmp.readTemperature();
-  P = bmp.readPressure();
-  //Pm = bmp.readSealevelPressure();
   dado += String(T);
   dado += "\t";
+  #endif
+  #if usa_pre
+  P = bmp.readPressure();
+  //Pm = bmp.readSealevelPressure();
   dado += String(P);
   dado += "\t";
+  #endif
+  #if usa_altMax  
   dado += String(Hmax);
   dado += "\t";
-
+  #endif
+  #if usa_apogeu || usa_alt
   SomaMov = 0;                                         //Zera o SomaMov1 em todo loop
   for (int j = 0; j < qf; j++) {
     for (int i = tam - 2; i >= 0; i--) {                 //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1
@@ -247,12 +347,18 @@ void loop() {
       SomaMov = SomaMov + MatrizFiltros[j][i];
     }
     MediaMov = SomaMov / tam;
-    dado += String(MediaMov);
+    #if usa_alt
+    dado += String(MediaMov);                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
     dado += "\t";
+    #endif
   }
+  #endif
+  #if usa_apogeu || usa_altMax
   if (Hmax < MediaMov) {                                    //Pega o valor máximo da média/filtro2
     Hmax = MediaMov;
   }
+  #endif
+  #if usa_apogeu
   Delta = Hmax - MediaMov;                                 //Compara o valor máximo do filtro1 com o valor atual do filtro1
 
   if (Delta >= 2 && apogeu == 0) {                         //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
@@ -267,6 +373,10 @@ void loop() {
   if (apogeu == 1) {
     dado += "Descendo";
     dado += "\t";
+  }
+  #endif
+  #if usa_acpq
+  if (apogeu == 1) {
     if (auxled1 == 0) {
       digitalWrite(IGN_1, HIGH);
       auxled1 = 1;
@@ -311,6 +421,8 @@ void loop() {
     dataFile.close();
   }
   #endif
+  #if usa_impreSerial
   Serial.print(dado);
   Serial.println();
+  #endif
 }
