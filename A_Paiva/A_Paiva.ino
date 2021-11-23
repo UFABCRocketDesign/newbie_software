@@ -39,7 +39,7 @@
 #define usa_mz (usa_mag && 0)     //Variavel de escolha do uso do valor do magnetometro em z
 
 #define usa_Tempo 0              //Variavel de escolha do uso da impressão do tempo
-#define usa_impreSerial 0         //Variavel de escolha do uso da impressão na serial
+#define usa_impreSerial 1         //Variavel de escolha do uso da impressão na serial
 #define usa_SD 0                  //Variavel de escolha do uso de funções
 //////////////////////////////////////////////////////////////////////
 #define IGN_1 36  //act1 LED DA PLAQUINHA
