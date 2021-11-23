@@ -1,8 +1,8 @@
 
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
-#define tam 100
-#define zer 100
+#define tam 20
+#define zer 20
 float zerar = 0;
 float filtro[tam] = {};
 float filtro1[tam] = {};
