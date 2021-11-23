@@ -423,7 +423,6 @@ void loop() {
   }
   #endif
   #if usa_impreSerial
-  Serial.print(dado);
-  Serial.println();
+  Serial.println(dado);
   #endif
 }
