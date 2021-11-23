@@ -5,6 +5,7 @@ Adafruit_BMP085 bmp;
 #define zer 10
 float zerar = 0;
 float filtro[tam] = {};
+float filtro1[tam] = {};
 
 void setup() {
   Serial.begin(115200);
@@ -24,8 +25,10 @@ void setup() {
 
 
 void loop() {
-  float alt_med= 0;
-  float f1 = bmp.readAltitude()- zerar;
+  float f0 = bmp.readAltitude()- zerar;
+  float f1 = 0; //saida do filtro0
+  float f2 = 0; //saida do filtro1
+  
   //Serial.print("Temperature = ");
   //Serial.print(bmp.readTemperature());
   //Serial.print("\t");
@@ -36,20 +39,33 @@ void loop() {
   for (int i=tam-1; i>0; i--){
     filtro[i] = filtro[i-1];
   }
-  filtro[0] = f1;
+  filtro[0] = f0;
   
   
   for (int i=0; i<tam; i++){
-    alt_med += filtro[i];
+    f1 += filtro[i];
   }
-  alt_med /= tam;
+  f1 /= tam;
+
+  for (int i=tam-1; i>0; i--){ //filtro1
+    filtro1[i] = filtro1[i-1];
+  }
+  filtro1[0] = f1;
+  
+  
+  for (int i=0; i<tam; i++){
+    f2 += filtro1[i];
+  }
+  f2 /= tam;
 
 
   //Serial.print("Altitude = ");
   
+  Serial.print(f0);
+  Serial.print("\t");
   Serial.print(f1);
   Serial.print("\t");
-  Serial.print(alt_med);
+  Serial.print(f2);
   Serial.print("\t");
 
   //Serial.print("Pressure at sealevel (calculated) = ");
