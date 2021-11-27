@@ -51,6 +51,7 @@ void setup() {
   if (dataFile) {
     dataFile.println(dataString);
     dataFile.close();
+  }
     if (!bmp.begin()) {
       Serial.println("Could not find a valid BMP085 sensor, check wiring!");
       while (1) {}
@@ -61,7 +62,7 @@ void setup() {
     }
     media = soma / 97;
   }
-}
+
 
   void loop() {
     String dataString = "";
