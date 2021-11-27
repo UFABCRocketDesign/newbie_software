@@ -35,15 +35,17 @@ void setup() {
   Serial.println("card initialized.");
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
-  Serial.print("Temperature(°C ) = ");
-  Serial.print("\t");
-  Serial.print("Pressure(Pa) = ");
-  Serial.print("\t");
-  Serial.print("Altitude(m) = ");
-  Serial.print("Pressure at sealevel (calculated as Pa) = ");
-  Serial.print("\t");
-  Serial.print("Real altitude(m) = ");
-  Serial.println("\t");
+  String dataString = "";
+  File dataFile = SD.open("rkflight.txt", FILE_WRITE);
+  dataString += String("Temperature(°C ) = ");
+  dataString += String("\t");
+  dataString += String("Pressure(Pa) = ");
+  dataString += String("\t");
+  dataString += String("Altitude(m) = ");
+  dataString += String("Pressure at sealevel (calculated as Pa) = ");
+  dataString += String("\t");
+  dataString += String("Real altitude(m) = ");
+  dataString += String("\t");
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
@@ -58,15 +60,6 @@ void setup() {
 void loop() {
   String dataString = "";
   File dataFile = SD.open("rkflight.txt", FILE_WRITE);
-  Serial.print("Temperature(°C ) = ");
-  Serial.print("\t");
-  Serial.print("Pressure(Pa) = ");
-  Serial.print("\t");
-  Serial.print("Altitude(m) = ");
-  Serial.print("Pressure at sealevel (calculated as Pa) = ");
-  Serial.print("\t");
-  Serial.print("Real altitude(m) = ");
-  Serial.println("\t");
   digitalWrite(LED_BUILTIN, HIGH);
   alt_atual = bmp.readAltitude() - media;
   for (int i = 9; i > 0; i--) {
