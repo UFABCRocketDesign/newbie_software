@@ -58,6 +58,15 @@ void setup() {
 void loop() {
   String dataString = "";
   File dataFile = SD.open("rkflight.txt", FILE_WRITE);
+  Serial.print("Temperature(°C ) = ");
+  Serial.print("\t");
+  Serial.print("Pressure(Pa) = ");
+  Serial.print("\t");
+  Serial.print("Altitude(m) = ");
+  Serial.print("Pressure at sealevel (calculated as Pa) = ");
+  Serial.print("\t");
+  Serial.print("Real altitude(m) = ");
+  Serial.println("\t");
   digitalWrite(LED_BUILTIN, HIGH);
   alt_atual = bmp.readAltitude() - media;
   for (int i = 9; i > 0; i--) {
@@ -75,10 +84,10 @@ void loop() {
   dataString += String(media_movel);
   dataString += ("\t");
   //Serial.print(alt_atual);
-  Serial.print("\t");
+  //Serial.print("\t");
   dataString += String(alt_atual);
   dataString += ("\t");
-  Serial.print("\t");
+ // Serial.print("\t");
 
   for (int j = 9; j > 0; j--) {
     altitude2[j] = altitude2 [j - 1];
@@ -94,7 +103,7 @@ void loop() {
   dataString += String(media_movel2);
   dataString += ("\t");
   //Serial.print(altitude2);
-  Serial.print("\t");
+  //Serial.print("\t");
 
   for (int k = 49; k > 0; k--) {
     medicao[k] = medicao[k - 1];
@@ -109,7 +118,7 @@ void loop() {
   //Serial.print(queda/float (50));
   dataString += String(queda / float(50));
   dataString += ("\t");
-  Serial.print("\t");
+ // Serial.print("\t");
   if (queda >= 45) {
     //Serial.print("1");
     dataString += String("1");
