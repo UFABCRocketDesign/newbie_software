@@ -47,6 +47,8 @@ void setup() {
 //dataString += ("  Pressure at sealevel (calculated) = \t");
 //dataString += (" Pa \t");
   dataString += (" Real altitude = \t meters \t");
+  dataString += ("Relative average \t");
+  dataString += (" Moving average \t");
   
 
   File dataFile = SD.open("JaqueMnt.txt", FILE_WRITE);
@@ -125,7 +127,6 @@ String dataString = "";
     Height = Height + vet [i];
   }
   relative_average = Height / n;
-  dataString += ("Relative average /t");
   dataString += String(relative_average);
   dataString += "\t";
   //Segunda camada de Fitro
@@ -144,7 +145,6 @@ String dataString = "";
     Height = Height + vet2[i];
   }
   moving_average = Height / n;
-  dataString += (" Moving average /t");
   dataString += String(moving_average);
   dataString += "\t";
   //Apogee detection
@@ -156,13 +156,13 @@ String dataString = "";
 
   else {
     cont = cont + 1;
-  dataString += (" Descida /t");
+  dataString += (" Descida \t");
   dataString += ("0");     //descida
   digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (HIGH is the voltage level)  // turn the LED on (LOW is the voltage level);
   }
 
   dataString += "\t";
-  dataString += (" Real /t");
+  dataString += (" Real \t");
   dataString += String(cont);   
   dataString += "\t";
  
