@@ -26,13 +26,13 @@ void setup() {
   // Open serial communications and wait for port to open:
   Serial.begin(115200);
   if (!bmp.begin()) {
-  Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-  while (1) {}
-  while (!Serial) {
-  pinMode(LED_BUILTIN,OUTPUT); 
-    ; // wait for serial port to connect. Needed for native USB port only
+    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+    while (1) {}
+    while (!Serial) {
+      pinMode(LED_BUILTIN, OUTPUT);
+      ; // wait for serial port to connect. Needed for native USB port only
+    }
   }
- }
   // see if the card is present and can be initialized:
   if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present");
@@ -40,19 +40,19 @@ void setup() {
     while (1);
   }
   String dataString = "";
-//dataString += ("Temperature = \t");
-//dataString += (" Pa \t");
-//dataString += ("  Pressure = \t");
-//dataString += (" Pa \t");
-//dataString += ("  Pressure at sealevel (calculated) = \t");
-//dataString += (" Pa \t");
-  dataString += ("Altitude = \t (Height)meters \t");
+  //dataString += ("Temperature = \t");
+  //dataString += (" Pa \t");
+  //dataString += ("  Pressure = \t");
+  //dataString += (" Pa \t");
+  //dataString += ("  Pressure at sealevel (calculated) = \t");
+  //dataString += (" Pa \t");
+  dataString += ("Height (meters) \t");
   dataString += ("Relative average \t");
-  dataString += (" Moving average \t");
-  dataString += (" Descida \t");
-  dataString += ("Apogeu /t");
-    
-  
+  dataString += ("Moving average \t");
+  dataString += ("Descida \t");
+  dataString += ("Contador \t");
+  dataString += ("Apogeu \t");
+
 
   File dataFile = SD.open("JaqueMnt.txt", FILE_WRITE);
 
@@ -67,18 +67,18 @@ void setup() {
   else {
     Serial.println("error opening datalog.txt");
   }
- 
- for (float k = 0; k < numReads; k++) {
+
+  for (float k = 0; k < numReads; k++) {
     accAltbase = accAltbase + bmp.readAltitude();
   }
   Altbase = accAltbase / numReads;   //Média das medições do foguete na base
   Serial.print(Altbase);
   Serial.println('\t');
- 
+
 }
 void loop() {
 
-String dataString = "";
+  String dataString = "";
 
   float Height = 0;
   float current_height;
@@ -152,27 +152,27 @@ String dataString = "";
   dataString += "\t";
   //Apogee detection
   if ( moving_average >= previous ) {
-  cont = 0;
-  dataString += ("1");
-  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)           // turn the LED on (HIGH is the voltage level)
+    cont = 0;
+    dataString += ("1");
+    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)           // turn the LED on (HIGH is the voltage level)
   }
 
   else {
     cont = cont + 1;
-  dataString += ("0");     //descida
-  digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (HIGH is the voltage level)  // turn the LED on (LOW is the voltage level);
+    dataString += ("0");     //descida
+    digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (HIGH is the voltage level)  // turn the LED on (LOW is the voltage level);
   }
 
   dataString += "\t";
-  dataString += String(cont);   
+  dataString += String(cont);
   dataString += "\t";
- 
+
   if (cont >= 50) {
-  dataString += ("1");             //apogeu detectado
-     }
+    dataString += ("1");             //apogeu detectado
+  }
 
   else {
-  dataString += ("0");
+    dataString += ("0");
   }
   dataString += "\t";
   previous =  moving_average;
@@ -191,7 +191,4 @@ String dataString = "";
     Serial.println("error opening datalog.txt");
   }
 
-} 
-
- 
-  
+}
