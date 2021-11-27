@@ -49,6 +49,8 @@ void setup() {
   dataString += (" Real altitude = \t meters \t");
   dataString += ("Relative average \t");
   dataString += (" Moving average \t");
+   dataString += (" Descida \t");
+    
   
 
   File dataFile = SD.open("JaqueMnt.txt", FILE_WRITE);
@@ -156,13 +158,12 @@ String dataString = "";
 
   else {
     cont = cont + 1;
-  dataString += (" Descida \t");
   dataString += ("0");     //descida
   digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (HIGH is the voltage level)  // turn the LED on (LOW is the voltage level);
   }
 
   dataString += "\t";
-  dataString += (" Real \t");
+  dataString += (" \t");
   dataString += String(cont);   
   dataString += "\t";
  
