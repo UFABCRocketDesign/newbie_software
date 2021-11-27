@@ -46,10 +46,11 @@ void setup() {
 //dataString += (" Pa \t");
 //dataString += ("  Pressure at sealevel (calculated) = \t");
 //dataString += (" Pa \t");
-  dataString += (" Real altitude = \t meters \t");
+  dataString += ("Altitude = \t (Height)meters \t");
   dataString += ("Relative average \t");
   dataString += (" Moving average \t");
-   dataString += (" Descida \t");
+  dataString += (" Descida \t");
+  dataString += ("Apogeu /t");
     
   
 
@@ -167,7 +168,6 @@ String dataString = "";
   dataString += "\t";
  
   if (cont >= 50) {
-  dataString += ("Apogeu /t");
   dataString += ("1");             //apogeu detectado
      }
 
