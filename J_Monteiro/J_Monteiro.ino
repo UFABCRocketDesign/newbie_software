@@ -163,7 +163,6 @@ String dataString = "";
   }
 
   dataString += "\t";
-  dataString += (" \t");
   dataString += String(cont);   
   dataString += "\t";
  
