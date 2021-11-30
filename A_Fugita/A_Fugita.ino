@@ -25,10 +25,12 @@ void setup() {
 
 
 void loop() {
+  
+  int dec = 0;
   float f0 = bmp.readAltitude()- zerar;
   float f1 = 0; //saida do filtro0
   float f2 = 0; //saida do filtro1
-  
+
   //Serial.print("Temperature = ");
   //Serial.print(bmp.readTemperature());
   //Serial.print("\t");
@@ -57,6 +59,18 @@ void loop() {
     f2 += filtro1[i];
   }
   f2 /= tam;
+
+  if (f2 > dec){
+    Serial.print(1);
+    Serial.print("\t");
+    dec = 1;
+  }
+  else{
+    Serial.print(0);
+    Serial.print("\t");
+    dec =0;
+  }
+  
 
 
   //Serial.print("Altitude = ");
