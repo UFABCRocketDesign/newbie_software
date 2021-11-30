@@ -47,85 +47,84 @@
 #define IGN_3 46  //act3 LED DA PLAQUINHA
 #define IGN_4 55  //act4 LED DA PLAQUINHA
 
-String dado = "";
-String cabecalho = "";
+String cabecalho = ""; //ok
 //#if usa_Tempo || usa_alt
 //unsigned long tempoAtual = 0;     // will store last time LED was updated
 //#endif
 #if usa_apogeu || usa_alt
-float SomaRef = 0;                //Soma valores iniciais(foguete parado na base)
-float AltitudeRef = 0;            //É o valor da média dos valores iniciais(foguete parado na base)
-float SomaMov = 0;                //Soma dos valores do vetor do filtro1
-float MediaMov = 0;               //É o valor da média dos valores do vetor do filtro1 ou altitude atual
-float MatrizFiltros[qf][tam];     //Vetor para guardar os valores para as médias utilizadas pelos filtros
+//float SomaRef = 0;                //Soma valores iniciais(foguete parado na base)
+float AltitudeRef = 0;            //É o valor da média dos valores iniciais(foguete parado na base)ok
+//float SomaMov = 0;                //Soma dos valores do vetor do filtro1
+//float MediaMov = 0;               //É o valor da média dos valores do vetor do filtro1 ou altitude atual
+//float MatrizFiltros[qf][tam];     //Vetor para guardar os valores para as médias utilizadas pelos filtros
 #endif
 #if usa_apogeu || usa_altMax
-float Hmax = 0;                   //Valor máximo filtrado
+float Hmax = 0;                   //Valor máximo filtrado ok
 #endif
 #if usa_apogeu
-float Delta;                      //Diferença entre valor máximo do filtro1 (Hmax1) e valor atual referênciado (H11)
-int apogeu = 0;
+//float Delta;                      //Diferença entre valor máximo do filtro1 (Hmax1) e valor atual referênciado (H11)
+//int apogeu = 0;
 #endif
 #if usa_acpq
-int auxled1 = 0;
-int auxled2 = 0;
-int auxled3 = 0;
-unsigned long inicio1 = 0;        // will store last time LED was updated
-unsigned long inicio2 = 0;        // will store last time LED was updated
-unsigned long inicio3 = 0;        // will store last time LED was updated
-unsigned long inicio4 = 0;        // will store last time LED was updated
+//int auxled1 = 0;
+//int auxled2 = 0;
+//int auxled3 = 0;
+//unsigned long inicio1 = 0;        // will store last time LED was updated
+//unsigned long inicio2 = 0;        // will store last time LED was updated
+//unsigned long inicio3 = 0;        // will store last time LED was updated
+//unsigned long inicio4 = 0;        // will store last time LED was updated
 #endif
 #if usa_temp
-float T;                          //Valor da Temperatura
+//float T;                          //Valor da Temperatura
 #endif
 #if usa_pre
-float P;                          //Valor da Pressão
+//float P;                          //Valor da Pressão
 //float Pm;                         //Valor da Pressão ao nivel do Mar
 #endif
 #if usa_bar
 Adafruit_BMP085 bmp;              //Cria variável 'bmp' para a biblioteca Adafruit_BMP085
 #endif
 #if usa_giro
-int Gx;                           //Giroscópio em x
-int Gy;                           //Giroscópio em y
-int Gz;                           //Giroscópio em z
+//int Gx;                           //Giroscópio em x
+//int Gy;                           //Giroscópio em y
+//int Gz;                           //Giroscópio em z
 L3G giro;
 #endif
 #if usa_mag
-float Mx;                         //Magnetometro em x
-float My;                         //Magnetometro em y
-float Mz;                         //Magnetometro em z
+//float Mx;                         //Magnetometro em x
+//float My;                         //Magnetometro em y
+//float Mz;                         //Magnetometro em z
 Adafruit_HMC5883_Unified mag;// = Adafruit_HMC5883_Unified(12345);
 #endif
 #if usa_acel
-float Ax;                         //Acelerometro em x
-float Ay;                         //Acelerometro em y
-float Az;                         //Acelerometro em z
+//float Ax;                         //Acelerometro em x
+//float Ay;                         //Acelerometro em y
+//float Az;                         //Acelerometro em z
 Adafruit_ADXL345_Unified accel;// = Adafruit_ADXL345_Unified(12345);
 #endif
 #if usa_SD
-int aux = 1;                      //Variavel auxiliar do while para criação de nome de arquivo do SD
-int tamNomeArq = 0;               //Valor da quantidade de caracteres da variavel NomeArq
-int Num = 0;                      //Valor da variavel que se somará e irá compor o nome do arquivo do SD
-int tamNum = 0;                   //Valor da quantidade de caracteres da variavel Num
-String x;                         //Primeira componente do nome do arquivo ou NomeArq
-String y;                         //Segunda componente do nome do arquivo ou preenchimento de zeros
-String z;                         //Terceira componente do nome do arquivo ou Num
+//int aux = 1;                      //Variavel auxiliar do while para criação de nome de arquivo do SD
+//int tamNomeArq = 0;               //Valor da quantidade de caracteres da variavel NomeArq
+//int Num = 0;                      //Valor da variavel que se somará e irá compor o nome do arquivo do SD
+//int tamNum = 0;                   //Valor da quantidade de caracteres da variavel Num
+//String x;                         //Primeira componente do nome do arquivo ou NomeArq
+//String y;                         //Segunda componente do nome do arquivo ou preenchimento de zeros
+//String z;                         //Terceira componente do nome do arquivo ou Num
 String NomeFinal;                 //Nome final do arquivo do SD
-int sub1 = 0;                     //Variavel auxiliar para contagem de caracteres totais no nome do arquivo do SD;
-int sub2 = 0;                     //Variavel auxiliar para contagem de caracteres totais no nome do arquivo do SD;
+//int sub1 = 0;                     //Variavel auxiliar para contagem de caracteres totais no nome do arquivo do SD;
+//int sub2 = 0;                     //Variavel auxiliar para contagem de caracteres totais no nome do arquivo do SD;
 const int chipSelect = 53;
 #endif
 
 void setup() {
   #if usa_acpq
   pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(IGN_1, OUTPUT);//PINOS DA MACRO pinos.h
+  pinMode(IGN_1, OUTPUT);//PINOS DA MACRO pinos.h feita pelo Heitor
   pinMode(IGN_2, OUTPUT);
   //pinMode(IGN_3, OUTPUT);
   //pinMode(IGN_4, OUTPUT);
-  //digitalWrite(IGN_1, LOW);
-  //digitalWrite(IGN_2, LOW);
+  digitalWrite(IGN_1, LOW);
+  digitalWrite(IGN_2, LOW);
   //digitalWrite(IGN_3, LOW);
   //digitalWrite(IGN_4, LOW);
   #endif
@@ -207,6 +206,7 @@ void setup() {
   cabecalho += "Statu de voo";
   #endif
   #if usa_alt || usa_apogeu
+  float SomaRef = 0;
   for (int i = 0; i < 100; i++) {                       //Este 'for' serve para definir a altitude da base de lançamento como valor de referência.
     SomaRef = SomaRef + bmp.readAltitude();
   }
@@ -221,14 +221,15 @@ void setup() {
   if (!SD.begin(chipSelect)) {
     Serial.println("FALHA NO CARTÃO SD");
   }
-  x = NomeArq;
-  tamNomeArq = x.length();
-  sub1 = 8 - tamNomeArq;
+  String x = NomeArq;
+  int tamNomeArq = x.length();
+  int sub1 = 8 - tamNomeArq;
+  int aux = 1;
   while (aux == 1) {
-    z = String(Num);
-    tamNum = z.length();
-    sub2 = sub1 - tamNum;
-    y = "";
+    String z = String(Num);
+    int tamNum = z.length();
+    int sub2 = sub1 - tamNum;
+    String y = "";
     for (int i = 0; i < sub2; i++) {
       y = y + "0";
     }
@@ -236,7 +237,7 @@ void setup() {
     if (SD.exists(NomeFinal)) {
       //Serial.print(NomeFinal);
       //Serial.println(" ja existe");
-      Num++;
+      int Num++;
       aux = 1;
     }
     else {
@@ -254,7 +255,7 @@ void setup() {
 }
 void loop() {
   unsigned long tempoAtual = millis();
-  dado = "";
+  String dado = "";
   #if usa_Tempo
   dado += String(tempoAtual/1000.0);
   dado += "\t";
@@ -262,17 +263,17 @@ void loop() {
   #if usa_giro
   giro.read();
   #if usa_gx
-  Gx = (int)giro.g.x;
+  int Gx = (int)giro.g.x;
   dado += String(Gx);
   dado += "\t";
   #endif
   #if usa_gy
-  Gy = (int)giro.g.y;
+  int Gy = (int)giro.g.y;
   dado += String(Gy);
   dado += "\t";
   #endif
   #if usa_gz
-  Gz = (int)giro.g.z;
+  int Gz = (int)giro.g.z;
   dado += String(Gz);
   dado += "\t";
   #endif
@@ -281,17 +282,17 @@ void loop() {
   sensors_event_t eventM; 
   mag.getEvent(&eventM);
   #if usa_mx
-  Mx = eventM.magnetic.x;
+  float Mx = eventM.magnetic.x;
   dado += String(Mx);
   dado += "\t";
   #endif
   #if usa_my
-  My = eventM.magnetic.y;
+  float My = eventM.magnetic.y;
   dado += String(My);
   dado += "\t";
   #endif
   #if usa_mz
-  Mz = eventM.magnetic.z;
+  float Mz = eventM.magnetic.z;
   dado += String(Mz);
   dado += "\t";
   #endif
@@ -300,28 +301,28 @@ void loop() {
   sensors_event_t eventA; 
   accel.getEvent(&eventA);
   #if usa_ax
-  Ax = eventA.acceleration.x;
+  float Ax = eventA.acceleration.x;
   dado += String(Ax);
   dado += "\t";
   #endif
   #if usa_ay
-  Ay = eventA.acceleration.y;
+  float Ay = eventA.acceleration.y;
   dado += String(Ay);
   dado += "\t";
   #endif
   #if usa_az
-  Az = eventA.acceleration.z;
+  float Az = eventA.acceleration.z;
   dado += String(Az);
   dado += "\t";
   #endif
   #endif
   #if usa_temp
-  T = bmp.readTemperature();
+  float T = bmp.readTemperature();
   dado += String(T);
   dado += "\t";
   #endif
   #if usa_pre
-  P = bmp.readPressure();
+  float P = bmp.readPressure();
   //Pm = bmp.readSealevelPressure();
   dado += String(P);
   dado += "\t";
@@ -331,7 +332,8 @@ void loop() {
   dado += "\t";
   #endif
   #if usa_apogeu || usa_alt
-  SomaMov = 0;                                         //Zera o SomaMov1 em todo loop
+  float SomaMov = 0;                                         //Zera o SomaMov em todo loop
+  float MatrizFiltros[qf][tam];
   for (int j = 0; j < qf; j++) {
     for (int i = tam - 2; i >= 0; i--) {                 //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1
       MatrizFiltros[j][i + 1] = MatrizFiltros[j][i];
@@ -346,7 +348,7 @@ void loop() {
     for (int i = 0; i <= tam - 1; i++) {                    //Esse 'for' faz a soma dos últimos valores medidos, para a média do filtro1
       SomaMov = SomaMov + MatrizFiltros[j][i];
     }
-    MediaMov = SomaMov / tam;
+    float MediaMov = SomaMov / tam;
     #if usa_alt
     dado += String(MediaMov);                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
     dado += "\t";
@@ -359,13 +361,15 @@ void loop() {
   }
   #endif
   #if usa_apogeu
-  Delta = Hmax - MediaMov;                                 //Compara o valor máximo do filtro1 com o valor atual do filtro1
-
+  float Delta = Hmax - MediaMov;                                 //Compara o valor máximo do filtro1 com o valor atual do filtro1
+  int apogeu = 0;
+  unsigned long inicio1 = 0;
+  unsigned long inicio2 = 0;
   if (Delta >= 2 && apogeu == 0) {                         //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
     apogeu = 1;
     #if usa_acpq
-    inicio1 = tempoAtual + duracao;
-    inicio2 = tempoAtual + espera;
+    unsigned long inicio1 = tempoAtual + duracao;
+    unsigned long inicio2 = tempoAtual + espera;
     #endif
   }
   else if (apogeu == 0) {
@@ -378,6 +382,9 @@ void loop() {
   }
   #endif
   #if usa_acpq
+  int auxled1 = 0;
+  int auxled2 = 0;
+  int auxled3 = 0;
   if (apogeu == 1) {
     if (auxled1 == 0) {
       digitalWrite(IGN_1, HIGH);
@@ -392,7 +399,7 @@ void loop() {
     if (tempoAtual >= inicio2 && auxled2 == 0) {
       digitalWrite(IGN_2, HIGH);
       auxled2 = 1;
-      inicio3 = tempoAtual + duracao;
+      unsigned long inicio3 = tempoAtual + duracao;
       dado += "12";
       //Serial.print("12");
     }
@@ -404,7 +411,7 @@ void loop() {
     if (MediaMov <= altura && auxled3 == 0) {
       digitalWrite(LED_BUILTIN, HIGH);
       auxled3 = 1;
-      inicio4 = tempoAtual + duracao;
+      unsigned long inicio4 = tempoAtual + duracao;
       dado += "13";
     }
     if (tempoAtual >= inicio4 && auxled3 == 1) {
