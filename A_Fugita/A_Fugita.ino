@@ -60,7 +60,7 @@ void loop() {
   }
   f2 /= tam;
 
-  if (bmp.readAltitude()> dec){
+  if (f2 > dec){
     Serial.print(1);
     Serial.print("\t");
     dec = 1;
