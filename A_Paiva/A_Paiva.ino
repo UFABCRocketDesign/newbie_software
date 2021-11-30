@@ -15,13 +15,13 @@
 #define duracao 5000              //Tempo de duracao do acionamento dos paraquedas (ms)
 #define altura 10                 //Altura para abertura do terceiro paraquedas
 
-#define usa_bar 0                 //Variavel de escolha do uso do sensor BMP
+#define usa_bar 1                 //Variavel de escolha do uso do sensor BMP
 #define usa_pre (usa_bar && 0)    //Variavel de escolha do uso do valor Pressão
-#define usa_alt (usa_bar && 0)    //Variavel de escolha do uso do valor Altura
-#define usa_altMax (usa_alt && 1) //Variavel de escolha do uso do valor Altura Máxima
-#define usa_temp (usa_bar && 0)   //Variavel de escolha do uso do valor Temperatura
-#define usa_apogeu (usa_bar && 0) //Variavel de escolha do uso da detecção de apogeu
-#define usa_acpq (usa_apogeu && 1)//Variavel de escolha do uso do acionamento dos paraquedas
+#define usa_alt (usa_bar && 1)    //Variavel de escolha do uso do valor Altura
+#define usa_altMax (usa_alt && 0) //Variavel de escolha do uso do valor Altura Máxima
+#define usa_temp (usa_bar && 1)   //Variavel de escolha do uso do valor Temperatura
+#define usa_apogeu (usa_bar && 1) //Variavel de escolha do uso da detecção de apogeu
+#define usa_acpq (usa_apogeu && 0)//Variavel de escolha do uso do acionamento dos paraquedas
 
 #define usa_giro 0                //Variavel de escolha do uso do sensor
 #define usa_gx (usa_giro && 0)    //Variavel de escolha do uso do valor do giroscopio em x
@@ -47,72 +47,34 @@
 #define IGN_3 46  //act3 LED DA PLAQUINHA
 #define IGN_4 55  //act4 LED DA PLAQUINHA
 
-String cabecalho = ""; //ok
-//#if usa_Tempo || usa_alt
-//unsigned long tempoAtual = 0;     // will store last time LED was updated
-//#endif
+String cabecalho = "";
 #if usa_apogeu || usa_alt
-//float SomaRef = 0;                //Soma valores iniciais(foguete parado na base)
-float AltitudeRef = 0;            //É o valor da média dos valores iniciais(foguete parado na base)ok
-//float SomaMov = 0;                //Soma dos valores do vetor do filtro1
-//float MediaMov = 0;               //É o valor da média dos valores do vetor do filtro1 ou altitude atual
-//float MatrizFiltros[qf][tam];     //Vetor para guardar os valores para as médias utilizadas pelos filtros
+float AltitudeRef = 0;            //É o valor da média dos valores iniciais(foguete parado na base)
+float MatrizFiltros[qf][tam];     //Vetor para guardar os valores para as médias utilizadas pelos filtros
 #endif
 #if usa_apogeu || usa_altMax
-float Hmax = 0;                   //Valor máximo filtrado ok
-#endif
-#if usa_apogeu
-//float Delta;                      //Diferença entre valor máximo do filtro1 (Hmax1) e valor atual referênciado (H11)
-//int apogeu = 0;
+float Hmax = 0;                   //Valor máximo filtrado
 #endif
 #if usa_acpq
-//int auxled1 = 0;
-//int auxled2 = 0;
-//int auxled3 = 0;
-//unsigned long inicio1 = 0;        // will store last time LED was updated
-//unsigned long inicio2 = 0;        // will store last time LED was updated
-//unsigned long inicio3 = 0;        // will store last time LED was updated
-//unsigned long inicio4 = 0;        // will store last time LED was updated
-#endif
-#if usa_temp
-//float T;                          //Valor da Temperatura
-#endif
-#if usa_pre
-//float P;                          //Valor da Pressão
-//float Pm;                         //Valor da Pressão ao nivel do Mar
+unsigned long inicio1 = 0;        // will store last time LED was updated
+unsigned long inicio2 = 0;        // will store last time LED was updated
+unsigned long inicio3 = 0;        // will store last time LED was updated
+unsigned long inicio4 = 0;        // will store last time LED was updated
 #endif
 #if usa_bar
 Adafruit_BMP085 bmp;              //Cria variável 'bmp' para a biblioteca Adafruit_BMP085
 #endif
 #if usa_giro
-//int Gx;                           //Giroscópio em x
-//int Gy;                           //Giroscópio em y
-//int Gz;                           //Giroscópio em z
 L3G giro;
 #endif
 #if usa_mag
-//float Mx;                         //Magnetometro em x
-//float My;                         //Magnetometro em y
-//float Mz;                         //Magnetometro em z
 Adafruit_HMC5883_Unified mag;// = Adafruit_HMC5883_Unified(12345);
 #endif
 #if usa_acel
-//float Ax;                         //Acelerometro em x
-//float Ay;                         //Acelerometro em y
-//float Az;                         //Acelerometro em z
 Adafruit_ADXL345_Unified accel;// = Adafruit_ADXL345_Unified(12345);
 #endif
 #if usa_SD
-//int aux = 1;                      //Variavel auxiliar do while para criação de nome de arquivo do SD
-//int tamNomeArq = 0;               //Valor da quantidade de caracteres da variavel NomeArq
-//int Num = 0;                      //Valor da variavel que se somará e irá compor o nome do arquivo do SD
-//int tamNum = 0;                   //Valor da quantidade de caracteres da variavel Num
-//String x;                         //Primeira componente do nome do arquivo ou NomeArq
-//String y;                         //Segunda componente do nome do arquivo ou preenchimento de zeros
-//String z;                         //Terceira componente do nome do arquivo ou Num
 String NomeFinal;                 //Nome final do arquivo do SD
-//int sub1 = 0;                     //Variavel auxiliar para contagem de caracteres totais no nome do arquivo do SD;
-//int sub2 = 0;                     //Variavel auxiliar para contagem de caracteres totais no nome do arquivo do SD;
 const int chipSelect = 53;
 #endif
 
@@ -323,7 +285,7 @@ void loop() {
   #endif
   #if usa_pre
   float P = bmp.readPressure();
-  //Pm = bmp.readSealevelPressure();
+  //float Pm = bmp.readSealevelPressure();
   dado += String(P);
   dado += "\t";
   #endif
@@ -333,7 +295,7 @@ void loop() {
   #endif
   #if usa_apogeu || usa_alt
   float SomaMov = 0;                                         //Zera o SomaMov em todo loop
-  float MatrizFiltros[qf][tam];
+  float MediaMov = 0;
   for (int j = 0; j < qf; j++) {
     for (int i = tam - 2; i >= 0; i--) {                 //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1
       MatrizFiltros[j][i + 1] = MatrizFiltros[j][i];
@@ -348,7 +310,7 @@ void loop() {
     for (int i = 0; i <= tam - 1; i++) {                    //Esse 'for' faz a soma dos últimos valores medidos, para a média do filtro1
       SomaMov = SomaMov + MatrizFiltros[j][i];
     }
-    float MediaMov = SomaMov / tam;
+    MediaMov = SomaMov / tam;
     #if usa_alt
     dado += String(MediaMov);                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
     dado += "\t";
@@ -363,13 +325,11 @@ void loop() {
   #if usa_apogeu
   float Delta = Hmax - MediaMov;                                 //Compara o valor máximo do filtro1 com o valor atual do filtro1
   int apogeu = 0;
-  unsigned long inicio1 = 0;
-  unsigned long inicio2 = 0;
   if (Delta >= 2 && apogeu == 0) {                         //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
     apogeu = 1;
     #if usa_acpq
-    unsigned long inicio1 = tempoAtual + duracao;
-    unsigned long inicio2 = tempoAtual + espera;
+    inicio1 = tempoAtual + duracao;
+    inicio2 = tempoAtual + espera;
     #endif
   }
   else if (apogeu == 0) {
@@ -399,7 +359,7 @@ void loop() {
     if (tempoAtual >= inicio2 && auxled2 == 0) {
       digitalWrite(IGN_2, HIGH);
       auxled2 = 1;
-      unsigned long inicio3 = tempoAtual + duracao;
+      inicio3 = tempoAtual + duracao;
       dado += "12";
       //Serial.print("12");
     }
@@ -411,7 +371,7 @@ void loop() {
     if (MediaMov <= altura && auxled3 == 0) {
       digitalWrite(LED_BUILTIN, HIGH);
       auxled3 = 1;
-      unsigned long inicio4 = tempoAtual + duracao;
+      inicio4 = tempoAtual + duracao;
       dado += "13";
     }
     if (tempoAtual >= inicio4 && auxled3 == 1) {
