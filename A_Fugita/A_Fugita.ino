@@ -73,7 +73,7 @@ void loop() {
   Serial.print(f2);
   Serial.print("\t");
   
-  if (f2 > dec){
+  if (f2 < dec){
     Serial.print(1);
     Serial.print("\t");
   }
