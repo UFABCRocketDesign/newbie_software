@@ -55,7 +55,13 @@ float MatrizFiltros[qf][tam];     //Vetor para guardar os valores para as média
 #if usa_apogeu || usa_altMax
 float Hmax = 0;                   //Valor máximo filtrado
 #endif
+#if usa_apogeu
+int apogeu = 0;
+#endif
 #if usa_acpq
+int auxled1 = 0;
+int auxled2 = 0;
+int auxled3 = 0;
 unsigned long inicio1 = 0;        // will store last time LED was updated
 unsigned long inicio2 = 0;        // will store last time LED was updated
 unsigned long inicio3 = 0;        // will store last time LED was updated
@@ -225,17 +231,17 @@ void loop() {
   #if usa_giro
   giro.read();
   #if usa_gx
-  int Gx = (int)giro.g.x;
+  int Gx = giro.g.x;
   dado += String(Gx);
   dado += "\t";
   #endif
   #if usa_gy
-  int Gy = (int)giro.g.y;
+  int Gy = giro.g.y;
   dado += String(Gy);
   dado += "\t";
   #endif
   #if usa_gz
-  int Gz = (int)giro.g.z;
+  int Gz = giro.g.z;
   dado += String(Gz);
   dado += "\t";
   #endif
@@ -324,7 +330,7 @@ void loop() {
   #endif
   #if usa_apogeu
   float Delta = Hmax - MediaMov;                                 //Compara o valor máximo do filtro1 com o valor atual do filtro1
-  int apogeu = 0;
+  
   if (Delta >= 2 && apogeu == 0) {                         //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
     apogeu = 1;
     #if usa_acpq
@@ -342,9 +348,6 @@ void loop() {
   }
   #endif
   #if usa_acpq
-  int auxled1 = 0;
-  int auxled2 = 0;
-  int auxled3 = 0;
   if (apogeu == 1) {
     if (auxled1 == 0) {
       digitalWrite(IGN_1, HIGH);
