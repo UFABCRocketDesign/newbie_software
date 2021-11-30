@@ -35,118 +35,127 @@ void setup() {
   Serial.println("card initialized.");
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
-  Serial.print("Temperature(°C ) = ");
-  Serial.print("\t");
-  Serial.print("Pressure(Pa) = ");
-  Serial.print("\t");
-  Serial.print("Altitude(m) = ");
-  Serial.print("Pressure at sealevel (calculated as Pa) = ");
-  Serial.print("\t");
-  Serial.print("Real altitude(m) = ");
-  Serial.println("\t");
-  if (!bmp.begin()) {
-    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-    while (1) {}
-  }
-  for (i = 0; i < 97; i++) {
-    alt_atual =  bmp.readAltitude();
-    soma += alt_atual;
-  }
-  media = soma / 97;
-}
-
-void loop() {
   String dataString = "";
   File dataFile = SD.open("rkflight.txt", FILE_WRITE);
-  digitalWrite(LED_BUILTIN, HIGH);
-  alt_atual = bmp.readAltitude() - media;
-  for (int i = 9; i > 0; i--) {
-    altitude[i] = altitude [i - 1];
-  }
-  altitude[0] = alt_atual;
-  soma_mm = 0;
-  for (int i = 0; i < 10; i++) {
-    soma_mm += altitude[i];
-  }
-  media_movel = soma_mm / 10;
-
-  //Serial.print(media_movel);
-  //Serial.print("\t");
-  dataString += String(media_movel);
-  dataString += ("\t");
-  //Serial.print(alt_atual);
-  Serial.print("\t");
-  dataString += String(alt_atual);
-  dataString += ("\t");
-  Serial.print("\t");
-
-  for (int j = 9; j > 0; j--) {
-    altitude2[j] = altitude2 [j - 1];
-  }
-  altitude2[0] = media_movel;
-  soma_mm2 = 0;
-  for (int j = 0; j < 10; j++) {
-    soma_mm2 += altitude2[j];
-  }
-  media_movel2 = soma_mm2 / 10;
-  //Serial.print(media_movel2);
-  //Serial.print("\t");
-  dataString += String(media_movel2);
-  dataString += ("\t");
-  //Serial.print(altitude2);
-  Serial.print("\t");
-
-  for (int k = 49; k > 0; k--) {
-    medicao[k] = medicao[k - 1];
-  }
-  medicao[0] = media_movel2;
-  queda = 0;
-  for (int k = 0; k < 49; k++) {
-    if (medicao[k] < medicao[k + 1]) {
-      queda += 1;
-    }
-  }
-  //Serial.print(queda/float (50));
-  dataString += String(queda / float(50));
-  dataString += ("\t");
-  Serial.print("\t");
-  if (queda >= 45) {
-    //Serial.print("1");
-    dataString += String("1");
-    dataString += ("\t");
-  }
-  else {
-    //Serial.print("0");
-    dataString += String("0");
-    dataString += ("\t");
-  }
+  dataString += String("Temperature(°C ) = ");
+  dataString += String("\t");
+  dataString += String("Pressure(Pa) = ");
+  dataString += String("\t");
+  dataString += String("Altitude(m) = ");
+  dataString += String("Pressure at sealevel (calculated as Pa) = ");
+  dataString += String("\t");
+  dataString += String("Real altitude(m) = ");
+  dataString += String("\t");
   Serial.println(dataString);
 
   if (dataFile) {
     dataFile.println(dataString);
     dataFile.close();
   }
-  else {
-    Serial.println("error opening datalog.txt");
+    if (!bmp.begin()) {
+      Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+      while (1) {}
+    }
+    for (i = 0; i < 97; i++) {
+      alt_atual =  bmp.readAltitude();
+      soma += alt_atual;
+    }
+    media = soma / 97;
   }
-}
+
+
+  void loop() {
+    String dataString = "";
+    File dataFile = SD.open("rkflight.txt", FILE_WRITE);
+    digitalWrite(LED_BUILTIN, HIGH);
+    alt_atual = bmp.readAltitude() - media;
+    for (int i = 9; i > 0; i--) {
+      altitude[i] = altitude [i - 1];
+    }
+    altitude[0] = alt_atual;
+    soma_mm = 0;
+    for (int i = 0; i < 10; i++) {
+      soma_mm += altitude[i];
+    }
+    media_movel = soma_mm / 10;
+
+    //Serial.print(media_movel);
+    //Serial.print("\t");
+    dataString += String(media_movel);
+    dataString += ("\t");
+    //Serial.print(alt_atual);
+    //Serial.print("\t");
+    dataString += String(alt_atual);
+    dataString += ("\t");
+    // Serial.print("\t");
+
+    for (int j = 9; j > 0; j--) {
+      altitude2[j] = altitude2 [j - 1];
+    }
+    altitude2[0] = media_movel;
+    soma_mm2 = 0;
+    for (int j = 0; j < 10; j++) {
+      soma_mm2 += altitude2[j];
+    }
+    media_movel2 = soma_mm2 / 10;
+    //Serial.print(media_movel2);
+    //Serial.print("\t");
+    dataString += String(media_movel2);
+    dataString += ("\t");
+    //Serial.print(altitude2);
+    //Serial.print("\t");
+
+    for (int k = 49; k > 0; k--) {
+      medicao[k] = medicao[k - 1];
+    }
+    medicao[0] = media_movel2;
+    queda = 0;
+    for (int k = 0; k < 49; k++) {
+      if (medicao[k] < medicao[k + 1]) {
+        queda += 1;
+      }
+    }
+    //Serial.print(queda/float (50));
+    dataString += String(queda / float(50));
+    dataString += ("\t");
+    // Serial.print("\t");
+    if (queda >= 45) {
+      //Serial.print("1");
+      dataString += String("1");
+      dataString += ("\t");
+    }
+    else {
+      //Serial.print("0");
+      dataString += String("0");
+      dataString += ("\t");
+    }
+    Serial.println(dataString);
+
+    if (dataFile) {
+      dataFile.println(dataString);
+      dataFile.close();
+    }
+    else {
+      Serial.println("error opening datalog.txt");
+    }
+  }
 
 
 
 
 
-//digitalWrite(LED_BUILTIN, HIGH);
-//Serial.print(bmp.readPressure());
-//Serial.print("\t");
-//digitalWrite(LED_BUILTIN, LOW);
+  //digitalWrite(LED_BUILTIN, HIGH);
+  //Serial.print(bmp.readPressure());
+  //Serial.print("\t");
+  //digitalWrite(LED_BUILTIN, LOW);
 
-// Calculate altitude assuming 'standard' barometric
-// pressure of 1013.25 millibar = 101325 Pascal
-//Serial.print(bmp.readAltitude());
-//Serial.print("\t");
+  // Calculate altitude assuming 'standard' barometric
+  // pressure of 1013.25 millibar = 101325 Pascal
+  //Serial.print(bmp.readAltitude());
+  //Serial.print("\t");
 
-//Serial.print(bmp.readSealevelPressure());
-//Serial.print("\t");
+  //Serial.print(bmp.readSealevelPressure());
+  //Serial.print("\t");
 
-//Serial.print(bmp.readAltitude(101500));
-//Serial.print("\t");
+  //Serial.print(bmp.readAltitude(101500));
+  //Serial.print("\t");
