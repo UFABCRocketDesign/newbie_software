@@ -37,15 +37,15 @@ void setup() {
   Serial.begin(115200);
   String dataString = "";
   File dataFile = SD.open("rkflight.txt", FILE_WRITE);
-  dataString += String("Temperature(°C ) = ");
+  dataString += String("Average altitude (m)");
   dataString += String("\t");
-  dataString += String("Pressure(Pa) = ");
+  dataString += String("Current altidude");
   dataString += String("\t");
   dataString += String("Altitude(m) = ");
-  dataString += String("Pressure at sealevel (calculated as Pa) = ");
+  dataString += String("Filtered altitude (m)");
   dataString += String("\t");
-  dataString += String("Real altitude(m) = ");
-  dataString += String("\t");
+ // dataString += String("Real altitude(m) = ");
+  //dataString += String("\t");
   Serial.println(dataString);
 
   if (dataFile) {
