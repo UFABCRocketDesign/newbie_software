@@ -22,7 +22,9 @@ int j = 0;
 float media_movel2 = 0;
 float medicao[50];
 int queda = 0;
-
+int numA = 1;
+String dataName; 
+String newData;
 
 void setup() {
   while (!Serial) {
@@ -66,7 +68,12 @@ void setup() {
 
   void loop() {
     String dataString = "";
-    File dataFile = SD.open("rkflight.txt", FILE_WRITE);
+    File dataFile = SD.open("bruno.txt", FILE_WRITE);
+    if (SD.exists("bruno.txt")) {
+        dataName = "bruno"+ String(numA)+".txt";
+        dataFile = SD.open(dataName, FILE_WRITE); 
+        numA += 1;   
+    }  
     digitalWrite(LED_BUILTIN, HIGH);
     alt_atual = bmp.readAltitude() - media;
     for (int i = 9; i > 0; i--) {
