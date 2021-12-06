@@ -15,9 +15,9 @@ Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
 Adafruit_BMP085 bmp;
 L3G gyro;
 
-#define use_tempo 0
-#define use_sd 0
-#define use_bar 0
+#define use_tempo 1
+#define use_sd 1
+#define use_bar 1
 #define use_gyro 1
 #define use_mag 1
 #define use_accel 1
@@ -29,16 +29,16 @@ L3G gyro;
 #define use_apogeu (use_alt && 1)
 
 #define use_gyro_x (use_gyro && 1)
-#define use_gyro_y (use_gyro && 0)
-#define use_gyro_z (use_gyro && 0)
+#define use_gyro_y (use_gyro && 1)
+#define use_gyro_z (use_gyro && 1)
 
 #define use_mag_x (use_mag && 1)
-#define use_mag_y (use_mag && 0)
-#define use_mag_z (use_mag && 0)
+#define use_mag_y (use_mag && 1)
+#define use_mag_z (use_mag && 1)
 
 #define use_accel_x (use_accel && 1)
-#define use_accel_y (use_accel && 0)
-#define use_accel_z (use_accel && 0)
+#define use_accel_y (use_accel && 1)
+#define use_accel_z (use_accel && 1)
 
 #define l 20 // tamanho
 #define IGN_1 36  /*act1*/
@@ -48,14 +48,10 @@ L3G gyro;
 #define ledPin LED_BUILTIN
 
 #if (use_alt)
-float novaAlt=0.0;
 float velhaAlt=0.0;
 float media=0.0;
-float h = 0.0;
 float lista[l];
-float media_mov = 0;
 float lista2[l];
-float media_mov2 = 0;
 #endif
 
 #if use_apogeu
@@ -257,10 +253,11 @@ void loop() {
   float t_atual_segundos = t_atual/1000.0;
   // make a string for assembling the data to log:
   String dataString = "";
-
+  
   //// LEITURA DE SENSORES
 
   #if use_alt
+  float h = 0.0;
   // Calculate altitude assuming 'standard' barometric pressure of 1013.25 millibar = 101325 Pascal
   float novaAlt=bmp.readAltitude();
   h = novaAlt - media;  //altura 
@@ -341,6 +338,7 @@ void loop() {
   
   #if use_alt
   // filtro 1
+  float media_mov = 0;
   for (int k=0; k<(l-1); k++) {
     lista[k] = lista[k+1];
   }
@@ -351,6 +349,7 @@ void loop() {
   media_mov = media_mov/l;
   
   // filtro 2
+  float media_mov2 = 0;
   for (int k=0; k<(l-1); k++) {
     lista2[k] = lista2[k+1];
   }
@@ -497,9 +496,7 @@ void loop() {
   #endif
 
   #if use_alt
-  // Reiniciando variáveis de velha altitude e filtros de altura
+  // Reiniciando variável de velha altitude
   velhaAlt = media_mov2;
-  media_mov = 0;
-  media_mov2 = 0;
   #endif
 }
