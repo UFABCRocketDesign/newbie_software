@@ -24,9 +24,9 @@ L3G gyro;
 #define print_serial 1
 
 #define use_alt (use_bar && 1)
-#define use_pressao (use_bar && 1)
-#define use_temp (use_bar && 1)
-#define use_apogeu (use_alt && 1)
+#define use_pressao (use_bar && 0)
+#define use_temp (use_bar && 0)
+#define use_apogeu (use_alt && 0)
 
 #define use_gyro_x (use_gyro && 1)
 #define use_gyro_y (use_gyro && 1)
