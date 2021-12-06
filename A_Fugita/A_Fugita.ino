@@ -6,8 +6,10 @@ Adafruit_BMP085 bmp;
 float zerar = 0;
 float filtro[tam] = {};
 float filtro1[tam] = {};
-
+float dec = 0;
+  
 void setup() {
+    
   Serial.begin(115200);
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
@@ -19,16 +21,18 @@ void setup() {
     zerar+= valor;
   }
   zerar /= zer;
+    
   
   //Serial.println("Temperature\tPressure\tAltitude\tPressure at sealevel (calculated)\tReal Altitude"); 
 }
 
 
 void loop() {
+  
   float f0 = bmp.readAltitude()- zerar;
   float f1 = 0; //saida do filtro0
   float f2 = 0; //saida do filtro1
-  
+
   //Serial.print("Temperature = ");
   //Serial.print(bmp.readTemperature());
   //Serial.print("\t");
@@ -57,6 +61,7 @@ void loop() {
     f2 += filtro1[i];
   }
   f2 /= tam;
+  
 
 
   //Serial.print("Altitude = ");
@@ -67,6 +72,17 @@ void loop() {
   Serial.print("\t");
   Serial.print(f2);
   Serial.print("\t");
+  
+  if (f2 < dec){
+    Serial.print(1);
+    Serial.print("\t");
+  }
+  else{
+    Serial.print(0);
+    Serial.print("\t");
+  }
+
+  dec = f2;
 
   //Serial.print("Pressure at sealevel (calculated) = ");
   //Serial.print(bmp.readSealevelPressure());
