@@ -15,12 +15,12 @@ Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
 Adafruit_BMP085 bmp;
 L3G gyro;
 
-#define use_tempo 1
-#define use_sd 1
+#define use_tempo 0
+#define use_sd 0
 #define use_bar 1
-#define use_gyro 1
-#define use_mag 1
-#define use_accel 1
+#define use_gyro 0
+#define use_mag 0
+#define use_accel 0
 #define print_serial 1
 
 #define use_alt (use_bar && 1)
@@ -193,7 +193,7 @@ void setup() {
   #endif
   
   #if (use_alt)
-  cabecalho += "Altitude [m]\tAltura [m]\tFiltro1 (h)\tFiltro2 (h)\t";
+  cabecalho += "Altura [m]\tFiltro1 (h)\tFiltro2 (h)\t";
   #endif
   
   #if (use_temp)
@@ -396,8 +396,8 @@ void loop() {
   dataString += "\t";
   #endif
   #if use_alt
-  dataString += String(novaAlt);
-  dataString += "\t";
+  // dataString += String(novaAlt);
+  // dataString += "\t";
   dataString += String(h);
   dataString += "\t";
   dataString += String(media_mov);  // media_mov é o filtro 1 de altura
