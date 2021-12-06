@@ -49,19 +49,19 @@ L3G gyro;
 
 #if (use_alt)
 float velhaAlt=0.0;
-float media=0.0;
+float altura_referencia=0.0;
 float lista[l];
 float lista2[l];
 #endif
 
 #if use_apogeu
 int encontra_apogeu=0;
-int apogeu_detectado = false;
-int laco_led_2 = false;      // variavel para entrar no laço liga led 2 
-int laco_led_3 = false;      // variavel para entrar no laço liga led 3 (built in)
-int ledState1 = LOW;    // ledState used to set the LED
-int ledState2 = LOW; 
-int ledState3 = LOW;
+bool apogeu_detectado = false;
+bool laco_led_2 = false;      // variavel para entrar no laço liga led 2 
+bool laco_led_3 = false;      // variavel para entrar no laço liga led 3 (built in)
+bool ledState1 = LOW;    // ledState used to set the LED
+bool ledState2 = LOW; 
+bool ledState3 = LOW;
 #define h_paraquedas_2 10  // altura para acionar 2º paraquedas (led2)
 #define interv_desliga_led 7000      // interval at which to blink (milliseconds)
 #define interv_liga_led2 4000
@@ -73,11 +73,38 @@ unsigned long desliga_led2 = 0; // quando o led tem que desligar após o apogeu
 unsigned long desliga_led3 = 0;
 #endif
 
-const int chipSelect = 53;
-String cabecalho = "";
+#define chipSelect 53
 String nomeArquivo = "";
 
+float filtro_altura(float entrada, int i)
+{
+  float media_mov = 0.0;
+  if (i==1){
+   for (int k=0; k<(l-1); k++){
+    lista[k] = lista[k+1];
+   }
+   lista[l-1] = entrada;
+   for (int j=0; j<l; j++){
+    media_mov = media_mov + lista[j];
+   }
+   media_mov = media_mov/l;
+  }
+  
+  else if (i==2){
+   for (int k=0; k<(l-1); k++){
+    lista2[k] = lista2[k+1];
+   }
+   lista2[l-1] = entrada;
+   for (int j=0; j<l; j++){
+    media_mov = media_mov + lista2[j];
+   }
+   media_mov = media_mov/l;
+  }
+  return media_mov;  
+}
+
 void setup() {
+  String cabecalho = "";
   // initialize digital pin LED_BUILTIN as an output.
   pinMode(ledPin, OUTPUT);
   pinMode(IGN_1, OUTPUT);
@@ -154,9 +181,9 @@ void setup() {
   // MÉDIA DE ALTITUDE
   
   for (int i=0; i<20; i++) {
-    media =  media + bmp.readAltitude();
+    altura_referencia =  altura_referencia + bmp.readAltitude();
   }
-  media = media / 20;
+  altura_referencia = altura_referencia / 20;
   #endif
 
   // CABEÇALHO
@@ -260,7 +287,7 @@ void loop() {
   float h = 0.0;
   // Calculate altitude assuming 'standard' barometric pressure of 1013.25 millibar = 101325 Pascal
   float novaAlt=bmp.readAltitude();
-  h = novaAlt - media;  //altura 
+  h = novaAlt - altura_referencia;  //altura 
   #endif
 
   #if use_temp
@@ -338,26 +365,28 @@ void loop() {
   
   #if use_alt
   // filtro 1
-  float media_mov = 0;
-  for (int k=0; k<(l-1); k++) {
-    lista[k] = lista[k+1];
-  }
-  lista[l-1] = h;
-  for (int j=0; j<l; j++) {
-    media_mov = media_mov + lista[j];
-  }
-  media_mov = media_mov/l;
+  float media_mov = filtro_altura(h, 1);
+//  float media_mov = 0;
+//  for (int k=0; k<(l-1); k++) {
+//    lista[k] = lista[k+1];
+//  }
+//  lista[l-1] = h;
+//  for (int j=0; j<l; j++) {
+//    media_mov = media_mov + lista[j];
+//  }
+//  media_mov = media_mov/l;
   
   // filtro 2
-  float media_mov2 = 0;
-  for (int k=0; k<(l-1); k++) {
-    lista2[k] = lista2[k+1];
-  }
-  lista2[l-1] = media_mov;
-  for (int j=0; j<l; j++) {
-    media_mov2 = media_mov2 + lista2[j];
-  }
-  media_mov2 = media_mov2/l;
+  float media_mov2 = filtro_altura(media_mov, 2);
+//  float media_mov2 = 0;
+//  for (int k=0; k<(l-1); k++) {
+//    lista2[k] = lista2[k+1];
+//  }
+//  lista2[l-1] = media_mov;
+//  for (int j=0; j<l; j++) {
+//    media_mov2 = media_mov2 + lista2[j];
+//  }
+//  media_mov2 = media_mov2/l;
   #endif
   
   //// REUNINDO OS DADOS EM UMA STRING
@@ -434,8 +463,8 @@ void loop() {
     encontra_apogeu = 0;
   }
 
-  if (encontra_apogeu == 5) {  
-    dataString += "Apogeu Detectado! Led 1";
+  if (encontra_apogeu <= 5) {  
+    dataString += "Apogeu foi detectado! Descendo.";
     dataString += "\t";
     if (apogeu_detectado == false) {
       // LED 1
