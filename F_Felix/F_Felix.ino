@@ -43,6 +43,9 @@ L3G gyro;
 #define use_pressao (use_baro && 0)
 #define use_temp (use_baro && 0)
 #define use_apogeu (use_alt && 1)
+#define use_paraquedas1 (use_apogeu && 1)
+#define use_paraquedas2 (use_paraquedas2 && 1)
+#define use_paraquedas3 (use_apogeu && 1)
 
 #if use_altura
 float auxiliar = 0;
@@ -58,18 +61,23 @@ String arquivo = "";
 #if use_relogio
 unsigned long tempoAtual = 0;
 #endif
-#if use_apogeu
-int num = 0;
+#if use_paraquedas1
 int led = LOW;
 int led2 = LOW;
-int led3 = LOW;
-int led4 = LOW;
-int led5 = LOW;
-int led6 = LOW;
 unsigned long desligaLED = 0;
 unsigned long desligaLED2 = 0;
 unsigned long ligaLED2 = 0;
+#endif
+#if use_paraquedas2
+int led3 = LOW;
+int led4 = LOW;
 unsigned long desligaLED3 = 0;
+#endif
+#if use_paraquedas3
+int led5 = LOW;
+int led6 = LOW;
+#endif
+#if use_apogeu
 float apogeu = 0;
 boolean detectaApogeu = false;
 #endif
@@ -348,7 +356,9 @@ void loop() {
   }
 
   float diferenca = apogeu - segundaMediaMovel;
-
+ #endif
+ 
+ #if use_paraquedas1
   if (diferenca >= 1) {
     dataString += String("caindo\t");
 
@@ -364,7 +374,6 @@ void loop() {
       dataString += String("subindo\t");
     }
   }
-
   if (detectaApogeu == true) {
 
     if (led2 == HIGH) {
@@ -374,7 +383,8 @@ void loop() {
         led2 = LOW;
       }
     }
-
+  #endif
+  #if use_paraquedas2
     if (led3 == LOW && tempoAtual >= ligaLED2 ) {
       digitalWrite(IGN_2, HIGH);
       led4 = HIGH;
@@ -388,7 +398,8 @@ void loop() {
         led4 = LOW;
       }
     }
-
+  #endif
+  #if use_paraquedas3
     if (led5 == LOW && segundaMediaMovel <= 10 ) {
       digitalWrite(LED_BUILTIN , HIGH);
       led6 = HIGH;
