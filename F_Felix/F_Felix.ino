@@ -271,7 +271,7 @@ void loop() {
     somaVet += matriz[0][i];
   }
 
-  mediaMovel = somaVet / 10.0;
+  mediaMovel = somaVet / (float)qtdValores;
 
 
   for (int i = 0; i < qtdValores - 1; i ++) {
