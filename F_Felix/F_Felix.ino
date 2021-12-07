@@ -74,11 +74,6 @@ void setup() {
   
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-
-  }
-
-  while (!Serial) {
-    ;
   }
 
   Serial.print("Initializing SD card...");
@@ -86,7 +81,6 @@ void setup() {
   if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present");
     // don't do anything more:
-    while (1);
   }
   Serial.println("card initialized.");
 
