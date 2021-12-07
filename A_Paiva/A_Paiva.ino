@@ -323,6 +323,9 @@ void loop() {
 //    #endif
 //  }
   float valoratualizado = bmp.readAltitude() - AltitudeRef;
+  #if usa_alt
+  dado += String(valoratualizado)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
+  #endif
   float Afiltrada = Friutu(valoratualizado, 0);
   #if usa_alt
   dado += String(Afiltrada)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
