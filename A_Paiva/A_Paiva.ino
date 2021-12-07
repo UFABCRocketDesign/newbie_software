@@ -19,7 +19,7 @@
 #define usa_pre (usa_bar && 0)    //Variavel de escolha do uso do valor Pressão
 #define usa_alt (usa_bar && 1)    //Variavel de escolha do uso do valor Altura
 #define usa_altMax (usa_alt && 0) //Variavel de escolha do uso do valor Altura Máxima
-#define usa_temp (usa_bar && 1)   //Variavel de escolha do uso do valor Temperatura
+#define usa_temp (usa_bar && 0)   //Variavel de escolha do uso do valor Temperatura
 #define usa_apogeu (usa_bar && 0) //Variavel de escolha do uso da detecção de apogeu
 #define usa_acpq (usa_apogeu && 0)//Variavel de escolha do uso do acionamento dos paraquedas
 
@@ -28,8 +28,8 @@
 #define usa_gy (usa_giro && 0)    //Variavel de escolha do uso do valor do giroscopio em y
 #define usa_gz (usa_giro && 0)    //Variavel de escolha do uso do valor do giroscopio em z
 
-#define usa_acel 0                //Variavel de escolha do uso de funções
-#define usa_ax (usa_acel && 0)    //Variavel de escolha do uso do valor do acelerometro em x
+#define usa_acel 1                //Variavel de escolha do uso de funções
+#define usa_ax (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em x
 #define usa_ay (usa_acel && 0)    //Variavel de escolha do uso do valor do acelerometro em y
 #define usa_az (usa_acel && 0)    //Variavel de escolha do uso do valor do acelerometro em z
 
@@ -322,6 +322,10 @@ void loop() {
 //    dado += "\t";
 //    #endif
 //  }
+  float Axfiltrada = Friutu(Ax, 2);
+  #if usa_ax
+  dado += String(Axfiltrada)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
+  #endif
   float valoratualizado = bmp.readAltitude() - AltitudeRef;
   #if usa_alt
   dado += String(valoratualizado)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
@@ -330,14 +334,11 @@ void loop() {
   #if usa_alt
   dado += String(Afiltrada)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
   #endif
-  Afiltrada = Friutu(Afiltrada, 1);
+  float Afiltrada2 = Friutu(Afiltrada, 1);
   #if usa_alt
-  dado += String(Afiltrada)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
+  dado += String(Afiltrada2)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
   #endif
-  float Pfiltrada = Friutu(T, 2);
-  #if usa_pre
-  dado += String(Pfiltrada)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
-  #endif
+  
   #endif
   #if usa_apogeu || usa_altMax
   if (Hmax < MediaMov) {                                    //Pega o valor máximo da média/filtro2
