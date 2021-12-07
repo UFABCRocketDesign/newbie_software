@@ -55,20 +55,17 @@ void setup() {
   {
     /* There was a problem detecting the ADXL345 ... check your connections */
     Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
-    while(1);
   }
 
   if(!mag.begin())
   {
     /* There was a problem detecting the HMC5883 ... check your connections */
     Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
-    while(1);
   }
 
   if (!gyro.init())
   {
     Serial.println("Failed to autodetect gyro type!");
-    while (1);
   }
   
   gyro.enableDefault();
@@ -77,7 +74,6 @@ void setup() {
   
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-    while (1) {}
 
   }
 
@@ -107,8 +103,6 @@ void setup() {
   dataString += ("Pres. sealevel(Pa)\t");
 
   dataString += ("Real alt.(m)\t");
-
-  dataString += ("Foguete\t");
 
   dataString += ("Variação\t");
 
@@ -323,7 +317,6 @@ void loop() {
       }
     }
   }
-
 
   File dataFile = SD.open(arquivo, FILE_WRITE);
 
