@@ -9,18 +9,18 @@
 
 //VALORES DE ENTRADA
 #define tam 10                    //Tamanho da matriz do filtro(quantidade de valores usado)
-#define qf 2                      //Quantidade de filtros
+#define qf 3                      //Quantidade de filtros
 #define NomeArq "apm"             //Nome do arquivo para o cartão SD entre aspas
 #define espera 0000               //Tempo de espera para acionamento do paraquedas 2 (ms)
 #define duracao 5000              //Tempo de duracao do acionamento dos paraquedas (ms)
 #define altura 10                 //Altura para abertura do terceiro paraquedas
 
 #define usa_bar 1                 //Variavel de escolha do uso do sensor BMP
-#define usa_pre (usa_bar && 0)    //Variavel de escolha do uso do valor Pressão
+#define usa_pre (usa_bar && 1)    //Variavel de escolha do uso do valor Pressão
 #define usa_alt (usa_bar && 1)    //Variavel de escolha do uso do valor Altura
 #define usa_altMax (usa_alt && 0) //Variavel de escolha do uso do valor Altura Máxima
-#define usa_temp (usa_bar && 1)   //Variavel de escolha do uso do valor Temperatura
-#define usa_apogeu (usa_bar && 1) //Variavel de escolha do uso da detecção de apogeu
+#define usa_temp (usa_bar && 0)   //Variavel de escolha do uso do valor Temperatura
+#define usa_apogeu (usa_bar && 0) //Variavel de escolha do uso da detecção de apogeu
 #define usa_acpq (usa_apogeu && 0)//Variavel de escolha do uso do acionamento dos paraquedas
 
 #define usa_giro 0                //Variavel de escolha do uso do sensor
@@ -300,28 +300,32 @@ void loop() {
   dado += "\t";
   #endif
   #if usa_apogeu || usa_alt
-  float SomaMov = 0;                                         //Zera o SomaMov em todo loop
-  float MediaMov = 0;
-  for (int j = 0; j < qf; j++) {
-    for (int i = tam - 2; i >= 0; i--) {                 //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1
-      MatrizFiltros[j][i + 1] = MatrizFiltros[j][i];
-    }
-    if (j == 0) {
-      MatrizFiltros[0][0] = bmp.readAltitude() - AltitudeRef; //Esse é o valor mais atualizado do filtro1
-    }
-    else {
-      MatrizFiltros[j][0] = MediaMov;
-    }
-    SomaMov = 0;
-    for (int i = 0; i <= tam - 1; i++) {                    //Esse 'for' faz a soma dos últimos valores medidos, para a média do filtro1
-      SomaMov = SomaMov + MatrizFiltros[j][i];
-    }
-    MediaMov = SomaMov / tam;
-    #if usa_alt
-    dado += String(MediaMov);                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
-    dado += "\t";
-    #endif
-  }
+//  float SomaMov = 0;                                         //Zera o SomaMov em todo loop
+//  float MediaMov = 0;
+//  for (int j = 0; j < qf; j++) {
+//    for (int i = tam - 2; i >= 0; i--) {                 //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1
+//      MatrizFiltros[j][i + 1] = MatrizFiltros[j][i];
+//    }
+//    if (j == 0) {
+//      MatrizFiltros[0][0] = bmp.readAltitude() - AltitudeRef; //Esse é o valor mais atualizado do filtro1
+//    }
+//    else {
+//      MatrizFiltros[j][0] = MediaMov;
+//    }
+//    SomaMov = 0;
+//    for (int i = 0; i <= tam - 1; i++) {                    //Esse 'for' faz a soma dos últimos valores medidos, para a média do filtro1
+//      SomaMov = SomaMov + MatrizFiltros[j][i];
+//    }
+//    MediaMov = SomaMov / tam;
+//    #if usa_alt
+//    dado += String(MediaMov);                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
+//    dado += "\t";
+//    #endif
+//  }
+  float valoratualizado = bmp.readAltitude() - AltitudeRef;
+  float Afiltrada = Friutu(valoratualizado, 0);
+  Afiltrada = Friutu(Afiltrada, 1);
+  float Pfiltrada = Friutu(P, 2); 
   #endif
   #if usa_apogeu || usa_altMax
   if (Hmax < MediaMov) {                                    //Pega o valor máximo da média/filtro2
@@ -395,4 +399,26 @@ void loop() {
   #if usa_impreSerial
   Serial.println(dado);
   #endif
+}
+////funçoes////
+float Friutu(float valoratualizado, int j){
+  float SomaMov = 0;                                            //Zera o SomaMov em todo loop
+  float MediaMov = 0;
+  //for (int j = 0; j < qf; j++) {
+      for (int i = tam - 2; i >= 0; i--) {                      //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1
+        MatrizFiltros[j][i + 1] = MatrizFiltros[j][i];
+      }
+      //if (j == 0) {
+        MatrizFiltros[j][0] = valoratualizado;                  //Esse é o valor mais atualizado do filtro1
+      //}
+//      else {
+//        MatrizFiltros[j][0] = MediaMov;
+//      }
+      SomaMov = 0;
+      for (int i = 0; i <= tam - 1; i++) {                      //Esse 'for' faz a soma dos últimos valores medidos, para a média do filtro1
+        SomaMov = SomaMov + MatrizFiltros[j][i];
+      }
+      MediaMov = SomaMov / tam;
+  //}
+  return MediaMov;
 }
