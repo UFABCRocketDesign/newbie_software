@@ -7,6 +7,11 @@
 #include <Adafruit_HMC5883_U.h> //magnetometro
 #include <L3G.h> //giroscopio
 
+Adafruit_BMP085 bmp;
+Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
+Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
+L3G gyro;
+
 #define IGN_1 36  /*act1*/
 #define IGN_2 61  /*act2*/
 #define IGN_3 46  /*act3*/
@@ -14,10 +19,21 @@
 #define intervalo 5000
 #define intervalo2 5000
 
-Adafruit_BMP085 bmp;
-Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
-Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
-L3G gyro;
+#define use_gyro 0
+#define use_acc 0
+#define use_mag 0
+
+#define use_gyro_x (use_gyro && 1)
+#define use_gyro_y (use_gyro && 1)
+#define use_gyro_z (use_gyro && 1)
+
+#define use_acc_x (use_acc && 1)
+#define use_acc_y (use_acc && 1)
+#define use_acc_z (use_acc && 1)
+
+#define use_mag_x (use_mag && 1)
+#define use_mag_y (use_mag && 1)
+#define use_mag_z (use_mag && 1)
 
 float auxiliar = 0;
 float media = 0;
@@ -51,26 +67,32 @@ void setup() {
   Serial.begin(115200);
   Wire.begin();
 
+  #if use_acc
   if(!accel.begin())
   {
     /* There was a problem detecting the ADXL345 ... check your connections */
     Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
   }
 
+  accel.setRange(ADXL345_RANGE_16_G);
+  #endif //accel
+
+  #if use_mag
   if(!mag.begin())
   {
     /* There was a problem detecting the HMC5883 ... check your connections */
     Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
   }
+  #endif //mag
 
+  #if use_gyro
   if (!gyro.init())
   {
     Serial.println("Failed to autodetect gyro type!");
   }
   
   gyro.enableDefault();
-
-  accel.setRange(ADXL345_RANGE_16_G);
+  #endif //gyro
   
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
@@ -104,17 +126,35 @@ void setup() {
 
   dataString += ("Média 2\t");
 
+  #if use_acc_x
   dataString += ("AceleromêtroX\t");
+  #endif
+  #if use_acc_y
   dataString += ("AceleromêtroY\t");
+  #endif
+  #if use_acc_z
   dataString += ("AceleromêtroZ\t");
+  #endif
 
+  #if use_mag_x
   dataString += ("MagnetromêtroX\t");
+  #endif
+  #if use_mag_y
   dataString += ("MagnetromêtroY\t");
+  #endif
+  #if use_mag_z
   dataString += ("MagnetromêtroZ\t");
+  #endif
 
+  #if use_gyro_x
   dataString += ("GiroscópioX\t");
+  #endif
+  #if use_gyro_y
   dataString += ("GiroscópioY\t");
+  #endif
+  #if use_gyro_z
   dataString += ("GiroscópioZ\t");
+  #endif
 
   String nome = "f";
   int cont = 0;
@@ -158,14 +198,20 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-   
+
+  #if use_acc
   sensors_event_t eventAcc; 
   accel.getEvent(&eventAcc);
-  
+  #endif
+
+  #if use_mag
   sensors_event_t eventMag;
   mag.getEvent(&eventMag);
+  #endif
 
+  #if use_gyro
   gyro.read();
+  #endif
 
   String dataString = "";
   
@@ -230,26 +276,44 @@ void loop() {
   dataString += String(segundaMediaMovel);
   dataString += ("\t");
 
+  #if use_acc_x
   dataString += String(eventAcc.acceleration.x);
   dataString += ("\t");
+  #endif
+  #if use_acc_y
   dataString += String(eventAcc.acceleration.y);
   dataString += ("\t");
+  #endif
+  #if use_acc_z
   dataString += String(eventAcc.acceleration.z);
   dataString += ("\t");
+  #endif
 
+  #if use_mag_x
   dataString += String(eventMag.magnetic.x);
   dataString += ("\t");
+  #endif
+  #if use_mag_y
   dataString += String(eventMag.magnetic.y);
   dataString += ("\t");
+  #endif
+  #if use_mag_z
   dataString += String(eventMag.magnetic.z);
   dataString += ("\t");
+  #endif
 
+  #if use_gyro_x
   dataString += String((int)gyro.g.x);
   dataString += ("\t");
+  #endif
+  #if use_gyro_y
   dataString += String((int)gyro.g.y);
   dataString += ("\t");
+  #endif
+  #if use_gyro_z
   dataString += String((int)gyro.g.z);
   dataString += ("\t");
+  #endif
 
   if (apogeu < segundaMediaMovel) {
     apogeu = segundaMediaMovel;
