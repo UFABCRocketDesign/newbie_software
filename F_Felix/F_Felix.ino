@@ -58,9 +58,6 @@ float matriz[2][10];
 #if use_sd
 String arquivo = "";
 #endif
-#if use_relogio
-unsigned long tempoAtual = 0;
-#endif
 #if use_paraquedas1
 int led = LOW;
 int led2 = LOW;
@@ -250,7 +247,7 @@ void loop() {
   #endif
 
   #if use_relogio
-  tempoAtual = millis();
+  unsigned long tempoAtual = millis();
 
   dataString += String(tempoAtual/1000.0);
   dataString += ("\t");
