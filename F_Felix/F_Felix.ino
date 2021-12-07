@@ -19,9 +19,13 @@ L3G gyro;
 #define intervalo 5000
 #define intervalo2 5000
 
+#define use_relogio 1
+#define use_sd 1
+
 #define use_gyro 0
 #define use_acc 0
 #define use_mag 0
+#define use_baro 1
 
 #define use_gyro_x (use_gyro && 1)
 #define use_gyro_y (use_gyro && 1)
@@ -35,13 +39,26 @@ L3G gyro;
 #define use_mag_y (use_mag && 1)
 #define use_mag_z (use_mag && 1)
 
+#define use_altura (use_baro && 1)
+#define use_pressao (use_baro && 1)
+#define use_temp (use_baro && 1)
+#define use_apogeu (use_alt && use_relogio && 1)
+
+#if use_altura
 float auxiliar = 0;
 float media = 0;
 float soma = 0;
 float mediaMovel = 0;
 float segundaMediaMovel = 0;
 float matriz[2][10];
+#endif
+#if use_sd
 String arquivo = "";
+#endif
+#if use_relogio
+unsigned long tempoAtual = 0;
+#endif
+#if use_apogeu
 int num = 0;
 int led = LOW;
 int led2 = LOW;
@@ -49,13 +66,13 @@ int led3 = LOW;
 int led4 = LOW;
 int led5 = LOW;
 int led6 = LOW;
-unsigned long tempoAtual = 0;
 unsigned long desligaLED = 0;
 unsigned long desligaLED2 = 0;
 unsigned long ligaLED2 = 0;
 unsigned long desligaLED3 = 0;
 float apogeu = 0;
 boolean detectaApogeu = false;
+#endif
 
 const int chipSelect = 53;
 
@@ -93,11 +110,14 @@ void setup() {
   
   gyro.enableDefault();
   #endif //gyro
-  
+
+  #if use_baro
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   }
+  #endif
 
+  #if use_sd
   Serial.print("Initializing SD card...");
 
   if (!SD.begin(chipSelect)) {
@@ -108,20 +128,24 @@ void setup() {
 
   String dataString = "";
 
+  #endif
+
+  #if use_relogio
   dataString += ("Relógio\t");
-
+  #endif
+  #if use_temp
   dataString += ("Temp.(*C)\t");
-
+  #endif
+  #if use_pressao
   dataString += ("Pres.(Pa)\t");
-
-  dataString += ("Height.(m)\t");
-
+  #endif
+  #if use_altura
   dataString += ("Variação\t");
-
+  #endif
+  #if use_altura
   dataString += ("Média\t");
-
   dataString += ("Média 2\t");
-
+  #endif
   #if use_acc_x
   dataString += ("AceleromêtroX\t");
   #endif
@@ -131,7 +155,6 @@ void setup() {
   #if use_acc_z
   dataString += ("AceleromêtroZ\t");
   #endif
-
   #if use_mag_x
   dataString += ("MagnetromêtroX\t");
   #endif
@@ -141,7 +164,6 @@ void setup() {
   #if use_mag_z
   dataString += ("MagnetromêtroZ\t");
   #endif
-
   #if use_gyro_x
   dataString += ("GiroscópioX\t");
   #endif
@@ -152,6 +174,7 @@ void setup() {
   dataString += ("GiroscópioZ\t");
   #endif
 
+  #if use_sd
   String nome = "f";
   int cont = 0;
   String aux = (String) cont;
@@ -181,15 +204,20 @@ void setup() {
       existente = true;
     }
   }
+  #endif
 
+  #if use_altura
   for (int j = 0; j < 100; j++) {
     float alt = bmp.readAltitude();
     soma += alt;
   }
 
   media = soma / 100.0;
+  #endif
 
+  #if use_sd
   Serial.println(dataString);
+  #endif
 }
 
 // the loop function runs over and over again forever
@@ -209,13 +237,18 @@ void loop() {
   gyro.read();
   #endif
 
+  #if use_sd
   String dataString = "";
-  
+  #endif
+
+  #if use_relogio
   tempoAtual = millis();
 
   dataString += String(tempoAtual/1000.0);
   dataString += ("\t");
+  #endif
 
+  #if use_altura
   float alt = bmp.readAltitude();
   float somaVet = 0;
   float somaVet2 = 0;
@@ -247,16 +280,19 @@ void loop() {
   }
 
   segundaMediaMovel = somaVet2 / 10.0;
+  #endif
 
+  #if use_temp
   dataString += String(bmp.readTemperature());
   dataString += ("\t");
+  #endif
 
+  #if use_pressao
   dataString += String(bmp.readPressure());
   dataString += ("\t");
+  #endif
 
-  dataString += String (alt);
-  dataString += ("\t");
-
+  #if use_altura
   dataString += String(altRelativa);
   dataString += ("\t");
 
@@ -265,6 +301,7 @@ void loop() {
 
   dataString += String(segundaMediaMovel);
   dataString += ("\t");
+  #endif
 
   #if use_acc_x
   dataString += String(eventAcc.acceleration.x);
@@ -278,7 +315,7 @@ void loop() {
   dataString += String(eventAcc.acceleration.z);
   dataString += ("\t");
   #endif
-
+  
   #if use_mag_x
   dataString += String(eventMag.magnetic.x);
   dataString += ("\t");
@@ -291,7 +328,7 @@ void loop() {
   dataString += String(eventMag.magnetic.z);
   dataString += ("\t");
   #endif
-
+  
   #if use_gyro_x
   dataString += String((int)gyro.g.x);
   dataString += ("\t");
@@ -305,6 +342,7 @@ void loop() {
   dataString += ("\t");
   #endif
 
+ #if use_apogeu
   if (apogeu < segundaMediaMovel) {
     apogeu = segundaMediaMovel;
   }
@@ -365,7 +403,9 @@ void loop() {
       }
     }
   }
+  #endif
 
+  #if use_sd
   File dataFile = SD.open(arquivo, FILE_WRITE);
 
   // if the file is available, write to it:
@@ -380,8 +420,11 @@ void loop() {
   }
 
   Serial.println(dataString);
+  #endif
 
+  #if use_alt
   auxiliar = alt;
+  #endif
 
  // delay(100);
 }
