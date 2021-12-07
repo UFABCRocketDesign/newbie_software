@@ -325,7 +325,11 @@ void loop() {
   float valoratualizado = bmp.readAltitude() - AltitudeRef;
   float Afiltrada = Friutu(valoratualizado, 0);
   Afiltrada = Friutu(Afiltrada, 1);
-  float Pfiltrada = Friutu(P, 2); 
+  float Pfiltrada = Friutu(P, 2);
+  #if usa_alt
+  dado += String(Afiltrada);                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
+  dado += "\t";
+  #endif 
   #endif
   #if usa_apogeu || usa_altMax
   if (Hmax < MediaMov) {                                    //Pega o valor máximo da média/filtro2
