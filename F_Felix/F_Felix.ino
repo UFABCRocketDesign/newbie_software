@@ -114,7 +114,7 @@ void setup() {
 
   dataString += ("Pres.(Pa)\t");
 
-  dataString += ("High.(m)\t");
+  dataString += ("Height.(m)\t");
 
   dataString += ("Variação\t");
 
