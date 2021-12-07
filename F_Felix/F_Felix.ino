@@ -114,11 +114,7 @@ void setup() {
 
   dataString += ("Pres.(Pa)\t");
 
-  dataString += ("Alt.(m)\t");
-
-  dataString += ("Pres. sealevel(Pa)\t");
-
-  dataString += ("Real alt.(m)\t");
+  dataString += ("High.(m)\t");
 
   dataString += ("Variação\t");
 
@@ -258,15 +254,9 @@ void loop() {
   dataString += String(bmp.readPressure());
   dataString += ("\t");
 
-  dataString += String(bmp.readAltitude(101500));
+  dataString += String (alt);
   dataString += ("\t");
 
-  dataString += String (bmp.readSealevelPressure());
-  dataString += ("\t");
-
-  dataString += String(altRelativa);
-  dataString += ("\t");
-    
   dataString += String(altRelativa);
   dataString += ("\t");
 
