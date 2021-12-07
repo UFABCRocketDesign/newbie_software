@@ -10,7 +10,7 @@
 //VALORES DE ENTRADA
 #define tam 10                    //Tamanho da matriz do filtro(quantidade de valores usado)
 #define qfa 3                      //Quantidade de filtros da altitude
-#define qfg 0                      //Quantidade de filtros a mais para variaveis gerais
+#define qfg 3                      //Quantidade de filtros a mais para variaveis gerais
 #define NomeArq "apm"             //Nome do arquivo para o cartão SD entre aspas
 #define espera 0000               //Tempo de espera para acionamento do paraquedas 2 (ms)
 #define duracao 5000              //Tempo de duracao do acionamento dos paraquedas (ms)
@@ -29,10 +29,10 @@
 #define usa_gy (usa_giro && 0)    //Variavel de escolha do uso do valor do giroscopio em y
 #define usa_gz (usa_giro && 0)    //Variavel de escolha do uso do valor do giroscopio em z
 
-#define usa_acel 0                //Variavel de escolha do uso de funções
-#define usa_ax (usa_acel && 0)    //Variavel de escolha do uso do valor do acelerometro em x
-#define usa_ay (usa_acel && 0)    //Variavel de escolha do uso do valor do acelerometro em y
-#define usa_az (usa_acel && 0)    //Variavel de escolha do uso do valor do acelerometro em z
+#define usa_acel 1                //Variavel de escolha do uso de funções
+#define usa_ax (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em x
+#define usa_ay (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em y
+#define usa_az (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em z
 
 #define usa_mag 0                 //Variavel de escolha do uso de funções
 #define usa_mx (usa_mag && 0)     //Variavel de escolha do uso do valor do magnetometro em x
@@ -265,14 +265,20 @@ void loop() {
   #if usa_ax
   float Ax = eventA.acceleration.x;
   dado += String(Ax)+"\t";
+  float Axfiltrada = Friutu(Ax, qfa+1);
+  dado += String(Axfiltrada)+"\t";
   #endif
   #if usa_ay
   float Ay = eventA.acceleration.y;
   dado += String(Ay)+"\t";
+  float Ayfiltrada = Friutu(Ay, qfa+2);
+  dado += String(Ayfiltrada)+"\t";
   #endif
   #if usa_az
   float Az = eventA.acceleration.z;
   dado += String(Az)+"\t";
+  float Azfiltrada = Friutu(Az, qfa+3);
+  dado += String(Azfiltrada)+"\t";
   #endif
   #endif
   #if usa_temp
