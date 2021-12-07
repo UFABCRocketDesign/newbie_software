@@ -19,7 +19,7 @@ L3G gyro;
 #define intervalo 5000
 #define intervalo2 5000
 
-#define use_relogio 1
+#define use_relogio 0
 #define use_sd 1
 
 #define use_gyro 0
@@ -39,10 +39,10 @@ L3G gyro;
 #define use_mag_y (use_mag && 1)
 #define use_mag_z (use_mag && 1)
 
-#define use_altura (use_baro && 1)
-#define use_pressao (use_baro && 1)
+#define use_altura (use_baro && 0)
+#define use_pressao (use_baro && 0)
 #define use_temp (use_baro && 1)
-#define use_apogeu (use_alt && use_relogio && 1)
+#define use_apogeu (use_alt && 1)
 
 #if use_altura
 float auxiliar = 0;
