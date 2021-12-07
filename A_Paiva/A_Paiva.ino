@@ -9,7 +9,8 @@
 
 //VALORES DE ENTRADA
 #define tam 10                    //Tamanho da matriz do filtro(quantidade de valores usado)
-#define qf 3                      //Quantidade de filtros
+#define qfa 3                      //Quantidade de filtros da altitude
+#define qfg 0                      //Quantidade de filtros a mais para variaveis gerais
 #define NomeArq "apm"             //Nome do arquivo para o cartão SD entre aspas
 #define espera 0000               //Tempo de espera para acionamento do paraquedas 2 (ms)
 #define duracao 5000              //Tempo de duracao do acionamento dos paraquedas (ms)
@@ -28,8 +29,8 @@
 #define usa_gy (usa_giro && 0)    //Variavel de escolha do uso do valor do giroscopio em y
 #define usa_gz (usa_giro && 0)    //Variavel de escolha do uso do valor do giroscopio em z
 
-#define usa_acel 1                //Variavel de escolha do uso de funções
-#define usa_ax (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em x
+#define usa_acel 0                //Variavel de escolha do uso de funções
+#define usa_ax (usa_acel && 0)    //Variavel de escolha do uso do valor do acelerometro em x
 #define usa_ay (usa_acel && 0)    //Variavel de escolha do uso do valor do acelerometro em y
 #define usa_az (usa_acel && 0)    //Variavel de escolha do uso do valor do acelerometro em z
 
@@ -50,7 +51,7 @@
 String cabecalho = "";
 #if usa_apogeu || usa_alt
 float AltitudeRef = 0;            //É o valor da média dos valores iniciais(foguete parado na base)
-float MatrizFiltros[qf][tam];     //Vetor para guardar os valores para as médias utilizadas pelos filtros
+float MatrizFiltros[qfa+qfg][tam];     //Vetor para guardar os valores para as médias utilizadas pelos filtros
 #endif
 #if usa_apogeu || usa_altMax
 float Hmax = 0;                   //Valor máximo filtrado
@@ -164,7 +165,7 @@ void setup() {
   cabecalho += "Altura máxima(m)\t";
   #endif
   #if usa_alt
-  for (int i = 0; i < qf; i++) {
+  for (int i = 0; i < qfa; i++) {
     cabecalho += "Altura do filtro ";
     cabecalho += i;
     cabecalho += "(m)\t";
@@ -225,25 +226,21 @@ void loop() {
   unsigned long tempoAtual = millis();
   String dado = "";
   #if usa_Tempo
-  dado += String(tempoAtual/1000.0);
-  dado += "\t";
+  dado += String(tempoAtual/1000.0)+"\t";
   #endif
   #if usa_giro
   giro.read();
   #if usa_gx
   int Gx = giro.g.x;
-  dado += String(Gx);
-  dado += "\t";
+  dado += String(Gx)+"\t";
   #endif
   #if usa_gy
   int Gy = giro.g.y;
-  dado += String(Gy);
-  dado += "\t";
+  dado += String(Gy)+"\t";
   #endif
   #if usa_gz
   int Gz = giro.g.z;
-  dado += String(Gz);
-  dado += "\t";
+  dado += String(Gz)+"\t";
   #endif
   #endif
   #if usa_mag
@@ -251,18 +248,15 @@ void loop() {
   mag.getEvent(&eventM);
   #if usa_mx
   float Mx = eventM.magnetic.x;
-  dado += String(Mx);
-  dado += "\t";
+  dado += String(Mx)+"\t";
   #endif
   #if usa_my
   float My = eventM.magnetic.y;
-  dado += String(My);
-  dado += "\t";
+  dado += String(My)+"\t";
   #endif
   #if usa_mz
   float Mz = eventM.magnetic.z;
-  dado += String(Mz);
-  dado += "\t";
+  dado += String(Mz)+"\t";
   #endif
   #endif
   #if usa_acel
@@ -270,75 +264,39 @@ void loop() {
   accel.getEvent(&eventA);
   #if usa_ax
   float Ax = eventA.acceleration.x;
-  dado += String(Ax);
-  dado += "\t";
+  dado += String(Ax)+"\t";
   #endif
   #if usa_ay
   float Ay = eventA.acceleration.y;
-  dado += String(Ay);
-  dado += "\t";
+  dado += String(Ay)+"\t";
   #endif
   #if usa_az
   float Az = eventA.acceleration.z;
-  dado += String(Az);
-  dado += "\t";
+  dado += String(Az)+"\t";
   #endif
   #endif
   #if usa_temp
   float T = bmp.readTemperature();
-  dado += String(T);
-  dado += "\t";
+  dado += String(T)+"\t";
   #endif
   #if usa_pre
   float P = bmp.readPressure();
   //float Pm = bmp.readSealevelPressure();
-  dado += String(P);
-  dado += "\t";
+  dado += String(P)+"\t";
+  #endif
+  #if usa_alt
+  float A = bmp.readAltitude() - AltitudeRef;
+  dado += String(A)+"\t";
   #endif
   #if usa_altMax  
-  dado += String(Hmax);
-  dado += "\t";
+  dado += String(Hmax)+"\t";
   #endif
   #if usa_apogeu || usa_alt
-//  float SomaMov = 0;                                         //Zera o SomaMov em todo loop
-//  float MediaMov = 0;
-//  for (int j = 0; j < qf; j++) {
-//    for (int i = tam - 2; i >= 0; i--) {                 //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1
-//      MatrizFiltros[j][i + 1] = MatrizFiltros[j][i];
-//    }
-//    if (j == 0) {
-//      MatrizFiltros[0][0] = bmp.readAltitude() - AltitudeRef; //Esse é o valor mais atualizado do filtro1
-//    }
-//    else {
-//      MatrizFiltros[j][0] = MediaMov;
-//    }
-//    SomaMov = 0;
-//    for (int i = 0; i <= tam - 1; i++) {                    //Esse 'for' faz a soma dos últimos valores medidos, para a média do filtro1
-//      SomaMov = SomaMov + MatrizFiltros[j][i];
-//    }
-//    MediaMov = SomaMov / tam;
-//    #if usa_alt
-//    dado += String(MediaMov);                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
-//    dado += "\t";
-//    #endif
-//  }
-  float Axfiltrada = Friutu(Ax, 2);
-  #if usa_ax
-  dado += String(Axfiltrada)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
-  #endif
-  float valoratualizado = bmp.readAltitude() - AltitudeRef;
-  #if usa_alt
-  dado += String(valoratualizado)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
-  #endif
-  float Afiltrada = Friutu(valoratualizado, 0);
-  #if usa_alt
-  dado += String(Afiltrada)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
-  #endif
-  float Afiltrada2 = Friutu(Afiltrada, 1);
-  #if usa_alt
-  dado += String(Afiltrada2)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
-  #endif
-  
+  float Afiltrada = A;                                     //Chama a função de filtro para a altitude
+  for(int i = 0; i < qfa; i++){
+    Afiltrada = Friutu(Afiltrada, i);
+    dado += String(Afiltrada)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
+  }
   #endif
   #if usa_apogeu || usa_altMax
   if (Hmax < MediaMov) {                                    //Pega o valor máximo da média/filtro2
@@ -415,23 +373,15 @@ void loop() {
 }
 ////funçoes////
 float Friutu(float valoratualizado, int j){
-  float SomaMov = 0;                                            //Zera o SomaMov em todo loop
-  float MediaMov = 0;
-  //for (int j = 0; j < qf; j++) {
-      for (int i = tam - 2; i >= 0; i--) {                      //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1
-        MatrizFiltros[j][i + 1] = MatrizFiltros[j][i];
-      }
-      //if (j == 0) {
-        MatrizFiltros[j][0] = valoratualizado;                  //Esse é o valor mais atualizado do filtro1
-      //}
-//      else {
-//        MatrizFiltros[j][0] = MediaMov;
-//      }
-      SomaMov = 0;
-      for (int i = 0; i <= tam - 1; i++) {                      //Esse 'for' faz a soma dos últimos valores medidos, para a média do filtro1
-        SomaMov = SomaMov + MatrizFiltros[j][i];
-      }
-      MediaMov = SomaMov / tam;
-  //}
+  float SomaMov = 0;                                 //Declara e zera o SomaMov em todo loop
+  float MediaMov = 0;                                //Declara e zera o MediaMov em todo loop
+  for (int i = tam - 2; i >= 0; i--) {               //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1 de trás pra frente
+    MatrizFiltros[j][i + 1] = MatrizFiltros[j][i];
+  }
+  MatrizFiltros[j][0] = valoratualizado;             //Esse é o valor mais atualizado do filtro1
+  for (int i = 0; i <= tam - 1; i++) {               //Esse 'for' faz a soma dos valores da matriz, para a média do filtro1
+    SomaMov = SomaMov + MatrizFiltros[j][i];
+  }
+  MediaMov = SomaMov / tam;                          //Valor final do filtro, uma média entre "tam" quantidades de valores
   return MediaMov;
 }
