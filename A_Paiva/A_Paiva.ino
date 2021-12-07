@@ -16,10 +16,10 @@
 #define altura 10                 //Altura para abertura do terceiro paraquedas
 
 #define usa_bar 1                 //Variavel de escolha do uso do sensor BMP
-#define usa_pre (usa_bar && 1)    //Variavel de escolha do uso do valor Pressão
+#define usa_pre (usa_bar && 0)    //Variavel de escolha do uso do valor Pressão
 #define usa_alt (usa_bar && 1)    //Variavel de escolha do uso do valor Altura
 #define usa_altMax (usa_alt && 0) //Variavel de escolha do uso do valor Altura Máxima
-#define usa_temp (usa_bar && 0)   //Variavel de escolha do uso do valor Temperatura
+#define usa_temp (usa_bar && 1)   //Variavel de escolha do uso do valor Temperatura
 #define usa_apogeu (usa_bar && 0) //Variavel de escolha do uso da detecção de apogeu
 #define usa_acpq (usa_apogeu && 0)//Variavel de escolha do uso do acionamento dos paraquedas
 
@@ -323,13 +323,21 @@ void loop() {
 //    #endif
 //  }
   float valoratualizado = bmp.readAltitude() - AltitudeRef;
-  float Afiltrada = Friutu(valoratualizado, 0);
-  Afiltrada = Friutu(Afiltrada, 1);
-  float Pfiltrada = Friutu(P, 2);
   #if usa_alt
-  dado += String(Afiltrada);                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
-  dado += "\t";
-  #endif 
+  dado += String(valoratualizado)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
+  #endif
+  float Afiltrada = Friutu(valoratualizado, 0);
+  #if usa_alt
+  dado += String(Afiltrada)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
+  #endif
+  Afiltrada = Friutu(Afiltrada, 1);
+  #if usa_alt
+  dado += String(Afiltrada)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
+  #endif
+  float Pfiltrada = Friutu(T, 2);
+  #if usa_pre
+  dado += String(Pfiltrada)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
+  #endif
   #endif
   #if usa_apogeu || usa_altMax
   if (Hmax < MediaMov) {                                    //Pega o valor máximo da média/filtro2
