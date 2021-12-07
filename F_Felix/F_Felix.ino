@@ -12,12 +12,15 @@ Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 L3G gyro;
 
+#define chipSelect 53
 #define IGN_1 36  /*act1*/
 #define IGN_2 61  /*act2*/
 #define IGN_3 46  /*act3*/
 #define IGN_4 55  /*act4*/
 #define intervalo 5000
 #define intervalo2 5000
+#define qtdFiltros 2
+#define qtdValores 10
 
 #define use_relogio 0
 #define use_sd 1
@@ -48,12 +51,8 @@ L3G gyro;
 #define use_paraquedas3 (use_apogeu && 1)
 
 #if use_altura
-float auxiliar = 0;
 float media = 0;
-float soma = 0;
-float mediaMovel = 0;
-float segundaMediaMovel = 0;
-float matriz[2][10];
+float matriz[qtdFiltros][qtdValores]; // acrescentar
 #endif
 #if use_sd
 String arquivo = "";
@@ -78,8 +77,6 @@ int led6 = LOW;
 float apogeu = 0;
 boolean detectaApogeu = false;
 #endif
-
-const int chipSelect = 53;
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
@@ -212,6 +209,7 @@ void setup() {
   #endif
 
   #if use_altura
+  float soma = 0; 
   for (int j = 0; j < 100; j++) {
     float alt = bmp.readAltitude();
     soma += alt;
@@ -254,37 +252,39 @@ void loop() {
   #endif
 
   #if use_altura
+  float mediaMovel = 0;
+  float segundaMediaMovel = 0;
   float alt = bmp.readAltitude();
   float somaVet = 0;
   float somaVet2 = 0;
 
   float altRelativa = alt - media;
 
-  for (int i = 0; i < 9; i++) {
+  for (int i = 0; i < (qtdValores - 1); i++) {
     matriz[0][i] = matriz[0][i + 1];
   }
 
-  matriz[0][9] = altRelativa;
+  matriz[0][qtdValores - 1] = altRelativa;
 
 
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < qtdValores; i++) {
     somaVet += matriz[0][i];
   }
 
   mediaMovel = somaVet / 10.0;
 
 
-  for (int i = 0; i < 9; i ++) {
+  for (int i = 0; i < qtdValores - 1; i ++) {
     matriz [1][i] = matriz [1][i + 1];
   }
-  matriz[1][9] = mediaMovel;
+  matriz[1][qtdValores - 1] = mediaMovel;
 
 
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < qtdValores; i++) {
     somaVet2 += matriz[1][i];
   }
 
-  segundaMediaMovel = somaVet2 / 10.0;
+  segundaMediaMovel = somaVet2 / (float)qtdValores;
   #endif
 
   #if use_temp
@@ -428,10 +428,6 @@ void loop() {
   }
 
   Serial.println(dataString);
-  #endif
-
-  #if use_alt
-  auxiliar = alt;
   #endif
 
  // delay(100);
