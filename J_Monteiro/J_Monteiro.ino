@@ -2,9 +2,11 @@
 #include <SPI.h>
 #include <SD.h>
 const int chipSelect = 53;
+File myFile;
 //========================================================
-#define n 25         // Número de medições para da média móvel
-#define numReads 15 //Número de medições para a média da base
+#define n 25           //Número de medições para da média móvel
+#define numReads 15   //Número de medições para a média da base
+#define numFiles 10  //Número de Arquivos
 Adafruit_BMP085 bmp;
 //========================================================
 //-----Variáveis Globais-----
@@ -19,8 +21,8 @@ float previous = 0;      //Altitude anterior
 float moving_average;   //Média móvel
 float vet2[n];         //Vetor 2
 int cont;             //Contador
-
-
+int num = 0;
+String jFile;
 
 void setup() {
   // Open serial communications and wait for port to open:
@@ -38,7 +40,8 @@ void setup() {
     Serial.println("Card failed, or not present");
     // don't do anything more:
     while (1);
-  }
+   } 
+  
   String dataString = "";
   //dataString += ("Temperature = \t");
   //dataString += (" Pa \t");
@@ -49,12 +52,12 @@ void setup() {
   dataString += ("Height (meters) \t");
   dataString += ("Relative average \t");
   dataString += ("Moving average \t");
-  dataString += ("Descida \t");
+  dataString += ("Descent \t");
   dataString += ("Contador \t");
   dataString += ("Apogeu \t");
 
 
-  File dataFile = SD.open("JaqueMnt.txt", FILE_WRITE);
+  File dataFile = SD.open("Jaque000.txt", FILE_WRITE);
 
   // if the file is available, write to it:
   if (dataFile) {
@@ -67,7 +70,24 @@ void setup() {
   else {
     Serial.println("error opening datalog.txt");
   }
+     while(num <= numFiles) {
+     jFile = "Jaque" + String(num) + ".txt";
+     num = num + 1;
+      }
+    Serial.println(jFile);
+    myFile = SD.open(jFile, FILE_WRITE);
+    myFile.close();
+    
+    if (SD.exists ("Jaque" + String(numFiles) + ".txt")) {
+    Serial.println("Jaque" + String(numFiles) + ".txt exists.");
+   } else {
+    Serial.println("Jaque" + String(numFiles) + ".txt doesn't exist.");
+  }
 
+  // delete the file:
+  Serial.println("Removing" "Jaque" + String(numFiles) + ".txt...");
+  SD.remove("Jaque" + String(numFiles) + ".txt");
+ 
   for (float k = 0; k < numReads; k++) {
     accAltbase = accAltbase + bmp.readAltitude();
   }
