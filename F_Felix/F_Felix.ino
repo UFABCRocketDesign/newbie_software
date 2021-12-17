@@ -7,41 +7,76 @@
 #include <Adafruit_HMC5883_U.h> //magnetometro
 #include <L3G.h> //giroscopio
 
+Adafruit_BMP085 bmp;
+Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
+Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
+L3G gyro;
+
+#define chipSelect 53
 #define IGN_1 36  /*act1*/
 #define IGN_2 61  /*act2*/
 #define IGN_3 46  /*act3*/
 #define IGN_4 55  /*act4*/
 #define intervalo 5000
 #define intervalo2 5000
+#define qtdFiltros 2
+#define qtdValores 10
 
-Adafruit_BMP085 bmp;
-Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
-Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
-L3G gyro;
+#define use_relogio 0
+#define use_sd 1
 
-float auxiliar = 0;
+#define use_gyro 0
+#define use_acc 0
+#define use_mag 0
+#define use_baro 1
+
+#define use_gyro_x (use_gyro && 1)
+#define use_gyro_y (use_gyro && 1)
+#define use_gyro_z (use_gyro && 1)
+
+#define use_acc_x (use_acc && 1)
+#define use_acc_y (use_acc && 1)
+#define use_acc_z (use_acc && 1)
+
+#define use_mag_x (use_mag && 1)
+#define use_mag_y (use_mag && 1)
+#define use_mag_z (use_mag && 1)
+
+#define use_altura (use_baro && 1)
+#define use_pressao (use_baro && 0)
+#define use_temp (use_baro && 0)
+#define use_apogeu (use_alt && 1)
+#define use_paraquedas1 (use_apogeu && 1)
+#define use_paraquedas2 (use_paraquedas2 && 1)
+#define use_paraquedas3 (use_apogeu && 1)
+
+#if use_altura
 float media = 0;
-float soma = 0;
-float mediaMovel = 0;
-float segundaMediaMovel = 0;
-float matriz[2][10];
+float matriz[qtdFiltros][qtdValores]; // acrescentar
+#endif
+#if use_sd
 String arquivo = "";
-int num = 0;
+#endif
+#if use_paraquedas1
 int led = LOW;
 int led2 = LOW;
-int led3 = LOW;
-int led4 = LOW;
-int led5 = LOW;
-int led6 = LOW;
-unsigned long tempoAtual = 0;
 unsigned long desligaLED = 0;
 unsigned long desligaLED2 = 0;
 unsigned long ligaLED2 = 0;
+#endif
+#if use_paraquedas2
+int led3 = LOW;
+int led4 = LOW;
 unsigned long desligaLED3 = 0;
+#endif
+#if use_paraquedas3
+int led5 = LOW;
+int led6 = LOW;
+#endif
+#if use_apogeu
 float apogeu = 0;
 boolean detectaApogeu = false;
-
-const int chipSelect = 53;
+#endif
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
@@ -51,83 +86,97 @@ void setup() {
   Serial.begin(115200);
   Wire.begin();
 
+  #if use_acc
   if(!accel.begin())
   {
     /* There was a problem detecting the ADXL345 ... check your connections */
     Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
-    while(1);
   }
 
+  accel.setRange(ADXL345_RANGE_16_G);
+  #endif //accel
+
+  #if use_mag
   if(!mag.begin())
   {
     /* There was a problem detecting the HMC5883 ... check your connections */
     Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
-    while(1);
   }
+  #endif //mag
 
+  #if use_gyro
   if (!gyro.init())
   {
     Serial.println("Failed to autodetect gyro type!");
-    while (1);
   }
   
   gyro.enableDefault();
+  #endif //gyro
 
-  accel.setRange(ADXL345_RANGE_16_G);
-  
+  #if use_baro
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-    while (1) {}
-
   }
+  #endif
 
-  while (!Serial) {
-    ;
-  }
-
+  #if use_sd
   Serial.print("Initializing SD card...");
 
   if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present");
     // don't do anything more:
-    while (1);
   }
   Serial.println("card initialized.");
 
   String dataString = "";
 
+  #endif
+
+  #if use_relogio
   dataString += ("Relógio\t");
-
+  #endif
+  #if use_temp
   dataString += ("Temp.(*C)\t");
-
+  #endif
+  #if use_pressao
   dataString += ("Pres.(Pa)\t");
-
-  dataString += ("Alt.(m)\t");
-
-  dataString += ("Pres. sealevel(Pa)\t");
-
-  dataString += ("Real alt.(m)\t");
-
-  dataString += ("Foguete\t");
-
+  #endif
+  #if use_altura
   dataString += ("Variação\t");
-
+  #endif
+  #if use_altura
   dataString += ("Média\t");
-
   dataString += ("Média 2\t");
-
+  #endif
+  #if use_acc_x
   dataString += ("AceleromêtroX\t");
+  #endif
+  #if use_acc_y
   dataString += ("AceleromêtroY\t");
+  #endif
+  #if use_acc_z
   dataString += ("AceleromêtroZ\t");
-
+  #endif
+  #if use_mag_x
   dataString += ("MagnetromêtroX\t");
+  #endif
+  #if use_mag_y
   dataString += ("MagnetromêtroY\t");
+  #endif
+  #if use_mag_z
   dataString += ("MagnetromêtroZ\t");
-
+  #endif
+  #if use_gyro_x
   dataString += ("GiroscópioX\t");
+  #endif
+  #if use_gyro_y
   dataString += ("GiroscópioY\t");
+  #endif
+  #if use_gyro_z
   dataString += ("GiroscópioZ\t");
+  #endif
 
+  #if use_sd
   String nome = "f";
   int cont = 0;
   String aux = (String) cont;
@@ -157,82 +206,98 @@ void setup() {
       existente = true;
     }
   }
+  #endif
 
+  #if use_altura
+  float soma = 0; 
   for (int j = 0; j < 100; j++) {
     float alt = bmp.readAltitude();
     soma += alt;
   }
 
   media = soma / 100.0;
+  #endif
 
+  #if use_sd
   Serial.println(dataString);
+  #endif
 }
 
 // the loop function runs over and over again forever
 void loop() {
-   
+
+  #if use_acc
   sensors_event_t eventAcc; 
   accel.getEvent(&eventAcc);
-  
+  #endif
+
+  #if use_mag
   sensors_event_t eventMag;
   mag.getEvent(&eventMag);
+  #endif
 
+  #if use_gyro
   gyro.read();
+  #endif
 
+  #if use_sd
   String dataString = "";
-  
-  tempoAtual = millis();
+  #endif
+
+  #if use_relogio
+  unsigned long tempoAtual = millis();
 
   dataString += String(tempoAtual/1000.0);
   dataString += ("\t");
+  #endif
 
+  #if use_altura
+  float mediaMovel = 0;
+  float segundaMediaMovel = 0;
   float alt = bmp.readAltitude();
   float somaVet = 0;
   float somaVet2 = 0;
 
   float altRelativa = alt - media;
 
-  for (int i = 0; i < 9; i++) {
+  for (int i = 0; i < (qtdValores - 1); i++) {
     matriz[0][i] = matriz[0][i + 1];
   }
 
-  matriz[0][9] = altRelativa;
+  matriz[0][qtdValores - 1] = altRelativa;
 
 
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < qtdValores; i++) {
     somaVet += matriz[0][i];
   }
 
-  mediaMovel = somaVet / 10.0;
+  mediaMovel = somaVet / (float)qtdValores;
 
 
-  for (int i = 0; i < 9; i ++) {
+  for (int i = 0; i < qtdValores - 1; i ++) {
     matriz [1][i] = matriz [1][i + 1];
   }
-  matriz[1][9] = mediaMovel;
+  matriz[1][qtdValores - 1] = mediaMovel;
 
 
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < qtdValores; i++) {
     somaVet2 += matriz[1][i];
   }
 
-  segundaMediaMovel = somaVet2 / 10.0;
+  segundaMediaMovel = somaVet2 / (float)qtdValores;
+  #endif
 
+  #if use_temp
   dataString += String(bmp.readTemperature());
   dataString += ("\t");
+  #endif
 
+  #if use_pressao
   dataString += String(bmp.readPressure());
   dataString += ("\t");
+  #endif
 
-  dataString += String(bmp.readAltitude(101500));
-  dataString += ("\t");
-
-  dataString += String (bmp.readSealevelPressure());
-  dataString += ("\t");
-
-  dataString += String(altRelativa);
-  dataString += ("\t");
-    
+  #if use_altura
   dataString += String(altRelativa);
   dataString += ("\t");
 
@@ -241,34 +306,56 @@ void loop() {
 
   dataString += String(segundaMediaMovel);
   dataString += ("\t");
+  #endif
 
+  #if use_acc_x
   dataString += String(eventAcc.acceleration.x);
   dataString += ("\t");
+  #endif
+  #if use_acc_y
   dataString += String(eventAcc.acceleration.y);
   dataString += ("\t");
+  #endif
+  #if use_acc_z
   dataString += String(eventAcc.acceleration.z);
   dataString += ("\t");
-
+  #endif
+  
+  #if use_mag_x
   dataString += String(eventMag.magnetic.x);
   dataString += ("\t");
+  #endif
+  #if use_mag_y
   dataString += String(eventMag.magnetic.y);
   dataString += ("\t");
+  #endif
+  #if use_mag_z
   dataString += String(eventMag.magnetic.z);
   dataString += ("\t");
-
+  #endif
+  
+  #if use_gyro_x
   dataString += String((int)gyro.g.x);
   dataString += ("\t");
+  #endif
+  #if use_gyro_y
   dataString += String((int)gyro.g.y);
   dataString += ("\t");
+  #endif
+  #if use_gyro_z
   dataString += String((int)gyro.g.z);
   dataString += ("\t");
+  #endif
 
+ #if use_apogeu
   if (apogeu < segundaMediaMovel) {
     apogeu = segundaMediaMovel;
   }
 
   float diferenca = apogeu - segundaMediaMovel;
-
+ #endif
+ 
+ #if use_paraquedas1
   if (diferenca >= 1) {
     dataString += String("caindo\t");
 
@@ -284,7 +371,6 @@ void loop() {
       dataString += String("subindo\t");
     }
   }
-
   if (detectaApogeu == true) {
 
     if (led2 == HIGH) {
@@ -294,7 +380,8 @@ void loop() {
         led2 = LOW;
       }
     }
-
+  #endif
+  #if use_paraquedas2
     if (led3 == LOW && tempoAtual >= ligaLED2 ) {
       digitalWrite(IGN_2, HIGH);
       led4 = HIGH;
@@ -308,7 +395,8 @@ void loop() {
         led4 = LOW;
       }
     }
-
+  #endif
+  #if use_paraquedas3
     if (led5 == LOW && segundaMediaMovel <= 10 ) {
       digitalWrite(LED_BUILTIN , HIGH);
       led6 = HIGH;
@@ -323,8 +411,9 @@ void loop() {
       }
     }
   }
+  #endif
 
-
+  #if use_sd
   File dataFile = SD.open(arquivo, FILE_WRITE);
 
   // if the file is available, write to it:
@@ -339,8 +428,7 @@ void loop() {
   }
 
   Serial.println(dataString);
-
-  auxiliar = alt;
+  #endif
 
  // delay(100);
 }
