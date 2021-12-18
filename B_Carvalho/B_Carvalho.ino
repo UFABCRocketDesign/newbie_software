@@ -22,9 +22,10 @@ int j = 0;
 float media_movel2 = 0;
 float medicao[50];
 int queda = 0;
-int numA = 1;
-String dataName;
-String newData = "bruno";
+int numA = 0;
+int files = 0;
+String newData = " ";
+File newFile;
 
 void setup() {
   while (!Serial) {
@@ -38,11 +39,14 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
   String dataString = "";
-  File dataFile = SD.open(newData, FILE_WRITE);
-  if (SD.exists(newData)) {
-    dataName = "bruno" + String(numA) + ".txt";
-    dataFile = SD.open(dataName, FILE_WRITE);
-    numA += 1;
+  File dataFile = SD.open("bruno000.txt", FILE_WRITE);
+    while (numA <= files){
+      newData = "bruno" + String(numA) + ".txt";
+      numA = numA + 1;
+    }
+  newFile = SD.open("bruno" + String(files) + ".txt");
+  if (SD.exists("bruno" + String(files) + ".txt") {
+    Serial.println(" This file has already exist");
   }
   dataString += String("Average altitude (m)");
   dataString += String("\t");
@@ -72,8 +76,6 @@ void setup() {
 
 
 void loop() {
-  String dataString = "";
-  File dataFile = SD.open("bruno.txt", FILE_WRITE);
   digitalWrite(LED_BUILTIN, HIGH);
   alt_atual = bmp.readAltitude() - media;
   for (int i = 9; i > 0; i--) {
