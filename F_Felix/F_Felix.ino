@@ -17,8 +17,8 @@ L3G gyro;
 #define IGN_2 61  /*act2*/
 #define IGN_3 46  /*act3*/
 #define IGN_4 55  /*act4*/
-#define intervalo 2500
-#define intervalo2 2500
+#define tempoLigado 2500
+#define atraso 0
 #define qtdFiltros 2
 #define qtdValores 10
 
@@ -122,7 +122,7 @@ void funcaoAtivaParaquedas1 (unsigned long tempoAtual){
       digitalWrite(IGN_1, HIGH);
       led2 = HIGH;
       led = HIGH;
-      desligaLED = tempoAtual + intervalo;
+      desligaLED = tempoAtual + tempoLigado;
     }
     
     else if (led2 == HIGH) {
@@ -135,14 +135,14 @@ void funcaoAtivaParaquedas1 (unsigned long tempoAtual){
 
 void funcaoAtivaParaquedas2 (unsigned long tempoAtual){
   if (ligaLED2 == 0){
-    ligaLED2 = tempoAtual + intervalo2;
+    ligaLED2 = tempoAtual + atraso;
   }
   
   if (led3 == LOW && tempoAtual >= ligaLED2 ) {
       digitalWrite(IGN_2, HIGH);
       led4 = HIGH;
       led3 = HIGH;
-      desligaLED2 = tempoAtual + intervalo;
+      desligaLED2 = tempoAtual + tempoLigado;
     }
 
   else if (led4 == HIGH) {
@@ -159,7 +159,7 @@ void funcaoAtivaParaquedas3 (float segundaMediaMovel, unsigned long tempoAtual){
       digitalWrite(LED_BUILTIN , HIGH);
       led6 = HIGH;
       led5 = HIGH;
-      desligaLED3 = tempoAtual + intervalo;
+      desligaLED3 = tempoAtual + tempoLigado;
     }
 
     if (led6 == HIGH) {
