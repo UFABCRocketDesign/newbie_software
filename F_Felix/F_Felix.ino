@@ -85,14 +85,8 @@ float funcaoMediaMovel(float x, int y){ // ou entra media movel ou entra alt rel
   for (int i = 0; i < (qtdValores - 1); i++) {
     matriz[y][i] = matriz[y][i + 1];
   }
-
-  if (y == 0){
-    matriz[y][qtdValores - 1] = x;
-  }
-  else if ( y == 1){
-    matriz[y][qtdValores - 1] = x;
-  }
-
+  
+  matriz[y][qtdValores - 1] = x;
 
   for (int i = 0; i < qtdValores; i++) {
     somaVet += matriz[y][i];
@@ -280,14 +274,13 @@ void loop() {
   #if use_altura
   float mediaMovel = 0;
   float segundaMediaMovel = 0;
-  int tam = 0;
   float alt = bmp.readAltitude();
 
   float altRelativa = alt - media;
 
-  mediaMovel = funcaoMediaMovel(altRelativa, tam);
+  mediaMovel = funcaoMediaMovel(altRelativa, 0);
 
-  segundaMediaMovel = funcaoMediaMovel(mediaMovel,tam + 1);
+  segundaMediaMovel = funcaoMediaMovel(mediaMovel,1);
   
   #endif
 
