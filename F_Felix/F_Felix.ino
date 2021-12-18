@@ -143,13 +143,16 @@ void funcaoAtivaParaquedas2 (unsigned long tempoAtual){
       led4 = HIGH;
       led3 = HIGH;
       desligaLED2 = tempoAtual + tempoLigado;
-      Serial.println("1° if: " + tempoAtual);
+      Serial.print("1° if: ");
+      Serial.println(tempoAtual);
     }
 
   else if (led4 == HIGH) {
-      Serial.print("else if: " + tempoAtual);
+      Serial.print("else if: ");
+      Serial.println(tempoAtual);
      if (tempoAtual >= desligaLED2 ) {
-        Serial.print("2° if: " + tempoAtual);
+        Serial.print("2° if: ");
+        Serial.println(tempoAtual);
         digitalWrite(IGN_2, LOW);
         led4 = LOW;
       }
