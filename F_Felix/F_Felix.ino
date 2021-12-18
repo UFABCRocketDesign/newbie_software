@@ -137,6 +137,8 @@ void funcaoAtivaParaquedas2 (unsigned long tempoAtual){
   if (ligaLED2 == 0){
     ligaLED2 = tempoAtual + atraso;
   }
+
+  Serial.println(ligaLED2);
   
   if (led3 == LOW && tempoAtual >= ligaLED2 ) {
       digitalWrite(IGN_2, HIGH);
