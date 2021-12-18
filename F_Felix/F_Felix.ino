@@ -78,6 +78,32 @@ float apogeu = 0;
 boolean detectaApogeu = false;
 #endif
 
+#if use_altura
+float funcaoMediaMovel(float x, int y){ // ou entra media movel ou entra alt relativa
+  float somaVet = 0;
+  
+  for (int i = 0; i < (qtdValores - 1); i++) {
+    matriz[y][i] = matriz[y][i + 1];
+  }
+
+  if (y == 0){
+    matriz[y][qtdValores - 1] = x;
+  }
+  else if ( y == 1){
+    matriz[y][qtdValores - 1] = x;
+  }
+
+
+  for (int i = 0; i < qtdValores; i++) {
+    somaVet += matriz[y][i];
+  }
+
+  float mediaMovel = somaVet / (float)qtdValores;
+
+  return mediaMovel;
+}
+
+#endif
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(IGN_1, OUTPUT);
@@ -254,37 +280,15 @@ void loop() {
   #if use_altura
   float mediaMovel = 0;
   float segundaMediaMovel = 0;
+  int tam = 0;
   float alt = bmp.readAltitude();
-  float somaVet = 0;
-  float somaVet2 = 0;
 
   float altRelativa = alt - media;
 
-  for (int i = 0; i < (qtdValores - 1); i++) {
-    matriz[0][i] = matriz[0][i + 1];
-  }
+  mediaMovel = funcaoMediaMovel(altRelativa, tam);
 
-  matriz[0][qtdValores - 1] = altRelativa;
-
-
-  for (int i = 0; i < qtdValores; i++) {
-    somaVet += matriz[0][i];
-  }
-
-  mediaMovel = somaVet / (float)qtdValores;
-
-
-  for (int i = 0; i < qtdValores - 1; i ++) {
-    matriz [1][i] = matriz [1][i + 1];
-  }
-  matriz[1][qtdValores - 1] = mediaMovel;
-
-
-  for (int i = 0; i < qtdValores; i++) {
-    somaVet2 += matriz[1][i];
-  }
-
-  segundaMediaMovel = somaVet2 / (float)qtdValores;
+  segundaMediaMovel = funcaoMediaMovel(mediaMovel,tam + 1);
+  
   #endif
 
   #if use_temp
