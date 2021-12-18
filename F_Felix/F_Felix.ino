@@ -145,8 +145,8 @@ void funcaoAtivaParaquedas2 (unsigned long tempoAtual){
       desligaLED2 = tempoAtual + intervalo;
     }
 
-    if (led4 == HIGH) {
-      if (tempoAtual >= desligaLED2 ) {
+  else if (led4 == HIGH) {
+     if (tempoAtual >= desligaLED2 ) {
         digitalWrite(IGN_2, LOW);
         led4 = LOW;
       }
