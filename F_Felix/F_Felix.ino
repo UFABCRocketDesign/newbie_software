@@ -17,7 +17,7 @@ L3G gyro;
 #define IGN_2 61  /*act2*/
 #define IGN_3 46  /*act3*/
 #define IGN_4 55  /*act4*/
-#define tempoLigado 2500
+#define tempoLigado 5000
 #define atraso 2500
 #define qtdFiltros 2
 #define qtdValores 10
