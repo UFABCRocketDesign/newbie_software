@@ -116,6 +116,57 @@ boolean funcaoDetectaApogeu (float segundaMediaMovel){
   return detectaApogeu;
 }
 
+void funcaoAtivaParaquedas1 (unsigned long tempoAtual){
+  
+   if (led == LOW){
+      digitalWrite(IGN_1, HIGH);
+      led2 = HIGH;
+      led = HIGH;
+      desligaLED = tempoAtual + intervalo;
+    }
+    
+    else if (led2 == HIGH) {
+      if (tempoAtual >= desligaLED) {
+        digitalWrite(IGN_1, LOW);
+        led2 = LOW;
+      }
+  }
+}
+
+void funcaoAtivaParaquedas2 (unsigned long tempoAtual, unsigned long ligaLED2){
+  
+  if (led3 == LOW && tempoAtual >= ligaLED2 ) {
+      digitalWrite(IGN_2, HIGH);
+      led4 = HIGH;
+      led3 = HIGH;
+      desligaLED2 = tempoAtual + intervalo;
+    }
+
+    if (led4 == HIGH) {
+      if (tempoAtual >= desligaLED2 ) {
+        digitalWrite(IGN_2, LOW);
+        led4 = LOW;
+      }
+    }
+}
+
+void funcaoAtivaParaquedas3 (float segundaMediaMovel, unsigned long tempoAtual){
+  
+  if (led5 == LOW && segundaMediaMovel <= 10 ) {
+      digitalWrite(LED_BUILTIN , HIGH);
+      led6 = HIGH;
+      led5 = HIGH;
+      desligaLED3 = tempoAtual + intervalo;
+    }
+
+    if (led6 == HIGH) {
+      if (tempoAtual >= desligaLED3) {
+        digitalWrite(LED_BUILTIN, LOW);
+        led6 = LOW;
+      }
+    }
+}
+
 #endif
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
@@ -364,53 +415,19 @@ void loop() {
     
   if (detectaApogeu == true) {
     dataString += String("caindo\t");
-     
-    if (led == LOW){
-      digitalWrite(IGN_1, HIGH);
-      led2 = HIGH;
-      led = HIGH;
-      desligaLED = tempoAtual + intervalo;
-      ligaLED2 = tempoAtual + intervalo2;
-    }
-    else if (led2 == HIGH) {
-      if (tempoAtual >= desligaLED) {
-        dataString += String("caindo\t");
-        digitalWrite(IGN_1, LOW);
-        led2 = LOW;
-      }
-   }
+
+    funcaoAtivaParaquedas1(tempoAtual);
+    ligaLED2 = tempoAtual + intervalo2; 
+      
+  }
  #endif
  
  #if use_paraquedas2
-    if (led3 == LOW && tempoAtual >= ligaLED2 ) {
-      digitalWrite(IGN_2, HIGH);
-      led4 = HIGH;
-      led3 = HIGH;
-      desligaLED2 = tempoAtual + intervalo;
-    }
-
-    if (led4 == HIGH) {
-      if (tempoAtual >= desligaLED2 ) {
-        digitalWrite(IGN_2, LOW);
-        led4 = LOW;
-      }
-    }
-  #endif
-  #if use_paraquedas3
-    if (led5 == LOW && segundaMediaMovel <= 10 ) {
-      digitalWrite(LED_BUILTIN , HIGH);
-      led6 = HIGH;
-      led5 = HIGH;
-      desligaLED3 = tempoAtual + intervalo;
-    }
-
-    if (led6 == HIGH) {
-      if (tempoAtual >= desligaLED3) {
-        digitalWrite(LED_BUILTIN, LOW);
-        led6 = LOW;
-      }
-    }
-  }
+   funcaoAtivaParaquedas2 (tempoAtual, ligaLED2);
+ #endif
+ 
+ #if use_paraquedas3
+   funcaoAtivaParaquedas3 (segundaMediaMovel, tempoAtual);
   #endif
 
   #if use_sd
