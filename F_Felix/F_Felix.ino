@@ -119,7 +119,7 @@ boolean funcaoDetectaApogeu (float segundaMediaMovel){
 void funcaoAtivaParaquedas1 (unsigned long tempoAtual){
   
    if (led == LOW){
-      digitalWrite(IGN_1, HIGH);
+      digitalWrite(IGN_2, HIGH);
       led2 = HIGH;
       led = HIGH;
       desligaLED = tempoAtual + tempoLigado;
@@ -127,7 +127,7 @@ void funcaoAtivaParaquedas1 (unsigned long tempoAtual){
     
     else if (led2 == HIGH) {
       if (tempoAtual >= desligaLED) {
-        digitalWrite(IGN_1, LOW);
+        digitalWrite(IGN_2, LOW);
         led2 = LOW;
       }
   }
@@ -139,7 +139,7 @@ void funcaoAtivaParaquedas2 (unsigned long tempoAtual){
   }
   
   if ((led3 == LOW) && (tempoAtual >= ligaLED2) ) {
-      digitalWrite(IGN_2, HIGH);
+      digitalWrite(IGN_1, HIGH);
       led4 = HIGH;
       led3 = HIGH;
       desligaLED2 = tempoAtual + tempoLigado;
@@ -153,7 +153,7 @@ void funcaoAtivaParaquedas2 (unsigned long tempoAtual){
      if (tempoAtual >= desligaLED2 ) {
         Serial.print("2° if: ");
         Serial.println(tempoAtual);
-        digitalWrite(IGN_2, LOW);
+        digitalWrite(IGN_1, LOW);
         led4 = LOW;
       }
     }
