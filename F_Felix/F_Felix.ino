@@ -418,18 +418,21 @@ void loop() {
     
   if (detectaApogeu == true) {
     dataString += String("caindo\t");
-
-    funcaoAtivaParaquedas1(tempoAtual);
-  }
- #endif
- 
- #if use_paraquedas2
-   funcaoAtivaParaquedas2 (tempoAtual);
- #endif
- 
- #if use_paraquedas3
-   funcaoAtivaParaquedas3 (segundaMediaMovel, tempoAtual);
   #endif
+
+  #if use_paraquedas1
+    funcaoAtivaParaquedas1(tempoAtual);
+  #endif
+   
+   #if use_paraquedas2
+     funcaoAtivaParaquedas2 (tempoAtual);
+   #endif
+ 
+    #if use_paraquedas3
+     funcaoAtivaParaquedas3 (segundaMediaMovel, tempoAtual);
+    #endif
+
+  }
 
   #if use_sd
   File dataFile = SD.open(arquivo, FILE_WRITE);
