@@ -47,7 +47,7 @@ L3G gyro;
 #define use_temp (use_baro && 0)
 #define use_apogeu (use_altura && 1)
 #define use_paraquedas1 (use_apogeu && 1)
-#define use_paraquedas2 (use_paraquedas1 && 1)
+#define use_paraquedas2 (use_apogeu && 1)
 #define use_paraquedas3 (use_apogeu && 1)
 
 #if use_altura
@@ -364,8 +364,7 @@ void loop() {
     
   if (detectaApogeu == true) {
     dataString += String("caindo\t");
-    
-    #if use_paraquedas1 
+     
     if (led == LOW){
       digitalWrite(IGN_1, HIGH);
       led2 = HIGH;
@@ -379,7 +378,6 @@ void loop() {
         digitalWrite(IGN_1, LOW);
         led2 = LOW;
       }
-    #endif
    }
  #endif
  
