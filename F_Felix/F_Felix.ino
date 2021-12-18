@@ -99,7 +99,13 @@ float funcaoMediaMovel(float x, int y){ // ou entra media movel ou entra alt rel
 #endif
 
 #if use_apogeu
-boolean funcaoDetectaApogeu (float diferenca){
+boolean funcaoDetectaApogeu (float segundaMediaMovel){
+  
+  if (apogeu < segundaMediaMovel) {
+     apogeu = segundaMediaMovel;
+  }
+  
+  float diferenca = apogeu - segundaMediaMovel;
   
   if (diferenca >= 1) {
     if (detectaApogeu == false){
@@ -354,13 +360,7 @@ void loop() {
   #endif
 
   #if use_apogeu
-  if (apogeu < segundaMediaMovel) {
-     apogeu = segundaMediaMovel;
-  }
-  
-  float diferenca = apogeu - segundaMediaMovel;
- 
-  detectaApogeu = funcaoDetectaApogeu(diferenca);   
+  detectaApogeu = funcaoDetectaApogeu(segundaMediaMovel);   
     
   if (detectaApogeu == true) {
     dataString += String("caindo\t");
