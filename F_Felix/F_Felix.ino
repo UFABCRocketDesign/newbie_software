@@ -17,8 +17,8 @@ L3G gyro;
 #define IGN_2 61  /*act2*/
 #define IGN_3 46  /*act3*/
 #define IGN_4 55  /*act4*/
-#define intervalo 5000
-#define intervalo2 5000
+#define intervalo 2500
+#define intervalo2 2500
 #define qtdFiltros 2
 #define qtdValores 10
 
@@ -134,8 +134,8 @@ void funcaoAtivaParaquedas1 (unsigned long tempoAtual){
 }
 
 void funcaoAtivaParaquedas2 (unsigned long tempoAtual){
-  if ( ligaLED2 == 0){
-    ligaLED2 = tempoAtual + intervalo;
+  if (ligaLED2 == 0){
+    ligaLED2 = tempoAtual + intervalo2;
   }
   
   if (led3 == LOW && tempoAtual >= ligaLED2 ) {
