@@ -133,7 +133,10 @@ void funcaoAtivaParaquedas1 (unsigned long tempoAtual){
   }
 }
 
-void funcaoAtivaParaquedas2 (unsigned long tempoAtual, unsigned long ligaLED2){
+void funcaoAtivaParaquedas2 (unsigned long tempoAtual){
+  if ( ligaLED2 == 0){
+    ligaLED2 = tempoAtual + intervalo;
+  }
   
   if (led3 == LOW && tempoAtual >= ligaLED2 ) {
       digitalWrite(IGN_2, HIGH);
@@ -417,13 +420,11 @@ void loop() {
     dataString += String("caindo\t");
 
     funcaoAtivaParaquedas1(tempoAtual);
-    ligaLED2 = tempoAtual + intervalo2; 
-      
   }
  #endif
  
  #if use_paraquedas2
-   funcaoAtivaParaquedas2 (tempoAtual, ligaLED2);
+   funcaoAtivaParaquedas2 (tempoAtual);
  #endif
  
  #if use_paraquedas3
