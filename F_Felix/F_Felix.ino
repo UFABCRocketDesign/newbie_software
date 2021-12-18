@@ -22,7 +22,7 @@ L3G gyro;
 #define qtdFiltros 2
 #define qtdValores 10
 
-#define use_relogio 0
+#define use_relogio 1
 #define use_sd 1
 
 #define use_gyro 0
@@ -45,9 +45,9 @@ L3G gyro;
 #define use_altura (use_baro && 1)
 #define use_pressao (use_baro && 0)
 #define use_temp (use_baro && 0)
-#define use_apogeu (use_alt && 1)
+#define use_apogeu (use_altura && 1)
 #define use_paraquedas1 (use_apogeu && 1)
-#define use_paraquedas2 (use_paraquedas2 && 1)
+#define use_paraquedas2 (use_paraquedas1 && 1)
 #define use_paraquedas3 (use_apogeu && 1)
 
 #if use_altura
@@ -96,6 +96,19 @@ float funcaoMediaMovel(float x, int y){ // ou entra media movel ou entra alt rel
 
   return mediaMovel;
 }
+#endif
+
+#if use_apogeu
+boolean funcaoDetectaApogeu (float diferenca){
+  
+  if (diferenca >= 1) {
+    if (detectaApogeu == false){
+      detectaApogeu = true;
+    }
+  }
+  
+  return detectaApogeu;
+}
 
 #endif
 void setup() {
@@ -139,18 +152,16 @@ void setup() {
   }
   #endif
 
-  #if use_sd
   Serial.print("Initializing SD card...");
-
+  #if use_sd
   if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present");
     // don't do anything more:
   }
+  #endif
   Serial.println("card initialized.");
 
   String dataString = "";
-
-  #endif
 
   #if use_relogio
   dataString += ("Relógio\t");
@@ -237,10 +248,8 @@ void setup() {
 
   media = soma / 100.0;
   #endif
-
-  #if use_sd
+  
   Serial.println(dataString);
-  #endif
 }
 
 // the loop function runs over and over again forever
@@ -344,41 +353,37 @@ void loop() {
   dataString += ("\t");
   #endif
 
- #if use_apogeu
+  #if use_apogeu
   if (apogeu < segundaMediaMovel) {
-    apogeu = segundaMediaMovel;
+     apogeu = segundaMediaMovel;
   }
-
+  
   float diferenca = apogeu - segundaMediaMovel;
- #endif
  
- #if use_paraquedas1
-  if (diferenca >= 1) {
+  detectaApogeu = funcaoDetectaApogeu(diferenca);   
+    
+  if (detectaApogeu == true) {
     dataString += String("caindo\t");
-
-    if (detectaApogeu == false) {
+    
+    #if use_paraquedas1 
+    if (led == LOW){
       digitalWrite(IGN_1, HIGH);
       led2 = HIGH;
       led = HIGH;
-      detectaApogeu = true;
       desligaLED = tempoAtual + intervalo;
       ligaLED2 = tempoAtual + intervalo2;
     }
-    else if (led == LOW) {
-      dataString += String("subindo\t");
-    }
-  }
-  if (detectaApogeu == true) {
-
-    if (led2 == HIGH) {
+    else if (led2 == HIGH) {
       if (tempoAtual >= desligaLED) {
         dataString += String("caindo\t");
         digitalWrite(IGN_1, LOW);
         led2 = LOW;
       }
-    }
-  #endif
-  #if use_paraquedas2
+    #endif
+   }
+ #endif
+ 
+ #if use_paraquedas2
     if (led3 == LOW && tempoAtual >= ligaLED2 ) {
       digitalWrite(IGN_2, HIGH);
       led4 = HIGH;
@@ -402,7 +407,7 @@ void loop() {
     }
 
     if (led6 == HIGH) {
-      if (tempoAtual >= desligaLED3 ) {
+      if (tempoAtual >= desligaLED3) {
         digitalWrite(LED_BUILTIN, LOW);
         led6 = LOW;
       }
@@ -423,9 +428,9 @@ void loop() {
   else {
     Serial.println("error opening" + arquivo);
   }
-
-  Serial.println(dataString);
   #endif
+  
+  Serial.println(dataString);
 
  // delay(100);
 }
