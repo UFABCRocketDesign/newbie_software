@@ -137,18 +137,19 @@ void funcaoAtivaParaquedas2 (unsigned long tempoAtual){
   if (ligaLED2 == 0){
     ligaLED2 = tempoAtual + atraso;
   }
-
-  Serial.println(ligaLED2);
   
-  if (led3 == LOW && tempoAtual >= ligaLED2 ) {
+  if ((led3 == LOW) && (tempoAtual >= ligaLED2) ) {
       digitalWrite(IGN_2, HIGH);
       led4 = HIGH;
       led3 = HIGH;
       desligaLED2 = tempoAtual + tempoLigado;
+      Serial.println("1° if: " + tempoAtual);
     }
 
   else if (led4 == HIGH) {
+      Serial.print("else if: " + tempoAtual);
      if (tempoAtual >= desligaLED2 ) {
+        Serial.print("2° if: " + tempoAtual);
         digitalWrite(IGN_2, LOW);
         led4 = LOW;
       }
@@ -426,11 +427,11 @@ void loop() {
   #endif
    
    #if use_paraquedas2
-     funcaoAtivaParaquedas2 (tempoAtual);
+     funcaoAtivaParaquedas2(tempoAtual);
    #endif
  
     #if use_paraquedas3
-     funcaoAtivaParaquedas3 (segundaMediaMovel, tempoAtual);
+     funcaoAtivaParaquedas3(segundaMediaMovel, tempoAtual);
     #endif
   }
   #endif
