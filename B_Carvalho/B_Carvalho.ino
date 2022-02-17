@@ -39,15 +39,18 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
   String dataString = "";
-  File dataFile = SD.open("bruno000.txt", FILE_WRITE);
-    while (numA <= files){
-      newData = "bruno" + String(numA) + ".txt";
-      numA = numA + 1;
+  while (numA <= files) {
+    newData = "bruno" + String(numA) + ".txt";
+    numA = numA + 1;
+    if (SD.exists("bruno" + String(files) + ".txt")) {
+      Serial.println(" This file has already exist");
+      Serial.println("error opening datalog.txt");
     }
-  newFile = SD.open("bruno" + String(files) + ".txt");
-  if (SD.exists("bruno" + String(files) + ".txt") {
-    Serial.println(" This file has already exist");
+    else {
+      newFile = SD.open("bruno" + String(files) + ".txt");
+    }
   }
+  
   dataString += String("Average altitude (m)");
   dataString += String("\t");
   dataString += String("Current altidude");
@@ -59,9 +62,9 @@ void setup() {
   //dataString += String("\t");
   Serial.println(dataString);
 
-  if (dataFile) {
-    dataFile.println(dataString);
-    dataFile.close();
+  if (newFile) {
+    newFile.println(dataString);
+    newFile.close();
   }
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
@@ -140,13 +143,6 @@ void loop() {
   }
   Serial.println(dataString);
 
-  if (dataFile) {
-    dataFile.println(dataString);
-    dataFile.close();
-  }
-  else {
-    Serial.println("error opening datalog.txt");
-  }
 }
 
 
