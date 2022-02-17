@@ -16,10 +16,10 @@ void setup() {
 
 void loop() {
   
- Serial.print(bmp.readTemperature());
- Serial.print("\t");
- Serial.print(bmp.readPressure());
- Serial.print("\t");
+// Serial.print(bmp.readTemperature());
+// Serial.print("\t");
+// Serial.print(bmp.readPressure());
+// Serial.print("\t");
  Serial.print(bmp.readAltitude());
  Serial.print("\t");
  Serial.println();
