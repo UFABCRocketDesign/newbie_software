@@ -4,53 +4,42 @@ Adafruit_BMP085 bmp;
 
 void setup() {
  pinMode(led, OUTPUT);
- Serial.begin(9600);
+ Serial.begin(115200);
  if (!bmp.begin()) {
  Serial.println("Could not find a valid BMP085 sensor, check wiring!");
- while (1) {}
   }
+  Serial.print("Temp |");
+  Serial.print("Pres |");
+  Serial.print("Alt  |");
+  Serial.println();
 }
 
 void loop() {
   
-  Serial.print("Temperature = ");
   Serial.print(bmp.readTemperature());
-  Serial.println(" *C");
-    
-  Serial.print("Pressure = ");
+  Serial.print(" *C |");
   Serial.print(bmp.readPressure());
-  Serial.println(" Pa");
-    
-  Serial.print("Altitude = ");
+  Serial.print(" Pa |");
   Serial.print(bmp.readAltitude());
-  Serial.println(" meters");
-
-  Serial.print("Pressure at sealevel (calculated) = ");
-  Serial.print(bmp.readSealevelPressure());
-  Serial.println(" Pa");
-
-  Serial.print("Real altitude = ");
-  Serial.print(bmp.readAltitude(101500));
-  Serial.println(" meters");
-    
+  Serial.print(" m |");
   Serial.println();
-  delay(500);
  
-  digitalWrite(led, HIGH);
-  delay(2000);
-  digitalWrite(led, LOW);
-  delay(500);
-  digitalWrite(led, HIGH);
-  delay(2000);
-  digitalWrite(led, LOW);
-  delay(500);
-  digitalWrite(led, HIGH);
-  delay(2000);
-  digitalWrite(led, LOW);
-  delay(500);
-  digitalWrite(led, HIGH);
-  delay(2000);
-  digitalWrite(led, LOW);
-  delay(2000);
+ 
+//  digitalWrite(led, HIGH);
+//  delay(2000);
+//  digitalWrite(led, LOW);
+//  delay(500);
+//  digitalWrite(led, HIGH);
+//  delay(2000);
+//  digitalWrite(led, LOW);
+//  delay(500);
+//  digitalWrite(led, HIGH);
+//  delay(2000);
+//  digitalWrite(led, LOW);
+//  delay(500);
+//  digitalWrite(led, HIGH);
+//  delay(2000);
+//  digitalWrite(led, LOW);
+//  delay(2000);
   
 }
