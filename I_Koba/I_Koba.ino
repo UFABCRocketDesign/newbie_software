@@ -4,7 +4,7 @@ Adafruit_BMP085 bmp;
 
 void setup() {
  pinMode(led, OUTPUT);
- Serial.begin(9600);
+ Serial.begin(115200);
  if (!bmp.begin()) {
  Serial.println("Could not find a valid BMP085 sensor, check wiring!");
  while (1) {}
@@ -34,23 +34,23 @@ void loop() {
   Serial.println(" meters");
     
   Serial.println();
-  delay(500);
  
-  digitalWrite(led, HIGH);
-  delay(2000);
-  digitalWrite(led, LOW);
-  delay(500);
-  digitalWrite(led, HIGH);
-  delay(2000);
-  digitalWrite(led, LOW);
-  delay(500);
-  digitalWrite(led, HIGH);
-  delay(2000);
-  digitalWrite(led, LOW);
-  delay(500);
-  digitalWrite(led, HIGH);
-  delay(2000);
-  digitalWrite(led, LOW);
-  delay(2000);
+ 
+//  digitalWrite(led, HIGH);
+//  delay(2000);
+//  digitalWrite(led, LOW);
+//  delay(500);
+//  digitalWrite(led, HIGH);
+//  delay(2000);
+//  digitalWrite(led, LOW);
+//  delay(500);
+//  digitalWrite(led, HIGH);
+//  delay(2000);
+//  digitalWrite(led, LOW);
+//  delay(500);
+//  digitalWrite(led, HIGH);
+//  delay(2000);
+//  digitalWrite(led, LOW);
+//  delay(2000);
   
 }
