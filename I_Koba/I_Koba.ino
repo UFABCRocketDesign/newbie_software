@@ -5,11 +5,13 @@ Adafruit_BMP085 bmp;
 void setup() {
  pinMode(led, OUTPUT);
  Serial.begin(115200);
- Serial.print("Temp |");
- Serial.print("Pres |");
- Serial.print("Alt  |");
- Serial.println();
- 
+ if (!bmp.begin()) {
+ Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+  }
+  Serial.print("Temp |");
+  Serial.print("Pres |");
+  Serial.print("Alt  |");
+  Serial.println();
 }
 
 void loop() {
