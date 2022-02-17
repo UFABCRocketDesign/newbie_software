@@ -13,26 +13,16 @@ void setup() {
 
 void loop() {
   
-  Serial.print("Temperature = ");
+  Serial.print("Temp |");
+  Serial.print("Pres |");
+  Serial.print("Alt  |");
+  Serial.println();
   Serial.print(bmp.readTemperature());
-  Serial.println(" *C");
-    
-  Serial.print("Pressure = ");
+  Serial.print(" *C |");
   Serial.print(bmp.readPressure());
-  Serial.println(" Pa");
-    
-  Serial.print("Altitude = ");
+  Serial.print(" Pa |");
   Serial.print(bmp.readAltitude());
-  Serial.println(" meters");
-
-  Serial.print("Pressure at sealevel (calculated) = ");
-  Serial.print(bmp.readSealevelPressure());
-  Serial.println(" Pa");
-
-  Serial.print("Real altitude = ");
-  Serial.print(bmp.readAltitude(101500));
-  Serial.println(" meters");
-    
+  Serial.print(" m |");
   Serial.println();
  
  
