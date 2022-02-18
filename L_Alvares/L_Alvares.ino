@@ -99,6 +99,5 @@ void loop()
     //  digitalWrite(LED_BUILTIN, HIGH);   
     //  Serial.print(" Foguete Em Queda ");
     // }
-    //ALTo = ALT;
     //digitalWrite(LED_BUILTIN, LOW); 
 }
