@@ -1,9 +1,8 @@
 #include <Adafruit_BMP085.h>
 #define led 13 
-
+#define pmt 20
 Adafruit_BMP085 bmp;
 float z, const_chao, alt_ref, sinal_filtrado;
-int pmt = 20;
 float vetor[pmt];
 
 void setup() {
@@ -79,7 +78,7 @@ void media_movel() {
 
  int k = 0;
  for(int x = 0; x < pmt; x++){
-   k = vetor[x] + k
+   k = vetor[x] + k;
  }
  
 sinal_filtrado = k/pmt;
