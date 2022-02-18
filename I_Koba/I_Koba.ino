@@ -72,11 +72,13 @@ void cal_chao() {
 
 void media_movel() {
 
- for(int x = pmt; x > 0; x--){
-   vetor[x]= bmp.readAltitude() - const_chao;
+ for(int x = pmt-1; x > 0; x--){
+   vetor[x]= vetor[x-1];
  }
-
- int k = 0;
+vetor[0]= bmp.readAltitude() - const_chao;
+ 
+ float k = 0;
+ 
  for(int x = 0; x < pmt; x++){
    k = vetor[x] + k;
  }
