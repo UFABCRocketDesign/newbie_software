@@ -61,9 +61,7 @@ void setup()
   TesteC.println(StringC);
   TesteC.close();
   }
-
-
-  
+ 
   //média
   for( i = 0; i < 11; i++)
   {
