@@ -54,7 +54,10 @@ void setup()
   //Serial.println();
   
   String StringC = "";
-  StringC = String("Temperatura(°C)") + ";" +  String("Pressão(Pa)")+ ";" +  String("Altitude(m)")+ ";" +  String("PressãoNivelMar(Pa)") + ";" +  String("AltitudeReal(m)") ;
+  StringC += "Temperatura(°C)";
+  StringC += "\t";
+  StringC += "Pressão(Pa)";
+  StringC += "\t";
   File TesteC = SD.open("Alvares.txt", FILE_WRITE);
   if (TesteC)
   {
