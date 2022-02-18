@@ -18,9 +18,9 @@ L3G gyro;
 #define use_tempo 0
 #define use_sd 0
 #define use_bar 1
-#define use_gyro 1
-#define use_mag 1
-#define use_accel 1
+#define use_gyro 0
+#define use_mag 0
+#define use_accel 0
 #define print_serial 0
 
 #define use_alt (use_bar && 0)
