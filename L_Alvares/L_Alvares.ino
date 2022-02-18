@@ -32,7 +32,7 @@ void setup()
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   while (1) {}
   }
-
+  
   //ligando SD
   while (!Serial) 
   {
@@ -42,14 +42,27 @@ void setup()
   if (!SD.begin(chipSelect)) 
   {
     Serial.println("Card failed, or not present");
-    while (1);
+    return;
   }
-  Serial.println("card initialized.");
+  Serial.println("Card initialized.");
 
   //Cabeçalho
+  
   //Serial.print("Temperatura(°C)  Pressão(Pa) Altitude(m) PressãoNivelMar(Pa)  AltitudeReal(m)");
   //Serial.print("Pressão(Pa)");
+  //Serial.print("\t"); 
   //Serial.println();
+  
+  String StringC = "";
+  StringC = String("Temperatura(°C)") + ";" +  String("Pressão(Pa)")+ ";" +  String("Altitude(m)")+ ";" +  String("PressãoNivelMar(Pa)") + ";" +  String("AltitudeReal(m)") ;
+  File TesteC = SD.open("Alvares.txt", FILE_WRITE);
+  if (TesteC)
+  {
+  TesteC.println(StringC);
+  TesteC.close();
+  }
+
+
   
   //média
   for( i = 0; i < 11; i++)
@@ -65,8 +78,6 @@ void loop()
 {
     //Calculos filtro
     ALT = (bmp.readAltitude() - M);
-    //Serial.print(ALT);
-    //Serial.print("\t");
     F = F - Vfiltro[A];
     Vfiltro[A] = ALT;
     F = F + Vfiltro[A];
