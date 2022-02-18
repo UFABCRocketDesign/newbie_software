@@ -50,7 +50,6 @@ void loop() {
  alt_ref = bmp.readAltitude() - const_chao;
  Serial.print(alt_ref);
  Serial.print("\t");
- Serial.println();
  Serial.print(sinal_filtrado);
  Serial.print("\t");
  Serial.println();
