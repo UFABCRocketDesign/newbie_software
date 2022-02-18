@@ -22,7 +22,8 @@ float moving_average;   //Média móvel
 float vet2[n];         //Vetor 2
 int cont;             //Contador
 int num = 0;
-String jFile;
+String jFile = "Jaquexxx.txt";
+
 
 void setup() {
   // Open serial communications and wait for port to open:
@@ -71,22 +72,21 @@ void setup() {
     Serial.println("error opening datalog.txt");
   }
      while(num <= numFiles) {
-     jFile = "Jaque" + String(num) + ".txt";
-     num = num + 1;
-      }
+    num = num + 1;
+    num = jFile.toInt() ;
     Serial.println(jFile);
     myFile = SD.open(jFile, FILE_WRITE);
     myFile.close();
     
-    if (SD.exists ("Jaque" + String(numFiles) + ".txt")) {
-    Serial.println("Jaque" + String(numFiles) + ".txt exists.");
+    if (SD.exists ("Jaquexxx.txt")) {
+    Serial.println("Jaquexxx.txt exists.");
    } else {
-    Serial.println("Jaque" + String(numFiles) + ".txt doesn't exist.");
+    Serial.println("Jaquexxx.txt doesn't exist.");
   }
-
+ }
   // delete the file:
-  Serial.println("Removing" "Jaque" + String(numFiles) + ".txt...");
-  SD.remove("Jaque" + String(numFiles) + ".txt");
+  Serial.println("Removing Jaquexxx.txt...");
+  SD.remove("Jaquexxx.txt");
  
   for (float k = 0; k < numReads; k++) {
     accAltbase = accAltbase + bmp.readAltitude();
