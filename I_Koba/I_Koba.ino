@@ -1,9 +1,13 @@
 #include <Adafruit_BMP085.h>
 #define led 13 
-#define pmt 20
+
+#define pmt 20 // intervalo de filtros  
+#define nf 15  // Numero de filtros
+
 Adafruit_BMP085 bmp;
 float z, const_chao, alt_ref, sinal_filtrado, sinal_filtrado_2;
-float vetor[pmt][pmt];
+float vetor[nf][pmt];
+float sinal[nf];
 
 void setup() {
  pinMode(led, OUTPUT);
@@ -47,16 +51,22 @@ void loop() {
 //  digitalWrite(led, LOW);
 //  delay(2000);
 
- media_movel();
- media_movel_2();
- alt_ref = bmp.readAltitude() - const_chao;
- Serial.print(alt_ref);
- Serial.print("\t");
- Serial.print(sinal_filtrado);
- Serial.print("\t");
- Serial.print(sinal_filtrado_2);
- Serial.print("\t");
- Serial.println();
+// media_movel();
+// media_movel_2();
+// Serial.print(alt_ref);
+// Serial.print("\t");
+// Serial.print(sinal_filtrado);
+// Serial.print("\t");
+// Serial.print(sinal_filtrado_2);
+
+
+ sinal[0] = bmp.readAltitude() - const_chao;
+ Filtros();
+ for(int y = 0; y < nf; y++){
+   Serial.print(sinal[y]);
+   Serial.print("\t");
+ }
+
  
 }
 //-----------------------------------------------------------------------------
@@ -73,30 +83,51 @@ void call_chao() {
 
 //----------------------------------------------------------------------------------
 
-void media_movel() {
-
- for(int x = pmt-1; x > 0; x--){
-   vetor[0][x]= vetor[0][x-1];
- }
-vetor[0][0]= bmp.readAltitude() - const_chao;
- float k = 0;
- for(int x = 0; x < pmt; x++){
-   k = vetor[0][x] + k;
- }
-sinal_filtrado = k/pmt;
-}
+//void media_movel() {
+//
+// for(int x = pmt-1; x > 0; x--){
+//   vetor[0][x]= vetor[0][x-1];
+// }
+//vetor[0][0]= bmp.readAltitude() - const_chao;
+// float k = 0;
+// for(int x = 0; x < pmt; x++){
+//   k = vetor[0][x] + k;
+// }
+//sinal_filtrado = k/pmt;
+//}
 
 //----------------------------------------------------------------------------------
 
-void media_movel_2() {
+//void media_movel_2() {
+//
+// for(int x = pmt-1; x > 0; x--){
+//   vetor[1][x]= vetor[1][x-1];
+// }
+// vetor[1][0]= sinal_filtrado ;
+// float k = 0;
+// for(int x = 0; x < pmt; x++){
+//   k = vetor[1][x] + k;
+// }
+// sinal_filtrado_2 = k/pmt;
+//}
 
+//----------------------------------------------------------------------------------
+
+void Filtros() {
+for(int y = 0; y < nf; y++){
  for(int x = pmt-1; x > 0; x--){
-   vetor[1][x]= vetor[1][x-1];
+   vetor[y][x]= vetor[y][x-1];
  }
- vetor[1][0]= sinal_filtrado ;
+ if(y == 0) {
+  vetor[y][0] = bmp.readAltitude() - const_chao;
+ }else{
+  vetor[y][0] = sinal[y];
+ }
  float k = 0;
  for(int x = 0; x < pmt; x++){
-   k = vetor[1][x] + k;
+   k = vetor[y][x] + k;
  }
- sinal_filtrado_2 = k/pmt;
+ sinal[y+1] = k/pmt;
 }
+}
+//----------------------------------------------------------------------------------
