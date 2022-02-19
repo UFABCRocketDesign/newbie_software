@@ -149,7 +149,7 @@ void loop() {
         previousMillis = currentMillis;                                                           // Começa a considerar este momento para inciar os timers
         TA = InterA + previousMillis;                                                         // Guarda o instante para desligar o paraquedas A
         TB = InterB + previousMillis;                                                         // Guarda o instante para ligar o paraquedas B
-        TB2 = InterB2 + InterB;                                                               // Guarda o instante para desligar o paraquedas B
+        TB2 = InterB2 + TB;                                                               // Guarda o instante para desligar o paraquedas B
         Tia = false;
       }
       if (currentMillis >= TA) {
