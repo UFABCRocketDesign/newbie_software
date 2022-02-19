@@ -24,7 +24,10 @@ void setup() {
   Serial.print("Pres (Pa)\t");
   Serial.print("Alt (m)\t");
   Serial.println();
-  Serial.println((unsigned int)(&const_chao),HEX);
+//  Serial.println((unsigned int)(&const_chao),HEX);
+//  Serial.println((unsigned int)(z),HEX);
+//  Serial.println((unsigned int)(&const_chao),HEX);
+//  Serial.println((unsigned int)(&const_chao),HEX);
 
 }
 
@@ -66,6 +69,11 @@ void loop() {
   Serial.print("\t");
   Serial.print(const_chao);
   Serial.print("\t");
+  Serial.println((unsigned int)(&const_chao),HEX);
+  Serial.println((unsigned int)(&z),HEX);
+  Serial.println((unsigned int)(&alt_ref),HEX);
+  Serial.println((unsigned int)(&sinal_filtrado),HEX);
+  Serial.println((unsigned int)(&sinal_filtrado_2),HEX);
   Filtros();
   for (int y = 0; y < nf; y++) {
     Serial.print(sinal[y]);
