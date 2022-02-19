@@ -147,7 +147,7 @@ void loop() {
         InterA = InterA + previousMillis;                                                         // Guarda o instante para desligar o paraquedas A
         InterB = InterB + previousMillis;                                                         // Guarda o instante para ligar o paraquedas B
         InterB2 = InterB2 + InterB;                                                               // Guarda o instante para desligar o paraquedas B
-                  Tia = false;
+        Tia = false;
       }
       if (currentMillis >= InterA) {
         ledState1 = LOW;
@@ -158,11 +158,11 @@ void loop() {
         dataString += String("Paraquedas A - On");
         digitalWrite(IGN_1, ledState1);                                                            // Ligou o paraquedas A
       }
-      if (currentMillis >= InterB && currentMillis< InterB2) {
+      if (currentMillis >= InterB && currentMillis < InterB2) {
         ledState2 = HIGH;
         dataString += String("Paraquedas B - On");                                                // Ligou o parquedas B
         digitalWrite(IGN_2, ledState2);
-      }else{
+      } else {
         ledState2 = LOW;
         dataString += String("Paraquedas B - Off");                                               // Desliga paraquedas B
         digitalWrite(IGN_2, ledState2);
