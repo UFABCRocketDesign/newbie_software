@@ -2,18 +2,19 @@
 #define led 13 
 #define pmt 20
 Adafruit_BMP085 bmp;
-float z, const_chao, alt_ref, sinal_filtrado;
-float vetor[pmt];
+float z, const_chao, alt_ref, sinal_filtrado, sinal_filtrado_2;
+float vetor[pmt][pmt];
 
 void setup() {
  pinMode(led, OUTPUT);
  Serial.begin(115200);
+ 
  if (!bmp.begin()) {
  Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   }
 
  //media para referenciar a altura 
-  cal_chao();
+  call_chao();
   
   Serial.print("Temp (*C)\t");
   Serial.print("Pres (Pa)\t");
@@ -46,11 +47,14 @@ void loop() {
 //  digitalWrite(led, LOW);
 //  delay(2000);
 
-  media_movel();
+ media_movel();
+ media_movel_2();
  alt_ref = bmp.readAltitude() - const_chao;
  Serial.print(alt_ref);
  Serial.print("\t");
  Serial.print(sinal_filtrado);
+ Serial.print("\t");
+ Serial.print(sinal_filtrado_2);
  Serial.print("\t");
  Serial.println();
  
@@ -58,7 +62,7 @@ void loop() {
 //-----------------------------------------------------------------------------
 
 
-void cal_chao() {
+void call_chao() {
   z = 0;
  for(int x = 0; x < 100; x++){
    z = bmp.readAltitude() + z;
@@ -72,16 +76,27 @@ void cal_chao() {
 void media_movel() {
 
  for(int x = pmt-1; x > 0; x--){
-   vetor[x]= vetor[x-1];
+   vetor[0][x]= vetor[0][x-1];
  }
-vetor[0]= bmp.readAltitude() - const_chao;
- 
+vetor[0][0]= bmp.readAltitude() - const_chao;
  float k = 0;
- 
  for(int x = 0; x < pmt; x++){
-   k = vetor[x] + k;
+   k = vetor[0][x] + k;
  }
- 
 sinal_filtrado = k/pmt;
+}
 
+//----------------------------------------------------------------------------------
+
+void media_movel_2() {
+
+ for(int x = pmt-1; x > 0; x--){
+   vetor[1][x]= vetor[1][x-1];
+ }
+ vetor[1][0]= sinal_filtrado ;
+ float k = 0;
+ for(int x = 0; x < pmt; x++){
+   k = vetor[1][x] + k;
+ }
+ sinal_filtrado_2 = k/pmt;
 }
