@@ -62,7 +62,9 @@ void loop() {
 
   sinal[0] = bmp.readAltitude() - const_chao;
   Serial.print(sinal[0]);
-   Serial.print("\t");
+  Serial.print("\t");
+  Serial.print(const_chao);
+  Serial.print("\t");
   Filtros();
   for (int y = 0; y < nf; y++) {
     Serial.print(sinal[y]);
