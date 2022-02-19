@@ -14,7 +14,7 @@
 #define NomeArq "apm"             //Nome do arquivo para o cartão SD entre aspas
 #define espera 0000               //Tempo de espera para acionamento do paraquedas 2 (ms)
 #define duracao 5000              //Tempo de duracao do acionamento dos paraquedas (ms)
-#define altura 10                 //Altura para abertura do terceiro paraquedas
+#define altura 10                 //Altura para abertura do terceiro paraquedas (m)
 
 #define usa_bar 1                 //Variavel de escolha do uso do sensor BMP
 #define usa_pre (usa_bar && 0)    //Variavel de escolha do uso do valor Pressão
@@ -305,25 +305,34 @@ void loop() {
   }
   #endif
   #if usa_apogeu || usa_altMax
-  if (Hmax < MediaMov) {                                    //Pega o valor máximo da média/filtro2
-    Hmax = MediaMov;
+  if (Hmax < Afiltrada) {                                    //Pega o valor máximo da média/filtro2
+    Hmax = Afiltrada;
   }
   #endif
   #if usa_apogeu
-  float Delta = Hmax - MediaMov;                           //Compara o valor máximo do filtro1 com o valor atual do filtro1
-  
-  if (Delta >= 2 && apogeu == 0) {                         //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
-    apogeu = 1;
-    #if usa_acpq
-    inicio1 = tempoAtual + duracao;
-    inicio2 = tempoAtual + espera;
-    #endif
-  }
-  else if (apogeu == 0) {
+//  float Delta = Hmax - MediaMov;                           //Compara o valor máximo do filtro1 com o valor atual do filtro1
+//  
+//  if (Delta >= 2 && apogeu == 0) {                         //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
+//    apogeu = 1;
+//    #if usa_acpq
+//    inicio1 = tempoAtual + duracao;
+//    inicio2 = tempoAtual + espera;
+//    #endif
+//  }
+//  else if (apogeu == 0) {
+//    dado += "Subindo";
+//    dado += "\t";
+//  }
+//  if (apogeu == 1) {
+//    dado += "Descendo";
+//    dado += "\t";
+//  }
+  apogeu = Apogueu(apogeu, Hmax, Afiltrada, tempoAtual);
+  if (apogeu == 0) {
     dado += "Subindo";
     dado += "\t";
   }
-  if (apogeu == 1) {
+  else if (apogeu == 1) {
     dado += "Descendo";
     dado += "\t";
   }
@@ -390,4 +399,15 @@ float Friutu(float valoratualizado, int j){
   }
   MediaMov = SomaMov / tam;                          //Valor final do filtro, uma média entre "tam" quantidades de valores
   return MediaMov;
+}
+int Apogueu(int apogeu, float Hmax, float MediaMov, unsigned long tempoAtual){
+  float Delta = Hmax - MediaMov;                           //Compara o valor máximo do filtro1 com o valor atual do filtro1
+  if (Delta >= 2 && apogeu == 0) {                         //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
+    apogeu = 1;
+    #if usa_acpq
+    inicio1 = tempoAtual + duracao;
+    inicio2 = tempoAtual + espera;
+    #endif
+  }
+  return apogeu;
 }
