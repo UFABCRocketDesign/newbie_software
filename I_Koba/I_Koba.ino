@@ -24,7 +24,7 @@ void setup() {
   Serial.print("Pres (Pa)\t");
   Serial.print("Alt (m)\t");
   Serial.println();
-  Serial.println(String(&const_chao));
+  Serial.println(unsigned int(&const_chao),HEX);
 
 }
 
