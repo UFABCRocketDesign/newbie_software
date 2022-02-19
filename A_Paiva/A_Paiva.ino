@@ -29,7 +29,7 @@
 #define usa_gy (usa_giro && 0)    //Variavel de escolha do uso do valor do giroscopio em y
 #define usa_gz (usa_giro && 0)    //Variavel de escolha do uso do valor do giroscopio em z
 
-#define usa_acel 1                //Variavel de escolha do uso de funções
+#define usa_acel 0                //Variavel de escolha do uso de funções
 #define usa_ax (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em x
 #define usa_ay (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em y
 #define usa_az (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em z
@@ -310,7 +310,7 @@ void loop() {
   }
   #endif
   #if usa_apogeu
-  float Delta = Hmax - MediaMov;                                 //Compara o valor máximo do filtro1 com o valor atual do filtro1
+  float Delta = Hmax - MediaMov;                           //Compara o valor máximo do filtro1 com o valor atual do filtro1
   
   if (Delta >= 2 && apogeu == 0) {                         //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
     apogeu = 1;

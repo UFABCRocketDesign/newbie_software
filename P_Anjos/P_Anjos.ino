@@ -139,21 +139,24 @@ void loop() {
   if (Delta > 0 || Apogeu == true) {                                                              // Se a diferença da média móvel com o Hmáx ta aumentando, significa que pode estar descendo
     if (Delta >= dfaltura || Apogeu == true) {                                                    // Se a diferença for maior ou igual ao delta de ref. ou A detecção de apogeu tenha acontecido
       Apogeu = true;                                                                              // Encontrou o apogeu
+      dataString += String("Encontrou o apogeu");
       unsigned long currentMillis = millis();                                                     // Regsitra em que instante do tempo está
       Tia = true;                                                                                 // Inicia a contagem de tempo do paraquedas A
       Tib = true;                                                                                 // Inicia a contagem de tempo do paraquedas B
       if (Tia == true ) {
         if (ledState1 == LOW) {
-          ledState1 = HIGH;
-          dataString += String("Paraquedas A - On");
-          digitalWrite(IGN_1, ledState1);
-        }
         if (currentMillis - previousMillis >= InterA) {
-          ledState1 = LOW;
-          dataString += String("Paraquedas A - Off");
-          digitalWrite(IGN_1, ledState1);
-          Tia = false;
+          if (ledState1 == LOW) {
+            ledState1 = HIGH;
+            dataString += String("Paraquedas A - On");
+            digitalWrite(IGN_1, ledState1);
+          } else {
+            ledState1 = LOW;
+            dataString += String("Paraquedas A - Off");
+            digitalWrite(IGN_1, ledState1);
+          }
         }
+      }
       }
       if (Tib == true ) {
         if (currentMillis - previousMillis >= InterB) {
