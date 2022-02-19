@@ -34,17 +34,17 @@ String parteB;
 int a;
 int b;
 int c;
-int ledState1 = LOW;                   // Estado inicial do LED que indica acionamento do paraquedas
+int ledState1 = LOW;                  // Estado do LED 1 que indica acionamento do paraquedas A
 int ledState2 = LOW;                  // Outra LED para verificar o timer antes de acionar o paraquedas
 float Timer = 0;                      // Guarda o tempo do timer
-unsigned long previousMillis = 0;     // Guarda o valor de tempo
+unsigned long previousMillis = 0;     // Guarda o momento de tempo para iniciar A e B
+unsigned long previousMillis2 = 0;    // Guarda o momento para o timer para manter B ligado
 const long interval = 2000;           // O intervalo de tempo que o LED deve ficar ligado em milesegundos
-int Intervalo = 3000;                //Intervalo de tempo do Timer antes do acionamento do paraquedas
+int Intervalo = 3000;                 //Intervalo de tempo do Timer antes do acionamento do paraquedas
 bool Apogeu = false;
-bool Tia = false;                     //Tempo inicial do paraquedas A
-int InterA = 1000;                   //Intervalo de tempo do paraquedas A em segundos
-bool Tib = false;                     //Tempo inicial do paraquedas B
-int InterB = 2000;                   //Intervalo de tempo do paraquedas B em segundos
+int InterA = 1000;                    //Intervalo de tempo para desligar o paraquedas A em segundos
+int InterB = 2000;                    //Intervalo de tempo para ligar o paraquedas B em segundos
+int InterB2 = 1000;                   //Intervalo de tempo que o paraquedas B fica ligado em segundos
 bool Aceso = false;                   // A variável booleana para verificar se o LED ta ligado
 bool Fim = true;                      // A variável booleana para parar a verificação do paraquedas
 float dfaltura = 2;                   // Define o delta de altura que serve de critério para a determinação do apogeu
@@ -118,9 +118,9 @@ void loop() {
     Hmax = H1;
   }
   Delta = Hmax - H1;
-  if (ledState1 == HIGH) {
-    Aceso = true;                                                                               // Para garantir que após o acionamento do paraquedas, ele irá executar o próximo if
-  }
+  //  if (ledState1 == HIGH) {
+  //    Aceso = true;                                                                               // Para garantir que após o acionamento do paraquedas, ele irá executar o próximo if
+  //  }
   dataString += String(Hmax);
   dataString += "\t";
   dataString += String(H1);
@@ -136,75 +136,63 @@ void loop() {
   dataString += String(bmp.readSealevelPressure());
   dataString += "\t";
 
-  if (Delta > 0 || Apogeu == true) {                                                              // Se a diferença da média móvel com o Hmáx ta aumentando, significa que pode estar descendo
-    if (Delta >= dfaltura || Apogeu == true) {                                                    // Se a diferença for maior ou igual ao delta de ref. ou A detecção de apogeu tenha acontecido
-      Apogeu = true;                                                                              // Encontrou o apogeu
+  if (Delta > 0 || Apogeu == true) {                                                              // Só serve para imprimir na tela. Se a diferença da média móvel com o Hmáx é maior que 0, significa que pode estar descendo
+    if (Delta >= dfaltura || Apogeu == true) {                                                    // Se a diferença for maior ou igual ao delta de ref. ou já tenha detectado o apogeu
+      Apogeu = true;                                                                              // Imprime na tela: Encontrou o apogeu
       dataString += String("Encontrou o apogeu");
       unsigned long currentMillis = millis();                                                     // Regsitra em que instante do tempo está
-      Tia = true;                                                                                 // Inicia a contagem de tempo do paraquedas A
-      Tib = true;                                                                                 // Inicia a contagem de tempo do paraquedas B
-      if (Tia == true ) {
-        if (ledState1 == LOW) {
-        if (currentMillis - previousMillis >= InterA) {
-          if (ledState1 == LOW) {
-            ledState1 = HIGH;
-            dataString += String("Paraquedas A - On");
-            digitalWrite(IGN_1, ledState1);
-          } else {
-            ledState1 = LOW;
-            dataString += String("Paraquedas A - Off");
-            digitalWrite(IGN_1, ledState1);
-          }
-        }
+      previousMillis = currentMillis;                                                             // Começa a considerar este momento para inciar os timers
+      ledState1 = HIGH;
+      dataString += String("Paraquedas A - On");
+      digitalWrite(IGN_1, ledState1);                                                             // Ligou o paraquedas A
+      if (currentMillis >= InterA + previousMillis) {
+        ledState1 = LOW;
+        dataString += String("Paraquedas A - Off");                                               // Desliga o paraquedas A
+        digitalWrite(IGN_1, ledState1);
       }
+      if (currentMillis >= InterB + previousMillis) {
+        previousMillis2 = currentMillis;                                                          // Momento para iniciar o timer de desligar o paraquedas B
+        ledState2 = HIGH;
+        dataString += String("Paraquedas B - On");                                                // Ligou o parquedas B
+        digitalWrite(IGN_2, ledState2);
       }
-      if (Tib == true ) {
-        if (currentMillis - previousMillis >= InterB) {
-          if (ledState2 == LOW) {
-            ledState2 = HIGH;
-            dataString += String("Paraquedas B - On");
-            digitalWrite(IGN_2, ledState2);
-          } else {
-            ledState2 = LOW;
-            dataString += String("Paraquedas B - Off");
-            digitalWrite(IGN_2, ledState2);
-          }
-        }
+      if (currentMillis >= InterB2 + previousMillis2) {
+        ledState2 = LOW;
+        dataString += String("Paraquedas B - Off");                                               // Desliga paraquedas B
+        digitalWrite(IGN_2, ledState2);
       }
     }
-    // ========================================================= PARTE DO CODIGO QUE ESTAVA FUNCIONANDO ========================================================================
-    //    if (((Delta >= dfaltura || Aceso == true) && Timer > 0) && Fim == true) { // Só excute esse if depois do Timer de 2s
-    //      unsigned long currentMillis = millis();   //conta em que instante do tempo está
-    //      if (currentMillis - previousMillis >= interval) {
-    //        previousMillis = currentMillis;
-    //        if (ledState == LOW) {
-    //          ledState = HIGH;
-    //          dataString += String("Descendo - Paraquedas On");
-    //        } else {
-    //          ledState = LOW;
-    //          dataString += String("Descendo - Paraquedas Off");
-    //          Fim = false;                // Finaliza a verificação do acionamento do paraquedas
-    //        }
-    //        digitalWrite(LED_BUILTIN, ledState);   // A partir do momento que a diferença de altitude for acima de 2, provavelmente o foguete está descendo. Acione o paraquedas
-    //      }
-    //    }
-    // ==========================================================================================================================================================================
-    dataString += String("Descendo");
-  } else {
-    dataString += String("Subindo");
-  }
+  // ========================================================= PARTE DO CODIGO QUE ESTAVA FUNCIONANDO ========================================================================
+  //    if (((Delta >= dfaltura || Aceso == true) && Timer > 0) && Fim == true) { // Só excute esse if depois do Timer de 2s
+  //      unsigned long currentMillis = millis();   //conta em que instante do tempo está
+  //      if (currentMillis - previousMillis >= interval) {
+  //        previousMillis = currentMillis;
+  //        if (ledState == LOW) {
+  //          ledState = HIGH;
+  //          dataString += String("Descendo - Paraquedas On");
+  //        } else {
+  //          ledState = LOW;
+  //          dataString += String("Descendo - Paraquedas Off");
+  //          Fim = false;                // Finaliza a verificação do acionamento do paraquedas
+  //        }
+  //        digitalWrite(LED_BUILTIN, ledState);   // A partir do momento que a diferença de altitude for acima de 2, provavelmente o foguete está descendo. Acione o paraquedas
+  //      }
+  //    }
+  // ==========================================================================================================================================================================
+  dataString += String("Descendo");                                                            // Só imprime na tela para acompanhar o funcionamento do código
+} else {
+  dataString += String("Subindo");                                                             // Só imprime na tela para acompanhar o funcionamento do código
+}
 
-  File dataFile = SD.open(nome, FILE_WRITE);
+File dataFile = SD.open(nome, FILE_WRITE);
 
-  // if the file is available, write to it:
-  if (dataFile) {
-    dataFile.println(dataString);
-    dataFile.close();
-    // print to the serial port too:
-    Serial.println(dataString);
-  }
-  // if the file isn't open, pop up an error:
-  else {
-    Serial.println("error opening P_ANJOS.txt");
-  }
+// if the file is available, write to it:
+if (dataFile) {
+  dataFile.println(dataString);
+  dataFile.close();
+  // print to the serial port too:
+  Serial.println(dataString);
+}else {  // if the file isn't open, pop up an error:
+  Serial.println("error opening P_ANJOS.txt");
+}
 }
