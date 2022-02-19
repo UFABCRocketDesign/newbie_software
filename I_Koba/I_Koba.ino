@@ -54,6 +54,8 @@ void loop() {
  Serial.print("\t");
  Serial.print(sinal_filtrado);
  Serial.print("\t");
+ Serial.print(sinal_filtrado_2);
+ Serial.print("\t");
  Serial.println();
  
 }
