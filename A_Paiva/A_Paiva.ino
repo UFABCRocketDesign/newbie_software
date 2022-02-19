@@ -335,6 +335,10 @@ void loop() {
   else if (apogeu == 1) {
     dado += "Descendo";
     dado += "\t";
+    #if usa_acpq
+    inicio1 = tempoAtual + duracao;
+    inicio2 = tempoAtual + espera;
+    #endif
   }
   #endif
   #if usa_acpq
@@ -404,10 +408,6 @@ int Apogueu(int apogeu, float Hmax, float MediaMov, unsigned long tempoAtual){
   float Delta = Hmax - MediaMov;                           //Compara o valor máximo do filtro1 com o valor atual do filtro1
   if (Delta >= 2 && apogeu == 0) {                         //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
     apogeu = 1;
-    #if usa_acpq
-    inicio1 = tempoAtual + duracao;
-    inicio2 = tempoAtual + espera;
-    #endif
   }
   return apogeu;
 }
