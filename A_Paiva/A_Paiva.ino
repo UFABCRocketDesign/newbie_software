@@ -63,6 +63,7 @@ int apogeu = 0;
 int auxled1 = 0;
 int auxled2 = 0;
 int auxled3 = 0;
+int auxinicio = 0;
 unsigned long inicio1 = 0;        // will store last time LED was updated
 unsigned long inicio2 = 0;        // will store last time LED was updated
 unsigned long inicio3 = 0;        // will store last time LED was updated
@@ -336,9 +337,12 @@ void loop() {
     dado += "Descendo";
     dado += "\t";
     #if usa_acpq
-    inicio1 = tempoAtual + duracao;
-    inicio2 = tempoAtual + espera;
-    #endif
+    if(auxinicio = 0){
+      inicio1 = tempoAtual + duracao;
+      inicio2 = tempoAtual + espera;
+      auxinicio =1;
+    }
+    #endif      
   }
   #endif
   #if usa_acpq
