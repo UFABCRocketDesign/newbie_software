@@ -66,6 +66,7 @@ void loop() {
     Serial.print(sinal[y]);
     Serial.print("\t");
   }
+  Serial.println();
 
 
 }
