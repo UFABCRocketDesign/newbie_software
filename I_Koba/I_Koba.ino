@@ -142,7 +142,7 @@ void Filtros() {
     for (int x = 0; x < pmt; x++) {
       k = vetor[y][x] + k;
     }
-    if (nf != y){
+    if ((nf-1)!= y){
       sinal[y + 1] = k / pmt;
     }
   }
