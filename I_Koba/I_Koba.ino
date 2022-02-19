@@ -24,10 +24,11 @@ void setup() {
   Serial.print("Pres (Pa)\t");
   Serial.print("Alt (m)\t");
   Serial.println();
-//  Serial.println((unsigned int)(&const_chao),HEX);
-//  Serial.println((unsigned int)(z),HEX);
-//  Serial.println((unsigned int)(&const_chao),HEX);
-//  Serial.println((unsigned int)(&const_chao),HEX);
+  Serial.println((unsigned int)(&const_chao),HEX);
+  Serial.println((unsigned int)(&z),HEX);
+  Serial.println((unsigned int)(&alt_ref),HEX);
+  Serial.println((unsigned int)(&sinal_filtrado),HEX);
+  Serial.println((unsigned int)(&sinal_filtrado_2),HEX);
 
 }
 
@@ -69,11 +70,15 @@ void loop() {
   Serial.print("\t");
   Serial.print(const_chao);
   Serial.print("\t");
-  Serial.println((unsigned int)(&const_chao),HEX);
-  Serial.println((unsigned int)(&z),HEX);
-  Serial.println((unsigned int)(&alt_ref),HEX);
-  Serial.println((unsigned int)(&sinal_filtrado),HEX);
-  Serial.println((unsigned int)(&sinal_filtrado_2),HEX);
+  Serial.print(z);
+  Serial.print("\t");
+  Serial.print(alt_ref);
+  Serial.print("\t");
+  Serial.print(sinal_filtrado);
+  Serial.print("\t");
+  Serial.print(sinal_filtrado_2);
+  Serial.print("\t");
+
   Filtros();
   for (int y = 0; y < nf; y++) {
     Serial.print(sinal[y]);
