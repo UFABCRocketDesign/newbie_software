@@ -61,6 +61,7 @@ void loop() {
 
 
   sinal[0] = bmp.readAltitude() - const_chao;
+  Serial.print(sinal[0]);
   Filtros();
   for (int y = 0; y < nf; y++) {
     Serial.print(sinal[y]);
@@ -125,7 +126,7 @@ void Filtros() {
       k = vetor[y][x] + k;
     }
     if (nf != y){
-    sinal[y + 1] = k / pmt;
+      sinal[y + 1] = k / pmt;
     }
   }
 }
