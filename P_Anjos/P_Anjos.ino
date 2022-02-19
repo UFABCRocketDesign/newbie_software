@@ -7,6 +7,9 @@
 #define IGN_2 61  /*act2*/
 #define IGN_3 46  /*act3*/
 #define IGN_4 55  /*act4*/
+#define InterA 1000;                    //Intervalo de tempo para desligar o paraquedas A em segundos
+#define InterB 2000;                    //Intervalo de tempo para ligar o paraquedas B em segundos
+#define InterB2 1000;                   //Intervalo de tempo que o paraquedas B fica ligado em segundos
 
 
 
@@ -43,9 +46,9 @@ const long interval = 2000;           // O intervalo de tempo que o LED deve fic
 int Intervalo = 3000;                 //Intervalo de tempo do Timer antes do acionamento do paraquedas
 bool Apogeu = false;
 bool Tia = true;
-int InterA = 1000;                    //Intervalo de tempo para desligar o paraquedas A em segundos
-int InterB = 2000;                    //Intervalo de tempo para ligar o paraquedas B em segundos
-int InterB2 = 1000;                   //Intervalo de tempo que o paraquedas B fica ligado em segundos
+int TA = 0;                           //Intervalo de tempo para desligar o paraquedas A em segundos
+int TB = 0;                           //Intervalo de tempo para ligar o paraquedas B em segundos
+int TB2 = 0;                          //Intervalo de tempo que o paraquedas B fica ligado em segundos
 bool Aceso = false;                   // A variável booleana para verificar se o LED ta ligado
 bool Fim = true;                      // A variável booleana para parar a verificação do paraquedas
 float dfaltura = 2;                   // Define o delta de altura que serve de critério para a determinação do apogeu
@@ -142,14 +145,14 @@ void loop() {
       Apogeu = true;                                                                              // Imprime na tela: Encontrou o apogeu
       dataString += String("Encontrou o apogeu");
       unsigned long currentMillis = millis();                                                     // Regsitra em que instante do tempo está
-      if (Tia = true) {
+      if (Tia == true) {
         previousMillis = currentMillis;                                                           // Começa a considerar este momento para inciar os timers
-        InterA = InterA + previousMillis;                                                         // Guarda o instante para desligar o paraquedas A
-        InterB = InterB + previousMillis;                                                         // Guarda o instante para ligar o paraquedas B
-        InterB2 = InterB2 + InterB;                                                               // Guarda o instante para desligar o paraquedas B
+        TA = InterA + previousMillis;                                                         // Guarda o instante para desligar o paraquedas A
+        TB = InterB + previousMillis;                                                         // Guarda o instante para ligar o paraquedas B
+        TB2 = InterB2 + InterB;                                                               // Guarda o instante para desligar o paraquedas B
         Tia = false;
       }
-      if (currentMillis >= InterA) {
+      if (currentMillis >= TA) {
         ledState1 = LOW;
         dataString += String("Paraquedas A - Off");                                               // Desliga o paraquedas A
         digitalWrite(IGN_1, ledState1);
@@ -158,7 +161,7 @@ void loop() {
         dataString += String("Paraquedas A - On");
         digitalWrite(IGN_1, ledState1);                                                            // Ligou o paraquedas A
       }
-      if (currentMillis >= InterB && currentMillis < InterB2) {
+      if (currentMillis >= TB && currentMillis < TB2) {
         ledState2 = HIGH;
         dataString += String("Paraquedas B - On");                                                // Ligou o parquedas B
         digitalWrite(IGN_2, ledState2);
@@ -190,7 +193,7 @@ void loop() {
     dataString += String("Subindo");                                                             // Só imprime na tela para acompanhar o funcionamento do código
   }
 
-  File dataFile = SD.open(nome, FILE_WRITE);
+  File dataFile = SD.open(nome, FILE_WRITE);                                                      // Só curiosidade: este é o ponto que mais consome de processamento
 
   // if the file is available, write to it:
   if (dataFile) {
