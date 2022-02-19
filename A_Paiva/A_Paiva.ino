@@ -21,7 +21,7 @@
 #define usa_alt (usa_bar && 1)    //Variavel de escolha do uso do valor Altura
 #define usa_altMax (usa_alt && 0) //Variavel de escolha do uso do valor Altura Máxima
 #define usa_temp (usa_bar && 0)   //Variavel de escolha do uso do valor Temperatura
-#define usa_apogeu (usa_bar && 0) //Variavel de escolha do uso da detecção de apogeu
+#define usa_apogeu (usa_bar && 1) //Variavel de escolha do uso da detecção de apogeu
 #define usa_acpq (usa_apogeu && 0)//Variavel de escolha do uso do acionamento dos paraquedas
 
 #define usa_giro 0                //Variavel de escolha do uso do sensor
