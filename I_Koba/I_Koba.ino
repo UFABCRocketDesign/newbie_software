@@ -1,5 +1,5 @@
 #include <Adafruit_BMP085.h>
-#define led 13 
+#define led 13
 
 #define pmt 20 // intervalo de filtros  
 #define nf 15  // Numero de filtros
@@ -10,16 +10,16 @@ float vetor[nf][pmt];
 float sinal[nf];
 
 void setup() {
- pinMode(led, OUTPUT);
- Serial.begin(115200);
- 
- if (!bmp.begin()) {
- Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+  pinMode(led, OUTPUT);
+  Serial.begin(115200);
+
+  if (!bmp.begin()) {
+    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   }
 
- //media para referenciar a altura 
+  //media para referenciar a altura
   call_chao();
-  
+
   Serial.print("Temp (*C)\t");
   Serial.print("Pres (Pa)\t");
   Serial.print("Alt (m)\t");
@@ -29,55 +29,55 @@ void setup() {
 
 void loop() {
 
-// Serial.print(bmp.readTemperature());
-// Serial.print("\t");
-// Serial.print(bmp.readPressure());
-// Serial.print("\t");
+  // Serial.print(bmp.readTemperature());
+  // Serial.print("\t");
+  // Serial.print(bmp.readPressure());
+  // Serial.print("\t");
 
-//  digitalWrite(led, HIGH);
-//  delay(2000);
-//  digitalWrite(led, LOW);
-//  delay(500);
-//  digitalWrite(led, HIGH);
-//  delay(2000);
-//  digitalWrite(led, LOW);
-//  delay(500);
-//  digitalWrite(led, HIGH);
-//  delay(2000);
-//  digitalWrite(led, LOW);
-//  delay(500);
-//  digitalWrite(led, HIGH);
-//  delay(2000);
-//  digitalWrite(led, LOW);
-//  delay(2000);
+  //  digitalWrite(led, HIGH);
+  //  delay(2000);
+  //  digitalWrite(led, LOW);
+  //  delay(500);
+  //  digitalWrite(led, HIGH);
+  //  delay(2000);
+  //  digitalWrite(led, LOW);
+  //  delay(500);
+  //  digitalWrite(led, HIGH);
+  //  delay(2000);
+  //  digitalWrite(led, LOW);
+  //  delay(500);
+  //  digitalWrite(led, HIGH);
+  //  delay(2000);
+  //  digitalWrite(led, LOW);
+  //  delay(2000);
 
-// media_movel();
-// media_movel_2();
-// Serial.print(alt_ref);
-// Serial.print("\t");
-// Serial.print(sinal_filtrado);
-// Serial.print("\t");
-// Serial.print(sinal_filtrado_2);
+  // media_movel();
+  // media_movel_2();
+  // Serial.print(alt_ref);
+  // Serial.print("\t");
+  // Serial.print(sinal_filtrado);
+  // Serial.print("\t");
+  // Serial.print(sinal_filtrado_2);
 
 
- sinal[0] = bmp.readAltitude() - const_chao;
- Filtros();
- for(int y = 0; y < nf; y++){
-   Serial.print(sinal[y]);
-   Serial.print("\t");
- }
+  sinal[0] = bmp.readAltitude() - const_chao;
+  Filtros();
+  for (int y = 0; y < nf; y++) {
+    Serial.print(sinal[y]);
+    Serial.print("\t");
+  }
 
- 
+
 }
 //-----------------------------------------------------------------------------
 
 
 void call_chao() {
   z = 0;
- for(int x = 0; x < 100; x++){
-   z = bmp.readAltitude() + z;
- }
- const_chao = z/100;
+  for (int x = 0; x < 100; x++) {
+    z = bmp.readAltitude() + z;
+  }
+  const_chao = z / 100;
 }
 
 
@@ -114,20 +114,16 @@ void call_chao() {
 //----------------------------------------------------------------------------------
 
 void Filtros() {
-for(int y = 0; y < nf; y++){
- for(int x = pmt-1; x > 0; x--){
-   vetor[y][x]= vetor[y][x-1];
- }
- if(y == 0) {
-  vetor[y][0] = bmp.readAltitude() - const_chao;
- }else{
-  vetor[y][0] = sinal[y];
- }
- float k = 0;
- for(int x = 0; x < pmt; x++){
-   k = vetor[y][x] + k;
- }
- sinal[y+1] = k/pmt;
-}
+  for (int y = 0; y < nf; y++) {
+    for (int x = pmt - 1; x > 0; x--) {
+      vetor[y][x] = vetor[y][x - 1];
+    }
+    vetor[y][0] = sinal[y];
+    float k = 0;
+    for (int x = 0; x < pmt; x++) {
+      k = vetor[y][x] + k;
+    }
+    sinal[y + 1] = k / pmt;
+  }
 }
 //----------------------------------------------------------------------------------
