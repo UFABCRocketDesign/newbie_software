@@ -1,8 +1,9 @@
 #include <Adafruit_BMP085.h>
 #define led 13
 #define pmt 20 // intervalo de filtros  
-#define nf 3  // Numero de filtros
+#define nf (3+1)  // Numero de filtros 
 #define ncp 4
+
 
 Adafruit_BMP085 bmp;
 float z, const_chao;
@@ -37,10 +38,17 @@ void loop() {
 
   sinal[0] = bmp.readAltitude() - const_chao;
   Filtros();
-  detec_queda();
+  //detec_queda();
   
   for (int y = 0; y < nf; y++) {
     Serial.print(sinal[y]);
+    Serial.print("\t");
+  }
+  if (detec_queda() == true){
+    Serial.print(1);
+    Serial.print("\t");
+  }else{
+    Serial.print(0);
     Serial.print("\t");
   }
   Serial.println();
@@ -65,22 +73,22 @@ void Filtros() {
     for (int x = 0; x < pmt; x++) {
       k = vetor[y][x] + k;
     }
-    if ((nf+1)!= y){
-      sinal[y + 1] = k / pmt;
-    }
+    
+    sinal[y + 1] = k / pmt;
+    
   }
 }
 
 //----------------------------------------------------------------------------------
-void detec_queda() {
+bool detec_queda() {
   for (int x = ncp - 1; x > 0; x--) {
       sinalzin[x] = sinalzin[x - 1];
     }
   sinalzin[0] = sinal[nf];
   if (sinalzin[0] > sinalzin[ncp - 1]){
-    Serial.print("subindo");
+    return true;
   }else {
-    Serial.print("caindo");
+    return false;
   }
 
 }
