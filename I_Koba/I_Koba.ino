@@ -1,14 +1,14 @@
 #include <Adafruit_BMP085.h>
 #define led 13
 #define pmt 20 // intervalo de filtros  
-#define nf (3+1)  // Numero de filtros 
+#define nf (3)  // Numero de filtros 
 #define ncp 4
 
 
 Adafruit_BMP085 bmp;
 float z, const_chao;
 float vetor[nf][pmt];
-float sinal[nf];
+float sinal[nf+1];
 float sinalzin[ncp];
 
 void setup() {
@@ -40,16 +40,14 @@ void loop() {
   Filtros();
   //detec_queda();
   
-  for (int y = 0; y < nf; y++) {
+  for (int y = 0; y < nf+1; y++) {
     Serial.print(sinal[y]);
     Serial.print("\t");
   }
-  if (detec_queda() == true){
+  if (detec_queda()){
     Serial.print(1);
-    Serial.print("\t");
   }else{
     Serial.print(0);
-    Serial.print("\t");
   }
   Serial.println();
 }
@@ -86,12 +84,9 @@ bool detec_queda() {
     }
   sinalzin[0] = sinal[nf];
   if (sinalzin[0] > sinalzin[ncp - 1]){
-    return true;
-  }else {
-    return false;
-  }
-
-}
+    return;
+    }
+    }
 
 //----------------------------------------------------------------------------------
 
