@@ -168,7 +168,7 @@ void loop() {
         dataString += String("Paraquedas A - On");
         digitalWrite(IGN_1, ledState1);                                                           // Ligou o paraquedas A
       }
-      if (currentMillis >= TA2 && currentMillis < TDA2) {
+      if (TA2 <= currentMillis && currentMillis < TDA2) {
         ledState2 = HIGH;
         dataString += String("Paraquedas A2 - On");                                               // Segundo acionamento paraquedas A
         digitalWrite(IGN_2, ledState2);
