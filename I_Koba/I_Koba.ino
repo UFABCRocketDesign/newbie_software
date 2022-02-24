@@ -2,14 +2,14 @@
 #define led 13
 #define pmt 20 // intervalo de filtros  
 #define nf (3)  // Numero de filtros 
-#define ncp 4
+#define ncp 4  // intervalo de comparação para queda e suibida
 
 
 Adafruit_BMP085 bmp;
 float z, const_chao;
-float vetor[nf][pmt];
-float sinal[nf+1];
-float sinalzin[ncp];
+float vetor[nf][pmt]; // movimentaçãop dos filtros de sinal de alrura 
+float sinal[nf+1];   // irá conter todos sinais relacionado a altura  
+float sinalzin[ncp]; // contem os dados usados para comparar a altura 
 
 void setup() {
   pinMode(led, OUTPUT);
@@ -38,7 +38,6 @@ void loop() {
 
   sinal[0] = bmp.readAltitude() - const_chao;
   Filtros();
-  //detec_queda();
   
   for (int y = 0; y < nf+1; y++) {
     Serial.print(sinal[y]);
