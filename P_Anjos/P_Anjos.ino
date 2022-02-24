@@ -7,9 +7,13 @@
 #define IGN_2 61  /*act2*/
 #define IGN_3 46  /*act3*/
 #define IGN_4 55  /*act4*/
-#define InterA 1000;                    //Intervalo de tempo para desligar o paraquedas A em segundos
-#define InterB 2000;                    //Intervalo de tempo para ligar o paraquedas B em segundos
-#define InterB2 1000;                   //Intervalo de tempo que o paraquedas B fica ligado em segundos
+#define InterA 1000                    //Intervalo de tempo para desligar o paraquedas A em segundos
+#define InterB 2000                    //Intervalo de tempo para ligar o 2º acionamento do paraquedas A
+#define InterB2 1000                   //Intervalo de tempo para desligar o 2º acionamento do paraquedas A em segundos
+#define InterC 2000                    //Intervalo de tempo para desligar o paraquedas B em segundos
+#define FS 5                           // Fator de segurança para dar valores iniciais para os timers
+#define HParaquedasB 400               //Altura de acionamento do paraquedas B em metros
+#define dfaltura 2                     // Define o delta de altura que serve de critério para a determinação do apogeu
 
 
 
@@ -38,7 +42,8 @@ int a;
 int b;
 int c;
 int ledState1 = LOW;                  // Estado do LED 1 que indica acionamento do paraquedas A
-int ledState2 = LOW;                  // Outra LED para verificar o timer antes de acionar o paraquedas
+int ledState2 = LOW;                  // Estado do LED 2 que indica o 2º acionamento do paraquedas A
+int ledState3 = LOW;                  // Estado do LED 3 que indica acionamento do paraquedas B
 float Timer = 0;                      // Guarda o tempo do timer
 unsigned long previousMillis = 0;     // Guarda o momento de tempo para iniciar A e B
 unsigned long previousMillis2 = 0;    // Guarda o momento para o timer para manter B ligado
@@ -47,12 +52,12 @@ int Intervalo = 3000;                 //Intervalo de tempo do Timer antes do aci
 bool Apogeu = false;
 bool Tia = true;
 int TA = 0;                           //Intervalo de tempo para desligar o paraquedas A em segundos
-int TB = 0;                           //Intervalo de tempo para ligar o paraquedas B em segundos
-int TB2 = 0;                          //Intervalo de tempo que o paraquedas B fica ligado em segundos
+int TB = 0;                           //Intervalo de tempo para ligar o 2º acionamento paraquedas A em segundos
+int TB2 = 0;                          //Intervalo de tempo que o 2º acionamento paraquedas A fica ligado em segundos
+int TC = 0;                           //Intervalo de tempo para desligar o paraquedas B em segundos
 bool Aceso = false;                   // A variável booleana para verificar se o LED ta ligado
 bool Fim = true;                      // A variável booleana para parar a verificação do paraquedas
-float HParaquedasB = 400;               //Altura de acionamento do paraquedas B em metros
-float dfaltura = 2;                     // Define o delta de altura que serve de critério para a determinação do apogeu
+
 Adafruit_BMP085 bmp;
 
 void setup() {
@@ -149,8 +154,9 @@ void loop() {
       if (Tia == true) {
         previousMillis = currentMillis;                                                           // Começa a considerar este momento para inciar os timers
         TA = InterA + previousMillis;                                                             // Guarda o instante para desligar o paraquedas A
-        TB = InterB + previousMillis;                                                             // Guarda o instante para ligar o paraquedas B
-        TB2 = InterB2 + TB;                                                                       // Guarda o instante para desligar o paraquedas B
+        TB = InterB + previousMillis;                                                             // Guarda o instante para o segundo acionamento do Paraquedas A (segurança)
+        TB2= FS*(InterB2 + previousMillis);                                                       // Um valor inicial para o instante de desligar o 2 acionamento A (será atualizado assim que o acionamento ocorrer) 
+        TC = FS*(InterC + previousMillis);                                                        // Um valor inicial para o instante de desligar o paraquedas B (será atualizado assim que o acionamento ocorrer)
         Tia = false;
       }
       if (currentMillis >= TA) {
@@ -160,16 +166,27 @@ void loop() {
       } else {
         ledState1 = HIGH;
         dataString += String("Paraquedas A - On");
-        digitalWrite(IGN_1, ledState1);                                                            // Ligou o paraquedas A
+        digitalWrite(IGN_1, ledState1);                                                           // Ligou o paraquedas A
       }
-      if (H1 >= HParaquedasB && currentMillis < TB2) {
+      if (currentMillis >= TB && currentMillis < TB2) {
         ledState2 = HIGH;
-        dataString += String("Paraquedas B - On");                                                // Ligou o parquedas B
+        dataString += String("Paraquedas A2 - On");                                               // Segundo acionamento paraquedas A
         digitalWrite(IGN_2, ledState2);
+        TB2 = InterB2 + TB;                                                                       // Atualiza o instante para desligar o segundo acionamento do paraquedas
       } else {
         ledState2 = LOW;
-        dataString += String("Paraquedas B - Off");                                               // Desliga paraquedas B
+        dataString += String("Paraquedas A2 - Off");                                              // Desliga o segundo acionamento paraquedas A
         digitalWrite(IGN_2, ledState2);
+      }
+      if (H1 >= HParaquedasB && currentMillis < TC) {
+        ledState3 = HIGH;
+        dataString += String("Paraquedas B - On");                                                // Ligou o parquedas B
+        digitalWrite(IGN_3, ledState3);
+        TC = InterC + currentMillis;                                                              // Atualiza o instante para desligar o paraquedas B
+      } else {
+        ledState3 = LOW;
+        dataString += String("Paraquedas B - Off");                                               // Desliga paraquedas B
+        digitalWrite(IGN_3, ledState3);
       }
     }
     // ========================================================= PARTE DO CODIGO QUE ESTAVA FUNCIONANDO ========================================================================
