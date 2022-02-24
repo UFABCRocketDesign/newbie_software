@@ -83,9 +83,7 @@ bool detec_queda() {
       sinalzin[x] = sinalzin[x - 1];
     }
   sinalzin[0] = sinal[nf];
-  if (sinalzin[0] > sinalzin[ncp - 1]){
-    return;
-    }
+    return (sinalzin[0] > sinalzin[ncp - 1]);
     }
 
 //----------------------------------------------------------------------------------
