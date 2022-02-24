@@ -51,7 +51,8 @@ int TB = 0;                           //Intervalo de tempo para ligar o paraqued
 int TB2 = 0;                          //Intervalo de tempo que o paraquedas B fica ligado em segundos
 bool Aceso = false;                   // A variável booleana para verificar se o LED ta ligado
 bool Fim = true;                      // A variável booleana para parar a verificação do paraquedas
-float dfaltura = 2;                   // Define o delta de altura que serve de critério para a determinação do apogeu
+float HParaquedasB = 400;               //Altura de acionamento do paraquedas B em metros
+float dfaltura = 2;                     // Define o delta de altura que serve de critério para a determinação do apogeu
 Adafruit_BMP085 bmp;
 
 void setup() {
@@ -147,9 +148,9 @@ void loop() {
       unsigned long currentMillis = millis();                                                     // Regsitra em que instante do tempo está
       if (Tia == true) {
         previousMillis = currentMillis;                                                           // Começa a considerar este momento para inciar os timers
-        TA = InterA + previousMillis;                                                         // Guarda o instante para desligar o paraquedas A
-        TB = InterB + previousMillis;                                                         // Guarda o instante para ligar o paraquedas B
-        TB2 = InterB2 + TB;                                                               // Guarda o instante para desligar o paraquedas B
+        TA = InterA + previousMillis;                                                             // Guarda o instante para desligar o paraquedas A
+        TB = InterB + previousMillis;                                                             // Guarda o instante para ligar o paraquedas B
+        TB2 = InterB2 + TB;                                                                       // Guarda o instante para desligar o paraquedas B
         Tia = false;
       }
       if (currentMillis >= TA) {
@@ -161,7 +162,7 @@ void loop() {
         dataString += String("Paraquedas A - On");
         digitalWrite(IGN_1, ledState1);                                                            // Ligou o paraquedas A
       }
-      if (currentMillis >= TB && currentMillis < TB2) {
+      if (H1 >= HParaquedasB && currentMillis < TB2) {
         ledState2 = HIGH;
         dataString += String("Paraquedas B - On");                                                // Ligou o parquedas B
         digitalWrite(IGN_2, ledState2);
