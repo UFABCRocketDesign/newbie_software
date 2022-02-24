@@ -7,10 +7,10 @@
 #define IGN_2 61  /*act2*/
 #define IGN_3 46  /*act3*/
 #define IGN_4 55  /*act4*/
-#define InterA 1000                    //Intervalo de tempo para desligar o paraquedas A em segundos
+#define InterDesligA 1000                    //Intervalo de tempo para desligar o paraquedas A em segundos
 #define InterA2 2000                   //Intervalo de tempo para ligar o 2º acionamento do paraquedas A
 #define InterDesligA2 1000             //Intervalo de tempo para desligar o 2º acionamento do paraquedas A em segundos
-#define InterB 2000                    //Intervalo de tempo para desligar o paraquedas B em segundos
+#define InterDesligB 2000                    //Intervalo de tempo para desligar o paraquedas B em segundos
 #define HParaquedasB 5                 //Altura de acionamento do paraquedas B em metros
 #define dfaltura 2                     // Define o delta de altura que serve de critério para a determinação do apogeu
 
@@ -129,7 +129,7 @@ void loop() {
   }
   Delta = Hmax - H1;
   //  if (ledState1 == HIGH) {
-  //    Aceso = true;                                                                               // Para garantir que após o acionamento do paraquedas, ele irá executar o próximo if
+  //    Aceso = true;                                                                           // Para garantir que após o acionamento do paraquedas, ele irá executar o próximo if
   //  }
   dataString += String(Hmax);
   dataString += "\t";
@@ -153,10 +153,10 @@ void loop() {
       unsigned long currentMillis = millis();                                                     // Regsitra em que instante do tempo está
       if (Tia == true) {
         previousMillis = currentMillis;                                                           // Começa a considerar este momento para inciar os timers
-        TA = InterA + previousMillis;                                                             // Guarda o instante para desligar o paraquedas A
+        TA = InterDesligA + previousMillis;                                                             // Guarda o instante para desligar o paraquedas A
         TA2 = InterA2 + previousMillis;                                                           // Guarda o instante para o segundo acionamento do Paraquedas A (segurança)
-        TDA2 =pow((InterDesligA2 + previousMillis+1),5);                                          // Um valor inicial para o instante de desligar o 2 acionamento A (será atualizado assim que o acionamento ocorrer)
-        TB =pow((InterB + previousMillis+1),5);                                                   // Um valor inicial para o instante de desligar o paraquedas B (será atualizado assim que o acionamento ocorrer)
+        TDA2 = pow((InterDesligA2 + previousMillis + 1), 5);                                      // Um valor inicial para o instante de desligar o 2 acionamento A (será atualizado assim que o acionamento ocorrer)
+        TB = pow((InterDesligB + previousMillis + 1), 5);                                               // Um valor inicial para o instante de desligar o paraquedas B (será atualizado assim que o acionamento ocorrer)
         Tia = false;
       }
       if (currentMillis >= TA) {
@@ -173,7 +173,7 @@ void loop() {
         dataString += String("Paraquedas A2 - On");                                               // Segundo acionamento paraquedas A
         digitalWrite(IGN_2, ledState2);
         if (ResetA2) {
-          TDA2 = InterA2 + currentMillis;                                                         // Atualiza o instante para desligar o segundo acionamento do paraquedas
+          TDA2 = InterDesligA2 + currentMillis;                                                   // Atualiza o instante para desligar o segundo acionamento do paraquedas
           ResetA2 = false;
         }
       } else {
@@ -186,7 +186,7 @@ void loop() {
         dataString += String("Paraquedas B - On");                                                // Ligou o parquedas B
         digitalWrite(IGN_3, ledState3);
         if (ResetB) {
-          TB = InterB + currentMillis;                                                            // Atualiza o instante para desligar o paraquedas B
+          TB = InterDesligB + currentMillis;                                                      // Atualiza o instante para desligar o paraquedas B
           ResetB = false;
         }
       } else {
