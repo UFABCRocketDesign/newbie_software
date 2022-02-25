@@ -73,18 +73,15 @@ void setup() {
     Serial.println(jFile);
 
     if (SD.exists (jFile)) {
-      Serial.println("Jaque" + String(num) + ".txt finished.");
+      Serial.println(jFile);
     } else {
       n_files == true;
       myFile = SD.open(jFile, FILE_WRITE);
-      myFile.close();
-
-      File jFile = SD.open("Jaque000.txt", FILE_WRITE);
-
+     
       // if the file is available, write to it:
       if (jFile) {
-        jFile.println(dataString);
-        jFile.close();
+        myFile.println(dataString);
+        myFile.close();
         // print to the serial port too:
         Serial.println(dataString);
       }
