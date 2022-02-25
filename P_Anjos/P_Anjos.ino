@@ -8,8 +8,8 @@
 #undef  IGN_3 46  /*act3*/
 #define IGN_3 13
 #define IGN_4 55  /*act4*/
-#define InterDesligTimer 1000           //Intervalo de tempo para desligar o paraquedas A em segundos
-#define InterA2 2000                   //Intervalo de tempo para ligar o 2º acionamento do paraquedas A
+#define InterDesligTimer 2000           //Intervalo de tempo para desligar o paraquedas A em segundos
+#define InterA2 4000                   //Intervalo de tempo para ligar o 2º acionamento do paraquedas A
 #define HParaquedasB 5                 //Altura de acionamento do paraquedas B em metros
 #define dfaltura 2                     // Define o delta de altura que serve de critério para a determinação do apogeu
 
@@ -160,25 +160,25 @@ void loop() {
         Tia = false;
       }
       if (currentMillis >= TA_Piloto) {
-        dataString += String(" PA - Off");                                               // Desliga o paraquedas A
+        dataString += String("PA - Off");                                               // Desliga o paraquedas A
         digitalWrite(IGN_1, LOW);
       } else {
-        dataString += String(" PA - On");
+        dataString += String("PA - On ");
         digitalWrite(IGN_1, HIGH);                                                                // Ligou o paraquedas A
       }
       if (TA_PilotoBackup <= currentMillis && (currentMillis < TDA_PilotoBackup || TDA_PilotoBackup == 0)) {
-        dataString += String(" PA2 - On");                                               // Segundo acionamento paraquedas A
+        dataString += String("PA2 - On  ");                                                         // Segundo acionamento paraquedas A
         if (ResetA2) {
           digitalWrite(IGN_2, HIGH);
-          TA_PilotoBackup = InterDesligTimer + currentMillis;                                     // Atualiza o instante para desligar o segundo acionamento do paraquedas
+          TDA_PilotoBackup = InterDesligTimer + currentMillis;                                     // Atualiza o instante para desligar o segundo acionamento do paraquedas
           ResetA2 = false;
         }
       } else {
-        dataString += String("PA2 - Off");                                              // Desliga o segundo acionamento paraquedas A
+        dataString += String("PA2 - Off ");                                              // Desliga o segundo acionamento paraquedas A
         digitalWrite(IGN_2, LOW);
       }
       if (H1 <= HParaquedasB && (currentMillis < TB_Main || TB_Main == 0)) {
-        dataString += String(" PB - On");                                                // Ligou o parquedas B
+        dataString += String("PB - On  ");                                                // Ligou o parquedas B
         if (ResetB) {
           digitalWrite(IGN_3, HIGH);
           TB_Main = InterDesligTimer + currentMillis;                                             // Atualiza o instante para desligar o paraquedas B
