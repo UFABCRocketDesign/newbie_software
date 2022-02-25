@@ -30,7 +30,7 @@ String jFile;
 //=========================================================
 
 void setup() {
-  // Open serial communications and wait for port to open:
+// Open serial communications and wait for port to open:
   Serial.begin(115200);
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
@@ -45,10 +45,10 @@ void setup() {
     Serial.println("Card failed, or not present");
     // don't do anything more:
     while (1);
-   } 
- //==========================================================================
- //Sensors
-  
+  }
+//==========================================================================
+//Sensors
+
   String dataString = "";
   //dataString += ("Temperature = \t");
   //dataString += (" Pa \t");
@@ -63,166 +63,166 @@ void setup() {
   dataString += ("Contador \t");
   dataString += ("Apogeu \t");
 
-//============================================================================ 
-  
-  File dataFile = SD.open("Jaque000.txt", FILE_WRITE);
+//============================================================================
 
-  // if the file is available, write to it:
-  if (dataFile) {
-    dataFile.println(dataString);
-    dataFile.close();
-    // print to the serial port too:
-    Serial.println(dataString);
-  }
-  // if the file isn't open, pop up an error:
-  else {
-    Serial.println("error opening datalog.txt");
-  }
-     n_files = num <= numFiles;
-     while(n_files != true) {
-     
-     jFile = "Jaque" + String(num) + ".txt";
-     num = num + 1;
-     Serial.println(jFile); 
-  
+  n_files = num <= numFiles;
+  while (n_files != true) {
+
+    jFile = "Jaque" + String(num) + ".txt";
+    num = num + 1;
+    Serial.println(jFile);
+
     if (SD.exists (jFile)) {
-     n_files != true;
-     Serial.println("Jaque" + String(num) + ".txt finished.");
-   } else {
-    myFile = SD.open(jFile, FILE_WRITE);
-    myFile.close();
+      Serial.println("Jaque" + String(num) + ".txt finished.");
+    } else {
+      n_files == true;
+      myFile = SD.open(jFile, FILE_WRITE);
+      myFile.close();
 
+      File jFile = SD.open("Jaque000.txt", FILE_WRITE);
+
+      // if the file is available, write to it:
+      if (jFile) {
+        jFile.println(dataString);
+        jFile.close();
+        // print to the serial port too:
+        Serial.println(dataString);
+      }
+      // if the file isn't open, pop up an error:
+      else {
+        Serial.println("error opening datalog.txt");
+      }
+    }
+
+    for (float k = 0; k < numReads; k++) {
+      accAltbase = accAltbase + bmp.readAltitude();
+    }
+    Altbase = accAltbase / numReads;   //Média das medições do foguete na base
+    Serial.print(Altbase);
+    Serial.println('\t');
   }
- }
- 
-  for (float k = 0; k < numReads; k++) {
-    accAltbase = accAltbase + bmp.readAltitude();
-  }
-  Altbase = accAltbase / numReads;   //Média das medições do foguete na base
-  Serial.print(Altbase);
-  Serial.println('\t');
-  
-//===========================================================================
 }
-void loop() {
+//===========================================================================
+  
+  void loop() {
 
-  String dataString = "";
+    String dataString = "";
 
-  float Height = 0;
-  float current_height;
+    float Height = 0;
+    float current_height;
 
-  current_height = bmp.readAltitude() - Altbase; //Transformar altitude em altura
-  dataString += String(current_height);
-  dataString += "\t";
+    current_height = bmp.readAltitude() - Altbase; //Transformar altitude em altura
+    dataString += String(current_height);
+    dataString += "\t";
 
 //===============================================================================
-//Table
-  //
-  //  Serial.print(bmp.readTemperature() );
-  //  Serial.print('\t');
-  //
-  //  Serial.print( bmp.readPressure()  );
-  //  Serial.print('\t');
-  //  // Calculate altitude assuming 'standard' barometric
-  //  // pressure of 1013.25 millibar = 101325 Pascal
-  //  Serial.print( current_Altitude);
-  //  Serial.print('\t');
-  //
-  //  Serial.print( bmp.readSealevelPressure() );
-  //  Serial.print('\t');
-  //
-  //
-  //  // vary with weather and such. If it is 1015 millibars
-  //  // that is equal to 101500 Pascals.
-  //
-  //  Serial.print( bmp.readAltitude(101500));
-  //  Serial.print('\t');
+    //Table
+    //
+    //  Serial.print(bmp.readTemperature() );
+    //  Serial.print('\t');
+    //
+    //  Serial.print( bmp.readPressure()  );
+    //  Serial.print('\t');
+    //  // Calculate altitude assuming 'standard' barometric
+    //  // pressure of 1013.25 millibar = 101325 Pascal
+    //  Serial.print( current_Altitude);
+    //  Serial.print('\t');
+    //
+    //  Serial.print( bmp.readSealevelPressure() );
+    //  Serial.print('\t');
+    //
+    //
+    //  // vary with weather and such. If it is 1015 millibars
+    //  // that is equal to 101500 Pascals.
+    //
+    //  Serial.print( bmp.readAltitude(101500));
+    //  Serial.print('\t');
 
-  //
-  //  Serial.print(current_high);
-  //  Serial.print('\t');
-  
-//=================================================================================
-//Primeira camada de filtro
-  
-  for ( int i = n - 1; i > 0 ; i --) {
+    //
+    //  Serial.print(current_high);
+    //  Serial.print('\t');
 
-    vet[i]  =  vet [i - 1];
+ //=================================================================================
+    //Primeira camada de filtro
 
-  }
-  vet[0] = current_height;
+    for ( int i = n - 1; i > 0 ; i --) {
 
-  Height = 0;
+      vet[i]  =  vet [i - 1];
 
-  for ( int i = 0; i < n ; i ++) {
+    }
+    vet[0] = current_height;
 
-    Height = Height + vet [i];
-  }
-  relative_average = Height / n;
-  dataString += String(relative_average);
-  dataString += "\t";
+    Height = 0;
 
-//===================================================================================
-//Segunda camada de Fitro
+    for ( int i = 0; i < n ; i ++) {
 
-  for ( int i = n - 1; i > 0 ; i --) {
+      Height = Height + vet [i];
+    }
+    relative_average = Height / n;
+    dataString += String(relative_average);
+    dataString += "\t";
 
-    vet2[i]  =  vet2 [i - 1];
+    //===================================================================================
+    //Segunda camada de Fitro
 
-  }
-  vet2[0] = relative_average;
+    for ( int i = n - 1; i > 0 ; i --) {
 
-  Height = 0;
+      vet2[i]  =  vet2 [i - 1];
 
-  for ( int i = 0; i < n ; i ++) {
+    }
+    vet2[0] = relative_average;
 
-    Height = Height + vet2[i];
-  }
-  moving_average = Height / n;
-  dataString += String(moving_average);
-  dataString += "\t";
+    Height = 0;
+
+    for ( int i = 0; i < n ; i ++) {
+
+      Height = Height + vet2[i];
+    }
+    moving_average = Height / n;
+    dataString += String(moving_average);
+    dataString += "\t";
 
 //==================================================================================
-//Apogee detection
+    //Apogee detection
 
-  if ( moving_average >= previous ) {
-    cont = 0;
-    dataString += ("1");
-    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)           
+    if ( moving_average >= previous ) {
+      cont = 0;
+      dataString += ("1");
+      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+    }
+
+    else {
+      cont = cont + 1;
+      dataString += ("0");     //descida
+      digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (HIGH is the voltage level)
+    }
+
+    dataString += "\t";
+    dataString += String(cont);
+    dataString += "\t";
+
+    if (cont >= 50) {
+      dataString += ("1");             //apogee detect
+    }
+
+    else {
+      dataString += ("0");
+    }
+    dataString += "\t";
+    previous =  moving_average;
+
+    File dataFile = SD.open("JaqueMnt.txt", FILE_WRITE);
+
+    // if the file is available, write to it:
+    if (dataFile) {
+      dataFile.println(dataString);
+      dataFile.close();
+      // print to the serial port too:
+      Serial.println(dataString);
+    }
+    // if the file isn't open, pop up an error:
+    else {
+      Serial.println("error opening datalog.txt");
+    }
+
   }
-
-  else {
-    cont = cont + 1;
-    dataString += ("0");     //descida
-    digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (HIGH is the voltage level)  
-  }
-
-  dataString += "\t";
-  dataString += String(cont);
-  dataString += "\t";
-
-  if (cont >= 50) {
-    dataString += ("1");             //apogee detect
-  }
-
-  else {
-    dataString += ("0");
-  }
-  dataString += "\t";
-  previous =  moving_average;
-
-  File dataFile = SD.open("JaqueMnt.txt", FILE_WRITE);
-
-  // if the file is available, write to it:
-  if (dataFile) {
-    dataFile.println(dataString);
-    dataFile.close();
-    // print to the serial port too:
-    Serial.println(dataString);
-  }
-  // if the file isn't open, pop up an error:
-  else {
-    Serial.println("error opening datalog.txt");
-  }
-
-}
