@@ -208,7 +208,7 @@ void setup() {
     dataString += "\t";
     previous =  moving_average;
 
-    File dataFile = SD.open("JaqueMnt.txt", FILE_WRITE);
+    File dataFile = SD.open(jFile, FILE_WRITE);
 
     // if the file is available, write to it:
     if (dataFile) {
