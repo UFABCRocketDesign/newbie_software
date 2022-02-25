@@ -65,8 +65,8 @@ void setup() {
 
 //============================================================================
 
-  n_files = false;
-  while (n_files == false) {
+  n_files = true;
+  while (n_files) {
 
     jFile = "Jaque" + String(num) + ".txt";
     num = num + 1;
