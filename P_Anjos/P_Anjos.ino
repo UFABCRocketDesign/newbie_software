@@ -5,7 +5,8 @@
 
 #define IGN_1 36  /*act1*/
 #define IGN_2 61  /*act2*/
-#define IGN_3 46  /*act3*/
+#undef  IGN_3 46  /*act3*/
+#define IGN_3 13
 #define IGN_4 55  /*act4*/
 #define InterDesligTimer 1000           //Intervalo de tempo para desligar o paraquedas A em segundos
 #define InterA2 2000                   //Intervalo de tempo para ligar o 2º acionamento do paraquedas A
@@ -61,6 +62,9 @@ Adafruit_BMP085 bmp;
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
   pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(IGN_1, OUTPUT);
+  pinMode(IGN_2, OUTPUT);
+  pinMode(IGN_3, OUTPUT);
   Serial.begin(115200);
   while (!Serial) {
     ;                                 // wait for serial port to connect. Needed for native USB port only
@@ -156,34 +160,32 @@ void loop() {
         Tia = false;
       }
       if (currentMillis >= TA_Piloto) {
-        ledState1 = LOW;
-        dataString += String("Paraquedas A - Off");                                               // Desliga o paraquedas A
-        digitalWrite(IGN_1, ledState1);
+        dataString += String(" PA - Off");                                               // Desliga o paraquedas A
+        digitalWrite(IGN_1, LOW);
       } else {
-        ledState1 = HIGH;
-        dataString += String("Paraquedas A - On");
-        digitalWrite(IGN_1, ledState1);                                                           // Ligou o paraquedas A
+        dataString += String(" PA - On");
+        digitalWrite(IGN_1, HIGH);                                                                // Ligou o paraquedas A
       }
       if (TA_PilotoBackup <= currentMillis && (currentMillis < TDA_PilotoBackup || TDA_PilotoBackup == 0)) {
-        dataString += String("Paraquedas A2 - On");                                               // Segundo acionamento paraquedas A
+        dataString += String(" PA2 - On");                                               // Segundo acionamento paraquedas A
         if (ResetA2) {
           digitalWrite(IGN_2, HIGH);
-          TA_PilotoBackup = InterDesligTimer + currentMillis;                                      // Atualiza o instante para desligar o segundo acionamento do paraquedas
+          TA_PilotoBackup = InterDesligTimer + currentMillis;                                     // Atualiza o instante para desligar o segundo acionamento do paraquedas
           ResetA2 = false;
         }
       } else {
-        dataString += String("Paraquedas A2 - Off");                                              // Desliga o segundo acionamento paraquedas A
+        dataString += String("PA2 - Off");                                              // Desliga o segundo acionamento paraquedas A
         digitalWrite(IGN_2, LOW);
       }
       if (H1 <= HParaquedasB && (currentMillis < TB_Main || TB_Main == 0)) {
-        dataString += String("Paraquedas B - On");                                                // Ligou o parquedas B
+        dataString += String(" PB - On");                                                // Ligou o parquedas B
         if (ResetB) {
           digitalWrite(IGN_3, HIGH);
-          TB_Main = InterDesligTimer + currentMillis;                                                      // Atualiza o instante para desligar o paraquedas B
+          TB_Main = InterDesligTimer + currentMillis;                                             // Atualiza o instante para desligar o paraquedas B
           ResetB = false;
         }
       } else {
-        dataString += String("Paraquedas B - Off");                                               // Desliga paraquedas B
+        dataString += String(" PB - Off");                                               // Desliga paraquedas B
         digitalWrite(IGN_3, LOW);
       }
     }
