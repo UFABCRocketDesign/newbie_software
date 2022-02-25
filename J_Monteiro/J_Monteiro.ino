@@ -72,9 +72,8 @@ void setup() {
     num = num + 1;
     Serial.println(jFile);
 
-    if (SD.exists (jFile)) {
-      Serial.println(jFile);
-    } else {
+    if (!SD.exists (jFile)) {
+ 
       n_files = false;
       myFile = SD.open(jFile, FILE_WRITE);
      
