@@ -1,6 +1,8 @@
 #include <Adafruit_BMP085.h>
 #include <SPI.h>
 #include <SD.h>
+
+//========================================================
 const int chipSelect = 53;
 File myFile;
 //========================================================
@@ -8,7 +10,7 @@ File myFile;
 #define numReads 15   //Número de medições para a média da base
 #define numFiles 10  //Número de Arquivos
 Adafruit_BMP085 bmp;
-//========================================================
+//=========================================================
 //-----Variáveis Globais-----
 
 float altitude = 0;            //Altitude
@@ -22,8 +24,10 @@ float moving_average;   //Média móvel
 float vet2[n];         //Vetor 2
 int cont;             //Contador
 int num = 0;
-String jFile = "Jaquexxx.txt";
+int n_files;
+String jFile;
 
+//=========================================================
 
 void setup() {
   // Open serial communications and wait for port to open:
@@ -42,6 +46,8 @@ void setup() {
     // don't do anything more:
     while (1);
    } 
+ //==========================================================================
+ //Sensors
   
   String dataString = "";
   //dataString += ("Temperature = \t");
@@ -57,7 +63,8 @@ void setup() {
   dataString += ("Contador \t");
   dataString += ("Apogeu \t");
 
-
+//============================================================================ 
+  
   File dataFile = SD.open("Jaque000.txt", FILE_WRITE);
 
   // if the file is available, write to it:
@@ -71,22 +78,22 @@ void setup() {
   else {
     Serial.println("error opening datalog.txt");
   }
-     while(num <= numFiles) {
-    num = num + 1;
-    num = jFile.toInt() ;
-    Serial.println(jFile);
+     n_files = num <= numFiles;
+     while(n_files != true) {
+     
+     jFile = "Jaque" + String(num) + ".txt";
+     num = num + 1;
+     Serial.println(jFile); 
+  
+    if (SD.exists (jFile)) {
+     n_files != true;
+     Serial.println("Jaque" + String(num) + ".txt finished.");
+   } else {
     myFile = SD.open(jFile, FILE_WRITE);
     myFile.close();
-    
-    if (SD.exists ("Jaquexxx.txt")) {
-    Serial.println("Jaquexxx.txt exists.");
-   } else {
-    Serial.println("Jaquexxx.txt doesn't exist.");
+
   }
  }
-  // delete the file:
-  Serial.println("Removing Jaquexxx.txt...");
-  SD.remove("Jaquexxx.txt");
  
   for (float k = 0; k < numReads; k++) {
     accAltbase = accAltbase + bmp.readAltitude();
@@ -94,7 +101,8 @@ void setup() {
   Altbase = accAltbase / numReads;   //Média das medições do foguete na base
   Serial.print(Altbase);
   Serial.println('\t');
-
+  
+//===========================================================================
 }
 void loop() {
 
@@ -107,8 +115,8 @@ void loop() {
   dataString += String(current_height);
   dataString += "\t";
 
-
-
+//===============================================================================
+//Table
   //
   //  Serial.print(bmp.readTemperature() );
   //  Serial.print('\t');
@@ -133,9 +141,10 @@ void loop() {
   //
   //  Serial.print(current_high);
   //  Serial.print('\t');
-
-  //Primeira camada de filtro
-
+  
+//=================================================================================
+//Primeira camada de filtro
+  
   for ( int i = n - 1; i > 0 ; i --) {
 
     vet[i]  =  vet [i - 1];
@@ -152,7 +161,9 @@ void loop() {
   relative_average = Height / n;
   dataString += String(relative_average);
   dataString += "\t";
-  //Segunda camada de Fitro
+
+//===================================================================================
+//Segunda camada de Fitro
 
   for ( int i = n - 1; i > 0 ; i --) {
 
@@ -170,17 +181,20 @@ void loop() {
   moving_average = Height / n;
   dataString += String(moving_average);
   dataString += "\t";
-  //Apogee detection
+
+//==================================================================================
+//Apogee detection
+
   if ( moving_average >= previous ) {
     cont = 0;
     dataString += ("1");
-    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)           // turn the LED on (HIGH is the voltage level)
+    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)           
   }
 
   else {
     cont = cont + 1;
     dataString += ("0");     //descida
-    digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (HIGH is the voltage level)  // turn the LED on (LOW is the voltage level);
+    digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (HIGH is the voltage level)  
   }
 
   dataString += "\t";
@@ -188,7 +202,7 @@ void loop() {
   dataString += "\t";
 
   if (cont >= 50) {
-    dataString += ("1");             //apogeu detectado
+    dataString += ("1");             //apogee detect
   }
 
   else {
