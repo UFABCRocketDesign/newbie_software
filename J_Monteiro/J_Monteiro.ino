@@ -90,6 +90,7 @@ void setup() {
         Serial.println("error opening datalog.txt");
       }
     }
+  }
 
     for (float k = 0; k < numReads; k++) {
       accAltbase = accAltbase + bmp.readAltitude();
@@ -98,7 +99,7 @@ void setup() {
     Serial.print(Altbase);
     Serial.println('\t');
   }
-}
+
 //===========================================================================
   
   void loop() {
