@@ -39,7 +39,7 @@
 #define usa_my (usa_mag && 0)     //Variavel de escolha do uso do valor do magnetometro em y
 #define usa_mz (usa_mag && 0)     //Variavel de escolha do uso do valor do magnetometro em z
 
-#define usa_Tempo 0              //Variavel de escolha do uso da impressão do tempo
+#define usa_Tempo 1               //Variavel de escolha do uso da impressão do tempo
 #define usa_impreSerial 1         //Variavel de escolha do uso da impressão na serial
 #define usa_SD 0                  //Variavel de escolha do uso de funções
 //////////////////////////////////////////////////////////////////////
@@ -406,7 +406,7 @@ int Apogueu(int apogeu, float Hmax, float MediaMov, unsigned long tempoAtual){
   return apogeu;
 }
 String Paraqueda1(unsigned long tempoAtual, int apogeu){
-  if(auxinicio1 = 0){
+  if(auxinicio1 == 0){
       inicio1 = tempoAtual + duracao;
       auxinicio1 =1;
   }
@@ -426,9 +426,9 @@ String Paraqueda1(unsigned long tempoAtual, int apogeu){
 }
 String Paraqueda2(unsigned long tempoAtual, int apogeu){
   if(apogeu ==1){
-    if(auxinicio2 = 0){
+    if(auxinicio2 == 0){
         inicio2 = tempoAtual + espera;
-        auxinicio2 =1;
+        auxinicio2 = 1;
     }
     if (tempoAtual >= inicio2 && auxled2 == 0) {
         digitalWrite(IGN_2, HIGH);
