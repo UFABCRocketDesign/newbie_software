@@ -375,10 +375,10 @@ void loop() {
 
 #if use_alt
   // filtro 1
-  float media_mov = filtro_altura(h, 1);
+  float media_mov = filtro_altura(h, 0);
 
   // filtro 2
-  float media_mov2 = filtro_altura(media_mov, 2);
+  float media_mov2 = filtro_altura(media_mov, 1);
 #endif
 
   //// REUNINDO OS DADOS EM UMA STRING
