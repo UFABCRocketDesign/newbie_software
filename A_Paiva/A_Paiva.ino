@@ -94,6 +94,7 @@ void setup() {
   pinMode(IGN_2, OUTPUT);
   //pinMode(IGN_3, OUTPUT);
   //pinMode(IGN_4, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
   digitalWrite(IGN_1, LOW);
   digitalWrite(IGN_2, LOW);
   //digitalWrite(IGN_3, LOW);
