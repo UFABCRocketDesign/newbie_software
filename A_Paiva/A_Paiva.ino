@@ -12,8 +12,8 @@
 #define qfa 3                      //Quantidade de filtros da altitude
 #define qfg 3                      //Quantidade de filtros a mais para variaveis gerais
 #define NomeArq "apm"             //Nome do arquivo para o cartão SD entre aspas
-#define espera 0000               //Tempo de espera para acionamento do paraquedas 2 (ms)
-#define duracao 5000              //Tempo de duracao do acionamento dos paraquedas (ms)
+#define espera 1000               //Tempo de espera para acionamento do paraquedas 2 (ms)
+#define duracao 2000              //Tempo de duracao do acionamento dos paraquedas (ms)
 #define altura 10                 //Altura para abertura do terceiro paraquedas (m)
 
 #define usa_bar 1                 //Variavel de escolha do uso do sensor BMP
@@ -328,7 +328,7 @@ void loop() {
 //    }
     dado += Paraqueda1(tempoAtual, apogeu);
     dado += Paraqueda2(tempoAtual, apogeu);
-    dado += Paraqueda3(tempoAtual, Afiltrada);
+    dado += Paraqueda3(tempoAtual, Afiltrada, apogeu);
     dado += "\t";
     #endif      
   }
@@ -425,16 +425,17 @@ String Paraqueda1(unsigned long tempoAtual, int apogeu){
   return "";
 }
 String Paraqueda2(unsigned long tempoAtual, int apogeu){
-  if(auxinicio2 = 0){
-      inicio2 = tempoAtual + espera;
-      auxinicio2 =1;
-  }
-  if (tempoAtual >= inicio2 && auxled2 == 0) {
-      digitalWrite(IGN_2, HIGH);
-      auxled2 = 1;
-      inicio3 = tempoAtual + duracao;
-      return "12";
-      //Serial.print("12");
+  if(apogeu ==1){
+    if(auxinicio2 = 0){
+        inicio2 = tempoAtual + espera;
+        auxinicio2 =1;
+    }
+    if (tempoAtual >= inicio2 && auxled2 == 0) {
+        digitalWrite(IGN_2, HIGH);
+        auxled2 = 1;
+        inicio3 = tempoAtual + duracao;
+        return "12";
+        //Serial.print("12");
     }
     if (tempoAtual >= inicio3 && auxled2 == 1) {
       digitalWrite(IGN_2, LOW);
@@ -442,9 +443,11 @@ String Paraqueda2(unsigned long tempoAtual, int apogeu){
       return "02";
     }
     return "";
+  }
 }
-String Paraqueda3(unsigned long tempoAtual, float MediaMov){
-  if (MediaMov <= altura && auxled3 == 0) {
+String Paraqueda3(unsigned long tempoAtual, float MediaMov, int apogeu){
+  if(apogeu == 1){
+    if (MediaMov <= altura && auxled3 == 0) {
       digitalWrite(LED_BUILTIN, HIGH);
       auxled3 = 1;
       inicio4 = tempoAtual + duracao;
@@ -456,4 +459,5 @@ String Paraqueda3(unsigned long tempoAtual, float MediaMov){
       return "03";
     }
     return "";
+  }
 }
