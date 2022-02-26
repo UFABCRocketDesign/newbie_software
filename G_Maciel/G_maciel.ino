@@ -21,11 +21,11 @@ L3G gyro;
 #define use_gyro 0
 #define use_mag 0
 #define use_accel 0
-#define print_serial 0
+#define print_serial 1
 
-#define use_alt (use_bar && 0)
+#define use_alt (use_bar && 1)
 #define use_pressao (use_bar && 0)
-#define use_temp (use_bar && 1)
+#define use_temp (use_bar && 0)
 #define use_apogeu (use_alt && 0)
 
 #define use_gyro_x (use_gyro && 1)
@@ -50,8 +50,10 @@ L3G gyro;
 #if (use_alt)
 float velhaAlt = 0.0;
 float altura_referencia = 0.0;
-float lista[l];
-float lista2[l];
+//float lista[l];
+//float lista2[l];
+#define numero_filtros 2  // numero de filtros
+float matriz_filtros[numero_filtros][l];
 #endif
 
 #if use_apogeu
@@ -81,31 +83,33 @@ String nomeArquivo = "";
 #if use_alt
 float filtro_altura(float entrada, int i)
 {
-  float media_mov = 0.0;
-  if (i == 1) {
+  float media_movel = 0.0;
+  // if (i == 1) {
     for (int k = 0; k < (l - 1); k++) {
-      lista[k] = lista[k + 1];
+      matriz_filtros[i][k] = matriz_filtros[i][k + 1];
     }
-    lista[l - 1] = entrada;
+    matriz_filtros[i][l - 1] = entrada;
     for (int j = 0; j < l; j++) {
-      media_mov = media_mov + lista[j];
+      media_movel = media_movel + matriz_filtros[i][j];
     }
-    media_mov = media_mov / l;
-  }
+    media_movel = media_movel / l;
+  //}
 
-  else if (i == 2) {
-    for (int k = 0; k < (l - 1); k++) {
-      lista2[k] = lista2[k + 1];
-    }
-    lista2[l - 1] = entrada;
-    for (int j = 0; j < l; j++) {
-      media_mov = media_mov + lista2[j];
-    }
-    media_mov = media_mov / l;
-  }
-  return media_mov;
+  // else if (i == 2) {
+   // for (int k = 0; k < (l - 1); k++) {
+      // lista2[k] = lista2[k + 1];
+   // }
+    // lista2[l - 1] = entrada;
+   // for (int j = 0; j < l; j++) {
+     // media_mov = media_mov + lista2[j];
+    //}
+    //media_mov = media_mov / l;
+  //}
+  return media_movel;
 }
+
 #endif
+
 
 ////////////////////////////////////////
 
@@ -124,8 +128,8 @@ void setup() {
   if (!bmp.begin()) {
 #if print_serial
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-  }
 #endif // print_serial
+  }
 #endif // bar
 
 #if use_mag
