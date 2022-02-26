@@ -22,7 +22,7 @@
 #define usa_altMax (usa_alt && 0) //Variavel de escolha do uso do valor Altura Máxima
 #define usa_temp (usa_bar && 0)   //Variavel de escolha do uso do valor Temperatura
 #define usa_apogeu (usa_bar && 1) //Variavel de escolha do uso da detecção de apogeu
-#define usa_acpq (usa_apogeu && 0)//Variavel de escolha do uso do acionamento dos paraquedas
+#define usa_acpq (usa_apogeu && 1)//Variavel de escolha do uso do acionamento dos paraquedas
 
 #define usa_giro 0                //Variavel de escolha do uso do sensor
 #define usa_gx (usa_giro && 0)    //Variavel de escolha do uso do valor do giroscopio em x
@@ -63,7 +63,8 @@ int apogeu = 0;
 int auxled1 = 0;
 int auxled2 = 0;
 int auxled3 = 0;
-int auxinicio = 0;
+int auxinicio1 = 0;
+int auxinicio2 = 0;
 unsigned long inicio1 = 0;        // will store last time LED was updated
 unsigned long inicio2 = 0;        // will store last time LED was updated
 unsigned long inicio3 = 0;        // will store last time LED was updated
@@ -311,23 +312,6 @@ void loop() {
   }
   #endif
   #if usa_apogeu
-//  float Delta = Hmax - MediaMov;                           //Compara o valor máximo do filtro1 com o valor atual do filtro1
-//  
-//  if (Delta >= 2 && apogeu == 0) {                         //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
-//    apogeu = 1;
-//    #if usa_acpq
-//    inicio1 = tempoAtual + duracao;
-//    inicio2 = tempoAtual + espera;
-//    #endif
-//  }
-//  else if (apogeu == 0) {
-//    dado += "Subindo";
-//    dado += "\t";
-//  }
-//  if (apogeu == 1) {
-//    dado += "Descendo";
-//    dado += "\t";
-//  }
   apogeu = Apogueu(apogeu, Hmax, Afiltrada, tempoAtual);
   if (apogeu == 0) {
     dado += "Subindo";
@@ -337,52 +321,56 @@ void loop() {
     dado += "Descendo";
     dado += "\t";
     #if usa_acpq
-    if(auxinicio = 0){
-      inicio1 = tempoAtual + duracao;
-      inicio2 = tempoAtual + espera;
-      auxinicio =1;
-    }
+//    if(auxinicio = 0){
+//      inicio1 = tempoAtual + duracao;
+//      inicio2 = tempoAtual + espera;
+//      auxinicio =1;
+//    }
+    dado += Paraqueda1(tempoAtual, apogeu);
+    dado += Paraqueda2(tempoAtual, apogeu);
+    dado += Paraqueda3(tempoAtual, Afiltrada);
+    dado += "\t";
     #endif      
   }
   #endif
-  #if usa_acpq
-  if (apogeu == 1) {
-    if (auxled1 == 0) {
-      digitalWrite(IGN_1, HIGH);
-      auxled1 = 1;
-      dado += "11";
-    }
-    if (tempoAtual >= inicio1 && auxled1 == 1) {
-      digitalWrite(IGN_1, LOW);
-      auxled1 = 2;
-      dado += "01";
-    }
-    if (tempoAtual >= inicio2 && auxled2 == 0) {
-      digitalWrite(IGN_2, HIGH);
-      auxled2 = 1;
-      inicio3 = tempoAtual + duracao;
-      dado += "12";
-      //Serial.print("12");
-    }
-    if (tempoAtual >= inicio3 && auxled2 == 1) {
-      digitalWrite(IGN_2, LOW);
-      auxled2 = 2;
-      dado += "02";
-    }
-    if (MediaMov <= altura && auxled3 == 0) {
-      digitalWrite(LED_BUILTIN, HIGH);
-      auxled3 = 1;
-      inicio4 = tempoAtual + duracao;
-      dado += "13";
-    }
-    if (tempoAtual >= inicio4 && auxled3 == 1) {
-      digitalWrite(LED_BUILTIN, LOW);
-      auxled3 = 2;
-      dado += "03";
-    }
-    dado += "\t";
-  }
-  #endif
+//  #if usa_acpq
+//  if (apogeu == 1) {
+//    if (auxled1 == 0) {
+//      digitalWrite(IGN_1, HIGH);
+//      auxled1 = 1;
+//      dado += "11";
+//    }
+//    if (tempoAtual >= inicio1 && auxled1 == 1) {
+//      digitalWrite(IGN_1, LOW);
+//      auxled1 = 2;
+//      dado += "01";
+//    }
+//    if (tempoAtual >= inicio2 && auxled2 == 0) {
+//      digitalWrite(IGN_2, HIGH);
+//      auxled2 = 1;
+//      inicio3 = tempoAtual + duracao;
+//      dado += "12";
+//      //Serial.print("12");
+//    }
+//    if (tempoAtual >= inicio3 && auxled2 == 1) {
+//      digitalWrite(IGN_2, LOW);
+//      auxled2 = 2;
+//      dado += "02";
+//    }
+//    if (MediaMov <= altura && auxled3 == 0) {
+//      digitalWrite(LED_BUILTIN, HIGH);
+//      auxled3 = 1;
+//      inicio4 = tempoAtual + duracao;
+//      dado += "13";
+//    }
+//    if (tempoAtual >= inicio4 && auxled3 == 1) {
+//      digitalWrite(LED_BUILTIN, LOW);
+//      auxled3 = 2;
+//      dado += "03";
+//    }
+//    dado += "\t";
+//  }
+//  #endif
   #if usa_SD
   File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
@@ -394,7 +382,9 @@ void loop() {
   Serial.println(dado);
   #endif
 }
+
 ////funçoes////
+
 float Friutu(float valoratualizado, int j){
   float SomaMov = 0;                                 //Declara e zera o SomaMov em todo loop
   float MediaMov = 0;                                //Declara e zera o MediaMov em todo loop
@@ -414,4 +404,53 @@ int Apogueu(int apogeu, float Hmax, float MediaMov, unsigned long tempoAtual){
     apogeu = 1;
   }
   return apogeu;
+}
+String Paraqueda1(unsigned long tempoAtual, int apogeu){
+  if(auxinicio1 = 0){
+      inicio1 = tempoAtual + duracao;
+      auxinicio1 =1;
+  }
+  if (apogeu == 1) {
+      if (auxled1 == 0) {
+        digitalWrite(IGN_1, HIGH);
+        auxled1 = 1;
+        return "11";
+      }
+      if (tempoAtual >= inicio1 && auxled1 == 1) {
+        digitalWrite(IGN_1, LOW);
+        auxled1 = 2;
+        return "01";
+      }
+  }
+}
+String Paraqueda2(unsigned long tempoAtual, int apogeu){
+  if(auxinicio2 = 0){
+      inicio2 = tempoAtual + espera;
+      auxinicio2 =1;
+  }
+  if (tempoAtual >= inicio2 && auxled2 == 0) {
+      digitalWrite(IGN_2, HIGH);
+      auxled2 = 1;
+      inicio3 = tempoAtual + duracao;
+      return "12";
+      //Serial.print("12");
+    }
+    if (tempoAtual >= inicio3 && auxled2 == 1) {
+      digitalWrite(IGN_2, LOW);
+      auxled2 = 2;
+      return "02";
+    }
+}
+String Paraqueda3(unsigned long tempoAtual, float MediaMov){
+  if (MediaMov <= altura && auxled3 == 0) {
+      digitalWrite(LED_BUILTIN, HIGH);
+      auxled3 = 1;
+      inicio4 = tempoAtual + duracao;
+      return "13";
+    }
+    if (tempoAtual >= inicio4 && auxled3 == 1) {
+      digitalWrite(LED_BUILTIN, LOW);
+      auxled3 = 2;
+      return "03";
+    }
 }
