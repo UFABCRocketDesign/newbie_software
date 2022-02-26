@@ -422,6 +422,7 @@ String Paraqueda1(unsigned long tempoAtual, int apogeu){
         return "01";
       }
   }
+  return "";
 }
 String Paraqueda2(unsigned long tempoAtual, int apogeu){
   if(auxinicio2 = 0){
@@ -440,6 +441,7 @@ String Paraqueda2(unsigned long tempoAtual, int apogeu){
       auxled2 = 2;
       return "02";
     }
+    return "";
 }
 String Paraqueda3(unsigned long tempoAtual, float MediaMov){
   if (MediaMov <= altura && auxled3 == 0) {
@@ -453,4 +455,5 @@ String Paraqueda3(unsigned long tempoAtual, float MediaMov){
       auxled3 = 2;
       return "03";
     }
+    return "";
 }
