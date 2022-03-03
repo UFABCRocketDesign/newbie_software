@@ -28,12 +28,13 @@ void setup() {
     Serial.println("Card failed, or not present");
   }
 
-  //media para referenciar a altura
-  call_chao();
-
   Serial.print("Temp (*C)\t");
   Serial.print("Pres (Pa)\t");
   Serial.print("Alt (m)\t");
+   
+  //media para referenciar a altura
+  call_chao();
+
   Serial.println();
 }
 
@@ -44,35 +45,22 @@ void loop() {
   // Serial.print(bmp.readPressure());
   // Serial.print("\t");
 
-
+  
   sinal[0] = bmp.readAltitude() - const_chao;
   Filtros();
   
   for (int y = 0; y < nf+1; y++) {
     Dados_string = String(sinal[y]);
-    File dataFile = SD.open("I_Koba.txt", FILE_WRITE);
-    dataFile.println(Dados_string);
-    dataFile.println("\t");
-    dataFile.close();
-
+    Dados_string += " ";
     Serial.print(sinal[y]);
     Serial.print("\t");
   }
   if (detec_queda()){
     Serial.print(1);
-    
-    File dataFile = SD.open("I_Koba.txt", FILE_WRITE);
-    dataFile.println("1");
-    dataFile.println("\t");
-    dataFile.close();
   }else{
     Serial.print(0);
-    
-    File dataFile = SD.open("I_Koba.txt", FILE_WRITE);
-    dataFile.println("0");
-    dataFile.println("\t");
-    dataFile.close();
   }
+  salvar();
   Serial.println();
 }
 
@@ -86,9 +74,10 @@ void call_chao() {
 
    //salvando a constante que refencia o chão.
    File dataFile = SD.open("I_Koba.txt", FILE_WRITE);
-   dataFile.println("constante que referencia o chão");
+   dataFile.print("Alt(m)\t");
+   dataFile.print("detecção de queda");
+   dataFile.print("constante que referencia o chão = ");
    dataFile.println(const_chao);
-   dataFile.println("\t");
    dataFile.close();
  
 }
@@ -103,9 +92,7 @@ void Filtros() {
     for (int x = 0; x < pmt; x++) {
       k = vetor[y][x] + k;
     }
-    
     sinal[y + 1] = k / pmt;
-    
   }
 }
 
@@ -115,7 +102,15 @@ bool detec_queda() {
       sinalzin[x] = sinalzin[x - 1];
     }
   sinalzin[0] = sinal[nf];
-    return (sinalzin[0] > sinalzin[ncp - 1]);
+  return (sinalzin[0] > sinalzin[ncp - 1]);
     }
+
+//----------------------------------------------------------------------------------
+void salvar(){ 
+   File dataFile = SD.open("I_Koba.txt", FILE_WRITE);
+   dataFile.print(Dados_string);
+   dataFile.print("\t");
+   dataFile.close();
+}
 
 //----------------------------------------------------------------------------------
