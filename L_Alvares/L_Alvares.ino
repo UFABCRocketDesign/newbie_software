@@ -98,7 +98,7 @@ void loop()
     // VetApogeu é o vetor com 5 slot
     //comparar valores do vetor e se o valor anterior for maior que o atual, adicionar +1 a queda e quando queda >=4 avisar que o foguete está em queda e se o valor for menor que o atual reduzir -1 em queda
 
-    FF = VetApogeu[x];
+    VetApogeu[x] = FF;
     x++;
     if (x >= 4)
      {
@@ -114,7 +114,7 @@ void loop()
      Queda=0;
      }
     Serial.println(Queda);
-    while (Queda >= 4)
+    if (Queda >= 4)
      {
       digitalWrite(LED_BUILTIN, HIGH);
       Serial.print(" Foguete Em Queda ");
