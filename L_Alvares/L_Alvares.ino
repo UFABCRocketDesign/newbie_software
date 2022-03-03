@@ -18,6 +18,7 @@ float VetApogeu[5];
 int A = 0;
 int x = 0;
 int Queda = 0;
+String dataString = "";
 
 const int chipSelect = 53;
 
@@ -49,7 +50,7 @@ void setup()
   Serial.println("Card initialized.");
 
   //Cabeçalho
-
+  
   String StringC = "";
   StringC += "Temperatura(°C)";
   StringC += "\t";
@@ -113,7 +114,6 @@ void loop()
      {
      Queda=0;
      }
-    Serial.println(Queda);
     if (Queda >= 4)
      {
       digitalWrite(LED_BUILTIN, HIGH);
@@ -123,9 +123,10 @@ void loop()
 
 
     //Cartão SD
-    String dataString = "";
     dataString += String(FF);
     dataString += "\t";
+    dataString += String(Queda);
+    dataString += "/t";
     Serial.println(dataString);
     File dataFile = SD.open("Alvares.txt", FILE_WRITE);
     if (dataFile) 
