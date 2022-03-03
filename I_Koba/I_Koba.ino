@@ -1,4 +1,8 @@
 #include <Adafruit_BMP085.h>
+#include <SPI.h>
+#include <SD.h>
+
+#define chipSelect 53
 #define led 13
 #define pmt 20 // intervalo de filtros  
 #define nf (3)  // Numero de filtros 
@@ -10,6 +14,7 @@ float z, const_chao;
 float vetor[nf][pmt]; // movimentaçãop dos filtros de sinal de alrura 
 float sinal[nf+1];   // irá conter todos sinais relacionado a altura  
 float sinalzin[ncp]; // contem os dados usados para comparar a altura 
+String Dados_string = ""; // irá conter os dados dos sinais em string
 
 void setup() {
   pinMode(led, OUTPUT);
@@ -17,6 +22,10 @@ void setup() {
 
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+  }
+
+  if (!SD.begin(chipSelect)) {
+    Serial.println("Card failed, or not present");
   }
 
   //media para referenciar a altura
@@ -40,13 +49,29 @@ void loop() {
   Filtros();
   
   for (int y = 0; y < nf+1; y++) {
+    Dados_string = String(sinal[y]);
+    File dataFile = SD.open("I_Koba.txt", FILE_WRITE);
+    dataFile.println(Dados_string);
+    dataFile.println("\t");
+    dataFile.close();
+
     Serial.print(sinal[y]);
     Serial.print("\t");
   }
   if (detec_queda()){
     Serial.print(1);
+    
+    File dataFile = SD.open("I_Koba.txt", FILE_WRITE);
+    dataFile.println("1");
+    dataFile.println("\t");
+    dataFile.close();
   }else{
     Serial.print(0);
+    
+    File dataFile = SD.open("I_Koba.txt", FILE_WRITE);
+    dataFile.println("0");
+    dataFile.println("\t");
+    dataFile.close();
   }
   Serial.println();
 }
@@ -58,6 +83,14 @@ void call_chao() {
     z = bmp.readAltitude() + z;
   }
   const_chao = z / 100;
+
+   //salvando a constante que refencia o chão.
+   File dataFile = SD.open("I_Koba.txt", FILE_WRITE);
+   dataFile.println("constante que referencia o chão");
+   dataFile.println(const_chao);
+   dataFile.println("\t");
+   dataFile.close();
+ 
 }
 //----------------------------------------------------------------------------------
 void Filtros() {
@@ -84,35 +117,5 @@ bool detec_queda() {
   sinalzin[0] = sinal[nf];
     return (sinalzin[0] > sinalzin[ncp - 1]);
     }
-
-//----------------------------------------------------------------------------------
-
-//void media_movel() {
-//
-// for(int x = pmt-1; x > 0; x--){
-//   vetor[0][x]= vetor[0][x-1];
-// }
-//vetor[0][0]= bmp.readAltitude() - const_chao;
-// float k = 0;
-// for(int x = 0; x < pmt; x++){
-//   k = vetor[0][x] + k;
-// }
-//sinal_filtrado = k/pmt;
-//}
-
-//----------------------------------------------------------------------------------
-
-//void media_movel_2() {
-//
-// for(int x = pmt-1; x > 0; x--){
-//   vetor[1][x]= vetor[1][x-1];
-// }
-// vetor[1][0]= sinal_filtrado ;
-// float k = 0;
-// for(int x = 0; x < pmt; x++){
-//   k = vetor[1][x] + k;
-// }
-// sinal_filtrado_2 = k/pmt;
-//}
 
 //----------------------------------------------------------------------------------
