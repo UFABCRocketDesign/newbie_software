@@ -91,23 +91,7 @@ void loop()
       A = 0;
      }
     FF = F/11;
-    String dataString = "";
-    dataString += String(FF);
-    dataString += "\t";
-    Serial.println(dataString);
-
-    //Cartão SD
-    File dataFile = SD.open("Alvares.txt", FILE_WRITE);
-    if (dataFile) 
-    {
-    dataFile.println(dataString);
-    dataFile.close();
-    }
-    else 
-    {
-    Serial.println("error opening datalog.txt");
-    }
-
+    
     //Apogeu
 
     // o valor filtrado é o FF; fazer mais um vetor limitando a 5 (talvez) medições e usar isso pra saber o estado do foguete
@@ -136,5 +120,22 @@ void loop()
       Serial.print(" Foguete Em Queda ");
      }
     //digitalWrite(LED_BUILTIN, LOW); 
+
+
+    //Cartão SD
+    String dataString = "";
+    dataString += String(FF);
+    dataString += "\t";
+    Serial.println(dataString);
+    File dataFile = SD.open("Alvares.txt", FILE_WRITE);
+    if (dataFile) 
+    {
+    dataFile.println(dataString);
+    dataFile.close();
+    }
+    else 
+    {
+    Serial.println("error opening datalog.txt");
+    }
 
 }
