@@ -98,11 +98,6 @@ void loop()
     dataString += "\t";
     
     //Apogeu
-
-    // o valor filtrado é o FF; fazer mais um vetor limitando a 5 (talvez) medições e usar isso pra saber o estado do foguete
-    // VetApogeu é o vetor com 5 slot
-    //comparar valores do vetor e se o valor anterior for maior que o atual, adicionar +1 a queda e quando queda >=4 avisar que o foguete está em queda e se o valor for menor que o atual reduzir -1 em queda
-
     VetApogeu[x] = FF;
     x++;
     if (x >= 4)
@@ -118,16 +113,22 @@ void loop()
      {
      Queda=0;
      }
+     dataString += String(Queda);
+     dataString += "\t";
+     
     if (Queda >= 4)
      {
-      dataString += String(Queda);
-      dataString += "\t";
       digitalWrite(LED_BUILTIN, HIGH);
-      //Serial.print(" Foguete Em Queda ");
+      dataString += String(1);
+      dataString += "\t";
      }
-    //digitalWrite(LED_BUILTIN, LOW); 
-
-
+    else
+     {
+      dataString += String(0);
+      dataString += "\t";
+      digitalWrite(LED_BUILTIN, LOW);
+     }
+     
     //Cartão SD
     Serial.println(dataString);
     File dataFile = SD.open("Alvares.txt", FILE_WRITE);
