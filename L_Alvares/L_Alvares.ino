@@ -94,6 +94,8 @@ void loop()
       A = 0;
      }
     FF = F/11;
+    dataString += String(FF);
+    dataString += "\t";
     
     //Apogeu
 
@@ -118,17 +120,15 @@ void loop()
      }
     if (Queda >= 4)
      {
+      dataString += String(Queda);
+      dataString += "\t";
       digitalWrite(LED_BUILTIN, HIGH);
-      Serial.print(" Foguete Em Queda ");
+      //Serial.print(" Foguete Em Queda ");
      }
     //digitalWrite(LED_BUILTIN, LOW); 
 
 
     //Cartão SD
-    dataString += String(FF);
-    dataString += "\t";
-    dataString += String(Queda);
-    dataString += "\t";
     Serial.println(dataString);
     File dataFile = SD.open("Alvares.txt", FILE_WRITE);
     if (dataFile) 
