@@ -127,8 +127,9 @@ void loop()
      }
     else
      {
-     Queda--;
+     Queda=0;
      }
+    Serial.println(Queda);
     while (Queda >= 4)
      {
       digitalWrite(LED_BUILTIN, HIGH);
