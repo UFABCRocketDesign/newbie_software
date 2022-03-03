@@ -18,7 +18,7 @@ float VetApogeu[5];
 int A = 0;
 int x = 0;
 int Queda = 0;
-String dataString = "";
+
 
 const int chipSelect = 53;
 
@@ -81,6 +81,8 @@ void setup()
 
 void loop() 
 {
+    String dataString = "";
+    
     //Calculos filtro
     ALT = (bmp.readAltitude() - M);
     F = F - Vfiltro[A];
@@ -126,7 +128,7 @@ void loop()
     dataString += String(FF);
     dataString += "\t";
     dataString += String(Queda);
-    dataString += "/t";
+    dataString += "\t";
     Serial.println(dataString);
     File dataFile = SD.open("Alvares.txt", FILE_WRITE);
     if (dataFile) 
