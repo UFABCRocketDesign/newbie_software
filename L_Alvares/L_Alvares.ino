@@ -8,14 +8,16 @@ Adafruit_BMP085 bmp;
 #define IGN_4 55  /*act4*/
 
 float ALT = 0.0;
-//float ALTo = 0.0;
 float i = 0.0;
 float Med = 0.0;
 float M = 0.0;
 float F = 0.0;
 float FF = 0.0;
 float Vfiltro[11];
+float VetApogeu[5];
 int A = 0;
+int x = 0;
+int Queda = 0;
 
 const int chipSelect = 53;
 
@@ -47,16 +49,17 @@ void setup()
   Serial.println("Card initialized.");
 
   //Cabeçalho
-  
-  //Serial.print("Temperatura(°C)  Pressão(Pa) Altitude(m) PressãoNivelMar(Pa)  AltitudeReal(m)");
-  //Serial.print("Pressão(Pa)");
-  //Serial.print("\t"); 
-  //Serial.println();
-  
+
   String StringC = "";
   StringC += "Temperatura(°C)";
   StringC += "\t";
   StringC += "Pressão(Pa)";
+  StringC += "\t";
+  StringC +=  "Altitude(m)";
+  StringC += "\t";
+  StringC += "PressãoNivelMar(Pa)";
+  StringC += "\t"; 
+  StringC += "AltitudeReal(m)";
   StringC += "\t";
   File TesteC = SD.open("Alvares.txt", FILE_WRITE);
   if (TesteC)
@@ -93,23 +96,44 @@ void loop()
     dataString += "\t";
     Serial.println(dataString);
 
-   //Cartão SD
-   File dataFile = SD.open("Alvares.txt", FILE_WRITE);
-   if (dataFile) 
-   {
+    //Cartão SD
+    File dataFile = SD.open("Alvares.txt", FILE_WRITE);
+    if (dataFile) 
+    {
     dataFile.println(dataString);
     dataFile.close();
-   }
-   else 
-   {
+    }
+    else 
+    {
     Serial.println("error opening datalog.txt");
-   }
-  
-    
-    //if(ALT < ALTo)
-    // {
-    //  digitalWrite(LED_BUILTIN, HIGH);   
-    //  Serial.print(" Foguete Em Queda ");
-    // }
+    }
+
+    //Apogeu
+
+    // o valor filtrado é o FF; fazer mais um vetor limitando a 5 (talvez) medições e usar isso pra saber o estado do foguete
+    // VetApogeu é o vetor com 5 slot
+    //comparar valores do vetor e se o valor anterior for maior que o atual, adicionar +1 a queda e quando queda >=4 avisar que o foguete está em queda e se o valor for menor que o atual reduzir -1 em queda
+
+    FF = VetApogeu[x];
+    x++;
+    if (x >= 4)
+     {
+     x = 0;
+     }
+     
+    if (VetApogeu[x-1] > VetApogeu [x])
+     {
+     Queda++;
+     }
+    else
+     {
+     Queda--;
+     }
+    while (Queda >= 4)
+     {
+      digitalWrite(LED_BUILTIN, HIGH);
+      Serial.print(" Foguete Em Queda ");
+     }
     //digitalWrite(LED_BUILTIN, LOW); 
+
 }
