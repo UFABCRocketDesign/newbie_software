@@ -119,12 +119,12 @@ void loop()
     if (Queda >= 4)
      {
       digitalWrite(LED_BUILTIN, HIGH);
-      dataString += String(1);
+      dataString += String("1");
       dataString += "\t";
      }
     else
      {
-      dataString += String(0);
+      dataString += String("0");
       dataString += "\t";
       digitalWrite(LED_BUILTIN, LOW);
      }
