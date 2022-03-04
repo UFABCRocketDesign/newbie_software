@@ -16,7 +16,7 @@ float SF1 = 0.0;
 float Vfiltro1[11];
 float F2 = 0.0;
 float SF2 = 0.0;
-float Vfiltro2[16];
+float Vfiltro2[11];
 float Ap1 = 0.0;
 int A = 0;
 int B = 0;
@@ -107,11 +107,11 @@ void loop()
     Vfiltro2[B] = SF1;
     F2 = F2 + Vfiltro2[B];
     B++;
-    if (B >= 15)
+    if (B >= 10)
     {
       B = 0;
     }
-    SF2 = F2/15;
+    SF2 = F2/11;
     dataString += String (SF2);
     dataString += "\t";
      
