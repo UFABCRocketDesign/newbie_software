@@ -11,17 +11,19 @@ float ALT = 0.0;
 float i = 0.0;
 float Med = 0.0;
 float M = 0.0;
-float F = 0.0;
-float FF = 0.0;
-float Vfiltro[11];
+float F1 = 0.0;
+float SF1 = 0.0;
+float Vfiltro1[11];
+float F2 = 0.0;
+float SF2 = 0.0;
+float Vfiltro2[16];
+float Ap1 = 0.0;
 int A = 0;
+int B = 0;
 int x = 0;
-int Ap1 = 0;
 int Queda = 0;
 
-
 const int chipSelect = 53;
-
 
 
 void setup() 
@@ -79,36 +81,42 @@ void setup()
   
 }
 
+
 void loop() 
 {
     String dataString = "";
     
-    //Calculos filtro
+    //Calculos filtro 1
     ALT = (bmp.readAltitude() - M);
     dataString += String(ALT);
     dataString += "\t";
-    F = F - Vfiltro[A];
-    Vfiltro[A] = ALT;
-    F = F + Vfiltro[A];
+    F1 = F1 - Vfiltro1[A];
+    Vfiltro1[A] = ALT;
+    F1 = F1 + Vfiltro1[A];
     A++;
     if(A >= 10)
      {
       A = 0;
      }
-    FF = F/11;
-    dataString += String(FF);
+    SF1 = F1/11;
+    dataString += String(SF1);
     dataString += "\t";
-    
-    //Apogeu
-    
-    //VetApogeu[x] = FF;
-    //x++;
-    //if (x >= 1)
-     //{
-    // x = 0;
-    // }
+
+    //Calculos filtro 2 
+    F2 = F2 - Vfiltro2[B];
+    Vfiltro2[B] = SF1;
+    F2 = F2 + Vfiltro2[B];
+    B++;
+    if (B >= 15)
+    {
+      B = 0;
+    }
+    SF2 = F2/15;
+    dataString += String (SF2);
+    dataString += "\t";
      
-    if (Ap1 > FF)
+    //Apogeu  
+    if (Ap1 > SF2)
      {
      Queda++;
      }
@@ -116,10 +124,10 @@ void loop()
      {
      Queda=0;
      }
-     dataString += String(Queda);
+     dataString += String(Queda/10.0);
      dataString += "\t";
      
-    if (Queda >= 4)
+    if (Queda >= 11)
      {
       digitalWrite(LED_BUILTIN, HIGH);
       dataString += String("1");
@@ -132,7 +140,7 @@ void loop()
       digitalWrite(LED_BUILTIN, LOW);
      }
 
-    Ap1 = FF;
+    Ap1 = SF2 ;
      
     //Cartão SD
     Serial.println(dataString);
