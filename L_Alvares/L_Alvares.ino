@@ -66,21 +66,44 @@ void setup()
   StringC += "\t";
   StringC += "AltitudeReal(m)";
   StringC += "\t";
-  
+
   while (NomeArq.length() == 0)
   {
     String Arq = "";
+    String VA = "";
+    String Zeros = "";
+    VA = String (ValorA);
+
+    if (VA.length() <= 1)
+    {
+      Zeros += "0000";
+    }
+    else if (VA.length() == 2)
+    {
+      Zeros += "000";
+    }
+    else if (VA.length() == 3)
+    {
+      Zeros += "00";
+    }
+    else
+    {
+      Zeros += "0";
+    }
+
     Arq += "LAQ";
-    Arq += String (ValorA);
+    Arq += Zeros;
+    Arq += VA;
     Arq += ".txt";
+
     if (SD.exists(Arq))
     {
-      Serial.println(Arq + "existe, fornecer outro nome.");
+      Serial.println(Arq + " existe, fornecer outro nome.");
       ValorA ++;
     }
     else
     {
-      Serial.println(Arq + "esta disponível.");
+      Serial.println(Arq + " esta disponível.");
       NomeArq = Arq;
       break;
     }
