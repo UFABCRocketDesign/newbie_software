@@ -27,7 +27,7 @@ const int chipSelect = 53;
 
 String NomeArq = "";
 int ValorA = 0;
-String Arq = "";
+
 
 void setup()
 {
@@ -66,15 +66,13 @@ void setup()
   StringC += "\t";
   StringC += "AltitudeReal(m)";
   StringC += "\t";
-
-  // Check to see if the file exists:
-
-  while (NomeArq = "")
+  
+  while (NomeArq.length() == 0)
   {
+    String Arq = "";
     Arq += "LAQ";
     Arq += String (ValorA);
     Arq += ".txt";
-
     if (SD.exists(Arq))
     {
       Serial.println(Arq + "existe, fornecer outro nome.");
@@ -84,6 +82,7 @@ void setup()
     {
       Serial.println(Arq + "esta disponível.");
       NomeArq = Arq;
+      break;
     }
   }
 
