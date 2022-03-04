@@ -14,9 +14,9 @@ float M = 0.0;
 float F = 0.0;
 float FF = 0.0;
 float Vfiltro[11];
-float VetApogeu[5];
 int A = 0;
 int x = 0;
+int Ap1 = 0;
 int Queda = 0;
 
 
@@ -85,6 +85,8 @@ void loop()
     
     //Calculos filtro
     ALT = (bmp.readAltitude() - M);
+    dataString += String(ALT);
+    dataString += "\t";
     F = F - Vfiltro[A];
     Vfiltro[A] = ALT;
     F = F + Vfiltro[A];
@@ -98,14 +100,15 @@ void loop()
     dataString += "\t";
     
     //Apogeu
-    VetApogeu[x] = FF;
-    x++;
-    if (x >= 4)
-     {
-     x = 0;
-     }
+    
+    //VetApogeu[x] = FF;
+    //x++;
+    //if (x >= 1)
+     //{
+    // x = 0;
+    // }
      
-    if (VetApogeu[x-1] > VetApogeu [x])
+    if (Ap1 > FF)
      {
      Queda++;
      }
@@ -128,6 +131,8 @@ void loop()
       dataString += "\t";
       digitalWrite(LED_BUILTIN, LOW);
      }
+
+    Ap1 = FF;
      
     //Cartão SD
     Serial.println(dataString);
