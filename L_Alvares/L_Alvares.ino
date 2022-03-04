@@ -25,26 +25,29 @@ int Queda = 0;
 
 const int chipSelect = 53;
 
+String NomeArq = "";
+int ValorA = 0;
+String Arq = "";
 
-void setup() 
+void setup()
 {
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
 
   //ligando bmp
-  if (!bmp.begin()) 
+  if (!bmp.begin())
   {
-  Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-  while (1) {}
+    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+    while (1) {}
   }
-  
+
   //ligando SD
-  while (!Serial) 
+  while (!Serial)
   {
     ;
   }
   Serial.print("Initializing SD card...");
-  if (!SD.begin(chipSelect)) 
+  if (!SD.begin(chipSelect))
   {
     Serial.println("Card failed, or not present");
     return;
@@ -52,7 +55,6 @@ void setup()
   Serial.println("Card initialized.");
 
   //Cabeçalho
-  
   String StringC = "";
   StringC += "Temperatura(°C)";
   StringC += "\t";
@@ -61,98 +63,118 @@ void setup()
   StringC +=  "Altitude(m)";
   StringC += "\t";
   StringC += "PressãoNivelMar(Pa)";
-  StringC += "\t"; 
+  StringC += "\t";
   StringC += "AltitudeReal(m)";
   StringC += "\t";
-  File TesteC = SD.open("Alvares.txt", FILE_WRITE);
+
+  // Check to see if the file exists:
+
+  while (NomeArq = "")
+  {
+    Arq += "LAQ";
+    Arq += String (ValorA);
+    Arq += ".txt";
+
+    if (SD.exists(Arq))
+    {
+      Serial.println(Arq + "existe, fornecer outro nome.");
+      ValorA ++;
+    }
+    else
+    {
+      Serial.println(Arq + "esta disponível.");
+      NomeArq = Arq;
+    }
+  }
+
+  File TesteC = SD.open(NomeArq , FILE_WRITE);
   if (TesteC)
   {
-  TesteC.println(StringC);
-  TesteC.close();
+    TesteC.println(StringC);
+    TesteC.close();
   }
- 
+
   //média
-  for( i = 0; i < 11; i++)
+  for ( i = 0; i < 11; i++)
   {
-   ALT = bmp.readAltitude();
-   Med = Med + ALT;
+    ALT = bmp.readAltitude();
+    Med = Med + ALT;
   }
-  M = (Med/11);
-  
+  M = (Med / 11);
+
 }
 
 
-void loop() 
+void loop()
 {
-    String dataString = "";
-    
-    //Calculos filtro 1
-    ALT = (bmp.readAltitude() - M);
-    dataString += String(ALT);
-    dataString += "\t";
-    F1 = F1 - Vfiltro1[A];
-    Vfiltro1[A] = ALT;
-    F1 = F1 + Vfiltro1[A];
-    A++;
-    if(A >= 10)
-     {
-      A = 0;
-     }
-    SF1 = F1/11;
-    dataString += String(SF1);
-    dataString += "\t";
+  String dataString = "";
 
-    //Calculos filtro 2 
-    F2 = F2 - Vfiltro2[B];
-    Vfiltro2[B] = SF1;
-    F2 = F2 + Vfiltro2[B];
-    B++;
-    if (B >= 10)
-    {
-      B = 0;
-    }
-    SF2 = F2/11;
-    dataString += String (SF2);
-    dataString += "\t";
-     
-    //Apogeu  
-    if (Ap1 > SF2)
-     {
-     Queda++;
-     }
-    else
-     {
-     Queda=0;
-     }
-     dataString += String(Queda/10.0);
-     dataString += "\t";
-     
-    if (Queda >= 11)
-     {
-      digitalWrite(LED_BUILTIN, HIGH);
-      dataString += String("1");
-      dataString += "\t";
-     }
-    else
-     {
-      dataString += String("0");
-      dataString += "\t";
-      digitalWrite(LED_BUILTIN, LOW);
-     }
+  //Calculos filtro 1
+  ALT = (bmp.readAltitude() - M);
+  dataString += String(ALT);
+  dataString += "\t";
+  F1 = F1 - Vfiltro1[A];
+  Vfiltro1[A] = ALT;
+  F1 = F1 + Vfiltro1[A];
+  A++;
+  if (A >= 10)
+  {
+    A = 0;
+  }
+  SF1 = F1 / 11;
+  dataString += String(SF1);
+  dataString += "\t";
 
-    Ap1 = SF2 ;
-     
-    //Cartão SD
-    Serial.println(dataString);
-    File dataFile = SD.open("Alvares.txt", FILE_WRITE);
-    if (dataFile) 
-    {
+  //Calculos filtro 2
+  F2 = F2 - Vfiltro2[B];
+  Vfiltro2[B] = SF1;
+  F2 = F2 + Vfiltro2[B];
+  B++;
+  if (B >= 10)
+  {
+    B = 0;
+  }
+  SF2 = F2 / 11;
+  dataString += String (SF2);
+  dataString += "\t";
+
+  //Apogeu
+  if (Ap1 > SF2)
+  {
+    Queda++;
+  }
+  else
+  {
+    Queda = 0;
+  }
+  dataString += String(Queda / 10.0);
+  dataString += "\t";
+
+  if (Queda >= 11)
+  {
+    digitalWrite(LED_BUILTIN, HIGH);
+    dataString += String("1");
+    dataString += "\t";
+  }
+  else
+  {
+    dataString += String("0");
+    dataString += "\t";
+    digitalWrite(LED_BUILTIN, LOW);
+  }
+  Ap1 = SF2 ;
+
+  //Cartão SD
+  Serial.println(dataString);
+  File dataFile = SD.open(NomeArq , FILE_WRITE);
+  if (dataFile)
+  {
     dataFile.println(dataString);
     dataFile.close();
-    }
-    else 
-    {
+  }
+  else
+  {
     Serial.println("error opening datalog.txt");
-    }
+  }
 
 }
