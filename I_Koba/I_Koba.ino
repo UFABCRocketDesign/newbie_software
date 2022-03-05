@@ -58,7 +58,7 @@ void loop() {
   }
   String Dados_string = "";
   for (int y = 0; y < nf+1; y++) {
-    Dados_string = String(sinal[y]);
+    Dados_string += String(sinal[y]);
     Dados_string += "\t";
   }
   Dados_string += var_queda;
