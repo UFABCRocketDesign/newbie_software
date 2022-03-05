@@ -104,12 +104,12 @@ void setup() {
   Serial.print("O arquivo será gravado com nome ");
   Serial.println(nome);
   Serial.println("card initialized.");
-  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tPressure(Pa)\tPr.sealevel(calculated)(Pa)\tX\tY\tZ\tSituacao");//Cabecalho no acompanhamento
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tSituacao");//Cabecalho no acompanhamento ( NÃO ESQUECE DE COLOCAR \tPressure(Pa) DE NOVO)
   File dataFile = SD.open(nome, FILE_WRITE);
-  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tPressure(Pa)\tPr.sealevel(calculated)(Pa)\tX\tY\tZ\tSituacao"); //Cabecalho no SD
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tSituacao"); //Cabecalho no SD ( NÃO ESQUECE DE COLOCAR \tPressure(Pa) DE NOVO)
   dataFile.close();
 
-  for (int i = 0; i < 100; i++) {                                                               //Este for serve para definir a altitude da base de lancamento como valor de referencia.
+  for (int i = 0; i < 100; i++) {                                                            //Este for serve para definir a altitude da base de lancamento como valor de referencia.
     Soma = Soma + bmp.readAltitude();
   }
   AltitudeRef = Soma / 100;
@@ -117,7 +117,7 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-  unsigned long currentMillis = millis();                                                     // Regsitra em que instante do tempo está
+  unsigned long currentMillis = millis();                                                     // Regsitra em que instante do tempo está em milisegundos
   gyro.read();                                                                                // Faz a leitura do sensor giroscópio
   String dataString = "";                                                                     // Serve para criar a string que vai guardar os dados para que eles sejam gravados no SD
   SomaMov = 0;
@@ -141,7 +141,7 @@ void loop() {
   }
   Delta = Hmax - H1;
 
-  dataString += String(currentMillis);
+  dataString += String(currentMillis / 1000);                                                 // Registra o tempo em segundos
   dataString += "\t";
   dataString += String(Hmax);
   dataString += "\t";
@@ -153,10 +153,8 @@ void loop() {
   dataString += "\t";
   dataString += String(bmp.readTemperature());
   dataString += "\t";
-  dataString += String(bmp.readPressure());
-  dataString += "\t";
-  dataString += String(bmp.readSealevelPressure());
-  dataString += "\t";
+  //dataString += String(bmp.readPressure());
+  //dataString += "\t";
   dataString += String((int)gyro.g.x);
   dataString += "\t";
   dataString += String((int)gyro.g.y);
@@ -204,23 +202,6 @@ void loop() {
         digitalWrite(IGN_3, LOW);
       }
     }
-    // ========================================================= PARTE DO CODIGO QUE ESTAVA FUNCIONANDO ========================================================================
-    //    if (((Delta >= dfaltura || Aceso == true) && Timer > 0) && Fim == true) { // Só excute esse if depois do Timer de 2s
-    //      unsigned long currentMillis = millis();   //conta em que instante do tempo está
-    //      if (currentMillis - previousMillis >= interval) {
-    //        previousMillis = currentMillis;
-    //        if (ledState == LOW) {
-    //          ledState = HIGH;
-    //          dataString += String("Descendo - Paraquedas On");
-    //        } else {
-    //          ledState = LOW;
-    //          dataString += String("Descendo - Paraquedas Off");
-    //          Fim = false;                // Finaliza a verificação do acionamento do paraquedas
-    //        }
-    //        digitalWrite(LED_BUILTIN, ledState);   // A partir do momento que a diferença de altitude for acima de 2, provavelmente o foguete está descendo. Acione o paraquedas
-    //      }
-    //    }
-    // ==========================================================================================================================================================================
     dataString += String("Descendo");                                                            // Só imprime na tela para acompanhar o funcionamento do código
   } else {
     dataString += String("Subindo");                                                             // Só imprime na tela para acompanhar o funcionamento do código
