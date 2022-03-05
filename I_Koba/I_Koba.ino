@@ -10,11 +10,13 @@
 
 
 Adafruit_BMP085 bmp;
-float z, const_chao;
+
+float z, ref_chao;
 float vetor[nf][pmt]; // movimentaçãop dos filtros de sinal de alrura 
 float sinal[nf+1];   // irá conter todos sinais relacionado a altura  
 float sinalzin[ncp]; // contem os dados usados para comparar a altura 
 String Dados_string = ""; // irá conter os dados dos sinais em string
+String var_queda;
 
 void setup() {
   pinMode(led, OUTPUT);
@@ -46,22 +48,26 @@ void loop() {
   // Serial.print("\t");
 
   
-  sinal[0] = bmp.readAltitude() - const_chao;
+  sinal[0] = bmp.readAltitude() - ref_chao;
   Filtros();
-  
+
+  String Dados_string = "";
   for (int y = 0; y < nf+1; y++) {
     Dados_string = String(sinal[y]);
-    Dados_string += " ";
-    Serial.print(sinal[y]);
+    Dados_string += "\t";
+  }
+    Serial.print(Dados_string);
     Serial.print("\t");
-  }
+    
   if (detec_queda()){
-    Serial.print(1);
+    var_queda = "1";
+    Serial.print(var_queda);
   }else{
-    Serial.print(0);
+    var_queda = "0";
+    Serial.print(var_queda);
   }
-  salvar();
   Serial.println();
+  salvar();
 }
 
 //-----------------------------------------------------------------------------
@@ -70,14 +76,14 @@ void call_chao() {
   for (int x = 0; x < 100; x++) {
     z = bmp.readAltitude() + z;
   }
-  const_chao = z / 100;
+  ref_chao = z / 100;
 
    //salvando a constante que refencia o chão.
    File dataFile = SD.open("I_Koba.txt", FILE_WRITE);
    dataFile.print("Alt(m)\t");
    dataFile.print("detecção de queda");
    dataFile.print("constante que referencia o chão = ");
-   dataFile.println(const_chao);
+   dataFile.println(ref_chao);
    dataFile.close();
  
 }
@@ -109,6 +115,8 @@ bool detec_queda() {
 void salvar(){ 
    File dataFile = SD.open("I_Koba.txt", FILE_WRITE);
    dataFile.print(Dados_string);
+   dataFile.print("\t");
+   dataFile.print(var_queda);
    dataFile.print("\t");
    dataFile.close();
 }
