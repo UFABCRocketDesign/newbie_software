@@ -26,7 +26,7 @@ L3G gyro;
 #define use_alt (use_bar && 1)
 #define use_pressao (use_bar && 0)
 #define use_temp (use_bar && 0)
-#define use_apogeu (use_alt && 0)
+#define use_apogeu (use_alt && 1)
 
 #define use_gyro_x (use_gyro && 1)
 #define use_gyro_y (use_gyro && 1)
@@ -78,7 +78,7 @@ unsigned long desliga_led3 = 0;
 #define chipSelect 53
 String nomeArquivo = "";
 
-//////// Função: filtro altura ///////////
+//////// FUNÇÃO: FILTRO ALTURA ///////////
 
 #if use_alt
 float filtro_altura(float entrada, int i)
@@ -93,25 +93,29 @@ float filtro_altura(float entrada, int i)
       media_movel = media_movel + matriz_filtros[i][j];
     }
     media_movel = media_movel / l;
-  //}
-
-  // else if (i == 2) {
-   // for (int k = 0; k < (l - 1); k++) {
-      // lista2[k] = lista2[k + 1];
-   // }
-    // lista2[l - 1] = entrada;
-   // for (int j = 0; j < l; j++) {
-     // media_mov = media_mov + lista2[j];
-    //}
-    //media_mov = media_mov / l;
-  //}
   return media_movel;
 }
 
 #endif
 
-
 ////////////////////////////////////////
+
+/////// FUNÇÃO: DETECTAR APOGEU /////////
+
+#if use_apogeu
+float func_detecta_apogeu(float altura_atual, float altura_antiga)
+{
+  if (altura_atual < altura_antiga) {
+    encontra_apogeu += 1;
+  }
+  else {
+    encontra_apogeu = 0;
+  }
+  return encontra_apogeu;
+}
+#endif
+
+/////////////////////////////////////////
 
 void setup() {
   String cabecalho = "";
@@ -170,7 +174,7 @@ void setup() {
   if (!SD.begin(chipSelect)) {
 #if print_serial
     Serial.println("Card failed, or not present");
-#endif
+#endif // print_serial
   }
 #if print_serial
   Serial.println("card initialized.");
@@ -448,13 +452,7 @@ void loop() {
   // Encontrando o apogeu
 
 #if use_apogeu
-  if (media_mov2 < velhaAlt) {
-    encontra_apogeu += 1;
-  }
-  else {
-    encontra_apogeu = 0;
-  }
-
+  float encontra_apogeu = func_detecta_apogeu(media_mov2, velhaAlt);
   if (encontra_apogeu <= 5) {
     dataString += "Apogeu foi detectado! Descendo.";
     dataString += "\t";
