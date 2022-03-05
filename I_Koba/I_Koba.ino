@@ -4,7 +4,7 @@
 
 #define chipSelect 53
 #define led 13
-#define pmt 20 // intervalo de filtros  
+#define pmt 20 // intervalo de valores usados na para media movel
 #define nf (3)  // Numero de filtros 
 #define ncp 4  // intervalo de comparação para queda e suibida
 
@@ -56,7 +56,8 @@ void loop() {
   }else{
     var_queda = "0";
   }
-  String Dados_string = "";
+  
+  Dados_string = "";
   for (int y = 0; y < nf+1; y++) {
     Dados_string += String(sinal[y]);
     Dados_string += "\t";
