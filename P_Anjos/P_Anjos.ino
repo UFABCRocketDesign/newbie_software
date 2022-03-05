@@ -1,7 +1,11 @@
-// Código para detecção do apogeu de um foguete que utiliza sensor de pressão. Inclui gravação de dados no cartão SD e acionamento de paraquedas
-#include <Adafruit_BMP085.h>
+//=========================== SOFTWARE DE VOO - ROCKET DESIGN ==========================================//
+// Pedro Anjos
+
+#include <Adafruit_BMP085.h>          //Biblioteca para o barômetro
 #include <SPI.h>
-#include <SD.h>
+#include <SD.h>                       //Biblioteca para o cartão SD
+#include <Wire.h>                     //Biblioteca para o giroscópio
+#include <L3G.h>                      //Biblioteca para o giroscópio
 
 #define IGN_1 36  /*act1*/
 #define IGN_2 61  /*act2*/
@@ -14,7 +18,7 @@
 #define dfaltura 2                     // Define o delta de altura que serve de critério para a determinação do apogeu
 
 
-
+L3G gyro;
 const int chipSelect = 53;            //Define o pino para o chipselect para gravar no cartão SD
 float H1 = 0;                         // Variável global - Não é ressetada a cada loop. Armazena o dado.
 float H2 = 0;
@@ -63,9 +67,16 @@ void setup() {
   pinMode(IGN_2, OUTPUT);
   pinMode(IGN_3, OUTPUT);
   Serial.begin(115200);
+  Wire.begin();
   while (!Serial) {
     ;                                 // wait for serial port to connect. Needed for native USB port only
   }
+  if (!gyro.init())
+  {
+    Serial.println("Failed to autodetect gyro type!");
+    while (1);
+  }
+  gyro.enableDefault();
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
@@ -93,9 +104,9 @@ void setup() {
   Serial.print("O arquivo será gravado com nome ");
   Serial.println(nome);
   Serial.println("card initialized.");
-  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada final(H1)\tDelta\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)\tSituacao");//Cabecalho no acompanhamento
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tPressure(Pa)\tPr.sealevel(calculated)(Pa)\tX\tY\tZ\tSituacao");//Cabecalho no acompanhamento
   File dataFile = SD.open(nome, FILE_WRITE);
-  dataFile.println("Apogeu(Hmax)\tAltura filtrada final(H1)\tDelta\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)\tSituacao"); //Cabecalho no SD
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tPressure(Pa)\tPr.sealevel(calculated)(Pa)\tX\tY\tZ\tSituacao"); //Cabecalho no SD
   dataFile.close();
 
   for (int i = 0; i < 100; i++) {                                                               //Este for serve para definir a altitude da base de lancamento como valor de referencia.
@@ -107,6 +118,7 @@ void setup() {
 // the loop function runs over and over again forever
 void loop() {
   unsigned long currentMillis = millis();                                                     // Regsitra em que instante do tempo está
+  gyro.read();                                                                                // Faz a leitura do sensor giroscópio
   String dataString = "";                                                                     // Serve para criar a string que vai guardar os dados para que eles sejam gravados no SD
   SomaMov = 0;
   MediaMov = bmp.readAltitude() - AltitudeRef;
@@ -144,6 +156,12 @@ void loop() {
   dataString += String(bmp.readPressure());
   dataString += "\t";
   dataString += String(bmp.readSealevelPressure());
+  dataString += "\t";
+  dataString += String((int)gyro.g.x);
+  dataString += "\t";
+  dataString += String((int)gyro.g.y);
+  dataString += "\t";
+  dataString += String((int)gyro.g.z);
   dataString += "\t";
 
   if (Delta > 0 || Apogeu == true) {                                                              // Só serve para imprimir na tela. Se a diferença da média móvel com o Hmáx é maior que 0, significa que pode estar descendo
