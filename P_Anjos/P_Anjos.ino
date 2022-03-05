@@ -4,8 +4,9 @@
 #include <Adafruit_BMP085.h>          //Biblioteca para o barômetro
 #include <SPI.h>
 #include <SD.h>                       //Biblioteca para o cartão SD
-#include <Wire.h>                     //Biblioteca para o giroscópio
+#include <Wire.h>                     //Biblioteca para o giroscópio e acelerômetro
 #include <L3G.h>                      //Biblioteca para o giroscópio
+#include <ADXL345.h>                  //Biblioteca para o acelerômetro
 
 #define IGN_1 36  /*act1*/
 #define IGN_2 61  /*act2*/
@@ -19,6 +20,7 @@
 
 
 L3G gyro;
+ADXL345 accel(ADXL345_STD);
 const int chipSelect = 53;            //Define o pino para o chipselect para gravar no cartão SD
 float H1 = 0;                         // Variável global - Não é ressetada a cada loop. Armazena o dado.
 float H2 = 0;
@@ -81,6 +83,52 @@ void setup() {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
+  //======================= PARTE APENAS DO ACELEROMETRO ================================= //
+  byte deviceID = accel.readDeviceID();
+  if (deviceID != 0) {
+    Serial.print("0x");
+    Serial.print(deviceID, HEX);
+    Serial.println("");
+  } else {
+    Serial.println("read device id: failed");
+    while (1) {
+      delay(100);
+    }
+  }
+  // Data Rate
+  // - ADXL345_RATE_3200HZ: 3200 Hz
+  // - ADXL345_RATE_1600HZ: 1600 Hz
+  // - ADXL345_RATE_800HZ:  800 Hz
+  // - ADXL345_RATE_400HZ:  400 Hz
+  // - ADXL345_RATE_200HZ:  200 Hz
+  // - ADXL345_RATE_100HZ:  100 Hz
+  // - ADXL345_RATE_50HZ:   50 Hz
+  // - ADXL345_RATE_25HZ:   25 Hz
+  // - ...
+  if (!accel.writeRate(ADXL345_RATE_200HZ)) {
+    Serial.println("write rate: failed");
+    while (1) {
+      delay(100);
+    }
+  }
+  // Data Range
+  // - ADXL345_RANGE_2G: +-2 g
+  // - ADXL345_RANGE_4G: +-4 g
+  // - ADXL345_RANGE_8G: +-8 g
+  // - ADXL345_RANGE_16G: +-16 g
+  if (!accel.writeRange(ADXL345_RANGE_16G)) {
+    Serial.println("write range: failed");
+    while (1) {
+      delay(100);
+    }
+  }
+  if (!accel.start()) {
+    Serial.println("start: failed");
+    while (1) {
+      delay(100);
+    }
+  }
+  // ============================ FIM DA PARTE DO ACELEROMETRO ================================== //
   // see if the card is present and can be initialized:
   if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present");
@@ -104,12 +152,12 @@ void setup() {
   Serial.print("O arquivo será gravado com nome ");
   Serial.println(nome);
   Serial.println("card initialized.");
-  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tSituacao");//Cabecalho no acompanhamento ( NÃO ESQUECE DE COLOCAR \tPressure(Pa) DE NOVO)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tSituacao");//Cabecalho no acompanhamento ( NÃO ESQUECE DE COLOCAR \tPressure(Pa) DE NOVO)
   File dataFile = SD.open(nome, FILE_WRITE);
-  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tSituacao"); //Cabecalho no SD ( NÃO ESQUECE DE COLOCAR \tPressure(Pa) DE NOVO)
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tSituacao"); //Cabecalho no SD ( NÃO ESQUECE DE COLOCAR \tPressure(Pa) DE NOVO)
   dataFile.close();
 
-  for (int i = 0; i < 100; i++) {                                                            //Este for serve para definir a altitude da base de lancamento como valor de referencia.
+  for (int i = 0; i < 100; i++) {                                                            //Este "for" serve para definir a altitude da base de lancamento como valor de referencia.
     Soma = Soma + bmp.readAltitude();
   }
   AltitudeRef = Soma / 100;
@@ -161,6 +209,16 @@ void loop() {
   dataString += "\t";
   dataString += String((int)gyro.g.z);
   dataString += "\t";
+  if (accel.update()) {
+    dataString += String(accel.getX());
+    dataString += "\t";
+    dataString += String(accel.getY());
+    dataString += "\t";
+    dataString += String(accel.getZ());
+    dataString += "\t";
+  } else {
+    Serial.println("update failed");
+  }
 
   if (Delta > 0 || Apogeu == true) {                                                              // Só serve para imprimir na tela. Se a diferença da média móvel com o Hmáx é maior que 0, significa que pode estar descendo
     if (Delta >= dfaltura || Apogeu == true) {                                                    // Se a diferença for maior ou igual ao delta de ref. ou já tenha detectado o apogeu
@@ -207,7 +265,7 @@ void loop() {
     dataString += String("Subindo");                                                             // Só imprime na tela para acompanhar o funcionamento do código
   }
 
-  File dataFile = SD.open(nome, FILE_WRITE);                                                      // Só curiosidade: este é o ponto que mais consome de processamento
+  File dataFile = SD.open(nome, FILE_WRITE);                                                     // Só curiosidade: este é o ponto que mais consome de processamento
 
   // if the file is available, write to it:
   if (dataFile) {
