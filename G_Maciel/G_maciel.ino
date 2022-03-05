@@ -57,7 +57,8 @@ float matriz_filtros[numero_filtros][l];
 #endif
 
 #if use_apogeu
-int encontra_apogeu = 0;
+int contagem_encontra_apogeu = 0;
+bool encontra_apogeu = false;
 bool apogeu_detectado = false;
 bool laco_led_2 = false;      // variavel para entrar no laço liga led 2
 bool laco_led_3 = false;      // variavel para entrar no laço liga led 3 (built in)
@@ -103,13 +104,19 @@ float filtro_altura(float entrada, int i)
 /////// FUNÇÃO: DETECTAR APOGEU /////////
 
 #if use_apogeu
-float func_detecta_apogeu(float altura_atual, float altura_antiga)
+float func_detecta_apogeu(float altura_atual)
 {
-  if (altura_atual < altura_antiga) {
-    encontra_apogeu += 1;
+  if (altura_atual < velhaAlt) {
+    contagem_encontra_apogeu += 1;
   }
   else {
-    encontra_apogeu = 0;
+    contagem_encontra_apogeu = 0;
+  }
+  if (contagem_encontra_apogeu >= 5) {
+    encontra_apogeu = true;
+  }
+  else {
+    encontra_apogeu = false;
   }
   return encontra_apogeu;
 }
@@ -452,9 +459,9 @@ void loop() {
   // Encontrando o apogeu
 
 #if use_apogeu
-  float encontra_apogeu = func_detecta_apogeu(media_mov2, velhaAlt);
-  if (encontra_apogeu <= 5) {
-    dataString += "Apogeu foi detectado! Descendo.";
+  float encontra_apogeu = func_detecta_apogeu(media_mov2);
+  if (encontra_apogeu = true) {
+    dataString += "Descendo.";
     dataString += "\t";
     if (apogeu_detectado == false) {
       // LED 1
