@@ -115,8 +115,7 @@ bool detec_queda() {
 void salvar(){ 
    File dataFile = SD.open("I_Koba.txt", FILE_WRITE);
    if (dataFile) {
-     dataFile.print(Dados_string);
-     dataFile.println();
+     dataFile.println(Dados_string);
      dataFile.close();
    }else {
     Serial.println("Erro ao abrir o SD");
