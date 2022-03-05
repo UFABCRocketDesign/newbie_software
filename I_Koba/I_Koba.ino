@@ -50,24 +50,24 @@ void loop() {
   
   sinal[0] = bmp.readAltitude() - ref_chao;
   Filtros();
-
+    
+  if (detec_queda()){
+    var_queda = "1";
+  }else{
+    var_queda = "0";
+  }
   String Dados_string = "";
   for (int y = 0; y < nf+1; y++) {
     Dados_string = String(sinal[y]);
     Dados_string += "\t";
   }
-    Serial.print(Dados_string);
-    Serial.print("\t");
-    
-  if (detec_queda()){
-    var_queda = "1";
-    Serial.print(var_queda);
-  }else{
-    var_queda = "0";
-    Serial.print(var_queda);
-  }
-  Serial.println();
+  Dados_string += var_queda;
+  
   salvar();
+
+  Serial.print(Dados_string);
+  Serial.print("\t");
+  Serial.println();
 }
 
 //-----------------------------------------------------------------------------
@@ -81,9 +81,9 @@ void call_chao() {
    //salvando a constante que refencia o chão.
    File dataFile = SD.open("I_Koba.txt", FILE_WRITE);
    dataFile.print("Alt(m)\t");
-   dataFile.print("detecção de queda");
+   dataFile.print("detecção de queda\t");
    dataFile.print("constante que referencia o chão = ");
-   dataFile.println(ref_chao);
+   dataFile.println(String(ref_chao));
    dataFile.close();
  
 }
@@ -114,11 +114,13 @@ bool detec_queda() {
 //----------------------------------------------------------------------------------
 void salvar(){ 
    File dataFile = SD.open("I_Koba.txt", FILE_WRITE);
-   dataFile.print(Dados_string);
-   dataFile.print("\t");
-   dataFile.print(var_queda);
-   dataFile.print("\t");
-   dataFile.close();
+   if (dataFile) {
+     dataFile.print(Dados_string);
+     dataFile.println();
+     dataFile.close();
+   }else {
+    Serial.println("Erro ao abrir o SD");
+  }
 }
 
 //----------------------------------------------------------------------------------
