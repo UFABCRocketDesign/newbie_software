@@ -39,9 +39,6 @@ String parteB;
 int a;
 int b;
 int c;
-int ledState1 = LOW;                  // Estado do LED 1 que indica acionamento do paraquedas A
-int ledState2 = LOW;                  // Estado do LED 2 que indica o 2º acionamento do paraquedas A
-int ledState3 = LOW;                  // Estado do LED 3 que indica acionamento do paraquedas B
 float Timer = 0;                      // Guarda o tempo do timer
 unsigned long previousMillis = 0;     // Guarda o momento de tempo para iniciar A e B
 unsigned long previousMillis2 = 0;    // Guarda o momento para o timer para manter B ligado
@@ -96,7 +93,7 @@ void setup() {
   Serial.print("O arquivo será gravado com nome ");
   Serial.println(nome);
   Serial.println("card initialized.");
-  Serial.println("Apogeu(Hmax)\tAltura filtrada final(H1)\tDelta\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)\tSituacao");//Cabecalho no acompanhamento
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada final(H1)\tDelta\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)\tSituacao");//Cabecalho no acompanhamento
   File dataFile = SD.open(nome, FILE_WRITE);
   dataFile.println("Apogeu(Hmax)\tAltura filtrada final(H1)\tDelta\tAltura medida no sensor\tTemperature(*C)\tPressure(Pa)\tPressure at sealevel(calculated)(Pa)\tSituacao"); //Cabecalho no SD
   dataFile.close();
@@ -109,30 +106,31 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-  String dataString = "";                                                                       // Serve para criar a string que vai guardar os dados para que eles sejam gravados no SD
+  unsigned long currentMillis = millis();                                                     // Regsitra em que instante do tempo está
+  String dataString = "";                                                                     // Serve para criar a string que vai guardar os dados para que eles sejam gravados no SD
   SomaMov = 0;
   MediaMov = bmp.readAltitude() - AltitudeRef;
   for (int j = 0; j < 3; j++) {
-    for (int i = 8; i >= 0; i--) {                                                              // Laco apenas para a movimentação
+    for (int i = 8; i >= 0; i--) {                                                            // Laco apenas para a movimentação
       Vetor[j][i + 1] = Vetor[j][i];
     }
     Vetor[j][0] = MediaMov;
     SomaMov = 0;
-    for (int i = 0; i < 10; i++) {                                                              // Laco para a somatoria dos valores
+    for (int i = 0; i < 10; i++) {                                                            // Laco para a somatoria dos valores
       SomaMov = SomaMov + Vetor[j][i];
     }
     MediaMov = SomaMov / 10;
   }
-  H2 = H1;                                                                                      // Guardei a altitude de referencia (medicao anterior)
-  H1 = MediaMov;                                                                                // Nova leitura de altitude
+  H2 = H1;                                                                                    // Guardei a altitude de referencia (medicao anterior)
+  H1 = MediaMov;                                                                              // Nova leitura de altitude
 
   if (Hmax < H1) {
     Hmax = H1;
   }
   Delta = Hmax - H1;
-  //  if (ledState1 == HIGH) {
-  //    Aceso = true;                                                                           // Para garantir que após o acionamento do paraquedas, ele irá executar o próximo if
-  //  }
+
+  dataString += String(currentMillis);
+  dataString += "\t";
   dataString += String(Hmax);
   dataString += "\t";
   dataString += String(H1);
@@ -152,40 +150,39 @@ void loop() {
     if (Delta >= dfaltura || Apogeu == true) {                                                    // Se a diferença for maior ou igual ao delta de ref. ou já tenha detectado o apogeu
       Apogeu = true;                                                                              // Imprime na tela: Encontrou o apogeu
       dataString += String("Encontrou o apogeu");
-      unsigned long currentMillis = millis();                                                     // Regsitra em que instante do tempo está
       if (Tia) {
         previousMillis = currentMillis;                                                           // Começa a considerar este momento para inciar os timers
         TA_Piloto = InterDesligTimer + previousMillis;                                            // Guarda o instante para desligar o paraquedas A
-        TA_PilotoBackup = InterA2 + previousMillis;                                                    // Guarda o instante para o segundo acionamento do Paraquedas A (segurança)
+        TA_PilotoBackup = InterA2 + previousMillis;                                               // Guarda o instante para o segundo acionamento do Paraquedas A (segurança)
         Tia = false;
       }
       if (currentMillis >= TA_Piloto) {
-        dataString += String("PA - Off");                                               // Desliga o paraquedas A
+        dataString += String("PA - Off");                                                         // Desliga o paraquedas A
         digitalWrite(IGN_1, LOW);
       } else {
         dataString += String("PA - On ");
         digitalWrite(IGN_1, HIGH);                                                                // Ligou o paraquedas A
       }
       if (TA_PilotoBackup <= currentMillis && (currentMillis < TDA_PilotoBackup || TDA_PilotoBackup == 0)) {
-        dataString += String("PA2 - On  ");                                                         // Segundo acionamento paraquedas A
+        dataString += String("PA2 - On  ");                                                       // Segundo acionamento paraquedas A
         if (ResetA2) {
           digitalWrite(IGN_2, HIGH);
-          TDA_PilotoBackup = InterDesligTimer + currentMillis;                                     // Atualiza o instante para desligar o segundo acionamento do paraquedas
+          TDA_PilotoBackup = InterDesligTimer + currentMillis;                                    // Atualiza o instante para desligar o segundo acionamento do paraquedas
           ResetA2 = false;
         }
       } else {
-        dataString += String("PA2 - Off ");                                              // Desliga o segundo acionamento paraquedas A
+        dataString += String("PA2 - Off ");                                                       // Desliga o segundo acionamento paraquedas A
         digitalWrite(IGN_2, LOW);
       }
       if (H1 <= HParaquedasB && (currentMillis < TB_Main || TB_Main == 0)) {
-        dataString += String("PB - On  ");                                                // Ligou o parquedas B
+        dataString += String("PB - On  ");                                                        // Ligou o parquedas B
         if (ResetB) {
           digitalWrite(IGN_3, HIGH);
           TB_Main = InterDesligTimer + currentMillis;                                             // Atualiza o instante para desligar o paraquedas B
           ResetB = false;
         }
       } else {
-        dataString += String(" PB - Off");                                               // Desliga paraquedas B
+        dataString += String("PB - Off  ");                                                       // Desliga paraquedas B
         digitalWrite(IGN_3, LOW);
       }
     }
