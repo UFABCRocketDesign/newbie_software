@@ -78,12 +78,11 @@ void setup() {
   title = "Jaque";
   nameFile = title.length();
   n_files = true;
-  n_complete = "";
   allTogether = nameFile + complement;
   numberTotal_Text = 8;
 
   while (n_files) {
-
+    n_complete = "";
     for (int i = 0; i < (numberTotal_Text - allTogether); i++) {
       n_complete = n_complete + "0";
     }
