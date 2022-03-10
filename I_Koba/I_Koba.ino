@@ -10,7 +10,7 @@
 
 
 Adafruit_BMP085 bmp;
-int indice;
+int numero_do_SD;
 float z, ref_chao;
 float vetor[nf][pmt]; // movimentaçãop dos filtros de sinal de alrura 
 float sinal[nf+1];   // irá conter todos sinais relacionado a altura  
@@ -26,16 +26,14 @@ void setup() {
   if (!SD.begin(chipSelect)){Serial.println("Card failed, or not present");}
   
   // laço para determinar o nome do SD
-  indice = 2;
-  for (int x = 1; x < indice; x++){
+  numero_do_SD = 0;
+  while(SD.exists(nome_SD)){
     nome_SD = "I_Koba.";
-    nome_SD += String(x);
-    if (SD.exists(nome_SD)){
-      indice++;
-    }else{
-      indice = x;
+    nome_SD += String(numero_do_SD);
+    numero_do_SD ++;
     }
-  } 
+  Serial.print(nome_SD);
+ 
     
   Serial.print("Temp (*C)\t");
   Serial.print("Pres (Pa)\t");
