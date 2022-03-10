@@ -10,36 +10,42 @@
 
 
 Adafruit_BMP085 bmp;
-
+int indice;
 float z, ref_chao;
 float vetor[nf][pmt]; // movimentaçãop dos filtros de sinal de alrura 
 float sinal[nf+1];   // irá conter todos sinais relacionado a altura  
 float sinalzin[ncp]; // contem os dados usados para comparar a altura 
 String Dados_string = ""; // irá conter os dados dos sinais em string
-String var_queda;
+String var_queda, nome_SD;
 
 void setup() {
   pinMode(led, OUTPUT);
   Serial.begin(115200);
 
-  if (!bmp.begin()) {
-    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-  }
-
-  if (!SD.begin(chipSelect)) {
-    Serial.println("Card failed, or not present");
-  }
-
+  if (!bmp.begin()){Serial.println("Could not find a valid BMP085 sensor, check wiring!");}
+  if (!SD.begin(chipSelect)){Serial.println("Card failed, or not present");}
+  
+  // laço para determinar o nome do SD
+  indice = 2;
+  for (int x = 1; x < indice; x++){
+    nome_SD = "I_Koba.";
+    nome_SD += String(x);
+    if (SD.exists(nome_SD)){
+      indice++;
+    }else{
+      indice = x;
+    }
+  } 
+    
   Serial.print("Temp (*C)\t");
   Serial.print("Pres (Pa)\t");
   Serial.print("Alt (m)\t");
-   
-  //media para referenciar a altura
-  call_chao();
+  Serial.println(); 
+  call_chao(); // calcula a media dos dados para referenciar a altura
 
-  Serial.println();
+
 }
-
+//----------------------------------------------------------------------------------
 void loop() {
 
   // Serial.print(bmp.readTemperature());
@@ -113,14 +119,14 @@ bool detec_queda() {
     }
 
 //----------------------------------------------------------------------------------
-void salvar(){ 
-   File dataFile = SD.open("I_Koba.txt", FILE_WRITE);
-   if (dataFile) {
+void salvar(){
+  File dataFile = SD.open(nome_SD, FILE_WRITE);
+  if(dataFile){
      dataFile.println(Dados_string);
      dataFile.close();
-   }else {
+  }else {
     Serial.println("Erro ao abrir o SD");
-  }
+  } 
 }
 
 //----------------------------------------------------------------------------------
