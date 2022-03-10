@@ -16,7 +16,7 @@ float vetor[nf][pmt]; // movimentaçãop dos filtros de sinal de alrura
 float sinal[nf+1];   // irá conter todos sinais relacionado a altura  
 float sinalzin[ncp]; // contem os dados usados para comparar a altura 
 String Dados_string = ""; // irá conter os dados dos sinais em string
-String var_queda, nome_SD;
+String var_queda, nome_SD, txt_SD, complemento_SD, Projeto_name;
 
 void setup() {
   pinMode(led, OUTPUT);
@@ -27,14 +27,16 @@ void setup() {
   
   // laço para determinar o nome do SD
   numero_do_SD = 0;
-  nome_SD = "I_Koba.";
-  nome_SD += String(numero_do_SD);
-  
-  while(SD.exists(nome_SD)){
+  nome_SD = "Kob_";
+  txt_SD += ".txt";
+  complemento_SD = String(numero_do_SD)
+  Projeto_name = nome_SD + complemento_SD + txt_SD;
+  do{
     nome_SD += String(numero_do_SD);
     numero_do_SD ++;
-    }
-  Serial.print(nome_SD);
+  }while(SD.exists(Projeto_name));
+ 
+  Serial.print(Projeto_name);
  
     
   Serial.print("Temp (*C)\t");
