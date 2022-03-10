@@ -29,10 +29,13 @@ void setup() {
   numero_do_SD = 0;
   nome_SD = "Kob_";
   txt_SD += ".txt";
-  complemento_SD = String(numero_do_SD)
+  complemento_SD = String(numero_do_SD);
   Projeto_name = nome_SD + complemento_SD + txt_SD;
+  
   do{
-    nome_SD += String(numero_do_SD);
+    Projeto_name = "";
+    complemento_SD = String(numero_do_SD);
+    Projeto_name = nome_SD + complemento_SD + txt_SD;
     numero_do_SD ++;
   }while(SD.exists(Projeto_name));
  
