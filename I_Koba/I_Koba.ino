@@ -24,29 +24,32 @@ void setup() {
 
   if (!bmp.begin()){Serial.println("Could not find a valid BMP085 sensor, check wiring!");}
   if (!SD.begin(chipSelect)){Serial.println("Card failed, or not present");}
+  call_chao(); // calcula a media dos dados para referenciar a altura
   
   // laço para determinar o nome do SD
   numero_do_SD = 0;
   nome_SD = "Kob_";
   txt_SD += ".txt";
-  complemento_SD = String(numero_do_SD);
-  Projeto_name = nome_SD + complemento_SD + txt_SD;
   
   do{
     Projeto_name = "";
     complemento_SD = String(numero_do_SD);
     Projeto_name = nome_SD + complemento_SD + txt_SD;
     numero_do_SD ++;
-  }while(SD.exists(Projeto_name));
- 
-  Serial.print(Projeto_name);
- 
-    
+  }while(!SD.exists(Projeto_name));
+  
+   File dataFile = SD.open(Projeto_name, FILE_WRITE);
+   dataFile.print("Alt(m)\t");
+   dataFile.print("detecção de queda\t");
+   dataFile.print("constante que referencia o chão = ");
+   dataFile.println(String(ref_chao));
+   dataFile.close();
+  
+  Serial.println(Projeto_name);  
   Serial.print("Temp (*C)\t");
   Serial.print("Pres (Pa)\t");
   Serial.print("Alt (m)\t");
   Serial.println(); 
-  call_chao(); // calcula a media dos dados para referenciar a altura
 
 
 }
@@ -88,16 +91,7 @@ void call_chao() {
   for (int x = 0; x < 100; x++) {
     z = bmp.readAltitude() + z;
   }
-  ref_chao = z / 100;
-
-   //salvando a constante que refencia o chão.
-   File dataFile = SD.open("I_Koba.txt", FILE_WRITE);
-   dataFile.print("Alt(m)\t");
-   dataFile.print("detecção de queda\t");
-   dataFile.print("constante que referencia o chão = ");
-   dataFile.println(String(ref_chao));
-   dataFile.close();
- 
+  ref_chao = z / 100; 
 }
 //----------------------------------------------------------------------------------
 void Filtros() {
@@ -125,7 +119,7 @@ bool detec_queda() {
 
 //----------------------------------------------------------------------------------
 void salvar(){
-  File dataFile = SD.open(nome_SD, FILE_WRITE);
+  File dataFile = SD.open(Projeto_name, FILE_WRITE);
   if(dataFile){
      dataFile.println(Dados_string);
      dataFile.close();
