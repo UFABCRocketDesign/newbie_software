@@ -74,19 +74,22 @@ void setup() {
   dataString += ("Apogeu \t");
 
   //============================================================================
-  complement = String(num).length();
+  
   title = "Jaque";
   nameFile = title.length();
   n_files = true;
-  allTogether = nameFile + complement;
   numberTotal_Text = 8;
 
   while (n_files) {
+    
+    allTogether = nameFile + complement;
+    complement = String(num).length();
     n_complete = "";
+    
     for (int i = 0; i < (numberTotal_Text - allTogether); i++) {
       n_complete = n_complete + "0";
     }
-    jFile = "Jaque" + n_complete + String(num) + ".txt";
+    jFile = title + n_complete + String(num) + ".txt";
     num = num + 1;
     Serial.println(jFile);
 
