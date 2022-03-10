@@ -35,6 +35,7 @@ void setup() {
     Projeto_name = "";
     complemento_SD = String(numero_do_SD);
     Projeto_name = nome_SD + complemento_SD + txt_SD;
+    Serial.println(Projeto_name);
     numero_do_SD ++;
   }while(!SD.exists(Projeto_name));
   
@@ -44,8 +45,7 @@ void setup() {
    dataFile.print("constante que referencia o chão = ");
    dataFile.println(String(ref_chao));
    dataFile.close();
-  
-  Serial.println(Projeto_name);  
+   
   Serial.print("Temp (*C)\t");
   Serial.print("Pres (Pa)\t");
   Serial.print("Alt (m)\t");
