@@ -3,7 +3,10 @@
 #include <SD.h>
 
 //============================================================
+
+const int ledPin =  LED_BUILTIN;        // the number of the LED pin
 const int chipSelect = 53;
+const long interval = 1000;           // interval at which to blink (milliseconds)
 File myFile;
 
 //=============================================================
@@ -24,6 +27,7 @@ float Maximum_height;     //Altura máxima
 float previous = 0;      //Altitude anterior
 float moving_average;   //Média móvel
 float vet2[n];         //Vetor 2
+int ledState = LOW;             // ledState used to set the LED
 
 String jFile;
 String title;
@@ -37,10 +41,11 @@ unsigned int n_files;            //Número de arquivos
 unsigned int num = 0;           //Numero correspondente a strings
 unsigned int numberTotal_Text; //Número referente a quantidade de texto
 
+unsigned long previousMillis = 0;        // will store last time LED was updated
 //======================================================================
 
 void setup() {
-  // Open serial communications and wait for port to open:
+// Open serial communications and wait for port to open:
   Serial.begin(115200);
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
@@ -123,12 +128,12 @@ void setup() {
 //===========================================================================
 
 void loop() {
-
+  
   String dataString = "";
-
   float Height = 0;
   float current_height;
-
+  unsigned long currentMillis = millis();
+  
   current_height = bmp.readAltitude() - Altbase; //Transformar altitude em altura
   dataString += String(current_height);
   dataString += "\t";
@@ -228,6 +233,22 @@ void loop() {
   }
   dataString += "\t";
   previous =  moving_average;
+
+  if (currentMillis - previousMillis >= interval) {
+    // save the last time you blinked the LED
+    previousMillis = currentMillis;
+
+    // if the LED is off turn it on and vice-versa:
+    if (ledState == LOW) {
+      ledState = HIGH;
+    } else {
+      ledState = LOW;
+    }
+
+    // set the LED with the ledState of the variable:
+    digitalWrite(ledPin, ledState);
+  
+}
 
   File dataFile = SD.open(jFile, FILE_WRITE);
 
