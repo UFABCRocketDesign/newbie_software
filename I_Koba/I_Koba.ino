@@ -27,8 +27,10 @@ void setup() {
   
   // laço para determinar o nome do SD
   numero_do_SD = 0;
+  nome_SD = "I_Koba.";
+  nome_SD += String(numero_do_SD);
+  
   while(SD.exists(nome_SD)){
-    nome_SD = "I_Koba.";
     nome_SD += String(numero_do_SD);
     numero_do_SD ++;
     }
