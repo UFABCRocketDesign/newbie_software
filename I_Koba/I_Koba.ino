@@ -37,7 +37,7 @@ void setup() {
     Projeto_name = nome_SD + complemento_SD + txt_SD;
     Serial.println(Projeto_name);
     numero_do_SD ++;
-  }while(!SD.exists(Projeto_name));
+  }while(SD.exists(Projeto_name));
   
    File dataFile = SD.open(Projeto_name, FILE_WRITE);
    dataFile.print("Alt(m)\t");
