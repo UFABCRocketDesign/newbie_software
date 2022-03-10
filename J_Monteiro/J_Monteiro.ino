@@ -82,9 +82,9 @@ void setup() {
 
   while (n_files) {
     
-    allTogether = nameFile + complement;
     complement = String(num).length();
     n_complete = "";
+    allTogether = nameFile + complement;
     
     for (int i = 0; i < (numberTotal_Text - allTogether); i++) {
       n_complete = n_complete + "0";
