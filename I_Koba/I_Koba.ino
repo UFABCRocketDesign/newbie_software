@@ -12,10 +12,13 @@
 Adafruit_BMP085 bmp;
 int numero_do_SD; 
 int qnt_zero;
+int Caindo;
+int acendeu;
 float z, ref_chao;
 float vetor[nf][pmt]; // movimentaçãop dos filtros de sinal de alrura 
 float sinal[nf+1];   // irá conter todos sinais relacionado a altura  
 float sinalzin[ncp]; // contem os dados usados para comparar a altura 
+unsigned long Tempo_Atual = millis();
 String Dados_string = ""; // irá conter os dados dos sinais em string
 String var_queda; 
 String nome_SD;
@@ -23,10 +26,12 @@ String txt_SD;
 String complemento_SD;
 String Projeto_name;
 String zeros;
+bool Trava1 = true;
 
 void setup() {
   pinMode(led, OUTPUT);
   Serial.begin(115200);
+  digitalWrite(led, LOW);
 
   if (!bmp.begin()){Serial.println("Could not find a valid BMP085 sensor, check wiring!");}
   if (!SD.begin(chipSelect)){Serial.println("Card failed, or not present");}
@@ -75,21 +80,9 @@ void loop() {
   
   sinal[0] = bmp.readAltitude() - ref_chao;
   Filtros();
-    
-  if (detec_queda()){
-    var_queda = "1";
-  }else{
-    var_queda = "0";
-  }
-  
-  Dados_string = "";
-  for (int y = 0; y < nf+1; y++) {
-    Dados_string += String(sinal[y]);
-    Dados_string += "\t";
-  }
-  Dados_string += var_queda;
-  
-  salvar();
+  Detec_queda();
+  Led_para_queda();
+  Salvar();
 
   Serial.print(Dados_string);
   Serial.print("\t");
@@ -120,16 +113,48 @@ void Filtros() {
 }
 
 //----------------------------------------------------------------------------------
-bool detec_queda() {
+void Detec_queda() {
   for (int x = ncp - 1; x > 0; x--) {
       sinalzin[x] = sinalzin[x - 1];
     }
   sinalzin[0] = sinal[nf];
-  return (sinalzin[0] > sinalzin[ncp - 1]);
+  if ( sinalzin[0] > sinalzin[ncp - 1]){
+    var_queda = "1";
+  }else{
+    var_queda = "0";
+  }
     }
+//----------------------------------------------------------------------------------
+void Led_para_queda() {
+  if(var_queda == "0"){
+   Caindo++;
+   if (Caindo >= 4){
+    Caindo = 0;
+    if(Trava1 == true){
+      digitalWrite(led, HIGH);
+      acendeu = 1;
+      Tempo_Atual = 0;
+      Trava1 == false;
+    }
+   }
+  }
+  if(Trava1 == false){
+    if (Tempo_Atual >= 5000) {
+      digitalWrite(led, LOW);
+      acendeu = 0;
+    }
+  }
+
+}
 
 //----------------------------------------------------------------------------------
-void salvar(){
+void Salvar(){
+  Dados_string = "";
+  for (int y = 0; y < nf+1; y++) {
+    Dados_string += String(sinal[y]);
+    Dados_string += "\t";
+  }
+  Dados_string += var_queda;
   File dataFile = SD.open(Projeto_name, FILE_WRITE);
   if(dataFile){
      dataFile.println(Dados_string);
