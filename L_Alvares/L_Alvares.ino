@@ -26,7 +26,10 @@ int Queda = 0;
 const int chipSelect = 53;
 
 String NomeArq = "";
+String Zeros = "";
+String Nome = "";
 int ValorA = 0;
+int NC = 0;
 
 
 void setup()
@@ -70,31 +73,20 @@ void setup()
   while (NomeArq.length() == 0)
   {
     String Arq = "";
+    String Nome = "LAQ";
     String VA = "";
-    String Zeros = "";
     VA = String (ValorA);
+    NC = Nome.length() + VA.length();
 
-    if (VA.length() <= 1)
-    {
-      Zeros += "0000";
-    }
-    else if (VA.length() == 2)
-    {
-      Zeros += "000";
-    }
-    else if (VA.length() == 3)
-    {
-      Zeros += "00";
-    }
-    else
-    {
-      Zeros += "0";
-    }
-
-    Arq += "LAQ";
-    Arq += Zeros;
-    Arq += VA;
-    Arq += ".txt";
+   for (int a = 0; a <= NC-8; a++)
+   {
+    Zeros += "0";
+   }
+   
+   Arq += Nome;
+   Arq += Zeros;
+   Arq += VA;
+   Arq += ".txt";
 
     if (SD.exists(Arq))
     {
