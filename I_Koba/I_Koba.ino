@@ -135,7 +135,7 @@ void Led_para_queda() {
     }
   }
   if(Trava1 == false){
-    if ((Tempo_Atual - millis()) >= 5000) {
+    if ((millis() - Tempo_Atual) >= 5000) {
       digitalWrite(led, LOW);
       acendeu = 0;
     }
