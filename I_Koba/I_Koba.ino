@@ -44,15 +44,11 @@ void setup() {
     for (int i = 0; i < qnt_zero; i++) {
       zeros += "0";  
     }
-    
      Projeto_name = nome_SD + zeros + complemento_SD + txt_SD;
-     Serial.println(nome_SD);
-     Serial.println(zeros);
-     Serial.println(complemento_SD);
-     Serial.println(txt_SD);
-     Serial.println(Projeto_name);
      numero_do_SD ++;
+     Serial.print(Projeto_name);
   }while(SD.exists(Projeto_name));
+  
   
    File dataFile = SD.open(Projeto_name, FILE_WRITE);
    dataFile.print("Alt(m)\t");
