@@ -27,7 +27,7 @@ const int chipSelect = 53;
 
 String NomeArq = "";
 String Zeros = "";
-String Nome = "";
+String Nome = "LAQ";
 int ValorA = 0;
 int NC = 0;
 
@@ -72,21 +72,21 @@ void setup()
 
   while (NomeArq.length() == 0)
   {
+    String Zeros = "";
     String Arq = "";
-    String Nome = "LAQ";
     String VA = "";
     VA = String (ValorA);
     NC = Nome.length() + VA.length();
 
-   for (int a = 0; a <= NC-8; a++)
-   {
-    Zeros += "0";
-   }
-   
-   Arq += Nome;
-   Arq += Zeros;
-   Arq += VA;
-   Arq += ".txt";
+    for (int a = 0; a < NC - 8; a++)
+    {
+      Zeros += "0";
+    }
+
+    Arq += Nome;
+    Arq += Zeros;
+    Arq += VA;
+    Arq += ".txt";
 
     if (SD.exists(Arq))
     {
