@@ -10,13 +10,19 @@
 
 
 Adafruit_BMP085 bmp;
-int numero_do_SD, qnt_zero, zeros;
+int numero_do_SD;
+int qnt_zero;
 float z, ref_chao;
 float vetor[nf][pmt]; // movimentaçãop dos filtros de sinal de alrura 
 float sinal[nf+1];   // irá conter todos sinais relacionado a altura  
 float sinalzin[ncp]; // contem os dados usados para comparar a altura 
 String Dados_string = ""; // irá conter os dados dos sinais em string
-String var_queda, nome_SD, txt_SD, complemento_SD, Projeto_name;
+String var_queda; 
+String nome_SD;
+String txt_SD;
+String complemento_SD;
+String Projeto_name;
+String zeros;
 
 void setup() {
   pinMode(led, OUTPUT);
@@ -38,6 +44,7 @@ void setup() {
     for (int i = 0; i < qnt_zero; i++) {
       zeros += "0";  
     }
+    
      Projeto_name = nome_SD + zeros + complemento_SD + txt_SD;
      Serial.println(nome_SD);
      Serial.println(zeros);
