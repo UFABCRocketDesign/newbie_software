@@ -18,7 +18,7 @@ float z, ref_chao;
 float vetor[nf][pmt]; // movimentaçãop dos filtros de sinal de alrura 
 float sinal[nf+1];   // irá conter todos sinais relacionado a altura  
 float sinalzin[ncp]; // contem os dados usados para comparar a altura 
-unsigned long Tempo_Atual = millis();
+unsigned long Tempo_Atual = 0;
 String Dados_string = ""; // irá conter os dados dos sinais em string
 String var_queda; 
 String nome_SD;
@@ -126,20 +126,16 @@ void Detec_queda() {
     }
 //----------------------------------------------------------------------------------
 void Led_para_queda() {
-  if(var_queda == "0"){
-   Caindo++;
-   if (Caindo >= 4){
-    Caindo = 0;
+   if (var_queda == "0"){
     if(Trava1 == true){
       digitalWrite(led, HIGH);
       acendeu = 1;
-      Tempo_Atual = 0;
+      Tempo_Atual = millis();
       Trava1 == false;
     }
-   }
   }
   if(Trava1 == false){
-    if (Tempo_Atual >= 5000) {
+    if ((Tempo_Atual - millis()) >= 5000) {
       digitalWrite(led, LOW);
       acendeu = 0;
     }
