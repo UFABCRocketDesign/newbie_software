@@ -10,7 +10,7 @@
 
 
 Adafruit_BMP085 bmp;
-int numero_do_SD;
+int numero_do_SD; 
 int qnt_zero;
 float z, ref_chao;
 float vetor[nf][pmt]; // movimentaçãop dos filtros de sinal de alrura 
@@ -46,7 +46,7 @@ void setup() {
     }
      Projeto_name = nome_SD + zeros + complemento_SD + txt_SD;
      numero_do_SD ++;
-     Serial.print(Projeto_name);
+     Serial.println(Projeto_name);
   }while(SD.exists(Projeto_name));
   
   
