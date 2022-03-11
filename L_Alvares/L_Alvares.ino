@@ -34,6 +34,7 @@ const int PLED =  LED_BUILTIN;
 int LEDST = LOW;
 unsigned long TAnt = 0;
 const long intervalo = 1000;
+boolean Q = false;
 
 
 void setup()
@@ -170,31 +171,33 @@ void loop()
 
   if (Queda >= 11)
   {
-    boolean Q = true;
+    Q = true;
     dataString += String("1");
     dataString += "\t";
-    if (Q == true)
-    {
-      if (TAtual - TAnt >= intervalo);
-      {
-        TAnt = TAtual;
-        if (LEDST == LOW)
-        {
-          LEDST = HIGH;
-        }
-        else
-        {
-          LEDST = LOW;
-        }
-        digitalWrite(PLED, LEDST);
-      }
-    }
   }
   else
   {
     dataString += String("0");
     dataString += "\t";
   }
+
+  if (Q == true)
+  {
+    if (TAtual - TAnt >= intervalo);
+    {
+      TAnt = TAtual;
+      if (LEDST == LOW)
+      {
+        LEDST = HIGH;
+      }
+      else
+      {
+        LEDST = LOW;
+      }
+      digitalWrite(PLED, LEDST);
+    }
+  }
+
   Ap1 = SF2 ;
 
   //Cartão SD
