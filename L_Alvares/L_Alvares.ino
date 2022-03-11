@@ -190,7 +190,6 @@ void loop()
   {
     dataString += String("0");
     dataString += "\t";
-    digitalWrite(PLED, LOW);
   }
   Ap1 = SF2 ;
 
