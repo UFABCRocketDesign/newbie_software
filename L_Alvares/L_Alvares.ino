@@ -30,9 +30,9 @@ String Nome = "LAQ";
 int ValorA = 0;
 int NC = 0;
 
-const int PLED =  LED_BUILTIN;
+const int PLED = LED_BUILTIN;
 int LEDST = LOW;
-unsigned long TAnt = 0;
+unsigned long previousMillis = 0;
 const long intervalo = 1000;
 boolean Q = false;
 
@@ -126,7 +126,7 @@ void setup()
 void loop()
 {
   String dataString = "";
-  unsigned long TAtual = millis();
+  unsigned long currentMillis = millis();
 
   //Calculos filtro 1
   ALT = (bmp.readAltitude() - M);
@@ -183,9 +183,9 @@ void loop()
 
   if (Q == true)
   {
-    if (TAtual - TAnt >= intervalo);
+    if (currentMillis - previousMillis >= intervalo);
     {
-      TAnt = TAtual;
+      previousMillis = currentMillis;
       if (LEDST == LOW)
       {
         LEDST = HIGH;
@@ -194,6 +194,8 @@ void loop()
       {
         LEDST = LOW;
       }
+      dataString += String(LEDST);
+      dataString += "\t";
       digitalWrite(PLED, LEDST);
     }
   }
