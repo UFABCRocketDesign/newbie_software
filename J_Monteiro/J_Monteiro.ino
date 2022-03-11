@@ -41,8 +41,8 @@ unsigned int n_files;            //Número de arquivos
 unsigned int num = 0;           //Numero correspondente a strings
 unsigned int numberTotal_Text; //Número referente a quantidade de texto
 
-unsigned long previousMillis = 0;        // will store last time LED was updated
-//======================================================================
+unsigned long previousMillis = 0;  // will store last time LED was updated
+//========================================================================
 
 void setup() {
 // Open serial communications and wait for port to open:
@@ -211,13 +211,11 @@ void loop() {
   if ( moving_average >= previous ) {
     cont = 0;
     dataString += ("1");
-    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
   }
 
   else {
     cont = cont + 1;
     dataString += ("0");     //descida
-    digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (HIGH is the voltage level)
   }
 
   dataString += "\t";
@@ -239,7 +237,7 @@ void loop() {
     previousMillis = currentMillis;
 
     // if the LED is off turn it on and vice-versa:
-    if (ledState == LOW) {
+    if (ledState == LOW and cont >= 50) {
       ledState = HIGH;
     } else {
       ledState = LOW;
