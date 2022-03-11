@@ -196,6 +196,8 @@ void loop()
     {
       LEDST = LOW;
     }
+    dataString += String(TAtual);
+    dataString += "\t";
     dataString += String(LEDST);
     dataString += "\t";
     digitalWrite(PLED, LEDST);
