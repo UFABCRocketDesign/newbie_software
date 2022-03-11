@@ -18,9 +18,11 @@ Adafruit_BMP085 bmp;
 //=============================================================
 //-----Variáveis Globais-----
 
+boolean parachute_deployment;
+
 float altitude = 0;            //Altitude
 float relative_average;       //Média Relativa
-float vet[n] ;               //Vetor 
+float vet[n] ;               //Vetor
 float Altbase;              //Altitude no solo
 float accAltbase = 0;      //Altitude inicial base acumulativa
 float Maximum_height;     //Altura máxima
@@ -45,7 +47,7 @@ unsigned long previousMillis = 0;  // will store last time LED was updated
 //========================================================================
 
 void setup() {
-// Open serial communications and wait for port to open:
+  // Open serial communications and wait for port to open:
   Serial.begin(115200);
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
@@ -79,18 +81,18 @@ void setup() {
   dataString += ("Apogeu \t");
 
   //============================================================================
-  
+
   title = "Jaque";
   nameFile = title.length();
   n_files = true;
   numberTotal_Text = 8;
 
   while (n_files) {
-    
+
     complement = String(num).length();
     n_complete = "";
     allTogether = nameFile + complement;
-    
+
     for (int i = 0; i < (numberTotal_Text - allTogether); i++) {
       n_complete = n_complete + "0";
     }
@@ -128,17 +130,17 @@ void setup() {
 //===========================================================================
 
 void loop() {
-  
+
   String dataString = "";
   float Height = 0;
   float current_height;
   unsigned long currentMillis = millis();
-  
+
   current_height = bmp.readAltitude() - Altbase; //Transformar altitude em altura
   dataString += String(current_height);
   dataString += "\t";
 
-//===============================================================================
+  //===============================================================================
   //Table
   //
   //  Serial.print(bmp.readTemperature() );
@@ -223,6 +225,7 @@ void loop() {
   dataString += "\t";
 
   if (cont >= 50) {
+    parachute_deployment = false;
     dataString += ("1");             //apogee detect
   }
 
@@ -232,21 +235,25 @@ void loop() {
   dataString += "\t";
   previous =  moving_average;
 
-  if (currentMillis - previousMillis >= interval) {
+  if (currentMillis - previousMillis >= interval ) {
     // save the last time you blinked the LED
     previousMillis = currentMillis;
 
+
     // if the LED is off turn it on and vice-versa:
-    if (ledState == LOW and cont >= 50) {
+    if (parachute_deployment = false) {
+    }
+    if (ledState == LOW) {
       ledState = HIGH;
     } else {
+      parachute_deployment = true;
       ledState = LOW;
     }
 
     // set the LED with the ledState of the variable:
     digitalWrite(ledPin, ledState);
-  
-}
+
+  }
 
   File dataFile = SD.open(jFile, FILE_WRITE);
 
