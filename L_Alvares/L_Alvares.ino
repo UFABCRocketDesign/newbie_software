@@ -30,10 +30,15 @@ String Nome = "LAQ";
 int ValorA = 0;
 int NC = 0;
 
+const int PLED =  LED_BUILTIN;
+int LEDST = LOW;
+unsigned long TAnt = 0;
+const long intervalo = 1000;
+
 
 void setup()
 {
-  pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(PLED, OUTPUT);
   Serial.begin(115200);
 
   //ligando bmp
@@ -77,7 +82,7 @@ void setup()
     VA = String (ValorA);
     NC = Nome.length() + VA.length();
 
-    for (int a = 0; a < 8-NC; a++)
+    for (int a = 0; a < 8 - NC; a++)
     {
       Zeros += "0";
     }
@@ -117,10 +122,10 @@ void setup()
 
 }
 
-
 void loop()
 {
   String dataString = "";
+  unsigned long TAtual = millis();
 
   //Calculos filtro 1
   ALT = (bmp.readAltitude() - M);
@@ -165,15 +170,27 @@ void loop()
 
   if (Queda >= 11)
   {
-    digitalWrite(LED_BUILTIN, HIGH);
     dataString += String("1");
     dataString += "\t";
+    if (TAtual - TAnt >= intervalo);
+    {
+      TAnt = TAtual;
+      if (LEDST == LOW)
+      {
+        LEDST = HIGH;
+      }
+      else
+      {
+        LEDST = LOW;
+      }
+      digitalWrite(PLED, LEDST);
+    }
   }
   else
   {
     dataString += String("0");
     dataString += "\t";
-    digitalWrite(LED_BUILTIN, LOW);
+    digitalWrite(PLED, LOW);
   }
   Ap1 = SF2 ;
 
