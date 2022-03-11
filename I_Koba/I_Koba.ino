@@ -10,7 +10,7 @@
 
 
 Adafruit_BMP085 bmp;
-int numero_do_SD;
+int numero_do_SD, qnt_zero, zeros;
 float z, ref_chao;
 float vetor[nf][pmt]; // movimentaçãop dos filtros de sinal de alrura 
 float sinal[nf+1];   // irá conter todos sinais relacionado a altura  
@@ -29,14 +29,18 @@ void setup() {
   // laço para determinar o nome do SD
   numero_do_SD = 0;
   nome_SD = "Kob_";
-  txt_SD += ".txt";
-  
+  txt_SD = ".txt";
   do{
+    zeros = "";
     Projeto_name = "";
     complemento_SD = String(numero_do_SD);
-    Projeto_name = nome_SD + complemento_SD + txt_SD;
-    Serial.println(Projeto_name);
-    numero_do_SD ++;
+    qnt_zero = 8 - nome_SD.length() - complemento_SD.length();
+    for (int i = 0; i < qnt_zero; i++) {
+      zeros += "0";  
+    }
+     Projeto_name = nome_SD + zeros + complemento_SD + txt_SD;
+     Serial.println(Projeto_name);
+     numero_do_SD ++;
   }while(SD.exists(Projeto_name));
   
    File dataFile = SD.open(Projeto_name, FILE_WRITE);
