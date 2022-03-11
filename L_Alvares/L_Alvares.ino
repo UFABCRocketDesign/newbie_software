@@ -32,9 +32,10 @@ int NC = 0;
 
 const int PLED = LED_BUILTIN;
 int LEDST = LOW;
-unsigned long previousMillis = 0;
+unsigned long TAnt = 0;
 const long intervalo = 1000;
 boolean Q = false;
+boolean LK = false;
 
 
 void setup()
@@ -126,7 +127,7 @@ void setup()
 void loop()
 {
   String dataString = "";
-  unsigned long currentMillis = millis();
+  unsigned long TAtual = millis();
 
   //Calculos filtro 1
   ALT = (bmp.readAltitude() - M);
@@ -172,6 +173,7 @@ void loop()
   if (Queda >= 11)
   {
     Q = true;
+    LK = true;
     dataString += String("1");
     dataString += "\t";
   }
@@ -183,9 +185,9 @@ void loop()
 
   if (Q == true)
   {
-    if (currentMillis - previousMillis >= intervalo);
+    if (TAtual - TAnt >= intervalo && LK == true);
     {
-      previousMillis = currentMillis;
+      TAnt = TAtual;
       if (LEDST == LOW)
       {
         LEDST = HIGH;
@@ -197,6 +199,7 @@ void loop()
       dataString += String(LEDST);
       dataString += "\t";
       digitalWrite(PLED, LEDST);
+      LK = false;
     }
   }
 
