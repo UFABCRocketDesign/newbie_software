@@ -26,7 +26,6 @@ int Queda = 0;
 const int chipSelect = 53;
 
 String NomeArq = "";
-String Zeros = "";
 String Nome = "LAQ";
 int ValorA = 0;
 int NC = 0;
@@ -78,7 +77,7 @@ void setup()
     VA = String (ValorA);
     NC = Nome.length() + VA.length();
 
-    for (int a = 0; a < NC - 8; a++)
+    for (int a = 0; a < 8-NC; a++)
     {
       Zeros += "0";
     }
