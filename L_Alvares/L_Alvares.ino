@@ -170,20 +170,24 @@ void loop()
 
   if (Queda >= 11)
   {
+    boolean Q = true;
     dataString += String("1");
     dataString += "\t";
-    if (TAtual - TAnt >= intervalo);
+    if (Q == true)
     {
-      TAnt = TAtual;
-      if (LEDST == LOW)
+      if (TAtual - TAnt >= intervalo);
       {
-        LEDST = HIGH;
+        TAnt = TAtual;
+        if (LEDST == LOW)
+        {
+          LEDST = HIGH;
+        }
+        else
+        {
+          LEDST = LOW;
+        }
+        digitalWrite(PLED, LEDST);
       }
-      else
-      {
-        LEDST = LOW;
-      }
-      digitalWrite(PLED, LEDST);
     }
   }
   else
