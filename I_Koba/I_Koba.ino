@@ -137,7 +137,7 @@ void Filtros() {
 //----------------------------------------------------------------------------------
 void Detec_queda() {
   for (int x = ncp - 1; x > 0; x--) {
-      sinalzin[x] = sinalzin[x - 1];
+    sinalzin[x] = sinalzin[x - 1];
   }
   sinalzin[0] = sinal[nf];
   if ( sinalzin[0] > sinalzin[ncp - 1]){
