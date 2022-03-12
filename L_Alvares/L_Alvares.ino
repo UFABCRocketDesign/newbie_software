@@ -34,7 +34,8 @@ const int PLED = LED_BUILTIN;
 int LEDST = LOW;
 unsigned long TAnt = 0;
 const long intervalo = 1000;
-boolean LK = false;
+//boolean LK = false;
+int Q = 0;
 
 
 
@@ -172,9 +173,17 @@ void loop()
 
   if (Queda >= 11)
   {
-    LK = true;
+    Q++;
     dataString += String("1");
     dataString += "\t";
+    //if (Q == 1)
+    //{
+    //  LK = true;
+    //}
+    //else
+   // {
+    //  LK = false;
+    //}
   }
   else
   {
@@ -182,7 +191,7 @@ void loop()
     dataString += "\t";
   }
 
-  if (LK == true)
+  if (Q == 1)
   {
     if (TAtual - TAnt >= intervalo)
     {
