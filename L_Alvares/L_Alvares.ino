@@ -190,10 +190,7 @@ void loop()
       if (TAtual - TAnt >= intervalo) //se o Atual-Anterior > 1 seg, o led liga
       {
         TAnt = TAtual;
-        //if (LEDST == LOW)
-        //{
         LEDST = HIGH;
-        //}
       }
       else
       {
@@ -205,7 +202,7 @@ void loop()
     {
       if (TAtual - TAnt >= 6000)// Caso a trava esteja desativada, Apos X tempo, desligar o led
       {
-       LEDST = LOW;
+        LEDST = LOW;
       }
     }
     dataString += String(TAtual);
@@ -214,8 +211,6 @@ void loop()
     dataString += "\t";
     digitalWrite(PLED, LEDST);
   }
-
-
   Ap1 = SF2 ;
 
   //Cartão SD
