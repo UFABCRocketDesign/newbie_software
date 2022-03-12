@@ -216,9 +216,6 @@ void loop()
   }
 
 
-  LEDST = LOW;
-  digitalWrite (PLED, LEDST);
-
   Ap1 = SF2 ;
 
   //Cartão SD
