@@ -65,106 +65,106 @@ bool ResetB = true;                   // A variável booleana para parar resetar
 Adafruit_BMP085 bmp;
 
 // =================== Funções para o Acelerômetro =================================== //
-void displaySensorDetails(void)
+void displaySensorDetails(void) // Função apenas para detalhes do sensor
 {
   sensor_t sensor;
   accel.getSensor(&sensor);
-  Serial.println("------------------------------------");
-  Serial.print  ("Sensor:       "); Serial.println(sensor.name);
-  Serial.print  ("Driver Ver:   "); Serial.println(sensor.version);
-  Serial.print  ("Unique ID:    "); Serial.println(sensor.sensor_id);
-  Serial.print  ("Max Value:    "); Serial.print(sensor.max_value); Serial.println(" m/s^2");
-  Serial.print  ("Min Value:    "); Serial.print(sensor.min_value); Serial.println(" m/s^2");
-  Serial.print  ("Resolution:   "); Serial.print(sensor.resolution); Serial.println(" m/s^2");
-  Serial.println("------------------------------------");
-  Serial.println("");
-  delay(500);
+  //Serial.println("------------------------------------");
+  //Serial.print  ("Sensor:       "); Serial.println(sensor.name);
+  //Serial.print  ("Driver Ver:   "); Serial.println(sensor.version);
+  //Serial.print  ("Unique ID:    "); Serial.println(sensor.sensor_id);
+  //Serial.print  ("Max Value:    "); Serial.print(sensor.max_value); Serial.println(" m/s^2");
+  //Serial.print  ("Min Value:    "); Serial.print(sensor.min_value); Serial.println(" m/s^2");
+  //Serial.print  ("Resolution:   "); Serial.print(sensor.resolution); Serial.println(" m/s^2");
+  //Serial.println("------------------------------------");
+  //Serial.println("");
+  //delay(500);
 }
-void displayDataRate(void)
+void displayDataRate(void) // Função apenas para acessar a frequência em que os dados são gravados e mostrar na tela
 {
-  Serial.print  ("Data Rate:    ");
+  //Serial.print  ("Data Rate:    ");
 
   switch (accel.getDataRate())
   {
     case ADXL345_DATARATE_3200_HZ:
-      Serial.print  ("3200 ");
+      //Serial.print  ("3200 ");
       break;
     case ADXL345_DATARATE_1600_HZ:
-      Serial.print  ("1600 ");
+      //Serial.print  ("1600 ");
       break;
     case ADXL345_DATARATE_800_HZ:
-      Serial.print  ("800 ");
+      //Serial.print  ("800 ");
       break;
     case ADXL345_DATARATE_400_HZ:
-      Serial.print  ("400 ");
+      //Serial.print  ("400 ");
       break;
     case ADXL345_DATARATE_200_HZ:
-      Serial.print  ("200 ");
+      //Serial.print  ("200 ");
       break;
     case ADXL345_DATARATE_100_HZ:
-      Serial.print  ("100 ");
+      //Serial.print  ("100 ");
       break;
     case ADXL345_DATARATE_50_HZ:
-      Serial.print  ("50 ");
+      //Serial.print  ("50 ");
       break;
     case ADXL345_DATARATE_25_HZ:
-      Serial.print  ("25 ");
+      //Serial.print  ("25 ");
       break;
     case ADXL345_DATARATE_12_5_HZ:
-      Serial.print  ("12.5 ");
+      //Serial.print  ("12.5 ");
       break;
     case ADXL345_DATARATE_6_25HZ:
-      Serial.print  ("6.25 ");
+      //Serial.print  ("6.25 ");
       break;
     case ADXL345_DATARATE_3_13_HZ:
-      Serial.print  ("3.13 ");
+      //Serial.print  ("3.13 ");
       break;
     case ADXL345_DATARATE_1_56_HZ:
-      Serial.print  ("1.56 ");
+      //Serial.print  ("1.56 ");
       break;
     case ADXL345_DATARATE_0_78_HZ:
-      Serial.print  ("0.78 ");
+      //Serial.print  ("0.78 ");
       break;
     case ADXL345_DATARATE_0_39_HZ:
-      Serial.print  ("0.39 ");
+      //Serial.print  ("0.39 ");
       break;
     case ADXL345_DATARATE_0_20_HZ:
-      Serial.print  ("0.20 ");
+      //Serial.print  ("0.20 ");
       break;
     case ADXL345_DATARATE_0_10_HZ:
-      Serial.print  ("0.10 ");
+      //Serial.print  ("0.10 ");
       break;
     default:
-      Serial.print  ("???? ");
+      //Serial.print  ("???? ");
       break;
   }
-  Serial.println(" Hz");
+  //Serial.println(" Hz");
 }
-void displayRange(void)
+void displayRange(void)  //Mostra o intervalo do display 
 {
-  Serial.print  ("Range:         +/- ");
+  //Serial.print  ("Range:         +/- ");
 
   switch (accel.getRange())
   {
     case ADXL345_RANGE_16_G:
-      Serial.print  ("16 ");
+      //Serial.print  ("16 ");
       break;
     case ADXL345_RANGE_8_G:
-      Serial.print  ("8 ");
+      //Serial.print  ("8 ");
       break;
     case ADXL345_RANGE_4_G:
-      Serial.print  ("4 ");
+      //Serial.print  ("4 ");
       break;
     case ADXL345_RANGE_2_G:
-      Serial.print  ("2 ");
+      //Serial.print  ("2 ");
       break;
     default:
-      Serial.print  ("?? ");
+      //Serial.print  ("?? ");
       break;
   }
-  Serial.println(" g");
+  //Serial.println(" g");
 }
-// ========================= FIM das funções do Acelerômetro ================= //
+// ========================= FIM DAS FUNÇÕES DO ACELERÔMETRO ================= //
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
   pinMode(LED_BUILTIN, OUTPUT);
