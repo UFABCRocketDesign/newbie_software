@@ -15,8 +15,8 @@
 #define nf 3  // Numero de filtros 
 #define ncp 4  // intervalo de comparação para queda e suibida
 
-#define intervalo_piloto 5000
-#define intervalo_secundario 10000
+#define intervalo 5000
+
 
 
 Adafruit_BMP085 bmp;
@@ -33,6 +33,7 @@ float sinal[nf+1];   // irá conter todos sinais relacionado a altura
 float sinalzin[ncp]; // contem os dados usados para comparar a altura 
 
 unsigned long Time_do_apogeu = 0;
+unsigned long Time_secundario = 0;
 
 String Dados_string = ""; // irá conter os dados dos sinais em string 
 String nome_SD; //primeiro nome do sd
@@ -143,7 +144,6 @@ void Detec_queda() {
     var_queda = 1;
   }else{
     var_queda = 0;
-    Time_do_apogeu = millis();
   }
 }
 //----------------------------------------------------------------------------------
@@ -151,11 +151,12 @@ void Led_para_queda_piloto() {
    if (var_queda == 0){
     if(Trava_piloto == true){
       digitalWrite(led_piloto, HIGH);
+      Time_do_apogeu = millis();
       acendeu_piloto = 1;
       Trava_piloto = false;
     }
     if(Trava_piloto == false){
-      if ((millis() - Time_do_apogeu) >= intervalo_piloto) {
+      if ((millis() - Time_do_apogeu) >= intervalo) {
         digitalWrite(led_piloto, LOW);
         acendeu_piloto = 0;
       }
@@ -165,14 +166,17 @@ void Led_para_queda_piloto() {
 
 //----------------------------------------------------------------------------------
 void Led_para_queda_secundario() {
-   if (var_queda == 0){
+  if (var_queda == 0){
     if(Trava_secundario == true){
-      digitalWrite(led_secundario, HIGH);
-      acendeu_secundario = 1;
-      Trava_secundario = false;
+      if ((millis() - Time_do_apogeu) >= intervalo){
+        digitalWrite(led_secundario, HIGH);
+        Time_secundario = millis();
+        acendeu_secundario = 1;
+        Trava_secundario = false;
+      }
     }
     if(Trava_secundario == false){
-      if ((millis() - Time_do_apogeu) >= intervalo_secundario) {
+      if ((millis() - Time_secundario) >= intervalo) {
         digitalWrite(led_secundario, LOW);
         acendeu_secundario = 0;
       }
