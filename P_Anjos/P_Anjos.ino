@@ -1,13 +1,15 @@
 //=========================== SOFTWARE DE VOO - ROCKET DESIGN ==========================================//
 // Pedro Anjos
 
-#include <Adafruit_BMP085.h>          //Biblioteca para o barômetro
+
 #include <SPI.h>
 #include <SD.h>                       //Biblioteca para o cartão SD
 #include <Wire.h>                     //Biblioteca para o giroscópio e acelerômetro
 #include <L3G.h>                      //Biblioteca para o giroscópio
-#include <Adafruit_Sensor.h>          //Biblioteca para o acelerômetro
+#include <Adafruit_Sensor.h>          //Biblioteca para os sensores
+#include <Adafruit_BMP085.h>          //Biblioteca para o barômetro
 #include <Adafruit_ADXL345_U.h>       //Biblioteca para o acelerômetro
+#include <Adafruit_HMC5883_U.h>       //Biblioteca para o magnetômetro
 
 #define IGN_1 36  /*act1*/
 #define IGN_2 61  /*act2*/
@@ -19,8 +21,11 @@
 #define HParaquedasB 5                 //Altura de acionamento do paraquedas B em metros
 #define dfaltura 2                     // Define o delta de altura que serve de critério para a determinação do apogeu
 
+Adafruit_BMP085 bmp;
 /* Assign a unique ID to this sensor at the same time */
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
+/* Assign a unique ID to this sensor at the same time */
+Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 
 L3G gyro;
 const int chipSelect = 53;            //Define o pino para o chipselect para gravar no cartão SD
@@ -62,109 +67,7 @@ bool Aceso = false;                   // A variável booleana para verificar se 
 bool Fim = true;                      // A variável booleana para parar a verificação do paraquedas
 bool ResetA2 = true;                  // A variável booleana para parar resetar o timer do A2
 bool ResetB = true;                   // A variável booleana para parar resetar o timer do B
-Adafruit_BMP085 bmp;
 
-// =================== Funções para o Acelerômetro =================================== //
-void displaySensorDetails(void) // Função apenas para detalhes do sensor
-{
-  sensor_t sensor;
-  accel.getSensor(&sensor);
-  //Serial.println("------------------------------------");
-  //Serial.print  ("Sensor:       "); Serial.println(sensor.name);
-  //Serial.print  ("Driver Ver:   "); Serial.println(sensor.version);
-  //Serial.print  ("Unique ID:    "); Serial.println(sensor.sensor_id);
-  //Serial.print  ("Max Value:    "); Serial.print(sensor.max_value); Serial.println(" m/s^2");
-  //Serial.print  ("Min Value:    "); Serial.print(sensor.min_value); Serial.println(" m/s^2");
-  //Serial.print  ("Resolution:   "); Serial.print(sensor.resolution); Serial.println(" m/s^2");
-  //Serial.println("------------------------------------");
-  //Serial.println("");
-  //delay(500);
-}
-void displayDataRate(void) // Função apenas para acessar a frequência em que os dados são gravados e mostrar na tela
-{
-  //Serial.print  ("Data Rate:    ");
-
-  switch (accel.getDataRate())
-  {
-    case ADXL345_DATARATE_3200_HZ:
-      //Serial.print  ("3200 ");
-      break;
-    case ADXL345_DATARATE_1600_HZ:
-      //Serial.print  ("1600 ");
-      break;
-    case ADXL345_DATARATE_800_HZ:
-      //Serial.print  ("800 ");
-      break;
-    case ADXL345_DATARATE_400_HZ:
-      //Serial.print  ("400 ");
-      break;
-    case ADXL345_DATARATE_200_HZ:
-      //Serial.print  ("200 ");
-      break;
-    case ADXL345_DATARATE_100_HZ:
-      //Serial.print  ("100 ");
-      break;
-    case ADXL345_DATARATE_50_HZ:
-      //Serial.print  ("50 ");
-      break;
-    case ADXL345_DATARATE_25_HZ:
-      //Serial.print  ("25 ");
-      break;
-    case ADXL345_DATARATE_12_5_HZ:
-      //Serial.print  ("12.5 ");
-      break;
-    case ADXL345_DATARATE_6_25HZ:
-      //Serial.print  ("6.25 ");
-      break;
-    case ADXL345_DATARATE_3_13_HZ:
-      //Serial.print  ("3.13 ");
-      break;
-    case ADXL345_DATARATE_1_56_HZ:
-      //Serial.print  ("1.56 ");
-      break;
-    case ADXL345_DATARATE_0_78_HZ:
-      //Serial.print  ("0.78 ");
-      break;
-    case ADXL345_DATARATE_0_39_HZ:
-      //Serial.print  ("0.39 ");
-      break;
-    case ADXL345_DATARATE_0_20_HZ:
-      //Serial.print  ("0.20 ");
-      break;
-    case ADXL345_DATARATE_0_10_HZ:
-      //Serial.print  ("0.10 ");
-      break;
-    default:
-      //Serial.print  ("???? ");
-      break;
-  }
-  //Serial.println(" Hz");
-}
-void displayRange(void)  //Mostra o intervalo do display 
-{
-  //Serial.print  ("Range:         +/- ");
-
-  switch (accel.getRange())
-  {
-    case ADXL345_RANGE_16_G:
-      //Serial.print  ("16 ");
-      break;
-    case ADXL345_RANGE_8_G:
-      //Serial.print  ("8 ");
-      break;
-    case ADXL345_RANGE_4_G:
-      //Serial.print  ("4 ");
-      break;
-    case ADXL345_RANGE_2_G:
-      //Serial.print  ("2 ");
-      break;
-    default:
-      //Serial.print  ("?? ");
-      break;
-  }
-  //Serial.println(" g");
-}
-// ========================= FIM DAS FUNÇÕES DO ACELERÔMETRO ================= //
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
   pinMode(LED_BUILTIN, OUTPUT);
@@ -206,13 +109,27 @@ void setup() {
   // accel.setRange(ADXL345_RANGE_2_G);
 
   /* Display some basic information on this sensor */
-  displaySensorDetails();
+  //displaySensorDetails();  //Reitirei do código pois não era interessante. Se precisar olhe na biblioteca original
 
   /* Display additional settings (outside the scope of sensor_t) */
-  displayDataRate();
-  displayRange();
-  Serial.println("");
-  // ============================ FIM DA PARTE DO ACELEROMETRO ================================== //
+  //displayDataRate(); //Reitirei do código pois não era interessante. Se precisar olhe na biblioteca original
+  //displayRange(); //Reitirei do código pois não era interessante. Se precisar olhe na biblioteca original
+
+  // ============================ PARTE APENAS DO MAGNETÔMETRO ================================== //
+  Serial.println("HMC5883 Magnetometer Test"); Serial.println("");
+
+  /* Initialise the sensor */
+  if (!mag.begin())
+  {
+    /* There was a problem detecting the HMC5883 ... check your connections */
+    Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
+    while (1);
+  }
+
+  /* Display some basic information on this sensor */
+  //displaySensorDetails(); //Reitirei do código pois não era interessante. Se precisar olhe na biblioteca original
+  // ================================================================================================ //
+
   // see if the card is present and can be initialized:
   if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present");
@@ -236,9 +153,9 @@ void setup() {
   Serial.print("O arquivo será gravado com nome ");
   Serial.println(nome);
   Serial.println("card initialized.");
-  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tSituacao");//Cabecalho no acompanhamento ( NÃO ESQUECE DE COLOCAR \tPressure(Pa) DE NOVO)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tHeading(deg)\tSituacao");//Cabecalho no acompanhamento ( NÃO ESQUECE DE COLOCAR \tPressure(Pa) DE NOVO)
   File dataFile = SD.open(nome, FILE_WRITE);
-  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tSituacao"); //Cabecalho no SD ( NÃO ESQUECE DE COLOCAR \tPressure(Pa) DE NOVO)
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tHeading(deg)\tSituacao"); //Cabecalho no SD ( NÃO ESQUECE DE COLOCAR \tPressure(Pa) DE NOVO)
   dataFile.close();
 
   for (int i = 0; i < 100; i++) {                                                            //Este "for" serve para definir a altitude da base de lancamento como valor de referencia.
@@ -252,8 +169,8 @@ void loop() {
   unsigned long currentMillis = millis();                                                     // Regsitra em que instante do tempo está em milisegundos
   gyro.read();                                                                                // Faz a leitura do sensor giroscópio
   String dataString = "";                                                                     // Serve para criar a string que vai guardar os dados para que eles sejam gravados no SD
-  
-// ========================= MÉDIA MÓVEL E DETECÇÃO DE APOGEU =============================== //  
+
+  // ========================= MÉDIA MÓVEL E DETECÇÃO DE APOGEU =============================== //
   SomaMov = 0;
   MediaMov = bmp.readAltitude() - AltitudeRef;
   for (int j = 0; j < 3; j++) {
@@ -274,7 +191,7 @@ void loop() {
     Hmax = H1;
   }
   Delta = Hmax - H1;
-// ============================= DADOS QUE VÃO PARA STRING ================================== //
+  // ============================= DADOS QUE VÃO PARA STRING ================================== //
   dataString += String(currentMillis / 1000);                                                 // Registra o tempo em segundos
   dataString += "\t";
   dataString += String(Hmax);
@@ -295,18 +212,50 @@ void loop() {
   dataString += "\t";
   dataString += String((int)gyro.g.z);
   dataString += "\t";
-  
-// =========================== ETAPA DO ACELERÔMETRO ============================================ //
+
+  // ================================= ETAPA DO ACELERÔMETRO ==================================== //
   /* Get a new sensor event */
   sensors_event_t event;
   accel.getEvent(&event);
 
   /* Display the results (acceleration is measured in m/s^2) */
-  dataString +="X:\t"; dataString +=String(event.acceleration.x);dataString+="\t";
-  dataString +="Y:\t"; dataString +=String(event.acceleration.y);dataString+="\t";
-  dataString +="Z:\t"; dataString +=String(event.acceleration.z);dataString+="\t";
-  
- // ======================== ETAPA PARA ACIONAMENTO DE PARAQUEDAS =============================== // 
+  dataString += String(event.acceleration.x); dataString += "\t";
+  dataString += String(event.acceleration.y); dataString += "\t";
+  dataString += String(event.acceleration.z); dataString += "\t";
+
+  // ================================== ETAPA DO MAGNETÔMETRO ==================================== //
+  /* Get a new sensor event */
+  mag.getEvent(&event);
+
+  /* Display the results (magnetic vector values are in micro-Tesla (uT)) */
+  dataString += String(event.magnetic.x); dataString += "\t";
+  dataString += String(event.magnetic.y); dataString += "\t";
+  dataString += String(event.magnetic.z); dataString += "\t";
+
+  // Hold the module so that Z is pointing 'up' and you can measure the heading with x&y
+  // Calculate heading when the magnetometer is level, then correct for signs of axis.
+  float heading = atan2(event.magnetic.y, event.magnetic.x);
+
+  // Once you have your heading, you must then add your 'Declination Angle', which is the 'Error' of the magnetic field in your location.
+  // Find yours here: http://www.magnetic-declination.com/
+  // Mine is: -13* 2' W, which is ~13 Degrees, or (which we need) 0.22 radians
+  // If you cannot find your Declination, comment out these two lines, your compass will be slightly off.
+  float declinationAngle = 0.22;
+  heading += declinationAngle;
+
+  // Correct for when signs are reversed.
+  if (heading < 0)
+    heading += 2 * PI;
+
+  // Check for wrap due to addition of declination.
+  if (heading > 2 * PI)
+    heading -= 2 * PI;
+
+  // Convert radians to degrees for readability.
+  float headingDegrees = heading * 180 / M_PI;
+
+  dataString += String(headingDegrees); dataString += "\t";
+  // ======================== ETAPA PARA ACIONAMENTO DE PARAQUEDAS ============================== //
   if (Delta > 0 || Apogeu == true) {                                                              // Só serve para imprimir na tela. Se a diferença da média móvel com o Hmáx é maior que 0, significa que pode estar descendo
     if (Delta >= dfaltura || Apogeu == true) {                                                    // Se a diferença for maior ou igual ao delta de ref. ou já tenha detectado o apogeu
       Apogeu = true;                                                                              // Imprime na tela: Encontrou o apogeu
@@ -352,7 +301,7 @@ void loop() {
     dataString += String("Subindo");                                                             // Só imprime na tela para acompanhar o funcionamento do código
   }
 
-// ======================== ETAPA PARA GRAVAR NO CARTÃO SD ===================================== //
+  // ======================== ETAPA PARA GRAVAR NO CARTÃO SD ===================================== //
   File dataFile = SD.open(nome, FILE_WRITE);                                                     // Só curiosidade: este é o ponto que mais consome de processamento
 
   // if the file is available, write to it:
