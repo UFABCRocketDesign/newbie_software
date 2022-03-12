@@ -34,7 +34,7 @@ const int PLED = LED_BUILTIN;
 int LEDST = LOW;
 unsigned long TAnt = 0;
 const long intervalo = 1000;
-//boolean LK = false;
+boolean LK = false;
 int Q = 0;
 
 
@@ -173,17 +173,9 @@ void loop()
 
   if (Queda >= 11)
   {
-    Q++;
+    Q = 1;
     dataString += String("1");
     dataString += "\t";
-    //if (Q == 1)
-    //{
-    //  LK = true;
-    //}
-    //else
-   // {
-    //  LK = false;
-    //}
   }
   else
   {
@@ -191,19 +183,30 @@ void loop()
     dataString += "\t";
   }
 
-  if (Q == 1)
+  if (Q == 1) // se detectar a queda (alterar condição, apenas para salvar o progresso)
   {
-    if (TAtual - TAnt >= intervalo)
+    if (LK == false) //se a trava estiver ativada
     {
-      TAnt = TAtual;
-      if (LEDST == LOW)
+      if (TAtual - TAnt >= intervalo) //se o Atual-Anterior > 1 seg, o led liga
       {
+        TAnt = TAtual;
+        //if (LEDST == LOW)
+        //{
         LEDST = HIGH;
+        //}
       }
+      else
+      {
+        LEDST = LOW;
+      }
+      LK = true;
     }
     else
     {
-      LEDST = LOW;
+      if (TAtual - TAnt >= 6000)// Caso a trava esteja desativada, Apos X tempo, desligar o led
+      {
+       LEDST = LOW;
+      }
     }
     dataString += String(TAtual);
     dataString += "\t";
@@ -211,6 +214,11 @@ void loop()
     dataString += "\t";
     digitalWrite(PLED, LEDST);
   }
+
+
+  LEDST = LOW;
+  digitalWrite (PLED, LEDST);
+
   Ap1 = SF2 ;
 
   //Cartão SD
