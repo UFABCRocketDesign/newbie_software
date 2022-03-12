@@ -153,9 +153,9 @@ void setup() {
   Serial.print("O arquivo será gravado com nome ");
   Serial.println(nome);
   Serial.println("card initialized.");
-  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tHeading(deg)\tSituacao");//Cabecalho no acompanhamento ( NÃO ESQUECE DE COLOCAR \tPressure(Pa) DE NOVO)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");//Cabecalho no acompanhamento ( NÃO ESQUECE DE COLOCAR \tPressure(Pa) DE NOVO)
   File dataFile = SD.open(nome, FILE_WRITE);
-  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tHeading(deg)\tSituacao"); //Cabecalho no SD ( NÃO ESQUECE DE COLOCAR \tPressure(Pa) DE NOVO)
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao"); //Cabecalho no SD ( NÃO ESQUECE DE COLOCAR \tPressure(Pa) DE NOVO)
   dataFile.close();
 
   for (int i = 0; i < 100; i++) {                                                            //Este "for" serve para definir a altitude da base de lancamento como valor de referencia.
@@ -231,30 +231,9 @@ void loop() {
   dataString += String(event.magnetic.x); dataString += "\t";
   dataString += String(event.magnetic.y); dataString += "\t";
   dataString += String(event.magnetic.z); dataString += "\t";
+  // O código permite reajustar a oritenção para o Norte. Neste código isso não é necessário.
+  // Caso precise, olhe na biblioteca original
 
-  // Hold the module so that Z is pointing 'up' and you can measure the heading with x&y
-  // Calculate heading when the magnetometer is level, then correct for signs of axis.
-  float heading = atan2(event.magnetic.y, event.magnetic.x);
-
-  // Once you have your heading, you must then add your 'Declination Angle', which is the 'Error' of the magnetic field in your location.
-  // Find yours here: http://www.magnetic-declination.com/
-  // Mine is: -13* 2' W, which is ~13 Degrees, or (which we need) 0.22 radians
-  // If you cannot find your Declination, comment out these two lines, your compass will be slightly off.
-  float declinationAngle = 0.22;
-  heading += declinationAngle;
-
-  // Correct for when signs are reversed.
-  if (heading < 0)
-    heading += 2 * PI;
-
-  // Check for wrap due to addition of declination.
-  if (heading > 2 * PI)
-    heading -= 2 * PI;
-
-  // Convert radians to degrees for readability.
-  float headingDegrees = heading * 180 / M_PI;
-
-  dataString += String(headingDegrees); dataString += "\t";
   // ======================== ETAPA PARA ACIONAMENTO DE PARAQUEDAS ============================== //
   if (Delta > 0 || Apogeu == true) {                                                              // Só serve para imprimir na tela. Se a diferença da média móvel com o Hmáx é maior que 0, significa que pode estar descendo
     if (Delta >= dfaltura || Apogeu == true) {                                                    // Se a diferença for maior ou igual ao delta de ref. ou já tenha detectado o apogeu
