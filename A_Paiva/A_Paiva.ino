@@ -322,11 +322,6 @@ void loop() {
     dado += "Descendo";
     dado += "\t";
     #if usa_acpq
-//    if(auxinicio = 0){
-//      inicio1 = tempoAtual + duracao;
-//      inicio2 = tempoAtual + espera;
-//      auxinicio =1;
-//    }
     dado += Paraqueda1(tempoAtual, apogeu);
     dado += Paraqueda2(tempoAtual, apogeu);
     dado += Paraqueda3(tempoAtual, Afiltrada, apogeu);
@@ -334,44 +329,6 @@ void loop() {
     #endif      
   }
   #endif
-//  #if usa_acpq
-//  if (apogeu == 1) {
-//    if (auxled1 == 0) {
-//      digitalWrite(IGN_1, HIGH);
-//      auxled1 = 1;
-//      dado += "11";
-//    }
-//    if (tempoAtual >= inicio1 && auxled1 == 1) {
-//      digitalWrite(IGN_1, LOW);
-//      auxled1 = 2;
-//      dado += "01";
-//    }
-//    if (tempoAtual >= inicio2 && auxled2 == 0) {
-//      digitalWrite(IGN_2, HIGH);
-//      auxled2 = 1;
-//      inicio3 = tempoAtual + duracao;
-//      dado += "12";
-//      //Serial.print("12");
-//    }
-//    if (tempoAtual >= inicio3 && auxled2 == 1) {
-//      digitalWrite(IGN_2, LOW);
-//      auxled2 = 2;
-//      dado += "02";
-//    }
-//    if (MediaMov <= altura && auxled3 == 0) {
-//      digitalWrite(LED_BUILTIN, HIGH);
-//      auxled3 = 1;
-//      inicio4 = tempoAtual + duracao;
-//      dado += "13";
-//    }
-//    if (tempoAtual >= inicio4 && auxled3 == 1) {
-//      digitalWrite(LED_BUILTIN, LOW);
-//      auxled3 = 2;
-//      dado += "03";
-//    }
-//    dado += "\t";
-//  }
-//  #endif
   #if usa_SD
   File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
@@ -461,4 +418,30 @@ String Paraqueda3(unsigned long tempoAtual, float MediaMov, int apogeu){
     }
     return "";
   }
+}
+
+///////// classes ou objetos ///////////
+
+class Filtro{
+  private:
+  const int QtTermosFiltro;
+  float VetorFiltro[tam];
+  float MediaMov;
+  public:
+  Filtro(int c_QtTermosFiltro):QtTermosFiltro(c_QtTermosFiltro){  
+  }
+  float FuncaoFriutu(float valoratualizado);
+};
+float Filtro::FuncaoFriutu(float valoratualizado){
+  float SomaMov = 0;                                 //Declara e zera o SomaMov em todo loop
+  MediaMov = 0;                                      //Declara e zera o MediaMov em todo loop
+  for (int i = QtTermosFiltro - 2; i >= 0; i--) {    //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1 de trás pra frente
+    VetorFiltro[i + 1] = VetorFiltro[i];
+  }
+  VetorFiltro[0] = valoratualizado;                  //Esse é o valor mais atualizado do filtro1
+  for (int i = 0; i <= QtTermosFiltro - 1; i++) {    //Esse 'for' faz a soma dos valores da matriz, para a média do filtro1
+    SomaMov = SomaMov + VetorFiltro[i];
+  }
+  MediaMov = SomaMov / QtTermosFiltro;               //Valor final do filtro, uma média entre "tam" quantidades de valores
+  return MediaMov;
 }
