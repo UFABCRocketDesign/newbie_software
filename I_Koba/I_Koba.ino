@@ -10,23 +10,23 @@
 
 
 Adafruit_BMP085 bmp;
-int numero_do_SD; 
-int qnt_zero;
-int Caindo;
-int acendeu;
-int var_queda;
-float z, ref_chao;
+int numero_do_SD;  //contem o numero que vai seguir o nome do sd
+int qnt_zero;  //quantidade de zeros que será adicionado no nome do sd
+int acendeu;  // contem o estado do led, 1 para acesso e 0 para apagado
+int var_queda;  // contem o estado do foguete, 1 para subindo e 0 para queda
+float z;
+float ref_chao; // constante que será usada para referenciar o chão
 float vetor[nf][pmt]; // movimentaçãop dos filtros de sinal de alrura 
 float sinal[nf+1];   // irá conter todos sinais relacionado a altura  
 float sinalzin[ncp]; // contem os dados usados para comparar a altura 
-unsigned long Tempo_Atual = 0;
+unsigned long Tempo_do_led = 0;
 String Dados_string = ""; // irá conter os dados dos sinais em string 
-String nome_SD;
-String txt_SD;
-String complemento_SD;
-String Projeto_name;
+String nome_SD; //primeiro nome do sd
+String txt_SD; 
+String complemento_SD;  // contem o numero do sd em string
+String Projeto_name; //Nome compketo do SD
 String zeros;
-bool Trava1 = true;
+bool Trava1 = true; //trava usado para o led 
 
 void setup() {
   pinMode(led, OUTPUT);
@@ -35,7 +35,9 @@ void setup() {
 
   if (!bmp.begin()){Serial.println("Could not find a valid BMP085 sensor, check wiring!");}
   if (!SD.begin(chipSelect)){Serial.println("Card failed, or not present");}
-  call_chao(); // calcula a media dos dados para referenciar a altura
+
+  // calcula a media dos dados para referenciar a altura
+  call_chao(); 
   
   // laço para determinar o nome do SD
   numero_do_SD = 0;
@@ -54,13 +56,12 @@ void setup() {
      Serial.println(Projeto_name);
   }while(SD.exists(Projeto_name));
   
-  
-   File dataFile = SD.open(Projeto_name, FILE_WRITE);
-   dataFile.print("Alt(m)\t");
-   dataFile.print("detecção de queda\t");
-   dataFile.print("constante que referencia o chão = ");
-   dataFile.println(String(ref_chao));
-   dataFile.close();
+  File dataFile = SD.open(Projeto_name, FILE_WRITE);
+  dataFile.print("Alt(m)\t");
+  dataFile.print("detecção de queda\t");
+  dataFile.print("constante que referencia o chão = ");
+  dataFile.println(String(ref_chao));
+  dataFile.close();
    
   Serial.print("Temp (*C)\t");
   Serial.print("Pres (Pa)\t");
@@ -71,14 +72,14 @@ void setup() {
 }
 //----------------------------------------------------------------------------------
 void loop() {
-
+  
   // Serial.print(bmp.readTemperature());
   // Serial.print("\t");
   // Serial.print(bmp.readPressure());
   // Serial.print("\t");
 
-  
   sinal[0] = bmp.readAltitude() - ref_chao;
+  
   Filtros();
   Detec_queda();
   Led_para_queda();
@@ -116,31 +117,30 @@ void Filtros() {
 void Detec_queda() {
   for (int x = ncp - 1; x > 0; x--) {
       sinalzin[x] = sinalzin[x - 1];
-    }
+  }
   sinalzin[0] = sinal[nf];
   if ( sinalzin[0] > sinalzin[ncp - 1]){
     var_queda = 1;
   }else{
     var_queda = 0;
   }
-    }
+}
 //----------------------------------------------------------------------------------
 void Led_para_queda() {
    if (var_queda == 0){
     if(Trava1 == true){
       digitalWrite(led, HIGH);
       acendeu = 1;
-      Tempo_Atual = millis();
+      Tempo_do_led = millis();
       Trava1 = false;
     }
-  }
-  if(Trava1 == false){
-    if ((millis() - Tempo_Atual) >= 5000) {
-      digitalWrite(led, LOW);
-      acendeu = 0;
+    if(Trava1 == false){
+      if ((millis() - Tempo_do_led) >= 5000) {.
+        digitalWrite(led, LOW);
+        acendeu = 0;
+      }
     }
   }
-
 }
 
 //----------------------------------------------------------------------------------
