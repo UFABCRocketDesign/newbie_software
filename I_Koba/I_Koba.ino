@@ -4,12 +4,13 @@
 
 //#define IGN_1 36  /*act1*/
 //#define IGN_2 61  /*act2*/
-//#define IGN_3 46  /*act3*/
+//#define IGN_3 46  /*act3*/ 
 //#define IGN_4 55  /*act4*/
 
 #define chipSelect 53
 #define led_piloto 36
 #define led_secundario 61
+#define led_final 13
 
 #define pmt 20 // intervalo de valores usados na para media movel
 #define nf 3  // Numero de filtros 
@@ -24,6 +25,7 @@ int numero_do_SD;  //contem o numero que vai seguir o nome do sd
 int qnt_zero;  //quantidade de zeros que será adicionado no nome do sd
 int acendeu_piloto;  // contem o estado do led piloto, 1 para acesso e 0 para apagado
 int acendeu_secundario;  // contem o estado do led secundario, 1 para acesso e 0 para apagado
+int acendeu_final; // contem o estado do led final, 1 para acesso e 0 para apagado
 int var_queda;  // contem o estado do foguete, 1 para subindo e 0 para queda
 
 float z;
@@ -34,6 +36,7 @@ float sinalzin[ncp]; // contem os dados usados para comparar a altura
 
 unsigned long Time_do_apogeu = 0;
 unsigned long Time_secundario = 0;
+unsigned long Time_final = 0;
 
 String Dados_string = ""; // irá conter os dados dos sinais em string 
 String nome_SD; //primeiro nome do sd
@@ -42,14 +45,21 @@ String complemento_SD;  // contem o numero do sd em string
 String Projeto_name; //Nome compketo do SD
 String zeros;
 
+bool Trava_apogeu = true; //trava usado para o led piloto
 bool Trava_piloto = true; //trava usado para o led piloto
 bool Trava_secundario = true; //trava usado para o led secundario
+bool Trava_final = true; //trava usado para o led secundario
 
 //----------------------------------------------------------------------------------
 void setup() {
   pinMode(led_piloto, OUTPUT);
-  Serial.begin(115200);
   digitalWrite(led_piloto, LOW);
+  pinMode(led_secundario, OUTPUT);
+  digitalWrite(led_secundario, LOW);
+  pinMode(led_final, OUTPUT);
+  digitalWrite(led_final, LOW);
+  
+  Serial.begin(115200);
 
   if (!bmp.begin()){Serial.println("Could not find a valid BMP085 sensor, check wiring!");}
   if (!SD.begin(chipSelect)){Serial.println("Card failed, or not present");}
@@ -104,6 +114,7 @@ void loop() {
   Detec_queda();
   Led_para_queda_piloto();
   Led_para_queda_secundario();
+  Led_para_queda_final();
   Salvar();
 
   Serial.print(Dados_string);
@@ -144,6 +155,11 @@ void Detec_queda() {
     var_queda = 1;
   }else{
     var_queda = 0;
+    // define o a hora do ainicio do apogeu
+    if(Trava_apogeu == true){
+      Time_do_apogeu = millis();
+      Trava_apogeu = false;
+    }
   }
 }
 //----------------------------------------------------------------------------------
@@ -151,7 +167,6 @@ void Led_para_queda_piloto() {
    if (var_queda == 0){
     if(Trava_piloto == true){
       digitalWrite(led_piloto, HIGH);
-      Time_do_apogeu = millis();
       acendeu_piloto = 1;
       Trava_piloto = false;
     }
@@ -185,7 +200,26 @@ void Led_para_queda_secundario() {
 }
 
 //----------------------------------------------------------------------------------
+void Led_para_queda_final() {
+  if (var_queda == 0){
+    if(sinal[nf] <= 400){
+      if(Trava_final == false){
+         digitalWrite(led_final, HIGH);
+         Time_final = millis();
+         acendeu_final = 1;
+         Trava_final = false;
+       }
+       if(Trava_final == false){
+         if((millis() - Time_final) >= intervalo) {
+           digitalWrite(led_final, LOW);
+           acendeu_final = 0;
+        }
+      }
+    }
+  }
+}
 
+//----------------------------------------------------------------------------------
 void Salvar(){
   Dados_string = "";
   for (int y = 0; y < nf+1; y++) {
@@ -197,6 +231,8 @@ void Salvar(){
   Dados_string += String(acendeu_piloto);
   Dados_string += "\t";
   Dados_string += String(acendeu_secundario);
+  Dados_string += "\t";
+  Dados_string += String(acendeu_final);
   File dataFile = SD.open(Projeto_name, FILE_WRITE);
   if(dataFile){
      dataFile.println(Dados_string);
