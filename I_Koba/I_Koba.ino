@@ -203,7 +203,7 @@ void Led_para_queda_secundario() {
 void Led_para_queda_final() {
   if (var_queda == 0){
     if(sinal[nf] <= 400){
-      if(Trava_final == false){
+      if(Trava_final == true){
          digitalWrite(led_final, HIGH);
          Time_final = millis();
          acendeu_final = 1;
