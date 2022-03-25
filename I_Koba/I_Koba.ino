@@ -11,6 +11,7 @@ L3G giroscopio;
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 
+
 //#define IGN_1 36  /*act1*/
 //#define IGN_2 61  /*act2*/
 //#define IGN_3 46  /*act3*/ 
@@ -42,6 +43,7 @@ float ref_chao; // constante que será usada para referenciar o chão
 float vetor[nf][pmt]; // movimentaçãop dos filtros de sinal de alrura 
 float sinal[nf+1];   // irá conter todos sinais relacionado a altura  
 float sinalzin[ncp]; // contem os dados usados para comparar a altura 
+float tempo_atual;
 
 unsigned long Time_do_apogeu = 0;
 unsigned long Time_secundario = 0;
@@ -119,6 +121,7 @@ void setup() {
   dataFile.print("Sensormag em X(uT):\t");
   dataFile.print("Sensormag em Y(uT):\t");
   dataFile.print("Sensormag em Z(uT):\t");
+  dataFile.print("Tempo atual(s):\t");
   dataFile.print("Constante que referencia o chão = ");
   dataFile.println(String(ref_chao));
   dataFile.close();
@@ -139,6 +142,7 @@ void loop() {
   // Serial.print("\t");
 
   sinal[0] = bmp.readAltitude() - ref_chao;
+  tempo_atual = millis();
   
   Filtros();
   Detec_queda();
@@ -204,7 +208,7 @@ void Led_para_queda_piloto() {
       Trava_piloto = false;
     }
     if(Trava_piloto == false){
-      if ((millis() - Time_do_apogeu) >= intervalo) {
+      if ((tempo_atual - Time_do_apogeu) >= intervalo) {
         digitalWrite(led_piloto, LOW);
         acendeu_piloto = 0;
       }
@@ -216,7 +220,7 @@ void Led_para_queda_piloto() {
 void Led_para_queda_secundario() {
   if (var_queda == 0){
     if(Trava_secundario == true){
-      if ((millis() - Time_do_apogeu) >= intervalo){
+      if ((tempo_atual - Time_do_apogeu) >= intervalo){
         digitalWrite(led_secundario, HIGH);
         Time_secundario = millis();
         acendeu_secundario = 1;
@@ -224,7 +228,7 @@ void Led_para_queda_secundario() {
       }
     }
     if(Trava_secundario == false){
-      if ((millis() - Time_secundario) >= intervalo) {
+      if ((tempo_atual - Time_secundario) >= intervalo) {
         digitalWrite(led_secundario, LOW);
         acendeu_secundario = 0;
       }
@@ -243,7 +247,7 @@ void Led_para_queda_final() {
          Trava_final = false;
        }
        if(Trava_final == false){
-         if((millis() - Time_final) >= intervalo) {
+         if((tempo_atual - Time_final) >= intervalo) {
            digitalWrite(led_final, LOW);
            acendeu_final = 0;
         }
@@ -311,6 +315,9 @@ void Salvar(){
   Dados_string += String(estado_acelerometro);
   Dados_string += "\t";
   Dados_string += String(estado_sensormag);
+  Dados_string += "\t";
+  tempo_atual = tempo_atual/100; 
+  Dados_string += String(tempo_atual);
   File dataFile = SD.open(Projeto_name, FILE_WRITE);
   if(dataFile){
      dataFile.println(Dados_string);
