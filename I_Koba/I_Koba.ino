@@ -1,6 +1,15 @@
+#include <Adafruit_Sensor.h>
 #include <Adafruit_BMP085.h>
+#include <Adafruit_ADXL345_U.h>
+#include <Adafruit_HMC5883_U.h>
 #include <SPI.h>
 #include <SD.h>
+#include <Wire.h>
+#include <L3G.h>
+L3G giroscopio;
+
+Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
+Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 
 //#define IGN_1 36  /*act1*/
 //#define IGN_2 61  /*act2*/
@@ -44,6 +53,9 @@ String txt_SD;
 String complemento_SD;  // contem o numero do sd em string
 String Projeto_name; //Nome compketo do SD
 String zeros;
+String estado_giroscopio;
+String estado_acelerometro;
+String estado_sensormag;
 
 bool Trava_apogeu = true; //trava usado para o led piloto
 bool Trava_piloto = true; //trava usado para o led piloto
@@ -60,9 +72,17 @@ void setup() {
   digitalWrite(led_final, LOW);
   
   Serial.begin(115200);
+  Wire.begin();
 
   if (!bmp.begin()){Serial.println("Could not find a valid BMP085 sensor, check wiring!");}
   if (!SD.begin(chipSelect)){Serial.println("Card failed, or not present");}
+  if (!giroscopio.init()){Serial.println("Failed to autodetect gyro type!");}
+  if(!accel.begin()){Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");}
+  if(!mag.begin()){Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");}
+
+  giroscopio.enableDefault();
+
+  accel.setRange(ADXL345_RANGE_16_G);
 
   // calcula a media dos dados para referenciar a altura
   call_chao(); 
@@ -85,11 +105,21 @@ void setup() {
   Serial.println(Projeto_name);
   
   File dataFile = SD.open(Projeto_name, FILE_WRITE);
-  dataFile.print("Alt(m)\t");
-  dataFile.print("detecção de queda\t");
-  dataFile.print("estado do led piloto\t");
-  dataFile.print("estado do led piloto\t");
-  dataFile.print("constante que referencia o chão = ");
+  dataFile.print("Alt(m):\t");
+  dataFile.print("Detecção de queda:\t");
+  dataFile.print("Estado do led piloto:\t");
+  dataFile.print("Estado do led secundario:\t");
+  dataFile.print("Estado do led Final:\t");
+  dataFile.print("Giroscopio em X:\t");
+  dataFile.print("Giroscopio em Y:\t");
+  dataFile.print("Giroscopio em Z:\t");
+  dataFile.print("Acelerometro em X(m/s^2):\t");
+  dataFile.print("Acelerometro em Y(m/s^2):\t");
+  dataFile.print("Acelerometro em Z(m/s^2):\t");
+  dataFile.print("Sensormag em X(uT):\t");
+  dataFile.print("Sensormag em Y(uT):\t");
+  dataFile.print("Sensormag em Z(uT):\t");
+  dataFile.print("Constante que referencia o chão = ");
   dataFile.println(String(ref_chao));
   dataFile.close();
    
@@ -115,6 +145,9 @@ void loop() {
   Led_para_queda_piloto();
   Led_para_queda_secundario();
   Led_para_queda_final();
+  Giroscopio();
+  Acelerometro();
+  Magsensor();
   Salvar();
 
   Serial.print(Dados_string);
@@ -220,12 +253,51 @@ void Led_para_queda_final() {
 }
 
 //----------------------------------------------------------------------------------
+void Giroscopio(){
+  giroscopio.read();
+  estado_giroscopio = "";
+  estado_giroscopio += giroscopio.g.x;
+  estado_giroscopio += "\t";
+  estado_giroscopio += giroscopio.g.y;
+  estado_giroscopio += "\t";
+  estado_giroscopio += giroscopio.g.z;
+}
+
+//----------------------------------------------------------------------------------
+void Acelerometro(){
+  sensors_event_t event; 
+  accel.getEvent(&event);
+  estado_acelerometro = "";
+  estado_acelerometro += String(event.acceleration.x);
+  estado_acelerometro += "\t";
+  estado_acelerometro += String(event.acceleration.y);
+  estado_acelerometro += "\t";
+  estado_acelerometro += String(event.acceleration.z);
+}
+
+//----------------------------------------------------------------------------------
+void Magsensor(){
+  sensors_event_t event; 
+  mag.getEvent(&event);
+ 
+  estado_sensormag = "";
+  estado_sensormag += String(event.magnetic.x);
+  estado_sensormag += "\t";
+  estado_sensormag += String(event.magnetic.y);
+  estado_sensormag += "\t";
+  estado_sensormag += String(event.magnetic.z);
+}
+
+//----------------------------------------------------------------------------------
+
 void Salvar(){
   Dados_string = "";
-  for (int y = 0; y < nf+1; y++) {
-    Dados_string += String(sinal[y]);
-    Dados_string += "\t";
-  }
+//  for (int y = 0; y < nf+1; y++) {
+//    Dados_string += String(sinal[y]);
+//    Dados_string += "\t";
+//  }
+  Dados_string += String(sinal[nf]);
+  Dados_string += "\t";
   Dados_string += String(var_queda);
   Dados_string += "\t";
   Dados_string += String(acendeu_piloto);
@@ -233,6 +305,12 @@ void Salvar(){
   Dados_string += String(acendeu_secundario);
   Dados_string += "\t";
   Dados_string += String(acendeu_final);
+  Dados_string += "\t";
+  Dados_string += String(estado_giroscopio);
+  Dados_string += "\t";
+  Dados_string += String(estado_acelerometro);
+  Dados_string += "\t";
+  Dados_string += String(estado_sensormag);
   File dataFile = SD.open(Projeto_name, FILE_WRITE);
   if(dataFile){
      dataFile.println(Dados_string);
