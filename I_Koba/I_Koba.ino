@@ -194,7 +194,7 @@ void Detec_queda() {
     var_queda = 0;
     // define o a hora do ainicio do apogeu
     if(Trava_apogeu == true){
-      Time_do_apogeu = millis();
+      Time_do_apogeu = tempo_atual;
       Trava_apogeu = false;
     }
   }
@@ -222,7 +222,7 @@ void Led_para_queda_secundario() {
     if(Trava_secundario == true){
       if ((tempo_atual - Time_do_apogeu) >= intervalo){
         digitalWrite(led_secundario, HIGH);
-        Time_secundario = millis();
+        Time_secundario = tempo_atual;
         acendeu_secundario = 1;
         Trava_secundario = false;
       }
@@ -242,7 +242,7 @@ void Led_para_queda_final() {
     if(sinal[nf] <= 400){
       if(Trava_final == true){
          digitalWrite(led_final, HIGH);
-         Time_final = millis();
+         Time_final = tempo_atual;
          acendeu_final = 1;
          Trava_final = false;
        }
@@ -300,8 +300,7 @@ void Salvar(){
 //    Dados_string += String(sinal[y]);
 //    Dados_string += "\t";
 //  }
-  tempo_atual = tempo_atual/100; 
-  Dados_string += String(tempo_atual);
+  Dados_string += String(tempo_atual/100);
   Dados_string += "\t";
   Dados_string += String(sinal[nf]);
   Dados_string += "\t";
