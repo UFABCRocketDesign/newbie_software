@@ -300,7 +300,7 @@ void Salvar(){
 //    Dados_string += String(sinal[y]);
 //    Dados_string += "\t";
 //  }
-  Dados_string += String(tempo_atual/100);
+  Dados_string += String(tempo_atual/1000);
   Dados_string += "\t";
   Dados_string += String(sinal[nf]);
   Dados_string += "\t";
