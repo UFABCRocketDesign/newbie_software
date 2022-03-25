@@ -107,6 +107,7 @@ void setup() {
   Serial.println(Projeto_name);
   
   File dataFile = SD.open(Projeto_name, FILE_WRITE);
+  dataFile.print("Tempo atual(s):\t");
   dataFile.print("Alt(m):\t");
   dataFile.print("Detecção de queda:\t");
   dataFile.print("Estado do led piloto:\t");
@@ -121,7 +122,6 @@ void setup() {
   dataFile.print("Sensormag em X(uT):\t");
   dataFile.print("Sensormag em Y(uT):\t");
   dataFile.print("Sensormag em Z(uT):\t");
-  dataFile.print("Tempo atual(s):\t");
   dataFile.print("Constante que referencia o chão = ");
   dataFile.println(String(ref_chao));
   dataFile.close();
@@ -300,6 +300,9 @@ void Salvar(){
 //    Dados_string += String(sinal[y]);
 //    Dados_string += "\t";
 //  }
+  tempo_atual = tempo_atual/100; 
+  Dados_string += String(tempo_atual);
+  Dados_string += "\t";
   Dados_string += String(sinal[nf]);
   Dados_string += "\t";
   Dados_string += String(var_queda);
@@ -315,9 +318,6 @@ void Salvar(){
   Dados_string += String(estado_acelerometro);
   Dados_string += "\t";
   Dados_string += String(estado_sensormag);
-  Dados_string += "\t";
-  tempo_atual = tempo_atual/100; 
-  Dados_string += String(tempo_atual);
   File dataFile = SD.open(Projeto_name, FILE_WRITE);
   if(dataFile){
      dataFile.println(Dados_string);
