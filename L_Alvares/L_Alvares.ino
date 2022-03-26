@@ -7,6 +7,10 @@ Adafruit_BMP085 bmp;
 #define IGN_3 46  /*act3*/
 #define IGN_4 55  /*act4*/
 
+#define Tempo1 6000
+#define AtivarLED2 3000
+#define Tempo2 5000
+
 float ALT = 0.0;
 float i = 0.0;
 float Med = 0.0;
@@ -208,7 +212,7 @@ void loop()
     }
     else
     {
-      if (TAtual - T1Ant >= 8000) //apos X seg, o Led 1 apaga
+      if (TAtual - T1Ant >= Tempo1) //apos X seg, o Led 1 apaga
       {
         LED1ST = LOW;
       }
@@ -218,7 +222,7 @@ void loop()
     digitalWrite(PLED1, LED1ST);
   }
 
-  if (TAtual >= 3000)
+  if (TAtual >= AtivarLED2)
   {
     if (LK2 == false) //se a trava estiver desativada
     {
@@ -235,7 +239,7 @@ void loop()
     }
     else
     {
-      if (TAtual - T2Ant >= 5000)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
+      if (TAtual - T2Ant >= Tempo2)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
       {
         LED2ST = LOW;
       }
