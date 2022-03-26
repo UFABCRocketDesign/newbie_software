@@ -30,21 +30,27 @@ String Nome = "LAQ";
 int ValorA = 0;
 int NC = 0;
 
-const int PLED = LED_BUILTIN;
-int LEDST = LOW;
-unsigned long TAnt = 0;
-const long int1 = 1000;
-boolean LK = false;
 int Q = 0;
+const int PLED1 = LED_BUILTIN;
+int LED1ST = LOW;
+unsigned long T1Ant = 0;
+const long int1 = 1000;
+boolean LK1 = false;
+boolean T2 = false;
 
+
+const int PLED2 = IGN_1;
+int LED2ST = LOW;
+boolean LK2 = false;
 unsigned long T2Ant = 0;
 const long int2 = 1000;
-boolean T2 = false;
+
 
 
 void setup()
 {
-  pinMode(PLED, OUTPUT);
+  pinMode(PLED1, OUTPUT);
+  pinMode(PLED2, OUTPUT);
   Serial.begin(115200);
 
   //ligando bmp
@@ -131,7 +137,7 @@ void setup()
 void loop()
 {
   String dataString = "";
-  unsigned long TAtual = millis();
+  unsigned long T1Atual = millis();
   unsigned long T2Atual = millis();
 
   //Calculos filtro 1
@@ -187,50 +193,62 @@ void loop()
     dataString += "\t";
   }
 
-  //Timer de aviso de queda
+  Ap1 = SF2;
 
+  //Timer de aviso de queda
   if (Q = 1) // se detectar a queda
   {
-    if (TAtual - TAnt >= int1)
+    if (LK1 == false) //se a trava estiver desativada
     {
-      TAnt = TAtual;
+      if (T1Atual - T1Ant >= int1) //se o Atual-Anterior > 1 seg, o led liga
+      {
+        T1Ant = T1Atual;
+        LED1ST = HIGH;
+      }
+      else
+      {
+        LED1ST = LOW;
+      }
+      LK1 = true;
     }
-    if (TAtual - TAnt >= 3000) //apos X seg, o timer está completo e a rotina do led pode ser iniciada
+    else
     {
-      T2 = true;
+      if (T1Atual - T1Ant >= 8000) //apos X seg, o Led 1 apaga
+      {
+        LED1ST = LOW;
+      }
     }
+    T2 = true;
+    digitalWrite(PLED1, LED1ST);
   }
 
   if (T2 == true) // se o primeiro timer rodou
   {
-    if (LK == false) //se a trava estiver desativada
+    if (LK2 == false) //se a trava estiver desativada
     {
       if (T2Atual - T2Ant >= int2) //se o Atual-Anterior > 1 seg, o led liga
       {
         T2Ant = T2Atual;
-        LEDST = HIGH;
+        LED2ST = HIGH;
       }
       else
       {
-        LEDST = LOW;
+        LED2ST = LOW;
       }
-      LK = true;
+      LK2 = true;
     }
     else
     {
-      if (T2Atual - T2Ant >= 6000)// Caso a trava esteja ativada, Apos X tempo, desligar o led
+      if (T2Atual - T2Ant >= 5000)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
       {
-        LEDST = LOW;
+        LED2ST = LOW;
       }
     }
-
-    //dataString += String(TAtual);
+    //dataString += String(LED2ST);
     //dataString += "\t";
-    //dataString += String(LEDST);
-    //dataString += "\t";
-    digitalWrite(PLED, LEDST);
+    digitalWrite(PLED2, LED2ST);
   }
-  Ap1 = SF2 ;
+
 
   //Cartão SD
   Serial.println(dataString);
