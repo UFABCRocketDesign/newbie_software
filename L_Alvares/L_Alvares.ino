@@ -33,10 +33,13 @@ int NC = 0;
 const int PLED = LED_BUILTIN;
 int LEDST = LOW;
 unsigned long TAnt = 0;
-const long intervalo = 1000;
+const long int1 = 1000;
 boolean LK = false;
 int Q = 0;
 
+unsigned long T2Ant = 0;
+const long int2 = 1000;
+boolean T2 = false;
 
 
 void setup()
@@ -64,7 +67,7 @@ void setup()
   }
   Serial.println("Card initialized.");
 
-  //Cabeçalho
+  //Cabeçalho e formatação do nome do arquivo
   String StringC = "";
   StringC += "Temperatura(°C)";
   StringC += "\t";
@@ -129,6 +132,7 @@ void loop()
 {
   String dataString = "";
   unsigned long TAtual = millis();
+  unsigned long T2Atual = millis();
 
   //Calculos filtro 1
   ALT = (bmp.readAltitude() - M);
@@ -183,13 +187,27 @@ void loop()
     dataString += "\t";
   }
 
-  if (Q == 1) // se detectar a queda (alterar condição, apenas para salvar o progresso)
+  //Timer de aviso de queda
+
+  if (Q = 1) // se detectar a queda
   {
-    if (LK == false) //se a trava estiver ativada
+    if (TAtual - TAnt >= int1)
     {
-      if (TAtual - TAnt >= intervalo) //se o Atual-Anterior > 1 seg, o led liga
+      TAnt = TAtual;
+    }
+    if (TAtual - TAnt >= 3000) //apos X seg, o timer está completo e a rotina do led pode ser iniciada
+    {
+      T2 = true;
+    }
+  }
+
+  if (T2 == true) // se o primeiro timer rodou
+  {
+    if (LK == false) //se a trava estiver desativada
+    {
+      if (T2Atual - T2Ant >= int2) //se o Atual-Anterior > 1 seg, o led liga
       {
-        TAnt = TAtual;
+        T2Ant = T2Atual;
         LEDST = HIGH;
       }
       else
@@ -200,15 +218,16 @@ void loop()
     }
     else
     {
-      if (TAtual - TAnt >= 6000)// Caso a trava esteja desativada, Apos X tempo, desligar o led
+      if (T2Atual - T2Ant >= 6000)// Caso a trava esteja ativada, Apos X tempo, desligar o led
       {
         LEDST = LOW;
       }
     }
-    dataString += String(TAtual);
-    dataString += "\t";
-    dataString += String(LEDST);
-    dataString += "\t";
+
+    //dataString += String(TAtual);
+    //dataString += "\t";
+    //dataString += String(LEDST);
+    //dataString += "\t";
     digitalWrite(PLED, LEDST);
   }
   Ap1 = SF2 ;
