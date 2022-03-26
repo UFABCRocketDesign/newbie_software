@@ -191,7 +191,7 @@ void loop()
   }
 
   //Timer de aviso de queda
-  if (T1 = 1) // se detectar a queda
+  if (T1 == 1) // se detectar a queda
   {
     if (LK1 == false) //se a trava estiver desativada
     {
