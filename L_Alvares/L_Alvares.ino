@@ -190,8 +190,6 @@ void loop()
     dataString += "\t";
   }
 
-  Ap1 = SF2;
-
   //Timer de aviso de queda
   if (T1 = 1) // se detectar a queda
   {
@@ -247,6 +245,7 @@ void loop()
     digitalWrite(PLED2, LED2ST);
   }
 
+Ap1 = SF2;
 
   //Cartão SD
   Serial.println(dataString);
