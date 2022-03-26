@@ -10,12 +10,15 @@ L3G giroscopio;
 
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
-
+Adafruit_BMP085 bmp;
 
 //#define IGN_1 36  /*act1*/
 //#define IGN_2 61  /*act2*/
 //#define IGN_3 46  /*act3*/ 
 //#define IGN_4 55  /*act4*/
+
+#define Existencia_SD 1 
+#define Existencia_Giroscopio 1
 
 #define chipSelect 53
 #define led_piloto 36
@@ -26,13 +29,21 @@ Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 #define nf 3  // Numero de filtros 
 #define ncp 4  // intervalo de comparação para queda e suibida
 
-#define intervalo 5000
+#define intervalo 5000 // intervalo de tempo para acionamento dos paraquedas
+
+
+#if Existencia_SD
+ int numero_do_SD;  //contem o numero que vai seguir o nome do sd
+ int qnt_zero;  //quantidade de zeros que será adicionado no nome do sd
+ String nome_SD; //primeiro nome do sd
+ String txt_SD;
+ String zeros;
+ String Projeto_name; //Nome compketo do SD
+ String complemento_SD;  // contem o numero do sd em string
+#endif
 
 
 
-Adafruit_BMP085 bmp;
-int numero_do_SD;  //contem o numero que vai seguir o nome do sd
-int qnt_zero;  //quantidade de zeros que será adicionado no nome do sd
 int acendeu_piloto;  // contem o estado do led piloto, 1 para acesso e 0 para apagado
 int acendeu_secundario;  // contem o estado do led secundario, 1 para acesso e 0 para apagado
 int acendeu_final; // contem o estado do led final, 1 para acesso e 0 para apagado
@@ -50,11 +61,6 @@ unsigned long Time_secundario = 0;
 unsigned long Time_final = 0;
 
 String Dados_string = ""; // irá conter os dados dos sinais em string 
-String nome_SD; //primeiro nome do sd
-String txt_SD; 
-String complemento_SD;  // contem o numero do sd em string
-String Projeto_name; //Nome compketo do SD
-String zeros;
 String estado_giroscopio;
 String estado_acelerometro;
 String estado_sensormag;
@@ -77,7 +83,6 @@ void setup() {
   Wire.begin();
 
   if (!bmp.begin()){Serial.println("Could not find a valid BMP085 sensor, check wiring!");}
-  if (!SD.begin(chipSelect)){Serial.println("Card failed, or not present");}
   if (!giroscopio.init()){Serial.println("Failed to autodetect gyro type!");}
   if(!accel.begin()){Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");}
   if(!mag.begin()){Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");}
@@ -88,43 +93,47 @@ void setup() {
 
   // calcula a media dos dados para referenciar a altura
   call_chao(); 
-  
+
+   
   // laço para determinar o nome do SD
-  numero_do_SD = 0;
-  nome_SD = "Kob_";
-  txt_SD = ".txt";
-  do{
-    zeros = "";
-    Projeto_name = "";
-    complemento_SD = String(numero_do_SD);
-    qnt_zero = 8 - nome_SD.length() - complemento_SD.length();
-    for (int i = 0; i < qnt_zero; i++) {
-      zeros += "0";  
-    }
-     Projeto_name = nome_SD + zeros + complemento_SD + txt_SD;
-     numero_do_SD ++;
-  }while(SD.exists(Projeto_name));
-  Serial.println(Projeto_name);
+  #if Existencia_SD
+   if (!SD.begin(chipSelect)){Serial.println("Card failed, or not present");}
+   numero_do_SD = 0;
+   nome_SD = "Kob_";
+   txt_SD = ".txt";
+   do{
+     zeros = "";
+     Projeto_name = "";
+     complemento_SD = String(numero_do_SD);
+     qnt_zero = 8 - nome_SD.length() - complemento_SD.length();
+     for (int i = 0; i < qnt_zero; i++) {
+       zeros += "0";  
+     }
+      Projeto_name = nome_SD + zeros + complemento_SD + txt_SD;
+      numero_do_SD ++;
+   }while(SD.exists(Projeto_name));
+   Serial.println(Projeto_name);
   
-  File dataFile = SD.open(Projeto_name, FILE_WRITE);
-  dataFile.print("Tempo atual(s):\t");
-  dataFile.print("Alt(m):\t");
-  dataFile.print("Detecção de queda:\t");
-  dataFile.print("Estado do led piloto:\t");
-  dataFile.print("Estado do led secundario:\t");
-  dataFile.print("Estado do led Final:\t");
-  dataFile.print("Giroscopio em X:\t");
-  dataFile.print("Giroscopio em Y:\t");
-  dataFile.print("Giroscopio em Z:\t");
-  dataFile.print("Acelerometro em X(m/s^2):\t");
-  dataFile.print("Acelerometro em Y(m/s^2):\t");
-  dataFile.print("Acelerometro em Z(m/s^2):\t");
-  dataFile.print("Sensormag em X(uT):\t");
-  dataFile.print("Sensormag em Y(uT):\t");
-  dataFile.print("Sensormag em Z(uT):\t");
-  dataFile.print("Constante que referencia o chão = ");
-  dataFile.println(String(ref_chao));
-  dataFile.close();
+   File dataFile = SD.open(Projeto_name, FILE_WRITE);
+   dataFile.print("Tempo atual(s):\t");
+   dataFile.print("Alt(m):\t");
+   dataFile.print("Detecção de queda:\t");
+   dataFile.print("Estado do led piloto:\t");
+   dataFile.print("Estado do led secundario:\t");
+   dataFile.print("Estado do led Final:\t");
+   dataFile.print("Giroscopio em X:\t");
+   dataFile.print("Giroscopio em Y:\t");
+   dataFile.print("Giroscopio em Z:\t");
+   dataFile.print("Acelerometro em X(m/s^2):\t");
+   dataFile.print("Acelerometro em Y(m/s^2):\t");
+   dataFile.print("Acelerometro em Z(m/s^2):\t");
+   dataFile.print("Sensormag em X(uT):\t");
+   dataFile.print("Sensormag em Y(uT):\t");
+   dataFile.print("Sensormag em Z(uT):\t");
+   dataFile.print("Constante que referencia o chão = ");
+   dataFile.println(String(ref_chao));
+   dataFile.close();
+  #endif
    
   Serial.print("Temp (*C)\t");
   Serial.print("Pres (Pa)\t");
@@ -155,7 +164,6 @@ void loop() {
   Salvar();
 
   Serial.print(Dados_string);
-  Serial.print("\t");
   Serial.println();
 }
 
@@ -317,13 +325,15 @@ void Salvar(){
   Dados_string += String(estado_acelerometro);
   Dados_string += "\t";
   Dados_string += String(estado_sensormag);
-  File dataFile = SD.open(Projeto_name, FILE_WRITE);
-  if(dataFile){
-     dataFile.println(Dados_string);
-     dataFile.close();
-  }else {
-    Serial.println("Erro ao abrir o SD");
-  } 
+  #if Existencia_SD 
+   File dataFile = SD.open(Projeto_name, FILE_WRITE);
+   if(dataFile){
+      dataFile.println(Dados_string);
+      dataFile.close();
+   }else {
+     Serial.println("Erro ao abrir o SD");
+   } 
+  #endif
 }
 
 //----------------------------------------------------------------------------------
