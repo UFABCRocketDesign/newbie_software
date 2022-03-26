@@ -30,14 +30,12 @@ String Nome = "LAQ";
 int ValorA = 0;
 int NC = 0;
 
-int Q = 0;
+int T1 = 0;
 const int PLED1 = LED_BUILTIN;
 int LED1ST = LOW;
 unsigned long T1Ant = 0;
 const long int1 = 1000;
 boolean LK1 = false;
-boolean T2 = false;
-
 
 const int PLED2 = IGN_1;
 int LED2ST = LOW;
@@ -137,8 +135,7 @@ void setup()
 void loop()
 {
   String dataString = "";
-  unsigned long T1Atual = millis();
-  unsigned long T2Atual = millis();
+  unsigned long TAtual = millis();
 
   //Calculos filtro 1
   ALT = (bmp.readAltitude() - M);
@@ -183,7 +180,7 @@ void loop()
 
   if (Queda >= 11)
   {
-    Q = 1;
+    T1 = 1;
     dataString += String("1");
     dataString += "\t";
   }
@@ -196,13 +193,13 @@ void loop()
   Ap1 = SF2;
 
   //Timer de aviso de queda
-  if (Q = 1) // se detectar a queda
+  if (T1 = 1) // se detectar a queda
   {
     if (LK1 == false) //se a trava estiver desativada
     {
-      if (T1Atual - T1Ant >= int1) //se o Atual-Anterior > 1 seg, o led liga
+      if (TAtual - T1Ant >= int1) //se o Atual-Anterior > 1 seg, o led liga
       {
-        T1Ant = T1Atual;
+        T1Ant = TAtual;
         LED1ST = HIGH;
       }
       else
@@ -213,22 +210,23 @@ void loop()
     }
     else
     {
-      if (T1Atual - T1Ant >= 8000) //apos X seg, o Led 1 apaga
+      if (TAtual - T1Ant >= 8000) //apos X seg, o Led 1 apaga
       {
         LED1ST = LOW;
       }
     }
-    T2 = true;
+    dataString += String(LED1ST);
+    dataString += "\t";
     digitalWrite(PLED1, LED1ST);
   }
 
-  if (T2 == true) // se o primeiro timer rodou
+  if (TAtual >= 3000)
   {
     if (LK2 == false) //se a trava estiver desativada
     {
-      if (T2Atual - T2Ant >= int2) //se o Atual-Anterior > 1 seg, o led liga
+      if (TAtual - T2Ant >= int2) //se o Atual-Anterior > 1 seg, o led liga
       {
-        T2Ant = T2Atual;
+        T2Ant = TAtual;
         LED2ST = HIGH;
       }
       else
@@ -239,13 +237,13 @@ void loop()
     }
     else
     {
-      if (T2Atual - T2Ant >= 5000)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
+      if (TAtual - T2Ant >= 5000)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
       {
         LED2ST = LOW;
       }
     }
-    //dataString += String(LED2ST);
-    //dataString += "\t";
+    dataString += String(LED2ST);
+    dataString += "\t";
     digitalWrite(PLED2, LED2ST);
   }
 
