@@ -18,12 +18,14 @@ Adafruit_BMP085 bmp;
 //#define IGN_4 55  /*act4*/
 
 #define EXIST_SD 0 
-#define EXIST_GIRO 1
+#define EXIST_GIRO 0
 #define EXIST_ACEl 0
 #define EXIST_MAG 0
 #define EXIST_IGN_1 1
 #define EXIST_IGN_2 1
 #define EXIST_IGN_3 1
+#define EXIST_TEMPO 0
+#define EXIST_ALTURA 0
 
 #define chipSelect 53
 #define led_piloto 36
@@ -131,11 +133,15 @@ void setup() {
   call_chao(); 
 
    dados_string = "";
-   dados_string += "Tempo atual(s):\t";
-   dados_string += "Alt(m):\t";
-   dados_string += "Detecção de queda:\t";
+   #if EXIST_TEMPO
+    dados_string += "Tempo atual(s):\t";
+   #endif
+   #if EXIST_ALTURA
+    dados_string += "Alt(m):\t";
+    dados_string += "Detecção de queda:\t";
+   #endif
    #if EXIST_IGN_1
-   dados_string += "Estado do led piloto:\t";
+    dados_string += "Estado do led piloto:\t";
    #endif
    #if EXIST_IGN_2
     dados_string +="Estado do led secundario:\t";
@@ -388,11 +394,15 @@ void Led_para_queda_piloto() {
 
 void Salvar(){
   dados_string = "";
-  dados_string += String(tempo_atual/1000);
-  dados_string += "\t";
-  dados_string += String(sinal[nf]);
-  dados_string += "\t";
-  dados_string += String(var_queda);
+  #if EXIST_TEMPO
+   dados_string += String(tempo_atual/1000);
+  #endif
+  #if EXIST_ALTURA
+   dados_string += "\t";  
+   dados_string += String(sinal[nf]);
+   dados_string += "\t";
+   dados_string += String(var_queda);
+  #endif
   #if EXIST_IGN_1
    dados_string += "\t";
    dados_string += String(acendeu_piloto);
