@@ -17,12 +17,13 @@ Adafruit_BMP085 bmp;
 //#define IGN_3 46  /*act3*/ 
 //#define IGN_4 55  /*act4*/
 
-#define EXIST_SD 1 
+#define EXIST_SD 0 
 #define EXIST_GIRO 1
 #define EXIST_ACEl 0
-#define EXIST_MAG 1
+#define EXIST_MAG 0
 #define EXIST_IGN_1 1
 #define EXIST_IGN_2 1
+#define EXIST_IGN_3 1
 
 #define chipSelect 53
 #define led_piloto 36
