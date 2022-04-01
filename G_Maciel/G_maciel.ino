@@ -104,17 +104,15 @@ float filtro_altura(float entrada, int i)
 /////// FUNÇÃO: DETECTAR APOGEU /////////
 
 #if use_apogeu
-float func_detecta_apogeu(float altura_atual)
+bool func_detecta_apogeu(float altura_atual)
 {
   if (altura_atual < velhaAlt) {
     contagem_encontra_apogeu += 1;
-    if (contagem_encontra_apogeu >= 5) {
-      return true;
     }
-  }
   else {
     contagem_encontra_apogeu = 0;
   }
+  return (contagem_encontra_apogeu >= 5);
 }
 #endif
 
