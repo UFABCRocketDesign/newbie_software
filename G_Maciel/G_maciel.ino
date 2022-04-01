@@ -144,7 +144,8 @@ bool func_paraquedas_1()
   if (t_atual >= desliga_led1) {
     ledState1 = LOW;
   }
-  return ledState1;
+  digitalWrite(IGN_1, ledState1);
+  return (ledState1);
 }
 #endif
 
@@ -164,7 +165,8 @@ bool func_paraquedas_2()
   if (t_atual >= desliga_led2) {
     ledState2 = LOW;
   }
-  return (t_atual >= liga_led2 && laco_led_2 == true);
+  digitalWrite(IGN_2, ledState2);
+  return (ledState2);
 }
 #endif
 
@@ -512,7 +514,7 @@ void loop() {
   // LED 1
   bool ledState1 = func_paraquedas_1();
   if (ledState1 == true) { 
-    dataString += "Led !\t";
+    dataString += "Led 1!\t";
   }
   // LED 2
   bool ledState2 = func_paraquedas_2();
@@ -532,9 +534,7 @@ void loop() {
   if (t_atual >= desliga_led3) {
     ledState3 = LOW;
   }
-
-  digitalWrite(IGN_1, ledState1);
-  digitalWrite(IGN_2, ledState2);
+  
   digitalWrite(ledPin, ledState3);
 #endif // use_apogeu
 
