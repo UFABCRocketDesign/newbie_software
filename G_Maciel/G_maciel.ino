@@ -47,6 +47,8 @@ L3G gyro;
 #define IGN_4 55  /*act4*/
 #define ledPin LED_BUILTIN
 
+unsigned long t_atual; 
+
 #if (use_alt)
 float velhaAlt = 0.0;
 float altura_referencia = 0.0;
@@ -62,6 +64,7 @@ bool encontra_apogeu = false;
 bool apogeu_detectado = false;
 bool laco_led_2 = false;      // variavel para entrar no laço liga led 2
 bool laco_led_3 = false;      // variavel para entrar no laço liga led 3 (built in)
+
 bool ledState1 = LOW;    // ledState used to set the LED
 bool ledState2 = LOW;
 bool ledState3 = LOW;
@@ -112,7 +115,47 @@ bool func_detecta_apogeu(float altura_atual)
   else {
     contagem_encontra_apogeu = 0;
   }
+  velhaAlt = altura_atual;
   return (contagem_encontra_apogeu >= 15);
+}
+#endif
+
+/////////////////////////////////////////
+
+//////////FUNÇÃO: PARAQUEDAS 1////////////
+
+#if use_apogeu
+bool func_paraquedas_1()
+{
+  if (encontra_apogeu == true) {     ///// encontrou o apogeu
+    if (apogeu_detectado == false) {     //// a variavel ainda não foi atualizada
+      // LED 1
+      ledState1 = HIGH;                  //// paraquedas 1
+      desliga_led1 = t_atual + interv_desliga_led;
+      liga_led2 = t_atual + interv_liga_led2;
+      apogeu_detectado = true;           //// atualizou a variavel
+      laco_led_2 = true;
+      laco_led_3 = true;
+    }
+  }
+  return encontra_apogeu;
+}
+#endif
+
+///////////////////////////////////////////
+
+//////////FUNÇÃO: PARAQUEDAS 2////////////
+
+#if use_apogeu
+bool func_paraquedas_2()
+{
+  if (t_atual >= liga_led2 && laco_led_2 == true) {
+    // LED 2
+    ledState2 = HIGH;
+    desliga_led2 = t_atual + interv_desliga_led;
+    laco_led_2 = false;
+  }
+  return (t_atual >= liga_led2 && laco_led_2 == true);
 }
 #endif
 
@@ -291,7 +334,7 @@ void setup() {
 }
 
 void loop() {
-  unsigned long t_atual = millis();
+  t_atual = millis();
   float t_atual_segundos = t_atual / 1000.0;
   // make a string for assembling the data to log:
   String dataString = "";
@@ -454,27 +497,17 @@ void loop() {
 
 #if use_apogeu
   bool encontra_apogeu = func_detecta_apogeu(media_mov2);
-  if (encontra_apogeu == true) {
-    dataString += "Descendo.";
-    dataString += "\t";
-    if (apogeu_detectado == false) {
-      // LED 1
-      ledState1 = HIGH;
-      desliga_led1 = t_atual + interv_desliga_led;
-      liga_led2 = t_atual + interv_liga_led2;
-      apogeu_detectado = true;
-      laco_led_2 = true;
-      laco_led_3 = true;
-    }
+  // LED 1
+  bool led1 = func_paraquedas_1();
+  if (led1 == true) { 
+    dataString += "Descendo. Led 1\t";
   }
   // LED 2
-  if (t_atual >= liga_led2 && laco_led_2 == true) {
-    ledState2 = HIGH;
-    dataString += "Led 2!";
-    dataString += "\t";
-    desliga_led2 = t_atual + interv_desliga_led;
-    laco_led_2 = false;
+  bool led2 = func_paraquedas_2();
+  if (led2 == true) {
+    dataString += "Led 2\t";
   }
+  
   // LED 3
   if (media_mov2 <= h_paraquedas_2 && laco_led_3 == true) {
     ledState3 = HIGH;
@@ -515,8 +548,4 @@ void loop() {
   }
 #endif
 
-#if use_alt
-  // Reiniciando variável de velha altitude
-  velhaAlt = media_mov2;
-#endif
 }
