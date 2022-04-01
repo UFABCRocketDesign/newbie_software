@@ -108,17 +108,14 @@ float func_detecta_apogeu(float altura_atual)
 {
   if (altura_atual < velhaAlt) {
     contagem_encontra_apogeu += 1;
+    if (contagem_encontra_apogeu >= 5) {
+      return true;
   }
   else {
     contagem_encontra_apogeu = 0;
   }
-  if (contagem_encontra_apogeu >= 5) {
-    encontra_apogeu = true;
+  
   }
-  else {
-    encontra_apogeu = false;
-  }
-  return encontra_apogeu;
 }
 #endif
 
@@ -459,7 +456,7 @@ void loop() {
   // Encontrando o apogeu
 
 #if use_apogeu
-  float encontra_apogeu = func_detecta_apogeu(media_mov2);
+  bool encontra_apogeu = func_detecta_apogeu(media_mov2);
   if (encontra_apogeu = true) {
     dataString += "Descendo.";
     dataString += "\t";
