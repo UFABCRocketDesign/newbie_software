@@ -116,7 +116,10 @@ bool func_detecta_apogeu(float altura_atual)
     contagem_encontra_apogeu = 0;
   }
   velhaAlt = altura_atual;
-  return (contagem_encontra_apogeu >= 15);
+  if (contagem_encontra_apogeu >= 15) { 
+    encontra_apogeu = true;
+  }
+  return (encontra_apogeu);
 }
 #endif
 
@@ -138,7 +141,10 @@ bool func_paraquedas_1()
       laco_led_3 = true;
     }
   }
-  return encontra_apogeu;
+  if (t_atual >= desliga_led1) {
+    ledState1 = LOW;
+  }
+  return ledState1;
 }
 #endif
 
@@ -154,6 +160,9 @@ bool func_paraquedas_2()
     ledState2 = HIGH;
     desliga_led2 = t_atual + interv_desliga_led;
     laco_led_2 = false;
+  }
+  if (t_atual >= desliga_led2) {
+    ledState2 = LOW;
   }
   return (t_atual >= liga_led2 && laco_led_2 == true);
 }
@@ -497,14 +506,17 @@ void loop() {
 
 #if use_apogeu
   encontra_apogeu = func_detecta_apogeu(media_mov2);
+  if (encontra_apogeu == true){
+    dataString += "Descendo!\t";
+  }
   // LED 1
-  bool led1 = func_paraquedas_1();
-  if (led1 == true) { 
-    dataString += "Descendo.\t";
+  bool ledState1 = func_paraquedas_1();
+  if (ledState1 == true) { 
+    dataString += "Led !\t";
   }
   // LED 2
-  bool led2 = func_paraquedas_2();
-  if (led2 == true) {
+  bool ledState2 = func_paraquedas_2();
+  if (ledState2 == true) {
     dataString += "Led 2\t";
   }
   
@@ -516,13 +528,7 @@ void loop() {
     desliga_led3 = t_atual + interv_desliga_led;
     laco_led_3 = false;
   }
-
-  if (t_atual >= desliga_led1) {
-    ledState1 = LOW;
-  }
-  if (t_atual >= desliga_led2) {
-    ledState2 = LOW;
-  }
+  
   if (t_atual >= desliga_led3) {
     ledState3 = LOW;
   }
