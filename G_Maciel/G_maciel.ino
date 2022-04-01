@@ -112,7 +112,7 @@ bool func_detecta_apogeu(float altura_atual)
   else {
     contagem_encontra_apogeu = 0;
   }
-  return (contagem_encontra_apogeu >= 5);
+  return (contagem_encontra_apogeu >= 15);
 }
 #endif
 
