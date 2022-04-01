@@ -496,11 +496,11 @@ void loop() {
   // Encontrando o apogeu
 
 #if use_apogeu
-  bool encontra_apogeu = func_detecta_apogeu(media_mov2);
+  encontra_apogeu = func_detecta_apogeu(media_mov2);
   // LED 1
   bool led1 = func_paraquedas_1();
   if (led1 == true) { 
-    dataString += "Descendo. Led 1\t";
+    dataString += "Descendo.\t";
   }
   // LED 2
   bool led2 = func_paraquedas_2();
