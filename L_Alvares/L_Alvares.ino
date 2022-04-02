@@ -40,16 +40,17 @@ int NC = 0;
 
 unsigned long TQ = 0;
 int Q1 = 0;
+
 int LED1ST = LOW;
-unsigned long T1Ant = 0;
 boolean LK1 = false;
+unsigned long T1Ant = 0;
 
 int LED2ST = LOW;
 boolean LK2 = false;
 unsigned long T2Ant = 0;
 
 int LED3ST = LOW;
-boolean LK3 = false;
+boolean LKA3 = false;
 unsigned long T3Ant = 0;
 
 
@@ -248,9 +249,9 @@ void loop()
     }
     if (SF2 <= -2) // Quando a queda atingir certa altura X, ligar o led
     {
-      if (LK3 == false)
+      if (LKA3 == false) //se a trava estiver desativada
       {
-        if (TAtual - T3Ant >= inter)
+        if (TAtual - T3Ant >= inter) //se o Atual-Anterior > 1 seg, o led liga
         {
           T3Ant = TAtual;
           LED3ST = HIGH;
@@ -259,11 +260,11 @@ void loop()
         {
           LED3ST = LOW;
         }
-        LK3 = true;
+        LKA3 = true;
       }
       else
       {
-        if (TAtual - T3Ant >= Tempo)
+        if (TAtual - T3Ant >= Tempo)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
         {
           LED3ST = LOW;
         }
@@ -275,6 +276,10 @@ void loop()
   dataString += String(LED1ST);
   dataString += "\t";
   dataString += String(LED2ST);
+  dataString += "\t";
+  dataString += String(TAtual);
+  dataString += "\t";
+  dataString += String(T3Ant);
   dataString += "\t";
   dataString += String(LED3ST);
   dataString += "\t";
