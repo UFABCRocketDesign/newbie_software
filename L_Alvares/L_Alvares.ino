@@ -37,18 +37,17 @@ int ValorA = 0;
 int NC = 0;
 
 int Q1 = 0;
-const int PLED1 = LED_BUILTIN;
+const int PLED1 = IGN_1;
 int LED1ST = LOW;
 unsigned long T1Ant = 0;
 boolean LK1 = false;
 
-const int PLED2 = IGN_1;
+const int PLED2 = IGN_2;
 int LED2ST = LOW;
 boolean LK2 = false;
 unsigned long T2Ant = 0;
-//const long int2 = 1000;
 
-const int PLED3 = IGN_2;
+const int PLED3 = LED_BUILTIN;
 int LED3ST = LOW;
 boolean LK3 = false;
 unsigned long T3Ant = 0;
@@ -185,8 +184,6 @@ void loop()
   {
     Queda = 0;
   }
-  dataString += String(Queda / 10.0);
-  dataString += "\t";
 
   if (Queda >= 11)
   {
