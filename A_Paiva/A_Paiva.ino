@@ -29,7 +29,7 @@
 #define usa_gy (usa_giro && 0)    //Variavel de escolha do uso do valor do giroscopio em y
 #define usa_gz (usa_giro && 0)    //Variavel de escolha do uso do valor do giroscopio em z
 
-#define usa_acel 0                //Variavel de escolha do uso de funções
+#define usa_acel 1                //Variavel de escolha do uso de funções
 #define usa_ax (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em x
 #define usa_ay (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em y
 #define usa_az (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em z
@@ -86,6 +86,33 @@ Adafruit_ADXL345_Unified accel;// = Adafruit_ADXL345_Unified(12345);
 String NomeFinal;                 //Nome final do arquivo do SD
 const int chipSelect = 53;
 #endif
+///////// classes ou objetos ///////////
+
+class Filtro{
+  private:
+  int QtTermos;
+  float MediaMov;
+  public:
+  Filtro(int c_QtTermos){
+    QtTermos = c_QtTermos;
+  }
+  float FuncaoFriutu(float valoratualizado);
+};
+float Filtro::FuncaoFriutu(float valoratualizado){
+  float VetorFiltro[QtTermos];
+  float SomaMov = 0;                                 //Declara e zera o SomaMov em todo loop
+  MediaMov = 0;                                      //Declara e zera o MediaMov em todo loop
+  for (int i = QtTermos - 2; i >= 0; i--) {    //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1 de trás pra frente
+    VetorFiltro[i + 1] = VetorFiltro[i];
+  }
+  VetorFiltro[0] = valoratualizado;                  //Esse é o valor mais atualizado do filtro1
+  for (int i = 0; i <= QtTermos - 1; i++) {    //Esse 'for' faz a soma dos valores da matriz, para a média do filtro1
+    SomaMov = SomaMov + VetorFiltro[i];
+  }
+  MediaMov = SomaMov / QtTermos;               //Valor final do filtro, uma média entre "tam" quantidades de valores
+  return MediaMov;
+}
+Filtro Tentativa(10);
 
 void setup() {
   #if usa_acpq
@@ -280,8 +307,10 @@ void loop() {
   #if usa_az
   float Az = eventA.acceleration.z;
   dado += String(Az)+"\t";
-  float Azfiltrada = Friutu(Az, qfa+3);
-  dado += String(Azfiltrada)+"\t";
+  float Azfiltrada1 = Friutu(Az, qfa+3);
+  float Azfiltrada2 = Tentativa.FuncaoFriutu(Az); 
+  dado += String(Azfiltrada1)+"\t";
+  dado += String(Azfiltrada2)+"\t";
   #endif
   #endif
   #if usa_temp
@@ -418,30 +447,4 @@ String Paraqueda3(unsigned long tempoAtual, float MediaMov, int apogeu){
     }
     return "";
   }
-}
-
-///////// classes ou objetos ///////////
-
-class Filtro{
-  private:
-  const int QtTermosFiltro;
-  float VetorFiltro[tam];
-  float MediaMov;
-  public:
-  Filtro(int c_QtTermosFiltro):QtTermosFiltro(c_QtTermosFiltro){  
-  }
-  float FuncaoFriutu(float valoratualizado);
-};
-float Filtro::FuncaoFriutu(float valoratualizado){
-  float SomaMov = 0;                                 //Declara e zera o SomaMov em todo loop
-  MediaMov = 0;                                      //Declara e zera o MediaMov em todo loop
-  for (int i = QtTermosFiltro - 2; i >= 0; i--) {    //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1 de trás pra frente
-    VetorFiltro[i + 1] = VetorFiltro[i];
-  }
-  VetorFiltro[0] = valoratualizado;                  //Esse é o valor mais atualizado do filtro1
-  for (int i = 0; i <= QtTermosFiltro - 1; i++) {    //Esse 'for' faz a soma dos valores da matriz, para a média do filtro1
-    SomaMov = SomaMov + VetorFiltro[i];
-  }
-  MediaMov = SomaMov / QtTermosFiltro;               //Valor final do filtro, uma média entre "tam" quantidades de valores
-  return MediaMov;
 }
