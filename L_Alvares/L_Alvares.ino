@@ -58,6 +58,7 @@ void setup()
 {
   pinMode(PLED1, OUTPUT);
   pinMode(PLED2, OUTPUT);
+  pinMode(PLED3, OUTPUT);
   Serial.begin(115200);
 
   //ligando bmp
@@ -222,8 +223,6 @@ void loop()
         LED1ST = LOW;
       }
     }
-    dataString += String(LED1ST);
-    dataString += "\t";
     digitalWrite(PLED1, LED1ST);
   }
 
@@ -249,12 +248,10 @@ void loop()
         LED2ST = LOW;
       }
     }
-    dataString += String(LED2ST);
-    dataString += "\t";
     digitalWrite(PLED2, LED2ST);
   }
 
-  if (Q1 == 1 && SF2 <= 0.40) // se detectou queda e a altura for X, ligar o led
+  if (Q1 == 1 && SF2 <= -2) // se detectou queda e a altura for X, ligar o led
   {
     if (LK3 == false)
     {
@@ -276,11 +273,16 @@ void loop()
         LED3ST = LOW;
       }
     }
-    dataString += String(LED3ST);
-    dataString += "\t";
     digitalWrite(PLED3, LED3ST);
   }
-  
+
+  dataString += String(LED1ST);
+  dataString += "\t";
+  dataString += String(LED2ST);
+  dataString += "\t";
+  dataString += String(LED3ST);
+  dataString += "\t";
+
   Ap1 = SF2;
 
   //Cartão SD
