@@ -248,7 +248,7 @@ void loop()
       }
       digitalWrite(PLED2, LED2ST);
     }
-    if (SF2 <= -1 || LKc == true) // Quando a queda atingir certa altura X, ligar o led
+    if (SF2 <= -0.25 || LKc == true) // Quando a queda atingir certa altura X, ligar o led
     {
       if (LK3 == false) //se a trava estiver desativada
       {
@@ -262,7 +262,7 @@ void loop()
           LED3ST = LOW;
         }
         LK3 = true;
-        LKc == true;
+        LKc = true;
       }
       else
       {
