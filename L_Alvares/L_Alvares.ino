@@ -50,7 +50,7 @@ boolean LK2 = false;
 unsigned long T2Ant = 0;
 
 int LED3ST = LOW;
-boolean LKA3 = false;
+boolean LK3 = false;
 unsigned long T3Ant = 0;
 
 
@@ -247,9 +247,9 @@ void loop()
       }
       digitalWrite(PLED2, LED2ST);
     }
-    if (SF2 <= -2) // Quando a queda atingir certa altura X, ligar o led
+    if (SF2 <= -0.25) // Quando a queda atingir certa altura X, ligar o led
     {
-      if (LKA3 == false) //se a trava estiver desativada
+      if (LK3 == false) //se a trava estiver desativada
       {
         if (TAtual - T3Ant >= inter) //se o Atual-Anterior > 1 seg, o led liga
         {
@@ -260,7 +260,7 @@ void loop()
         {
           LED3ST = LOW;
         }
-        LKA3 = true;
+        LK3 = true;
       }
       else
       {
