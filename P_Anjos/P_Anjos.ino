@@ -19,14 +19,19 @@
 #define InterDesligTimer 2000           //Intervalo de tempo para desligar o paraquedas A em segundos
 #define InterA2 4000                   //Intervalo de tempo para ligar o 2º acionamento do paraquedas A
 #define HParaquedasB 5                 //Altura de acionamento do paraquedas B em metros
-#define dfaltura 2                     // Define o delta de altura que serve de critério para a determinação do apogeu
-
+#define dfaltura 2                     //Define o delta de altura que serve de critério para a determinação do apogeu
+#define giroscopio 0                   //Definindo a presença ou não de um sensor giroscópio no sistema
+#define Acelerometro 0                 //Definindo a presença ou não de um sensor acelerômetro no sistema
+#define Magnetometro 0                 //Definindo a presença ou não de um sensor magnetômetro no sistema
 Adafruit_BMP085 bmp;
 /* Assign a unique ID to this sensor at the same time */
-#define giroscopio 0
+#if Acelerometro
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
 /* Assign a unique ID to this sensor at the same time */
+#endif
+#if Magnetometro
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
+#endif
 #if giroscopio
 L3G gyro;
 #endif
@@ -96,6 +101,7 @@ void setup() {
     while (1) {}
   }
   // ======================= PARTE APENAS DO ACELEROMETRO ================================= //
+#if Acelerometro
   Serial.println("Accelerometer Test"); Serial.println("");
 
   /* Initialise the sensor */
@@ -118,7 +124,9 @@ void setup() {
   /* Display additional settings (outside the scope of sensor_t) */
   //displayDataRate(); //Reitirei do código pois não era interessante. Se precisar olhe na biblioteca original
   //displayRange(); //Reitirei do código pois não era interessante. Se precisar olhe na biblioteca original
+#endif
   // ============================ PARTE APENAS DO MAGNETÔMETRO ================================== //
+#if Magnetometro
   Serial.println("HMC5883 Magnetometer Test"); Serial.println("");
 
   /* Initialise the sensor */
@@ -131,6 +139,7 @@ void setup() {
 
   /* Display some basic information on this sensor */
   //displaySensorDetails(); //Reitirei do código pois não era interessante. Se precisar olhe na biblioteca original
+#endif
   // ================================================================================================ //
 
   // see if the card is present and can be initialized:
@@ -156,9 +165,32 @@ void setup() {
   Serial.print("O arquivo será gravado com nome ");
   Serial.println(nome);
   Serial.println("card initialized.");
-  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");//Cabecalho no acompanhamento ( NÃO ESQUECE DE COLOCAR \tPressure(Pa) DE NOVO)
   File dataFile = SD.open(nome, FILE_WRITE);
+#if (giroscopio && Acelerometro && Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");//Cabecalho no acompanhamento ( NÃO ESQUECE DE COLOCAR \tPressure(Pa) DE NOVO)
   dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao"); //Cabecalho no SD ( NÃO ESQUECE DE COLOCAR \tPressure(Pa) DE NOVO)
+#elif (!giroscopio && Acelerometro && Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+#elif (giroscopio && !Acelerometro && Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+#elif (giroscopio && Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tSituacao");
+#elif (!giroscopio && !Acelerometro && Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+#elif (!giroscopio && Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX_ddot\tY_ddot\tZ_ddot\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX_ddot\tY_ddot\tZ_ddot\tSituacao");
+#elif (giroscopio && !Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tSituacao");
+#elif (!giroscopio && !Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tSituacao");
+#endif
   dataFile.close();
 
   for (int i = 0; i < 100; i++) {                                                            //Este "for" serve para definir a altitude da base de lancamento como valor de referencia.
@@ -218,20 +250,19 @@ void loop() {
   dataString += "\t";
   dataString += String((int)gyro.g.z);
   dataString += "\t";
-#else
-  dataString += "Giroscópio desativado\t";
 #endif
   // ================================= ETAPA DO ACELERÔMETRO ==================================== //
+#if Acelerometro
   /* Get a new sensor event */
   sensors_event_t event;
   accel.getEvent(&event);
-
   /* Display the results (acceleration is measured in m/s^2) */
   dataString += String(event.acceleration.x); dataString += "\t";
   dataString += String(event.acceleration.y); dataString += "\t";
   dataString += String(event.acceleration.z); dataString += "\t";
-
+#endif
   // ================================== ETAPA DO MAGNETÔMETRO ==================================== //
+#if Magnetometro
   /* Get a new sensor event */
   mag.getEvent(&event);
 
@@ -241,7 +272,7 @@ void loop() {
   dataString += String(event.magnetic.z); dataString += "\t";
   // O código permite reajustar a oritenção para o Norte. Neste código isso não é necessário.
   // Caso precise, olhe na biblioteca original
-
+#endif
   // ======================== ETAPA PARA ACIONAMENTO DE PARAQUEDAS ============================== //
   if (Delta > 0 || Apogeu == true) {                                                              // Só serve para imprimir na tela. Se a diferença da média móvel com o Hmáx é maior que 0, significa que pode estar descendo
     if (Delta >= dfaltura || Apogeu == true) {                                                    // Se a diferença for maior ou igual ao delta de ref. ou já tenha detectado o apogeu
