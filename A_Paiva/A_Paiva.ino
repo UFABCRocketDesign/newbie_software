@@ -90,29 +90,25 @@ const int chipSelect = 53;
 
 class Filtro{
   private:
-  int QtTermos;
+  float VetorFiltro[tam];
   float MediaMov;
   public:
-  Filtro(int c_QtTermos){
-    QtTermos = c_QtTermos;
-  }
   float FuncaoFriutu(float valoratualizado);
 };
 float Filtro::FuncaoFriutu(float valoratualizado){
-  float VetorFiltro[QtTermos];
   float SomaMov = 0;                                 //Declara e zera o SomaMov em todo loop
   MediaMov = 0;                                      //Declara e zera o MediaMov em todo loop
-  for (int i = QtTermos - 2; i >= 0; i--) {    //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1 de trás pra frente
+  for (int i = tam - 2; i >= 0; i--) {    //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1 de trás pra frente
     VetorFiltro[i + 1] = VetorFiltro[i];
   }
   VetorFiltro[0] = valoratualizado;                  //Esse é o valor mais atualizado do filtro1
-  for (int i = 0; i <= QtTermos - 1; i++) {    //Esse 'for' faz a soma dos valores da matriz, para a média do filtro1
+  for (int i = 0; i <= tam - 1; i++) {    //Esse 'for' faz a soma dos valores da matriz, para a média do filtro1
     SomaMov = SomaMov + VetorFiltro[i];
   }
-  MediaMov = SomaMov / QtTermos;               //Valor final do filtro, uma média entre "tam" quantidades de valores
+  MediaMov = SomaMov / tam;               //Valor final do filtro, uma média entre "tam" quantidades de valores
   return MediaMov;
 }
-Filtro Tentativa(10);
+Filtro Tentativa;
 
 void setup() {
   #if usa_acpq
