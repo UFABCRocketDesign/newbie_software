@@ -13,6 +13,10 @@ Adafruit_BMP085 bmp;
 #define Tempo2 5000
 #define Tempo3 5000
 
+#define PLED1 IGN_1
+#define PLED2 IGN_2
+#define PLED3 LED_BUILTIN
+
 float ALT = 0.0;
 float i = 0.0;
 float Med = 0.0;
@@ -36,18 +40,16 @@ String Nome = "LAQ";
 int ValorA = 0;
 int NC = 0;
 
+unsigned long TQ = 0;
 int Q1 = 0;
-const int PLED1 = IGN_1;
 int LED1ST = LOW;
 unsigned long T1Ant = 0;
 boolean LK1 = false;
 
-const int PLED2 = IGN_2;
 int LED2ST = LOW;
 boolean LK2 = false;
 unsigned long T2Ant = 0;
 
-const int PLED3 = LED_BUILTIN;
 int LED3ST = LOW;
 boolean LK3 = false;
 unsigned long T3Ant = 0;
@@ -188,6 +190,7 @@ void loop()
   if (Queda >= 11)
   {
     Q1 = 1;
+    TQ = TAtual;
     dataString += String("1");
     dataString += "\t";
   }
@@ -197,7 +200,7 @@ void loop()
     dataString += "\t";
   }
 
-  //Timer de aviso de queda
+  //Timer e ativação de leds
   if (Q1 == 1) // se detectar a queda
   {
     if (LK1 == false) //se a trava estiver desativada
@@ -220,56 +223,56 @@ void loop()
         LED1ST = LOW;
       }
     }
+    if (TAtual - TQ >= AtivarLED2)
+    {
+      if (LK2 == false) //se a trava estiver desativada
+      {
+        if (TAtual - T2Ant >= inter) //se o Atual-Anterior > 1 seg, o led liga
+        {
+          T2Ant = TAtual;
+          LED2ST = HIGH;
+        }
+        else
+        {
+          LED2ST = LOW;
+        }
+        LK2 = true;
+      }
+      else
+      {
+        if (TAtual - T2Ant >= Tempo2)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
+        {
+          LED2ST = LOW;
+        }
+      }
+      //digitalWrite(PLED2, LED2ST);
+    }
+    if (SF2 <= -2) // Quando a queda atingir certa altura X, ligar o led
+    {
+      if (LK3 == false)
+      {
+        if (TAtual - T3Ant >= inter)
+        {
+          T3Ant = TAtual;
+          LED3ST = HIGH;
+        }
+        else
+        {
+          LED3ST = LOW;
+        }
+        LK3 = true;
+      }
+      else
+      {
+        if (TAtual - T3Ant >= Tempo3)
+        {
+          LED3ST = LOW;
+        }
+      }
+      //digitalWrite(PLED3, LED3ST);
+    }
     digitalWrite(PLED1, LED1ST);
-  }
-
-  if (TAtual >= AtivarLED2)
-  {
-    if (LK2 == false) //se a trava estiver desativada
-    {
-      if (TAtual - T2Ant >= inter) //se o Atual-Anterior > 1 seg, o led liga
-      {
-        T2Ant = TAtual;
-        LED2ST = HIGH;
-      }
-      else
-      {
-        LED2ST = LOW;
-      }
-      LK2 = true;
-    }
-    else
-    {
-      if (TAtual - T2Ant >= Tempo2)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
-      {
-        LED2ST = LOW;
-      }
-    }
     digitalWrite(PLED2, LED2ST);
-  }
-
-  if (Q1 == 1 && SF2 <= -2) // se detectou queda e a altura for X, ligar o led
-  {
-    if (LK3 == false)
-    {
-      if (TAtual - T3Ant >= inter)
-      {
-        T3Ant = TAtual;
-        LED3ST = HIGH;
-      }
-      else
-      {
-        LED3ST = LOW;
-      }
-      LK3 = true;
-    }
-    else
-    {
-      if (TAtual - T3Ant >= Tempo3)
-      {
-        LED3ST = LOW;
-      }
-    }
     digitalWrite(PLED3, LED3ST);
   }
 
