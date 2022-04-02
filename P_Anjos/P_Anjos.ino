@@ -21,6 +21,7 @@
 #define HParaquedasB 5                 //Altura de acionamento do paraquedas B em metros
 #define dfaltura 2                     // Define o delta de altura que serve de critério para a determinação do apogeu
 
+#define Barometro 1
 Adafruit_BMP085 bmp;
 /* Assign a unique ID to this sensor at the same time */
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
@@ -87,10 +88,12 @@ void setup() {
     while (1);
   }
   gyro.enableDefault();
+#ifdef Barometro
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
+#endif
   // ======================= PARTE APENAS DO ACELEROMETRO ================================= //
   Serial.println("Accelerometer Test"); Serial.println("");
 
@@ -141,7 +144,7 @@ void setup() {
     a = nome.length();
     parteB = String(cont);
     b = parteB.length();
-    c = 8 - (a + b);                                                                            // Guarda a quantidade de zeros necessária para se colocar entre "PA" e o nº da versão.
+    c = 8 - (a + b);                                                                          // Guarda a quantidade de zeros necessária para se colocar entre "PA" e o nº da versão.
     for (int i = 0; i < c; i++) {
       nome += "0";
     }
@@ -171,6 +174,7 @@ void loop() {
   String dataString = "";                                                                     // Serve para criar a string que vai guardar os dados para que eles sejam gravados no SD
 
   // ========================= MÉDIA MÓVEL E DETECÇÃO DE APOGEU =============================== //
+  #ifdef Barometro
   SomaMov = 0;
   MediaMov = bmp.readAltitude() - AltitudeRef;
   for (int j = 0; j < 3; j++) {
@@ -206,6 +210,9 @@ void loop() {
   dataString += "\t";
   //dataString += String(bmp.readPressure());
   //dataString += "\t";
+  #elif
+  dataString += "\t Barômetro desativado"
+  #endif
   dataString += String((int)gyro.g.x);
   dataString += "\t";
   dataString += String((int)gyro.g.y);
