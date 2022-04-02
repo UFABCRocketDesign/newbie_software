@@ -7,9 +7,11 @@ Adafruit_BMP085 bmp;
 #define IGN_3 46  /*act3*/
 #define IGN_4 55  /*act4*/
 
-#define Tempo1 6000
+#define inter 1000
 #define AtivarLED2 3000
+#define Tempo1 5000
 #define Tempo2 5000
+#define Tempo3 5000
 
 float ALT = 0.0;
 float i = 0.0;
@@ -34,19 +36,22 @@ String Nome = "LAQ";
 int ValorA = 0;
 int NC = 0;
 
-int T1 = 0;
+int Q1 = 0;
 const int PLED1 = LED_BUILTIN;
 int LED1ST = LOW;
 unsigned long T1Ant = 0;
-const long int1 = 1000;
 boolean LK1 = false;
 
 const int PLED2 = IGN_1;
 int LED2ST = LOW;
 boolean LK2 = false;
 unsigned long T2Ant = 0;
-const long int2 = 1000;
+//const long int2 = 1000;
 
+const int PLED3 = IGN_2;
+int LED3ST = LOW;
+boolean LK3 = false;
+unsigned long T3Ant = 0;
 
 
 void setup()
@@ -184,7 +189,7 @@ void loop()
 
   if (Queda >= 11)
   {
-    T1 = 1;
+    Q1 = 1;
     dataString += String("1");
     dataString += "\t";
   }
@@ -195,11 +200,11 @@ void loop()
   }
 
   //Timer de aviso de queda
-  if (T1 == 1) // se detectar a queda
+  if (Q1 == 1) // se detectar a queda
   {
     if (LK1 == false) //se a trava estiver desativada
     {
-      if (TAtual - T1Ant >= int1) //se o Atual-Anterior > 1 seg, o led liga
+      if (TAtual - T1Ant >= inter) //se o Atual-Anterior > 1 seg, o led liga
       {
         T1Ant = TAtual;
         LED1ST = HIGH;
@@ -226,7 +231,7 @@ void loop()
   {
     if (LK2 == false) //se a trava estiver desativada
     {
-      if (TAtual - T2Ant >= int2) //se o Atual-Anterior > 1 seg, o led liga
+      if (TAtual - T2Ant >= inter) //se o Atual-Anterior > 1 seg, o led liga
       {
         T2Ant = TAtual;
         LED2ST = HIGH;
@@ -249,7 +254,34 @@ void loop()
     digitalWrite(PLED2, LED2ST);
   }
 
-Ap1 = SF2;
+  if (Q1 == 1 && SF2 <= 0.40) // se detectou queda e a altura for X, ligar o led
+  {
+    if (LK3 == false)
+    {
+      if (TAtual - T3Ant >= inter)
+      {
+        T3Ant = TAtual;
+        LED3ST = HIGH;
+      }
+      else
+      {
+        LED3ST = LOW;
+      }
+      LK3 = true;
+    }
+    else
+    {
+      if (TAtual - T3Ant >= Tempo3)
+      {
+        LED3ST = LOW;
+      }
+    }
+    dataString += String(LED3ST);
+    dataString += "\t";
+    digitalWrite(PLED3, LED3ST);
+  }
+  
+  Ap1 = SF2;
 
   //Cartão SD
   Serial.println(dataString);
