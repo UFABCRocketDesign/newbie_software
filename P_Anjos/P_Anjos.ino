@@ -192,7 +192,7 @@ void loop() {
   }
   Delta = Hmax - H1;
   // ============================= DADOS QUE VÃO PARA STRING ================================== //
-  dataString += String(currentMillis / 1000);                                                 // Registra o tempo em segundos
+  dataString += String(currentMillis / 1000.0);                                                 // Registra o tempo em segundos
   dataString += "\t";
   dataString += String(Hmax);
   dataString += "\t";
