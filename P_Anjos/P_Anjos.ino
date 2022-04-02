@@ -21,14 +21,15 @@
 #define HParaquedasB 5                 //Altura de acionamento do paraquedas B em metros
 #define dfaltura 2                     // Define o delta de altura que serve de critério para a determinação do apogeu
 
-#define Barometro 1
 Adafruit_BMP085 bmp;
 /* Assign a unique ID to this sensor at the same time */
+#define giroscopio 1
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
 /* Assign a unique ID to this sensor at the same time */
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
-
+#if giroscopio
 L3G gyro;
+#endif
 const int chipSelect = 53;            //Define o pino para o chipselect para gravar no cartão SD
 float H1 = 0;                         // Variável global - Não é ressetada a cada loop. Armazena o dado.
 float H2 = 0;
@@ -82,18 +83,18 @@ void setup() {
     ;                                 // wait for serial port to connect. Needed for native USB port only
   }
 #endif
+#if giroscopio
   if (!gyro.init())
   {
     Serial.println("Failed to autodetect gyro type!");
     while (1);
   }
   gyro.enableDefault();
-#ifdef Barometro
+#endif
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
-#endif
   // ======================= PARTE APENAS DO ACELEROMETRO ================================= //
   Serial.println("Accelerometer Test"); Serial.println("");
 
@@ -117,7 +118,6 @@ void setup() {
   /* Display additional settings (outside the scope of sensor_t) */
   //displayDataRate(); //Reitirei do código pois não era interessante. Se precisar olhe na biblioteca original
   //displayRange(); //Reitirei do código pois não era interessante. Se precisar olhe na biblioteca original
-
   // ============================ PARTE APENAS DO MAGNETÔMETRO ================================== //
   Serial.println("HMC5883 Magnetometer Test"); Serial.println("");
 
@@ -170,11 +170,12 @@ void setup() {
 // the loop function runs over and over again forever
 void loop() {
   unsigned long currentMillis = millis();                                                     // Regsitra em que instante do tempo está em milisegundos
+#if giroscopio
   gyro.read();                                                                                // Faz a leitura do sensor giroscópio
+#endif
   String dataString = "";                                                                     // Serve para criar a string que vai guardar os dados para que eles sejam gravados no SD
 
   // ========================= MÉDIA MÓVEL E DETECÇÃO DE APOGEU =============================== //
-  #ifdef Barometro
   SomaMov = 0;
   MediaMov = bmp.readAltitude() - AltitudeRef;
   for (int j = 0; j < 3; j++) {
@@ -210,16 +211,16 @@ void loop() {
   dataString += "\t";
   //dataString += String(bmp.readPressure());
   //dataString += "\t";
-  #elif
-  dataString += "\t Barômetro desativado"
-  #endif
+#if giroscopio
   dataString += String((int)gyro.g.x);
   dataString += "\t";
   dataString += String((int)gyro.g.y);
   dataString += "\t";
   dataString += String((int)gyro.g.z);
   dataString += "\t";
-
+#else
+  dataString += "Giroscópio desativado\t"
+#endif
   // ================================= ETAPA DO ACELERÔMETRO ==================================== //
   /* Get a new sensor event */
   sensors_event_t event;
