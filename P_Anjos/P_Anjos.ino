@@ -23,7 +23,7 @@
 
 Adafruit_BMP085 bmp;
 /* Assign a unique ID to this sensor at the same time */
-#define giroscopio 1
+#define giroscopio 0
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
 /* Assign a unique ID to this sensor at the same time */
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
@@ -219,7 +219,7 @@ void loop() {
   dataString += String((int)gyro.g.z);
   dataString += "\t";
 #else
-  dataString += "Giroscópio desativado\t"
+  dataString += "Giroscópio desativado\t";
 #endif
   // ================================= ETAPA DO ACELERÔMETRO ==================================== //
   /* Get a new sensor event */
