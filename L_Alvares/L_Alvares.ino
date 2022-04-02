@@ -51,6 +51,7 @@ unsigned long T2Ant = 0;
 
 int LED3ST = LOW;
 boolean LK3 = false;
+boolean LKc = false;
 unsigned long T3Ant = 0;
 
 
@@ -247,7 +248,7 @@ void loop()
       }
       digitalWrite(PLED2, LED2ST);
     }
-    if (SF2 <= -0.25) // Quando a queda atingir certa altura X, ligar o led
+    if (SF2 <= -1 || LKc == true) // Quando a queda atingir certa altura X, ligar o led
     {
       if (LK3 == false) //se a trava estiver desativada
       {
@@ -261,6 +262,7 @@ void loop()
           LED3ST = LOW;
         }
         LK3 = true;
+        LKc == true;
       }
       else
       {
@@ -276,10 +278,6 @@ void loop()
   dataString += String(LED1ST);
   dataString += "\t";
   dataString += String(LED2ST);
-  dataString += "\t";
-  dataString += String(TAtual);
-  dataString += "\t";
-  dataString += String(T3Ant);
   dataString += "\t";
   dataString += String(LED3ST);
   dataString += "\t";
