@@ -90,9 +90,16 @@ const int chipSelect = 53;
 
 class Filtro{
   private:
-  float VetorFiltro[tam];
+  int const QtTermos;
+  float* const VetorFiltro;
   float MediaMov;
   public:
+  //construtor
+  Filtro(int v_QtTermos) : QtTermos(v_QtTermos), VetorFiltro(new float[QtTermos]){}
+  //destrutor
+  ~Filtro() {
+        delete[] VetorFiltro;
+    }
   float FuncaoFriutu(float valoratualizado);
 };
 float Filtro::FuncaoFriutu(float valoratualizado){
@@ -108,7 +115,10 @@ float Filtro::FuncaoFriutu(float valoratualizado){
   MediaMov = SomaMov / tam;               //Valor final do filtro, uma média entre "tam" quantidades de valores
   return MediaMov;
 }
-Filtro Tentativa;
+Filtro FiltroAx(10);
+Filtro FiltroAy(10);
+Filtro FiltroAz(10);
+Filtro FiltroAltitude(10);
 
 void setup() {
   #if usa_acpq
@@ -291,22 +301,23 @@ void loop() {
   #if usa_ax
   float Ax = eventA.acceleration.x;
   dado += String(Ax)+"\t";
-  float Axfiltrada = Friutu(Ax, qfa+1);
+  //float Axfiltrada = Friutu(Ax, qfa+1);
+  float Axfiltrada = FiltroAx.FuncaoFriutu(Ax);
   dado += String(Axfiltrada)+"\t";
   #endif
   #if usa_ay
   float Ay = eventA.acceleration.y;
   dado += String(Ay)+"\t";
-  float Ayfiltrada = Friutu(Ay, qfa+2);
+  //float Ayfiltrada = Friutu(Ay, qfa+2);
+  float Ayfiltrada = FiltroAy.FuncaoFriutu(Ay);
   dado += String(Ayfiltrada)+"\t";
   #endif
   #if usa_az
   float Az = eventA.acceleration.z;
   dado += String(Az)+"\t";
-  float Azfiltrada1 = Friutu(Az, qfa+3);
-  float Azfiltrada2 = Tentativa.FuncaoFriutu(Az); 
-  dado += String(Azfiltrada1)+"\t";
-  dado += String(Azfiltrada2)+"\t";
+  //float Azfiltrada1 = Friutu(Az, qfa+3);
+  float Azfiltrada = FiltroAz.FuncaoFriutu(Az);
+  dado += String(Azfiltrada)+"\t";
   #endif
   #endif
   #if usa_temp
