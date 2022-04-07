@@ -19,19 +19,19 @@ Adafruit_BMP085 bmp;
 
 #define EXIST_TEMPO 1
 #define EXIST_SD 0 
-#define EXIST_GIRO 0
+#define EXIST_GIRO 1
+#define EXIST_ACEl 1
+#define EXIST_MAG 1
+#define EXIST_BAR 1
 #define EXIST_GIRO_X (EXIST_GIRO && 1)
 #define EXIST_GIRO_Y (EXIST_GIRO && 0)
 #define EXIST_GIRO_Z (EXIST_GIRO && 1)
-#define EXIST_ACEl 0
 #define EXIST_ACEl_X (EXIST_ACEl && 0)
 #define EXIST_ACEl_Y (EXIST_ACEl && 1)
 #define EXIST_ACEl_Z (EXIST_ACEl && 0)
-#define EXIST_MAG 0
 #define EXIST_MAG_X (EXIST_MAG && 0)
 #define EXIST_MAG_Y (EXIST_MAG && 1)
 #define EXIST_MAG_Z (EXIST_MAG && 0)
-#define EXIST_BAR 1
 #define EXIST_IGN_1 (EXIST_BAR && 1)
 #define EXIST_IGN_2 (EXIST_BAR && 1)
 #define EXIST_IGN_3 (EXIST_BAR && 1)
@@ -163,20 +163,41 @@ void setup() {
    #if EXIST_IGN_3
     dados_string +="Estado do led Final:\t";
    #endif
+   
    #if EXIST_GIRO
-    dados_string +="Giroscopio em X:\t";
-    dados_string +="Giroscopio em Y:\t";
-    dados_string +="Giroscopio em Z:\t";
+    #if EXIST_GIRO_X
+     dados_string +="Giroscopio em X:\t";
+    #endif
+    #if EXIST_GIRO_Y
+     dados_string +="Giroscopio em Y:\t";
+    #endif
+    #if EXIST_GIRO_Z
+     dados_string +="Giroscopio em Z:\t";
+    #endif
    #endif
+
    #if EXIST_ACEl
-    dados_string +="Acelerometro em X(m/s^2):\t";
-    dados_string +="Acelerometro em Y(m/s^2):\t";
-    dados_string +="Acelerometro em Z(m/s^2):\t";
+    #if EXIST_ACEl_X
+     dados_string +="Acelerometro em X(m/s^2):\t";
+    #endif
+    #if EXIST_ACEl_Y
+     dados_string +="Acelerometro em Y(m/s^2):\t";
+    #endif
+    #if EXIST_ACEl_Z
+     dados_string +="Acelerometro em Z(m/s^2):\t";
+    #endif
    #endif
-   #if EXIST_MAG
-    dados_string +="Sensormag em X(uT):\t";
-    dados_string +="Sensormag em Y(uT):\t";
-    dados_string +="Sensormag em Z(uT):\t";
+    
+    #if EXIST_MAG
+    #if EXIST_MAG_X
+     dados_string +="Sensormag em X(uT):\t";
+    #endif
+    #if EXIST_MAG_Y
+     dados_string +="Sensormag em Y(uT):\t";
+    #endif
+    #if EXIST_MAG_Z
+     dados_string +="Sensormag em Z(uT):\t";
+    #endif
    #endif
 
    
