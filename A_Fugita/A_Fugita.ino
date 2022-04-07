@@ -62,7 +62,7 @@ void loop() {
     f2 += filtro1[i];
   }
   f2 /= tam;
-  
+
 
 
   //Serial.print("Altitude = ");
@@ -77,7 +77,7 @@ void loop() {
   //detector de apogeu
   if (f2 < dec){
     contador+=1;
-    dec = f2;
+    
 
     if(contador>10){
       Serial.print(1);
@@ -87,8 +87,9 @@ void loop() {
   else{
     Serial.print(0);
     Serial.print("\t");
-    dec = f2;
+    contador=0;
   }
+  dec = f2;
 
  
 
