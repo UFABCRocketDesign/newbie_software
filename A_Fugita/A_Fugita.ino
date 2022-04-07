@@ -1,4 +1,3 @@
-
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 #define tam 20
@@ -97,6 +96,8 @@ void loop() {
   }
     
   dec = f2;
+  Serial.print(contador/10.0);
+  Serial.print("\t");
 
  
 
