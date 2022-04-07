@@ -451,11 +451,11 @@ void Led_para_queda_piloto() {
     estado_sensormag += String(event.magnetic.x);
     estado_sensormag += "\t";
    #endif
-   #if EXIST_MAG_X
+   #if EXIST_MAG_Y
     estado_sensormag += String(event.magnetic.y);
     estado_sensormag += "\t";
    #endif
-   #if EXIST_MAG_X
+   #if EXIST_MAG_Z
     estado_sensormag += String(event.magnetic.z);
    #endif
 }
