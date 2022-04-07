@@ -7,6 +7,7 @@ float zerar = 0;
 float filtro[tam] = {};
 float filtro1[tam] = {};
 float dec = 0;
+float contador = 0;
   
 void setup() {
     
@@ -72,17 +73,24 @@ void loop() {
   Serial.print("\t");
   Serial.print(f2);
   Serial.print("\t");
-  
+
+  //detector de apogeu
   if (f2 < dec){
-    Serial.print(1);
-    Serial.print("\t");
+    contador+=1;
+    dec = f2;
+
+    if(contador>10){
+      Serial.print(1);
+      Serial.print("\t");
+    }
   }
   else{
     Serial.print(0);
     Serial.print("\t");
+    dec = f2;
   }
 
-  dec = f2;
+ 
 
   //Serial.print("Pressure at sealevel (calculated) = ");
   //Serial.print(bmp.readSealevelPressure());
