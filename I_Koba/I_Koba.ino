@@ -17,26 +17,39 @@ Adafruit_BMP085 bmp;
 //#define IGN_3 46  /*act3*/ 
 //#define IGN_4 55  /*act4*/
 
+#define EXIST_TEMPO 1
 #define EXIST_SD 0 
 #define EXIST_GIRO 0
+#define EXIST_GIRO_X (EXIST_GIRO && 1)
+#define EXIST_GIRO_Y (EXIST_GIRO && 0)
+#define EXIST_GIRO_Z (EXIST_GIRO && 1)
 #define EXIST_ACEl 0
+#define EXIST_ACEl_X (EXIST_ACEl && 0)
+#define EXIST_ACEl_Y (EXIST_ACEl && 1)
+#define EXIST_ACEl_Z (EXIST_ACEl && 0)
 #define EXIST_MAG 0
-#define EXIST_IGN_1 1
-#define EXIST_IGN_2 1
-#define EXIST_IGN_3 1
-#define EXIST_TEMPO 0
-#define EXIST_ALTURA 0
+#define EXIST_MAG_X (EXIST_MAG && 0)
+#define EXIST_MAG_Y (EXIST_MAG && 1)
+#define EXIST_MAG_Z (EXIST_MAG && 0)
+#define EXIST_BAR 1
+#define EXIST_IGN_1 (EXIST_BAR && 1)
+#define EXIST_IGN_2 (EXIST_BAR && 1)
+#define EXIST_IGN_3 (EXIST_BAR && 1)
+#define EXIST_ALTURA (EXIST_BAR && 1)
 
 #define chipSelect 53
-#define led_piloto 36
-#define led_secundario 61
-#define led_final 13
+#define IGN_1 36 //paraquedas piloto
+#define IGN_2 61 //paraquedas secundario
+#define led_final 13 //paraquedas final
 
-#define pmt 20 // intervalo de valores usados na para media movel
-#define nf 3  // Numero de filtros 
-#define ncp 4  // intervalo de comparação para queda e suibida
+#define INTERVALO_MEDIA_M 20 // intervalo de valores usados na para media movel
+#define NUMERO_FILTROS 3  // Numero de filtros 
+#define INTERVALO_QUEDA 4  // intervalo de comparação para queda e suibida
 
-#define intervalo 5000 // intervalo de tempo para acionamento dos paraquedas
+#define TEMPO_PILOTO_ON 5000 // intervalo de tempo que o paraquedas piloto vai ficar ligado
+#define TEMPO_ATIVAR_SECUNDARIO 5000 // intervalo de tempo necessario para ativar o paraquedas secundario pos inicio de queda
+#define TEMPO_SECUNDARIO_ON 5000 // intervalo de tempo que o paraquedas secundariio vai ficar ligado
+#define TEMPO_FINAL_ON 5000 // intervalo de tempo que o paraquedas final vai ficar ligado
 
 
 #if EXIST_SD
@@ -45,65 +58,64 @@ Adafruit_BMP085 bmp;
  String nome_SD; //primeiro nome do sd
  String txt_SD;
  String zeros;
- String Projeto_name; //Nome compketo do SD
+ String projeto_name; //Nome compketo do SD
  String complemento_SD;  // contem o numero do sd em string
-#endif
+#endif //SD
 
 #if EXIST_GIRO
  String estado_giroscopio;
-#endif
+#endif //giroscopiio 
 
 #if EXIST_ACEl
  String estado_acelerometro;
-#endif
+#endif //acelerometro
 
 #if EXIST_MAG
  String estado_sensormag;
-#endif
+#endif //sensor campo magnetico
 
 #if EXIST_IGN_1
  int acendeu_piloto;  // contem o estado do led piloto, 1 para acesso e 0 para apagado
- bool Trava_piloto = true; //trava usado para o led piloto
-#endif
+ bool trava_piloto = true; //trava usado para o led piloto
+#endif //paraquedas piloto
 
 #if EXIST_IGN_2
  int acendeu_secundario;  // contem o estado do led secundario, 1 para acesso e 0 para apagado
- unsigned long Time_secundario = 0;
- bool Trava_secundario = true; //trava usado para o led secundario
-#endif
+ unsigned long time_secundario = 0;
+ bool trava_secundario = true; //trava usado para o led secundario
+#endif //paraquedas secundario
 
 #if EXIST_IGN_3
  int acendeu_final; // contem o estado do led final, 1 para acesso e 0 para apagado
- unsigned long Time_final = 0;
- bool Trava_final = true; //trava usado para o led secundario
-#endif
+ unsigned long time_final = 0;
+ bool trava_final = true; //trava usado para o led secundario
+#endif //paraquedas final
 
+#if EXIST_BAR
 int var_queda;  // contem o estado do foguete, 1 para subindo e 0 para queda
-
 float z;
 float ref_chao; // constante que será usada para referenciar o chão
-float vetor[nf][pmt]; // movimentaçãop dos filtros de sinal de alrura 
-float sinal[nf+1];   // irá conter todos sinais relacionado a altura  
-float sinalzin[ncp]; // contem os dados usados para comparar a altura 
+float vetor[NUMERO_FILTROS][INTERVALO_MEDIA_M]; // movimentaçãop dos filtros de sinal de alrura 
+float sinal[NUMERO_FILTROS+1];   // irá conter todos sinais relacionado a altura  
+float sinalzin[INTERVALO_QUEDA]; // contem os dados usados para comparar a altura 
+unsigned long time_do_apogeu = 0;
+bool trava_apogeu = true; //trava usado para o led piloto
+#endif //barometro
+
+String dados_string = ""; // irá conter os dados dos sensores
 float tempo_atual;
-
-unsigned long Time_do_apogeu = 0;
-
-bool Trava_apogeu = true; //trava usado para o led piloto
-
-String dados_string = ""; // irá conter os dados dos sinais em string 
 
 
 
 //----------------------------------------------------------------------------------
 void setup() {
   #if EXIST_IGN_1
-   pinMode(led_piloto, OUTPUT);
-   digitalWrite(led_piloto, LOW);
+   pinMode(IGN_1, OUTPUT);
+   digitalWrite(IGN_1, LOW);
   #endif
   #if EXIST_IGN_2
-   pinMode(led_secundario, OUTPUT);
-   digitalWrite(led_secundario, LOW);
+   pinMode(IGN_2, OUTPUT);
+   digitalWrite(IGN_2, LOW);
   #endif
   #if EXIST_IGN_3
    pinMode(led_final, OUTPUT);
@@ -130,7 +142,9 @@ void setup() {
   #endif
 
   // calcula a media dos dados para referenciar a altura
-  call_chao(); 
+  #if EXIST_BAR
+   Call_chao();
+  #endif 
 
    dados_string = "";
    #if EXIST_TEMPO
@@ -164,8 +178,6 @@ void setup() {
     dados_string +="Sensormag em Y(uT):\t";
     dados_string +="Sensormag em Z(uT):\t";
    #endif
-   dados_string +="Constante que referencia o chão = ";
-   dados_string +=(String(ref_chao));
 
    
   // laço para determinar o nome do SD
@@ -176,27 +188,35 @@ void setup() {
    txt_SD = ".txt";
    do{
      zeros = "";
-     Projeto_name = "";
+     projeto_name = "";
      complemento_SD = String(numero_do_SD);
      qnt_zero = 8 - nome_SD.length() - complemento_SD.length();
      for (int i = 0; i < qnt_zero; i++) {
        zeros += "0";  
      }
-      Projeto_name = nome_SD + zeros + complemento_SD + txt_SD;
+      projeto_name = nome_SD + zeros + complemento_SD + txt_SD;
       numero_do_SD ++;
-   }while(SD.exists(Projeto_name));
-   Serial.println(Projeto_name);
+   }while(SD.exists(projeto_name));
+   Serial.println(projeto_name);
    
-   File dataFile = SD.open(Projeto_name, FILE_WRITE);
+   File dataFile = SD.open(projeto_name, FILE_WRITE);
     if(dataFile){
+       #if EXIST_BAR
+        dataFile.print("Constante que referencia o chão = ");
+        dataFile.println(String(ref_chao));
+       #endif //barometro
        dataFile.println(dados_string);
        dataFile.close();
     }else {
       Serial.println("Erro ao abrir o SD");
     } 
    dataFile.close();
+  #endif //SD
+
+  #if EXIST_BAR
+   Serial.println("Constante que referencia o chão = ");
+   Serial.println(String(ref_chao));
   #endif
-  
   Serial.print(dados_string);
   Serial.println(); 
 
@@ -211,11 +231,12 @@ void loop() {
   // Serial.print(bmp.readPressure());
   // Serial.print("\t");
 
+  tempo_atual = millis(); 
+  #if EXIST_BAR
   sinal[0] = bmp.readAltitude() - ref_chao;
-  tempo_atual = millis();
-  
   Filtros();
   Detec_queda();
+  #endif
   #if EXIST_IGN_1
    Led_para_queda_piloto();
   #endif
@@ -241,58 +262,69 @@ void loop() {
 }
 
 //-----------------------------------------------------------------------------
-void call_chao() {
-  z = 0;
-  for (int x = 0; x < 100; x++) {
-    z = bmp.readAltitude() + z;
-  }
-  ref_chao = z / 100; 
-}
+
+#if EXIST_BAR
+ void Call_chao() {
+   z = 0;
+   for (int x = 0; x < 100; x++) {
+     z = bmp.readAltitude() + z;
+   }
+   ref_chao = z / 100; 
+ }
+ #endif
+ 
 //----------------------------------------------------------------------------------
-void Filtros() {
-  for (int y = 0; y < nf; y++) {
-    for (int x = pmt - 1; x > 0; x--) {
-      vetor[y][x] = vetor[y][x - 1];
-    }
-    vetor[y][0] = sinal[y];
-    float k = 0;
-    for (int x = 0; x < pmt; x++) {
-      k = vetor[y][x] + k;
-    }
-    sinal[y + 1] = k / pmt;
-  }
-}
+
+#if EXIST_BAR
+ void Filtros() {
+   for (int y = 0; y < NUMERO_FILTROS; y++) {
+     for (int x = INTERVALO_MEDIA_M - 1; x > 0; x--) {
+       vetor[y][x] = vetor[y][x - 1];
+     }
+     vetor[y][0] = sinal[y];
+     float k = 0;
+     for (int x = 0; x < INTERVALO_MEDIA_M; x++) {
+       k = vetor[y][x] + k;
+     }
+     sinal[y + 1] = k / INTERVALO_MEDIA_M;
+   }
+ }
+#endif
 
 //----------------------------------------------------------------------------------
-void Detec_queda() {
-  for (int x = ncp - 1; x > 0; x--) {
-    sinalzin[x] = sinalzin[x - 1];
-  }
-  sinalzin[0] = sinal[nf];
-  if ( sinalzin[0] > sinalzin[ncp - 1]){
-    var_queda = 1;
-  }else{
-    var_queda = 0;
-    // define o a hora do ainicio do apogeu
-    if(Trava_apogeu == true){
-      Time_do_apogeu = tempo_atual;
-      Trava_apogeu = false;
-    }
-  }
-}
+
+#if EXIST_BAR
+ void Detec_queda() {
+   for (int x = INTERVALO_QUEDA - 1; x > 0; x--) {
+     sinalzin[x] = sinalzin[x - 1];
+   }
+   sinalzin[0] = sinal[NUMERO_FILTROS];
+   if ( sinalzin[0] > sinalzin[INTERVALO_QUEDA - 1]){
+     var_queda = 1;
+   }else{
+     var_queda = 0;
+     // define o a hora do ainicio do apogeu
+     if(trava_apogeu == true){
+       time_do_apogeu = tempo_atual;
+       trava_apogeu = false;
+     }
+   }
+ }
+#endif
+ 
 //----------------------------------------------------------------------------------
 
 #if EXIST_IGN_1
 void Led_para_queda_piloto() {
     if (var_queda == 0){
-     if(Trava_piloto == true){
-       digitalWrite(led_piloto, HIGH);
+     if(trava_piloto == true){
+       digitalWrite(IGN_1, HIGH);
        acendeu_piloto = 1;
-       Trava_piloto = false;
+       trava_piloto = false;
      }
-     if(Trava_piloto == false){
-       if ((tempo_atual - Time_do_apogeu) >= intervalo) {
-         digitalWrite(led_piloto, LOW);
+     if(trava_piloto == false){
+       if ((tempo_atual - time_do_apogeu) >= TEMPO_PILOTO_ON) {
+         digitalWrite(IGN_1, LOW);
          acendeu_piloto = 0;
        }
      }
@@ -305,17 +337,17 @@ void Led_para_queda_piloto() {
 #if EXIST_IGN_2
  void Led_para_queda_secundario() {
    if (var_queda == 0){
-     if(Trava_secundario == true){
-       if ((tempo_atual - Time_do_apogeu) >= intervalo){
-         digitalWrite(led_secundario, HIGH);
-         Time_secundario = tempo_atual;
+     if(trava_secundario == true){
+       if ((tempo_atual - time_do_apogeu) >= TEMPO_ATIVAR_SECUNDARIO){
+         digitalWrite(IGN_2, HIGH);
+         time_secundario = tempo_atual;
          acendeu_secundario = 1;
-         Trava_secundario = false;
+         trava_secundario = false;
        }
      }
-     if(Trava_secundario == false){
-       if ((tempo_atual - Time_secundario) >= intervalo) {
-         digitalWrite(led_secundario, LOW);
+     if(trava_secundario == false){
+       if ((tempo_atual - time_secundario) >= TEMPO_SECUNDARIO_ON) {
+         digitalWrite(IGN_2, LOW);
          acendeu_secundario = 0;
        }
      }
@@ -328,15 +360,15 @@ void Led_para_queda_piloto() {
 #if EXIST_IGN_3
  void Led_para_queda_final() {
    if (var_queda == 0){
-     if(sinal[nf] <= 400){
-       if(Trava_final == true){
+     if(sinal[NUMERO_FILTROS] <= 400){
+       if(trava_final == true){
           digitalWrite(led_final, HIGH);
-          Time_final = tempo_atual;
+          time_final = tempo_atual;
           acendeu_final = 1;
-          Trava_final = false;
+          trava_final = false;
         }
-        if(Trava_final == false){
-          if((tempo_atual - Time_final) >= intervalo) {
+        if(trava_final == false){
+          if((tempo_atual - time_final) >= TEMPO_FINAL_ON) {
             digitalWrite(led_final, LOW);
             acendeu_final = 0;
          }
@@ -352,11 +384,17 @@ void Led_para_queda_piloto() {
  void Giroscopio(){
    giroscopio.read();
    estado_giroscopio = "";
-   estado_giroscopio += giroscopio.g.x;
-   estado_giroscopio += "\t";
-   estado_giroscopio += giroscopio.g.y;
-   estado_giroscopio += "\t";
-   estado_giroscopio += giroscopio.g.z;
+   #if EXIST_GIRO_X
+    estado_giroscopio += giroscopio.g.x;
+    estado_giroscopio += "\t";
+   #endif
+   #if EXIST_GIRO_Y
+    estado_giroscopio += giroscopio.g.y;
+    estado_giroscopio += "\t";
+   #endif
+   #if EXIST_GIRO_Z
+    estado_giroscopio += giroscopio.g.z;
+   #endif
  }
 #endif
 
@@ -367,11 +405,17 @@ void Led_para_queda_piloto() {
    sensors_event_t event; 
    accel.getEvent(&event);
    estado_acelerometro = "";
-   estado_acelerometro += String(event.acceleration.x);
-   estado_acelerometro += "\t";
-   estado_acelerometro += String(event.acceleration.y);
-   estado_acelerometro += "\t";
-   estado_acelerometro += String(event.acceleration.z);
+   #if EXIST_ACEl_X
+    estado_acelerometro += String(event.acceleration.x);
+    estado_acelerometro += "\t";
+   #endif
+   #if EXIST_ACEl_Y
+    estado_acelerometro += String(event.acceleration.y);
+    estado_acelerometro += "\t";
+   #endif
+   #if EXIST_ACEl_Z
+    estado_acelerometro += String(event.acceleration.z);
+   #endif
  }
 #endif
 
@@ -382,11 +426,17 @@ void Led_para_queda_piloto() {
    sensors_event_t event; 
    mag.getEvent(&event);
    estado_sensormag = "";
-   estado_sensormag += String(event.magnetic.x);
-   estado_sensormag += "\t";
-   estado_sensormag += String(event.magnetic.y);
-   estado_sensormag += "\t";
-   estado_sensormag += String(event.magnetic.z);
+   #if EXIST_MAG_X
+    estado_sensormag += String(event.magnetic.x);
+    estado_sensormag += "\t";
+   #endif
+   #if EXIST_MAG_X
+    estado_sensormag += String(event.magnetic.y);
+    estado_sensormag += "\t";
+   #endif
+   #if EXIST_MAG_X
+    estado_sensormag += String(event.magnetic.z);
+   #endif
 }
 #endif
 
@@ -399,7 +449,7 @@ void Salvar(){
   #endif
   #if EXIST_ALTURA
    dados_string += "\t";  
-   dados_string += String(sinal[nf]);
+   dados_string += String(sinal[NUMERO_FILTROS]);
    dados_string += "\t";
    dados_string += String(var_queda);
   #endif
@@ -428,7 +478,7 @@ void Salvar(){
    dados_string += String(estado_sensormag);
   #endif
   #if EXIST_SD 
-   File dataFile = SD.open(Projeto_name, FILE_WRITE);
+   File dataFile = SD.open(projeto_name, FILE_WRITE);
    if(dataFile){
       dataFile.println(dados_string);
       dataFile.close();
