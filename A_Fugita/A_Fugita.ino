@@ -77,18 +77,19 @@ void loop() {
   //detector de apogeu
   if (f2 < dec){
     contador+=1;
-    
-
-    if(contador>10){
-      Serial.print(1);
-      Serial.print("\t");
-    }
   }
+  
   else{
     Serial.print(0);
     Serial.print("\t");
     contador=0;
   }
+  
+  if(contador>10){
+      Serial.print(1);
+      Serial.print("\t");
+    }
+    
   dec = f2;
 
  
