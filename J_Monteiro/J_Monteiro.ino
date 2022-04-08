@@ -34,15 +34,13 @@ float moving_average;   //Média móvel
 float vet2[n];         //Vetor 2
 int ledState = LOW;   // ledState used to set the LED
 
-static bool ParachuteEjectionEnabled;
-static uint32_t ParachuteEjectionStart;
-
 String jFile;
 String title;
 String n_complete;
-String apogeeDetection;
+
 
 unsigned int allTogether;            //Soma
+unsigned int apogeeDetection = 1;
 unsigned int complement;            //Valor adicionado
 unsigned int cont;                 //Contador
 unsigned int nameFile;            //Nome do arquivo
@@ -125,17 +123,7 @@ void setup() {
       }
     }
   }
-//=======================================================================
-  static void EnableParachuteEjection() 
-// Only allow the parachute ejection to be enabled
 
-   if ( !ParachuteEjectionEnabled )
-   {
-    ParachuteEjectionStart = millis();   
-   
-    ParachuteEjectionEnabled = true;
-  }
-}
 //=======================================================================
  
   for (float k = 0; k < numReads; k++) {
@@ -247,6 +235,7 @@ void loop() {
 
   if (cont >= 50) {
     parachute_deployment = false;
+    apogeeDetection = 1;
     dataString += ("1");             //apogee detect
   }
 
@@ -257,21 +246,20 @@ void loop() {
   previous =  moving_average;
 
 //==============parachute deployment================
-
-  if (currentMillis - previousMillis >= interval) 
-  {
+    // if the LED is off turn it on and vice-versa:
+    if (parachute_deployment = false && ledState == LOW &&  apogeeDetection == 1) {
+        
+         if (currentMillis - previousMillis >= interval) 
+         {
     // save the last time you blinked the LED
     previousMillis = currentMillis;
 
-    // if the LED is off turn it on and vice-versa:
-    if (parachute_deployment = false && ledState == LOW && ParachuteEjectionEnabled) {
-      apogeeDetection = "1";
-      ledState = HIGH;
+    ledState = HIGH;
       
     } else {
       parachute_deployment = true;
       ledState = LOW;
-      ParachuteEjectionEnabled = true;;
+
      }
     } 
     // set the LED with the ledState of the variable:
