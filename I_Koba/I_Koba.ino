@@ -42,9 +42,11 @@ Adafruit_BMP085 bmp;
 #define IGN_2 61 //paraquedas secundario
 #define led_final 13 //paraquedas final
 
+#define MEDIA_PARA_CHAO 100 // intervalo de valores usados na para media do calculo do chão
 #define INTERVALO_MEDIA_M 20 // intervalo de valores usados na para media movel
 #define NUMERO_FILTROS 3  // Numero de filtros 
 #define INTERVALO_QUEDA 4  // intervalo de comparação para queda e suibida
+#define ALTURA_DE_ATIVACAO 400 // ALTURA minima para ativar o ultimo paraquedas
 
 #define TEMPO_PILOTO_ON 5000 // intervalo de tempo que o paraquedas piloto vai ficar ligado
 #define TEMPO_ATIVAR_SECUNDARIO 5000 // intervalo de tempo necessario para ativar o paraquedas secundario pos inicio de queda
@@ -52,14 +54,10 @@ Adafruit_BMP085 bmp;
 #define TEMPO_FINAL_ON 5000 // intervalo de tempo que o paraquedas final vai ficar ligado
 
 
+
+
 #if EXIST_SD
- int numero_do_SD;  //contem o numero que vai seguir o nome do sd
- int qnt_zero;  //quantidade de zeros que será adicionado no nome do sd
- String nome_SD; //primeiro nome do sd
- String txt_SD;
- String zeros;
  String projeto_name; //Nome compketo do SD
- String complemento_SD;  // contem o numero do sd em string
 #endif //SD
 
 #if EXIST_GIRO
@@ -81,19 +79,18 @@ Adafruit_BMP085 bmp;
 
 #if EXIST_IGN_2
  int acendeu_secundario;  // contem o estado do led secundario, 1 para acesso e 0 para apagado
- unsigned long time_secundario = 0;
  bool trava_secundario = true; //trava usado para o led secundario
+ unsigned long time_secundario = 0;
 #endif //paraquedas secundario
 
 #if EXIST_IGN_3
  int acendeu_final; // contem o estado do led final, 1 para acesso e 0 para apagado
- unsigned long time_final = 0;
  bool trava_final = true; //trava usado para o led secundario
+ unsigned long time_final = 0;
 #endif //paraquedas final
 
 #if EXIST_BAR
 int var_queda;  // contem o estado do foguete, 1 para subindo e 0 para queda
-float z;
 float ref_chao; // constante que será usada para referenciar o chão
 float vetor[NUMERO_FILTROS][INTERVALO_MEDIA_M]; // movimentaçãop dos filtros de sinal de alrura 
 float sinal[NUMERO_FILTROS+1];   // irá conter todos sinais relacionado a altura  
@@ -204,13 +201,13 @@ void setup() {
   // laço para determinar o nome do SD
   #if EXIST_SD
    if (!SD.begin(chipSelect)){Serial.println("Card failed, or not present");}
-   numero_do_SD = 0;
-   nome_SD = "Kob_";
-   txt_SD = ".txt";
+   int(numero_do_SD) = 0;
+   String(nome_SD) = "Kob_";
+   String(txt_SD) = ".txt";
    do{
-     zeros = "";
+    String(zeros) = "";
      projeto_name = "";
-     complemento_SD = String(numero_do_SD);
+     String(complemento_SD) = String(numero_do_SD);
      qnt_zero = 8 - nome_SD.length() - complemento_SD.length();
      for (int i = 0; i < qnt_zero; i++) {
        zeros += "0";  
@@ -286,11 +283,11 @@ void loop() {
 
 #if EXIST_BAR
  void Call_chao() {
-   z = 0;
-   for (int x = 0; x < 100; x++) {
+   int(z) = 0;
+   for (int x = 0; x < MEDIA_PARA_CHAO; x++) {
      z = bmp.readAltitude() + z;
    }
-   ref_chao = z / 100; 
+   ref_chao = z / MEDIA_PARA_CHAO; 
  }
  #endif
  
@@ -381,7 +378,7 @@ void Led_para_queda_piloto() {
 #if EXIST_IGN_3
  void Led_para_queda_final() {
    if (var_queda == 0){
-     if(sinal[NUMERO_FILTROS] <= 400){
+     if(sinal[NUMERO_FILTROS] <= ALTURA_DE_ATIVACAO){
        if(trava_final == true){
           digitalWrite(led_final, HIGH);
           time_final = tempo_atual;
