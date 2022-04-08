@@ -6,6 +6,9 @@
 
 const int ledPin =  LED_BUILTIN;        // the number of the LED pin
 const int chipSelect = 53;
+
+//The following constant is the number of milliseconds we wait to fire the parachute ejection.
+ 
 const long interval = 1000;           // interval at which to blink (milliseconds)
 File myFile;
 
@@ -29,11 +32,15 @@ float Maximum_height;     //Altura máxima
 float previous = 0;      //Altitude anterior
 float moving_average;   //Média móvel
 float vet2[n];         //Vetor 2
-int ledState = LOW;             // ledState used to set the LED
+int ledState = LOW;   // ledState used to set the LED
+
+static bool ParachuteEjectionEnabled;
+static uint32_t ParachuteEjectionStart;
 
 String jFile;
 String title;
 String n_complete;
+String apogeeDetection;
 
 unsigned int allTogether;            //Soma
 unsigned int complement;            //Valor adicionado
@@ -118,7 +125,19 @@ void setup() {
       }
     }
   }
+//=======================================================================
+  static void EnableParachuteEjection() 
+// Only allow the parachute ejection to be enabled
 
+   if ( !ParachuteEjectionEnabled )
+   {
+    ParachuteEjectionStart = millis();   
+   
+    ParachuteEjectionEnabled = true;
+  }
+}
+//=======================================================================
+ 
   for (float k = 0; k < numReads; k++) {
     accAltbase = accAltbase + bmp.readAltitude();
   }
@@ -131,9 +150,9 @@ void setup() {
 
 void loop() {
 
-  String dataString = "";
   float Height = 0;
   float current_height;
+  String dataString = "";
   unsigned long currentMillis = millis();
 
   current_height = bmp.readAltitude() - Altbase; //Transformar altitude em altura
@@ -215,9 +234,11 @@ void loop() {
     dataString += ("1");
   }
 
+//adds a point if rocket is descending 
+
   else {
     cont = cont + 1;
-    dataString += ("0");     //descida
+    dataString += ("0");     //descending
   }
 
   dataString += "\t";
@@ -235,25 +256,27 @@ void loop() {
   dataString += "\t";
   previous =  moving_average;
 
-  if (currentMillis - previousMillis >= interval ) {
+//==============parachute deployment================
+
+  if (currentMillis - previousMillis >= interval) 
+  {
     // save the last time you blinked the LED
     previousMillis = currentMillis;
 
-
     // if the LED is off turn it on and vice-versa:
-    if (parachute_deployment = false) {
-    }
-    if (ledState == LOW) {
+    if (parachute_deployment = false && ledState == LOW && ParachuteEjectionEnabled) {
+      apogeeDetection = "1";
       ledState = HIGH;
+      
     } else {
       parachute_deployment = true;
       ledState = LOW;
-    }
-
+      ParachuteEjectionEnabled = true;;
+     }
+    } 
     // set the LED with the ledState of the variable:
     digitalWrite(ledPin, ledState);
 
-  }
 
   File dataFile = SD.open(jFile, FILE_WRITE);
 
