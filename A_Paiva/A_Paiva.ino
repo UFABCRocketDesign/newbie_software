@@ -91,11 +91,11 @@ const int chipSelect = 53;
 class Filtro{
   private:
   int const QtTermos;
-  float* const VetorFiltro;
+  float* const VetorFiltro;  //ponteiro como vetor
   float MediaMov;
   public:
   //construtor
-  Filtro(int v_QtTermos) : QtTermos(v_QtTermos), VetorFiltro(new float[QtTermos]){}
+  Filtro(int v_QtTermos) : QtTermos(v_QtTermos), VetorFiltro(new float[QtTermos]){}  //"new" pega o valor para tamanho do vetor
   //destrutor
   ~Filtro() {
         delete[] VetorFiltro;
@@ -104,21 +104,45 @@ class Filtro{
 };
 float Filtro::FuncaoFriutu(float valoratualizado){
   float SomaMov = 0;                                 //Declara e zera o SomaMov em todo loop
-  MediaMov = 0;                                      //Declara e zera o MediaMov em todo loop
-  for (int i = tam - 2; i >= 0; i--) {    //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1 de trás pra frente
+  MediaMov = 0;                                      //Zera o MediaMov em todo loop
+  for (int i = QtTermos - 2; i >= 0; i--) {    //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1 de trás pra frente
     VetorFiltro[i + 1] = VetorFiltro[i];
   }
   VetorFiltro[0] = valoratualizado;                  //Esse é o valor mais atualizado do filtro1
-  for (int i = 0; i <= tam - 1; i++) {    //Esse 'for' faz a soma dos valores da matriz, para a média do filtro1
+  for (int i = 0; i <= QtTermos - 1; i++) {    //Esse 'for' faz a soma dos valores da matriz, para a média do filtro1
     SomaMov = SomaMov + VetorFiltro[i];
   }
-  MediaMov = SomaMov / tam;               //Valor final do filtro, uma média entre "tam" quantidades de valores
+  MediaMov = SomaMov / QtTermos;               //Valor final do filtro, uma média entre "tam" quantidades de valores
   return MediaMov;
 }
-Filtro FiltroAx(10);
-Filtro FiltroAy(10);
-Filtro FiltroAz(10);
-Filtro FiltroAltitude(10);
+
+class CascataDeFiltro{
+  private:
+  int const QtFiltros;
+  Filtro** MatrizFiltro;
+  public:
+  //construtor
+  CascataDeFiltro(int v_QtFiltros) : QtFiltros(v_QtFiltros), MatrizFiltro(new Filtro*[QtFiltros]){}  //"new" pega o valor para tamanho do vetor de vetor
+  //destrutor
+  ~CascataDeFiltro() {
+        delete[] MatrizFiltro;
+    }
+  float FuncaoCascataFriutu(float valoratualizado);
+};
+float CascataDeFiltro::FuncaoCascataFriutu(float valoratualizado){
+  float ValorFiltrado = valoratualizado;
+  for(int i = 0; i < QtFiltros; i++){
+    ValorFiltrado = FuncaoFriutu(ValorFiltrado);
+    dado += String(ValorFiltrado)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
+  }
+  return ValorFiltrado;
+}
+
+Filtro FiltroAx(tam);
+Filtro FiltroAy(tam);
+Filtro FiltroAz(tam);
+Filtro FiltroAltitude(tam);
+CascataDeFiltro CascataFiltroAltitude(qfa);
 
 void setup() {
   #if usa_acpq
@@ -337,11 +361,12 @@ void loop() {
   dado += String(Hmax)+"\t";
   #endif
   #if usa_apogeu || usa_alt
-  float Afiltrada = A;                                     //Chama a função de filtro para a altitude
-  for(int i = 0; i < qfa; i++){
-    Afiltrada = Friutu(Afiltrada, i);
-    dado += String(Afiltrada)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
-  }
+//  float Afiltrada = A;                                     //Chama a função de filtro para a altitude
+//  for(int i = 0; i < qfa; i++){
+//    Afiltrada = Friutu(Afiltrada, i);
+//    dado += String(Afiltrada)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
+//  }
+  float Afiltrada = CascataFiltroAltitude.FuncaoCascataFriutu(A);
   #endif
   #if usa_apogeu || usa_altMax
   if (Hmax < Afiltrada) {                                    //Pega o valor máximo da média/filtro2
