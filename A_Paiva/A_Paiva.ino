@@ -118,22 +118,31 @@ float Filtro::FuncaoFriutu(float valoratualizado){
 
 class CascataDeFiltro{
   private:
+  int const QtTermos;
   int const QtFiltros;
   Filtro** MatrizFiltro;
   public:
   //construtor
-  CascataDeFiltro(int v_QtFiltros) : QtFiltros(v_QtFiltros), MatrizFiltro(new Filtro*[QtFiltros]){}  //"new" pega o valor para tamanho do vetor de vetor
+  CascataDeFiltro(int v_QtFiltros, int v_QtTermos) : QtFiltros(v_QtFiltros), QtTermos(v_QtTermos), MatrizFiltro(new Filtro*[QtFiltros]){
+      for(int i = 0; i < QtFiltros; i++){
+        MatrizFiltro[i] = new Filtro(QtTermos);
+      }
+    }  //"new" pega o valor para tamanho do vetor de vetor
   //destrutor
   ~CascataDeFiltro() {
-        delete[] MatrizFiltro;
+    for(int i = 0; i < QtFiltros; i++){
+        delete MatrizFiltro[i];
+      }
+    delete[] MatrizFiltro;
     }
   float FuncaoCascataFriutu(float valoratualizado);
 };
 float CascataDeFiltro::FuncaoCascataFriutu(float valoratualizado){
   float ValorFiltrado = valoratualizado;
   for(int i = 0; i < QtFiltros; i++){
-    ValorFiltrado = FuncaoFriutu(ValorFiltrado);
-    dado += String(ValorFiltrado)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
+    ValorFiltrado = MatrizFiltro[i]->FuncaoFriutu(ValorFiltrado);
+    //dado += String(ValorFiltrado)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
+    Serial.println(ValorFiltrado);
   }
   return ValorFiltrado;
 }
@@ -142,7 +151,7 @@ Filtro FiltroAx(tam);
 Filtro FiltroAy(tam);
 Filtro FiltroAz(tam);
 Filtro FiltroAltitude(tam);
-CascataDeFiltro CascataFiltroAltitude(qfa);
+CascataDeFiltro CascataFiltroAltitude(qfa, tam);
 
 void setup() {
   #if usa_acpq
@@ -367,6 +376,7 @@ void loop() {
 //    dado += String(Afiltrada)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
 //  }
   float Afiltrada = CascataFiltroAltitude.FuncaoCascataFriutu(A);
+  dado += String(Afiltrada)+"\t";
   #endif
   #if usa_apogeu || usa_altMax
   if (Hmax < Afiltrada) {                                    //Pega o valor máximo da média/filtro2
