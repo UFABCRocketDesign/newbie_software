@@ -91,6 +91,7 @@ Adafruit_BMP085 bmp;
 
 #if EXIST_BAR
 int var_queda;  // contem o estado do foguete, 1 para subindo e 0 para queda
+int y; 
 float ref_chao; // constante que será usada para referenciar o chão
 float vetor[NUMERO_FILTROS][INTERVALO_MEDIA_M]; // movimentaçãop dos filtros de sinal de alrura 
 float sinal[NUMERO_FILTROS+1];   // irá conter todos sinais relacionado a altura  
@@ -295,17 +296,34 @@ void loop() {
 
 #if EXIST_BAR
  void Filtros() {
-   for (int y = 0; y < NUMERO_FILTROS; y++) {
-     for (int x = INTERVALO_MEDIA_M - 1; x > 0; x--) {
+   for (y = 0; y < NUMERO_FILTROS; y++) {
+     Camadas_de_filtros();
+     Calculo_media_movel();
+   }
+ }
+ 
+#endif
+
+//----------------------------------------------------------------------------------
+
+#if EXIST_BAR
+ void Camadas_de_filtros() {
+  for (int x = INTERVALO_MEDIA_M - 1; x > 0; x--) {
        vetor[y][x] = vetor[y][x - 1];
      }
      vetor[y][0] = sinal[y];
+ }
+#endif
+
+//----------------------------------------------------------------------------------
+
+#if EXIST_BAR
+ void Calculo_media_movel() {
      float k = 0;
      for (int x = 0; x < INTERVALO_MEDIA_M; x++) {
        k = vetor[y][x] + k;
      }
      sinal[y + 1] = k / INTERVALO_MEDIA_M;
-   }
  }
 #endif
 
