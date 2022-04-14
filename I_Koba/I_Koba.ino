@@ -17,24 +17,29 @@ Adafruit_BMP085 bmp;
 //#define IGN_3 46  /*act3*/ 
 //#define IGN_4 55  /*act4*/
 
-#define EXIST_TEMPO 1
+#define EXIST_TEMPO 0
 #define EXIST_SD 0 
-#define EXIST_GIRO 1
-#define EXIST_ACEl 1
-#define EXIST_MAG 1
+#define EXIST_GIRO 0
+#define EXIST_ACEl 0
+#define EXIST_MAG 0
 #define EXIST_BAR 1
+
 #define EXIST_GIRO_X (EXIST_GIRO && 1)
-#define EXIST_GIRO_Y (EXIST_GIRO && 0)
+#define EXIST_GIRO_Y (EXIST_GIRO && 1)
 #define EXIST_GIRO_Z (EXIST_GIRO && 1)
-#define EXIST_ACEl_X (EXIST_ACEl && 0)
+
+#define EXIST_ACEl_X (EXIST_ACEl && 1)
 #define EXIST_ACEl_Y (EXIST_ACEl && 1)
-#define EXIST_ACEl_Z (EXIST_ACEl && 0)
-#define EXIST_MAG_X (EXIST_MAG && 0)
+#define EXIST_ACEl_Z (EXIST_ACEl && 1)
+
+#define EXIST_MAG_X (EXIST_MAG && 1)
 #define EXIST_MAG_Y (EXIST_MAG && 1)
-#define EXIST_MAG_Z (EXIST_MAG && 0)
+#define EXIST_MAG_Z (EXIST_MAG && 1)
+
 #define EXIST_IGN_1 (EXIST_BAR && 1)
 #define EXIST_IGN_2 (EXIST_BAR && 1)
 #define EXIST_IGN_3 (EXIST_BAR && 1)
+
 #define EXIST_ALTURA (EXIST_BAR && 1)
 
 #define chipSelect 53
