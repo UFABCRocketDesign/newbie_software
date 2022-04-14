@@ -20,7 +20,7 @@ Adafruit_BMP085 bmp;
 #define EXIST_TEMPO 0
 #define EXIST_SD 0
 #define EXIST_GIRO 0
-#define EXIST_ACEl 0
+#define EXIST_ACEl 1
 #define EXIST_MAG 0
 #define EXIST_BAR 1
 
@@ -97,7 +97,7 @@ unsigned long time_final = 0;
 #if EXIST_BAR
 int var_queda;  // contem o estado do foguete, 1 para subindo e 0 para queda
 float ref_chao; // constante que será usada para referenciar o chão
-float vetor[NUMERO_FILTROS][INTERVALO_MEDIA_M]; // movimentaçãop dos filtros de sinal de alrura
+float vetor[NUMERO_FILTROS+1][INTERVALO_MEDIA_M]; // movimentaçãop dos filtros de sinal de alrura
 float sinal[NUMERO_FILTROS + 1]; // irá conter todos sinais relacionado a altura
 float sinalzin[INTERVALO_QUEDA]; // contem os dados usados para comparar a altura
 unsigned long time_do_apogeu = 0;
@@ -455,6 +455,8 @@ void Acelerometro() {
 #if EXIST_ACEl_Y
   estado_acelerometro += String(event.acceleration.y);
   estado_acelerometro += "\t";
+  estado_acelerometro += String(Calculo_media_movel(NUMERO_FILTROS,event.acceleration.y));
+  estado_acelerometro += "\t";
 #endif
 #if EXIST_ACEl_Z
   estado_acelerometro += String(event.acceleration.z);
@@ -494,6 +496,7 @@ void Salvar() {
   dados_string += "\t";
  // dados_string += String(sinal[NUMERO_FILTROS]);
  // dados_string += "\t";
+
    for (int x = NUMERO_FILTROS ; x >= 0; x--) {
      dados_string += String(sinal[x]);
      dados_string += "\t";
