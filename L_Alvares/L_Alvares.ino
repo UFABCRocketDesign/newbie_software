@@ -3,6 +3,7 @@
 #include <Adafruit_HMC5883_U.h>
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
+#include <L3G.h>
 #include <SPI.h>
 #include <SD.h>
 #define IGN_1 36  /*act1*/
@@ -58,6 +59,7 @@ boolean LKc = false;
 unsigned long T3Ant = 0;
 
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
+L3G gyro;
 
 void setup()
 {
@@ -65,6 +67,7 @@ void setup()
   pinMode(PLED2, OUTPUT);
   pinMode(PLED3, OUTPUT);
   Serial.begin(115200);
+  Wire.begin();
 
   //ligando bmp
   if (!bmp.begin())
@@ -78,6 +81,13 @@ void setup()
     Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
     while(1);
   }
+
+  if (!gyro.init())
+  {
+    Serial.println("Failed to autodetect gyro type!");
+    while (1);
+  }
+  gyro.enableDefault();
 
   //ligando SD
   while (!Serial)
@@ -214,43 +224,27 @@ void loop()
   sensors_event_t event; 
   mag.getEvent(&event);
 
-  dataString += "X: ";
   dataString += String (event.magnetic.x);
-  dataString += "uT";
-  dataString += "\t";
-  dataString += "Y: ";
+  dataString += "\t";  
   dataString += String (event.magnetic.y);
-  dataString += "uT";
   dataString += "\t";
-  dataString += "Z: ";
   dataString += String (event.magnetic.z);
-  dataString += "uT";
   dataString += "\t";
+
+  //Giroscópio
+  gyro.read();
+
+  dataString += String ((int)gyro.g.x);
+  dataString += "\t";  
+  dataString += String ((int)gyro.g.y);
+  dataString += "\t";
+  dataString += String ((int)gyro.g.z);
+  dataString += "\t";
+
+  //Serial.print((int)gyro.g.x);
+  //Serial.print((int)gyro.g.y);
+  //Serial.println((int)gyro.g.z);
   
-  //Serial.print("X: "); Serial.print(event.magnetic.x); Serial.print("  ");
-  //Serial.print("Y: "); Serial.print(event.magnetic.y); Serial.print("  ");
-  //Serial.print("Z: "); Serial.print(event.magnetic.z); Serial.print("  ");Serial.println("uT");
-
-  float heading = atan2(event.magnetic.y, event.magnetic.x);
-  float declinationAngle = 0.22;
-  heading += declinationAngle;
-   if(heading < 0)
-   {
-    heading += 2*PI;
-   }
-   if(heading > 2*PI)  
-   {
-    heading -= 2*PI;
-   }
-   float headingDegrees = heading * 180/M_PI;
-
-   dataString += "H: ";
-   dataString += String (headingDegrees);
-   dataString += "°";
-   dataString += "\t";
-
-   //Serial.print("Heading (degrees): "); Serial.println(headingDegrees);
-   
   //Timer e ativação de leds
   if (Q1 == 1) // se detectar a queda
   {
