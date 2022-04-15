@@ -62,6 +62,7 @@ Adafruit_BMP085 bmp;
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(1234);
 L3G gyro;
+float Tgraf = 0.0;
 
 void setup()
 {
@@ -180,6 +181,11 @@ void loop()
 {
   String dataString = "";
   unsigned long TAtual = millis();
+
+  //Calculo do tempo
+  Tgraf = TAtual/1000.0;
+  dataString += String(Tgraf);
+  dataString += "\t";
 
   //Calculos filtro 1
   ALT = (bmp.readAltitude() - M);
