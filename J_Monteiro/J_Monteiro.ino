@@ -22,6 +22,7 @@ Adafruit_BMP085 bmp;
 //-----Variáveis Globais-----
 
 bool parachute_deployment = true;
+bool trav = false;
 
 float altitude = 0;            //Altitude
 float relative_average;       //Média Relativa
@@ -250,8 +251,10 @@ void loop() {
   //==============parachute deployment================
   // if the LED is off turn it on and vice-versa:
   if (parachute_deployment == false &&  apogeeDetection == 1) {
-
+   
+    if( trav = false);
     if (currentMillis - previousMillis >= interval)
+       
     {
       // save the last time you blinked the LED
       previousMillis = currentMillis;
