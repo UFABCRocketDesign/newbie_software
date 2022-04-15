@@ -32,8 +32,7 @@ float Maximum_height;     //Altura máxima
 float previous = 0;      //Altitude anterior
 float moving_average;   //Média móvel
 float vet2[n];         //Vetor 2
-int ledState = LOW;   // ledState used to set the LED
-int ledState1;
+int ledState1 = LOW;
 
 String jFile;
 String title;
@@ -239,7 +238,8 @@ void loop() {
     parachute_deployment = false;
     apogeeDetection = 1;
     dataString += ("1");             //apogee detect
-    dataString += ("ledState1");
+    dataString += String(ledState1);
+
   }
 
   else {
