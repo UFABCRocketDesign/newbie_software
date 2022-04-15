@@ -238,7 +238,6 @@ void loop() {
     parachute_deployment = false;
     apogeeDetection = 1;
     dataString += ("1");             //apogee detect
-    dataString += String(ledState1);
 
   }
 
@@ -267,7 +266,8 @@ void loop() {
   }
   // set the LED with the ledState of the variable:
   digitalWrite(ledPin, ledState1);
-
+  dataString += String(ledState1);
+  
   File dataFile = SD.open(jFile, FILE_WRITE);
 
   // if the file is available, write to it:
