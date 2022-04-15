@@ -21,7 +21,7 @@ Adafruit_BMP085 bmp;
 //=============================================================
 //-----Variáveis Globais-----
 
-boolean parachute_deployment;
+bool parachute_deployment = true;
 
 float altitude = 0;            //Altitude
 float relative_average;       //Média Relativa
@@ -235,7 +235,7 @@ void loop() {
   dataString += String(cont);
   dataString += "\t";
 
-  if (cont >= 50) {
+  if (cont >= 10) {
     parachute_deployment = false;
     apogeeDetection = 1;
     dataString += ("1");             //apogee detect
