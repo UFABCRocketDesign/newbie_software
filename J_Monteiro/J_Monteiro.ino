@@ -41,7 +41,7 @@ String n_complete;
 
 
 unsigned int allTogether;             //Soma
-unsigned int apogeeDetection;
+unsigned int apogeeDetection = 0;
 unsigned int complement;            //Valor adicionado
 unsigned int cont;                 //Contador
 unsigned int nameFile;            //Nome do arquivo
@@ -53,6 +53,7 @@ unsigned long previousMillis = 0;  // will store last time LED was updated
 //========================================================================
 
 void setup() {
+  pinMode(ledPin, OUTPUT);
   // Open serial communications and wait for port to open:
   Serial.begin(115200);
   if (!bmp.begin()) {
@@ -61,7 +62,6 @@ void setup() {
     while (!Serial) {
       pinMode(LED_BUILTIN, OUTPUT);
       ; // wait for serial port to connect. Needed for native USB port only
-      pinMode(ledPin, OUTPUT);
     }
   }
   // see if the card is present and can be initialized:
