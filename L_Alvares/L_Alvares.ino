@@ -1,3 +1,6 @@
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_HMC5883_U.h>
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 #include <SPI.h>
@@ -54,6 +57,7 @@ boolean LK3 = false;
 boolean LKc = false;
 unsigned long T3Ant = 0;
 
+Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 
 void setup()
 {
@@ -67,6 +71,12 @@ void setup()
   {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
+  }
+  
+   if(!mag.begin())
+  {
+    Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
+    while(1);
   }
 
   //ligando SD
@@ -200,6 +210,47 @@ void loop()
     dataString += "\t";
   }
 
+  //Magnetometro
+  sensors_event_t event; 
+  mag.getEvent(&event);
+
+  dataString += "X: ";
+  dataString += String (event.magnetic.x);
+  dataString += "uT";
+  dataString += "\t";
+  dataString += "Y: ";
+  dataString += String (event.magnetic.y);
+  dataString += "uT";
+  dataString += "\t";
+  dataString += "Z: ";
+  dataString += String (event.magnetic.z);
+  dataString += "uT";
+  dataString += "\t";
+  
+  //Serial.print("X: "); Serial.print(event.magnetic.x); Serial.print("  ");
+  //Serial.print("Y: "); Serial.print(event.magnetic.y); Serial.print("  ");
+  //Serial.print("Z: "); Serial.print(event.magnetic.z); Serial.print("  ");Serial.println("uT");
+
+  float heading = atan2(event.magnetic.y, event.magnetic.x);
+  float declinationAngle = 0.22;
+  heading += declinationAngle;
+   if(heading < 0)
+   {
+    heading += 2*PI;
+   }
+   if(heading > 2*PI)  
+   {
+    heading -= 2*PI;
+   }
+   float headingDegrees = heading * 180/M_PI;
+
+   dataString += "H: ";
+   dataString += String (headingDegrees);
+   dataString += "°";
+   dataString += "\t";
+
+   //Serial.print("Heading (degrees): "); Serial.println(headingDegrees);
+   
   //Timer e ativação de leds
   if (Q1 == 1) // se detectar a queda
   {
