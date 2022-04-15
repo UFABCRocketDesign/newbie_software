@@ -2,7 +2,7 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_HMC5883_U.h>
 #include <Adafruit_BMP085.h>
-Adafruit_BMP085 bmp;
+#include <Adafruit_ADXL345_U.h>
 #include <L3G.h>
 #include <SPI.h>
 #include <SD.h>
@@ -58,7 +58,9 @@ boolean LK3 = false;
 boolean LKc = false;
 unsigned long T3Ant = 0;
 
+Adafruit_BMP085 bmp;
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
+Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(1234);
 L3G gyro;
 
 void setup()
@@ -88,6 +90,17 @@ void setup()
     while (1);
   }
   gyro.enableDefault();
+
+  if(!accel.begin())
+  {
+    Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
+    while(1);
+  }
+  
+  accel.setRange(ADXL345_RANGE_16_G);
+  // accel.setRange(ADXL345_RANGE_8_G);
+  // accel.setRange(ADXL345_RANGE_4_G);
+  // accel.setRange(ADXL345_RANGE_2_G);
 
   //ligando SD
   while (!Serial)
@@ -241,10 +254,16 @@ void loop()
   dataString += String ((int)gyro.g.z);
   dataString += "\t";
 
-  //Serial.print((int)gyro.g.x);
-  //Serial.print((int)gyro.g.y);
-  //Serial.println((int)gyro.g.z);
-  
+  //Acelerometro
+  accel.getEvent(&event);
+
+  dataString += String (event.acceleration.x);
+  dataString += "\t";  
+  dataString += String (event.acceleration.y);
+  dataString += "\t";
+  dataString += String (event.acceleration.z);
+  dataString += "\t";
+
   //Timer e ativação de leds
   if (Q1 == 1) // se detectar a queda
   {
