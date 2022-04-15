@@ -231,7 +231,7 @@ void loop() {
   }
 
   dataString += "\t";
-  dataString += String(cont);
+  dataString += String(cont/100.0);
   dataString += "\t";
 
   if (cont >= 10) {
