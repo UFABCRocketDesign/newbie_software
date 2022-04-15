@@ -33,7 +33,7 @@ float previous = 0;      //Altitude anterior
 float moving_average;   //Média móvel
 float vet2[n];         //Vetor 2
 int ledState = LOW;   // ledState used to set the LED
-
+int ledState1 = HIGH;
 String jFile;
 String title;
 String n_complete;
@@ -254,17 +254,17 @@ void loop() {
     // save the last time you blinked the LED
     previousMillis = currentMillis;
 
-    ledState = HIGH;
+    ledState1 = HIGH;
       
     } else {
       parachute_deployment = true;
-      ledState = LOW;
+      ledState1 = LOW;
 
      }
     } 
     // set the LED with the ledState of the variable:
-    digitalWrite(ledPin, ledState);
-
+    digitalWrite(ledPin, ledState1);
+     ledState1 = ledState;
 
   File dataFile = SD.open(jFile, FILE_WRITE);
 
