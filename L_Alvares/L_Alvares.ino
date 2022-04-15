@@ -62,7 +62,7 @@ Adafruit_BMP085 bmp;
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(1234);
 L3G gyro;
-float Tgraf = 0.0;
+
 
 void setup()
 {
@@ -72,17 +72,17 @@ void setup()
   Serial.begin(115200);
   Wire.begin();
 
-  //ligando bmp
+  // Ligando os Sensores
   if (!bmp.begin())
   {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
-  
-   if(!mag.begin())
+
+  if (!mag.begin())
   {
     Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
-    while(1);
+    while (1);
   }
 
   if (!gyro.init())
@@ -92,18 +92,14 @@ void setup()
   }
   gyro.enableDefault();
 
-  if(!accel.begin())
+  if (!accel.begin())
   {
     Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
-    while(1);
+    while (1);
   }
-  
   accel.setRange(ADXL345_RANGE_16_G);
-  // accel.setRange(ADXL345_RANGE_8_G);
-  // accel.setRange(ADXL345_RANGE_4_G);
-  // accel.setRange(ADXL345_RANGE_2_G);
 
-  //ligando SD
+  //Ligando o cartão SD
   while (!Serial)
   {
     ;
@@ -117,17 +113,53 @@ void setup()
   Serial.println("Card initialized.");
 
   //Cabeçalho e formatação do nome do arquivo
+  //ordem de impressão -- Tempo(s)/Altitude(m)/Filtro 1(m)/Filtro 2(m)/Detec. Apogeu/Mag X (uT)/Mag Y (uT)/Mag Z (uT)/Gyro X (rad/s)/Gyro Y (rad/s)/Gyro Z (rad/s)/Acel X (m/s^2)/Acel Y (m/s^2)/Acel Z (m/s^2)/Led P36/Led P61/Led P13
   String StringC = "";
-  StringC += "Temperatura(°C)";
+  StringC += "Tempo(s)";
   StringC += "\t";
-  StringC += "Pressão(Pa)";
+  StringC += "Altitude(m)";
   StringC += "\t";
-  StringC +=  "Altitude(m)";
+  StringC += "Filtro 1(m)";
   StringC += "\t";
-  StringC += "PressãoNivelMar(Pa)";
+  StringC += "Filtro 2(m)";
   StringC += "\t";
-  StringC += "AltitudeReal(m)";
+  StringC += "Detecção de Apogeu";
   StringC += "\t";
+  StringC += "Magnetômetro X(uT)";
+  StringC += "\t";
+  StringC += "Magnetômetro Y(uT)";
+  StringC += "\t";
+  StringC += "Magnetômetro Z(uT)";
+  StringC += "\t";
+  StringC += "Giroscópio X(rad/s)";
+  StringC += "\t";
+  StringC += "Giroscópio Y(rad/s)";
+  StringC += "\t";
+  StringC += "Giroscópio Z(rad/s)";
+  StringC += "\t";
+  StringC += "Acelerômetro X(m/s^2)";
+  StringC += "\t";
+  StringC += "Acelerômetro Y(m/s^2)";
+  StringC += "\t";
+  StringC += "Acelerômetro Z(m/s^2)";
+  StringC += "\t";
+  StringC += "Ativação Led1";
+  StringC += "\t";
+  StringC += "Ativação Led2";
+  StringC += "\t";
+  StringC += "Ativação Led3";
+  StringC += "\t";
+
+  //StringC += "Temperatura(°C)";
+  //StringC += "\t";
+  //StringC += "Pressão(Pa)";
+  //StringC += "\t";
+  //StringC +=  "Altitude(m)";
+  //StringC += "\t";
+  //StringC += "PressãoNivelMar(Pa)";
+  //StringC += "\t";
+  //StringC += "AltitudeReal(m)";
+  //StringC += "\t";
 
   while (NomeArq.length() == 0)
   {
@@ -183,11 +215,10 @@ void loop()
   unsigned long TAtual = millis();
 
   //Calculo do tempo
-  Tgraf = TAtual/1000.0;
-  dataString += String(Tgraf);
+  dataString += String(TAtual / 1000.0);
   dataString += "\t";
 
-  //Calculos filtro 1
+  //Calculos dos Filtros
   ALT = (bmp.readAltitude() - M);
   dataString += String(ALT);
   dataString += "\t";
@@ -200,10 +231,7 @@ void loop()
     A = 0;
   }
   SF1 = F1 / 11;
-  dataString += String(SF1);
-  dataString += "\t";
 
-  //Calculos filtro 2
   F2 = F2 - Vfiltro2[B];
   Vfiltro2[B] = SF1;
   F2 = F2 + Vfiltro2[B];
@@ -213,10 +241,13 @@ void loop()
     B = 0;
   }
   SF2 = F2 / 11;
+
+  dataString += String(SF1);
+  dataString += "\t";
   dataString += String (SF2);
   dataString += "\t";
 
-  //Apogeu
+  //Detecção de Apogeu
   if (Ap1 > SF2)
   {
     Queda++;
@@ -239,32 +270,26 @@ void loop()
     dataString += "\t";
   }
 
-  //Magnetometro
-  sensors_event_t event; 
+  //Captação dos sensores
+  sensors_event_t event;
   mag.getEvent(&event);
+  accel.getEvent(&event);
+  gyro.read();
 
   dataString += String (event.magnetic.x);
-  dataString += "\t";  
+  dataString += "\t";
   dataString += String (event.magnetic.y);
   dataString += "\t";
   dataString += String (event.magnetic.z);
   dataString += "\t";
-
-  //Giroscópio
-  gyro.read();
-
   dataString += String ((int)gyro.g.x);
-  dataString += "\t";  
+  dataString += "\t";
   dataString += String ((int)gyro.g.y);
   dataString += "\t";
   dataString += String ((int)gyro.g.z);
   dataString += "\t";
-
-  //Acelerometro
-  accel.getEvent(&event);
-
   dataString += String (event.acceleration.x);
-  dataString += "\t";  
+  dataString += "\t";
   dataString += String (event.acceleration.y);
   dataString += "\t";
   dataString += String (event.acceleration.z);
@@ -355,6 +380,7 @@ void loop()
   Ap1 = SF2;
 
   //Cartão SD
+
   Serial.println(dataString);
   File dataFile = SD.open(NomeArq , FILE_WRITE);
   if (dataFile)
