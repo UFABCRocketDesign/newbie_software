@@ -96,7 +96,11 @@ class Filtro {
     float MediaMov;
   public:
     //construtor
-    Filtro(int v_QtTermos) : QtTermos(v_QtTermos), VetorFiltro(new float[QtTermos]) {} //"new" pega o valor para tamanho do vetor
+    Filtro(int v_QtTermos) : QtTermos(v_QtTermos), VetorFiltro(new float[QtTermos]) {  //"new" pega o valor para tamanho do vetor
+      for (int i = 0; i < QtTermos; i++) {
+        VetorFiltro[i] = 0;
+      }
+    } 
     //destrutor
     ~Filtro() {
       delete[] VetorFiltro;
