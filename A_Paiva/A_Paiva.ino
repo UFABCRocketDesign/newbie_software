@@ -292,6 +292,7 @@ void setup() {
   #endif
 }
 void loop() {
+  Serial.print("Começo do loop");
   unsigned long tempoAtual = millis();
   String dado = "";
   #if usa_Tempo
@@ -378,6 +379,7 @@ void loop() {
   float Afiltrada = CascataFiltroAltitude.FuncaoCascataFriutu(A);
   dado += String(Afiltrada)+"\t";
   #endif
+  Serial.print("Meio loop,dps dos filtros");
   #if usa_apogeu || usa_altMax
   if (Hmax < Afiltrada) {                                    //Pega o valor máximo da média/filtro2
     Hmax = Afiltrada;
