@@ -294,6 +294,7 @@ void setup() {
 #endif
 }
 void loop() {
+  dado = "";
   unsigned long tempoAtual = millis();
 #if usa_Tempo
   dado += String(tempoAtual / 1000.0) + "\t";
@@ -388,12 +389,10 @@ void loop() {
 #if usa_apogeu
   apogeu = Apogueu(apogeu, Hmax, Afiltrada, tempoAtual);
   if (apogeu == 0) {
-    dado += "Subindo";
-    dado += "\t";
+    dado += "Subindo"+"\t";
   }
   else if (apogeu == 1) {
-    dado += "Descendo";
-    dado += "\t";
+    dado += "Descendo"+"\t";
 #if usa_acpq
     dado += Paraqueda1(tempoAtual, apogeu);
     dado += Paraqueda2(tempoAtual, apogeu);
