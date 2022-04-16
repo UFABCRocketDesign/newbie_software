@@ -18,6 +18,8 @@
 #define PLED2 IGN_2
 #define PLED3 LED_BUILTIN
 
+#define MagDbg 0
+
 const int chipSelect = 53; //pino SD
 String NomeArq = "";
 int ValorA = 0;
@@ -50,9 +52,10 @@ unsigned long T2Ant = 0;
 unsigned long T3Ant = 0;
 
 Adafruit_BMP085 bmp;
-Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(1234);
+Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 L3G gyro;
+
 
 void setup()
 {
@@ -69,11 +72,13 @@ void setup()
     while (1) {}
   }
 
+#if MagDbg == 1
   if (!mag.begin())
   {
     Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
     while (1);
   }
+#endif
 
   if (!gyro.init())
   {
@@ -147,12 +152,16 @@ void setup()
   StringC += "\t";
   StringC += "Detecção de Apogeu";
   StringC += "\t";
+
+#if MagDbg == 1
   StringC += "Magnetômetro X(uT)";
   StringC += "\t";
   StringC += "Magnetômetro Y(uT)";
   StringC += "\t";
   StringC += "Magnetômetro Z(uT)";
   StringC += "\t";
+#endif
+
   StringC += "Giroscópio X(rad/s)";
   StringC += "\t";
   StringC += "Giroscópio Y(rad/s)";
@@ -264,27 +273,31 @@ void loop()
 
   //Captação dos sensores
   sensors_event_t event;
-  mag.getEvent(&event);
-  accel.getEvent(&event);
-  gyro.read();
 
+#if MagDbg == 1
+  mag.getEvent(&event);
   dataString += String (event.magnetic.x);
   dataString += "\t";
   dataString += String (event.magnetic.y);
   dataString += "\t";
   dataString += String (event.magnetic.z);
   dataString += "\t";
-  dataString += String ((int)gyro.g.x);
-  dataString += "\t";
-  dataString += String ((int)gyro.g.y);
-  dataString += "\t";
-  dataString += String ((int)gyro.g.z);
-  dataString += "\t";
+#endif
+
+  accel.getEvent(&event);
   dataString += String (event.acceleration.x);
   dataString += "\t";
   dataString += String (event.acceleration.y);
   dataString += "\t";
   dataString += String (event.acceleration.z);
+  dataString += "\t";
+
+  gyro.read();
+  dataString += String ((int)gyro.g.x);
+  dataString += "\t";
+  dataString += String ((int)gyro.g.y);
+  dataString += "\t";
+  dataString += String ((int)gyro.g.z);
   dataString += "\t";
 
   //Timer e ativação de leds
