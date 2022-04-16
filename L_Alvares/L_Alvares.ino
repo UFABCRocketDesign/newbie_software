@@ -19,7 +19,8 @@
 #define PLED3 LED_BUILTIN
 
 #define MagDbg 1
-#define GyrDbg 0
+#define GyrDbg 1
+#define AclDbg 0
 
 const int chipSelect = 53; //pino SD
 String NomeArq = "";
@@ -53,7 +54,6 @@ unsigned long T2Ant = 0;
 unsigned long T3Ant = 0;
 
 Adafruit_BMP085 bmp;
-Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(1234);
 
 #if MagDbg
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
@@ -61,6 +61,10 @@ Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 
 #if GyrDbg
 L3G gyro;
+#endif
+
+#if AclDbg
+Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(1234);
 #endif
 
 void setup()
@@ -95,12 +99,14 @@ void setup()
   gyro.enableDefault();
 #endif
 
+#if AclDbg
   if (!accel.begin())
   {
     Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
     while (1);
   }
   accel.setRange(ADXL345_RANGE_16_G);
+#endif
 
   //Ligando o cartão SD
   while (!Serial)
@@ -179,14 +185,15 @@ void setup()
   StringC += "\t";
 #endif
 
+#if AclDbg
   StringC += "Acelerômetro X(m/s^2)";
   StringC += "\t";
   StringC += "Acelerômetro Y(m/s^2)";
   StringC += "\t";
   StringC += "Acelerômetro Z(m/s^2)";
   StringC += "\t";
+#endif
 
-  
   StringC += "Ativação Led1";
   StringC += "\t";
   StringC += "Ativação Led2";
@@ -194,7 +201,7 @@ void setup()
   StringC += "Ativação Led3";
   StringC += "\t";
 
-  
+
   Serial.print(StringC);
 
   //StringC += "Temperatura(°C)";
@@ -299,14 +306,6 @@ void loop()
   dataString += "\t";
 #endif
 
-  accel.getEvent(&event);
-  dataString += String (event.acceleration.x);
-  dataString += "\t";
-  dataString += String (event.acceleration.y);
-  dataString += "\t";
-  dataString += String (event.acceleration.z);
-  dataString += "\t";
-
 #if GyrDbg
   gyro.read();
   dataString += String ((int)gyro.g.x);
@@ -314,6 +313,16 @@ void loop()
   dataString += String ((int)gyro.g.y);
   dataString += "\t";
   dataString += String ((int)gyro.g.z);
+  dataString += "\t";
+#endif
+
+#if AclDbg
+  accel.getEvent(&event);
+  dataString += String (event.acceleration.x);
+  dataString += "\t";
+  dataString += String (event.acceleration.y);
+  dataString += "\t";
+  dataString += String (event.acceleration.z);
   dataString += "\t";
 #endif
 
