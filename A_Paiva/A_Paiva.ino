@@ -39,7 +39,7 @@
 #define usa_my (usa_mag && 0)     //Variavel de escolha do uso do valor do magnetometro em y
 #define usa_mz (usa_mag && 0)     //Variavel de escolha do uso do valor do magnetometro em z
 
-#define usa_Tempo 1               //Variavel de escolha do uso da impressão do tempo
+#define usa_Tempo 0               //Variavel de escolha do uso da impressão do tempo
 #define usa_impreSerial 1         //Variavel de escolha do uso da impressão na serial
 #define usa_SD 0                  //Variavel de escolha do uso de funções
 //////////////////////////////////////////////////////////////////////
@@ -48,6 +48,7 @@
 #define IGN_3 46  //act3 LED DA PLAQUINHA
 #define IGN_4 55  //act4 LED DA PLAQUINHA
 
+String dado = "";
 String cabecalho = "";
 #if usa_apogeu || usa_alt
 float AltitudeRef = 0;            //É o valor da média dos valores iniciais(foguete parado na base)
@@ -142,7 +143,7 @@ float CascataDeFiltro::FuncaoCascataFriutu(float valoratualizado) {
   float ValorFiltrado = valoratualizado;
   for (int i = 0; i < QtFiltros; i++) {
     ValorFiltrado = MatrizFiltro[i]->FuncaoFriutu(ValorFiltrado);      //o "->" chama uma função para ponteiro de ponteiro
-    //dado += String(ValorFiltrado)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
+    dado += String(ValorFiltrado)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
     //Serial.println(ValorFiltrado);
   }
   return ValorFiltrado;
@@ -293,9 +294,7 @@ void setup() {
 #endif
 }
 void loop() {
-  //Serial.print("Começo do loop");
   unsigned long tempoAtual = millis();
-  String dado = "";
 #if usa_Tempo
   dado += String(tempoAtual / 1000.0) + "\t";
 #endif
