@@ -18,7 +18,8 @@
 #define PLED2 IGN_2
 #define PLED3 LED_BUILTIN
 
-#define MagDbg 0
+#define MagDbg 1
+#define GyrDbg 0
 
 const int chipSelect = 53; //pino SD
 String NomeArq = "";
@@ -58,7 +59,9 @@ Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(1234);
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 #endif
 
+#if GyrDbg
 L3G gyro;
+#endif
 
 void setup()
 {
@@ -83,12 +86,14 @@ void setup()
   }
 #endif
 
+#if GyrDbg
   if (!gyro.init())
   {
     Serial.println("Failed to autodetect gyro type!");
     while (1);
   }
   gyro.enableDefault();
+#endif
 
   if (!accel.begin())
   {
@@ -165,24 +170,31 @@ void setup()
   StringC += "\t";
 #endif
 
+#if GyrDbg
   StringC += "Giroscópio X(rad/s)";
   StringC += "\t";
   StringC += "Giroscópio Y(rad/s)";
   StringC += "\t";
   StringC += "Giroscópio Z(rad/s)";
   StringC += "\t";
+#endif
+
   StringC += "Acelerômetro X(m/s^2)";
   StringC += "\t";
   StringC += "Acelerômetro Y(m/s^2)";
   StringC += "\t";
   StringC += "Acelerômetro Z(m/s^2)";
   StringC += "\t";
+
+  
   StringC += "Ativação Led1";
   StringC += "\t";
   StringC += "Ativação Led2";
   StringC += "\t";
   StringC += "Ativação Led3";
   StringC += "\t";
+
+  
   Serial.print(StringC);
 
   //StringC += "Temperatura(°C)";
@@ -295,6 +307,7 @@ void loop()
   dataString += String (event.acceleration.z);
   dataString += "\t";
 
+#if GyrDbg
   gyro.read();
   dataString += String ((int)gyro.g.x);
   dataString += "\t";
@@ -302,6 +315,7 @@ void loop()
   dataString += "\t";
   dataString += String ((int)gyro.g.z);
   dataString += "\t";
+#endif
 
   //Timer e ativação de leds
   if (Q1 == 1) // se detectar a queda
