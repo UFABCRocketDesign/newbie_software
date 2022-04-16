@@ -21,8 +21,8 @@
 #define usa_alt (usa_bar && 1)    //Variavel de escolha do uso do valor Altura
 #define usa_altMax (usa_alt && 0) //Variavel de escolha do uso do valor Altura Máxima
 #define usa_temp (usa_bar && 0)   //Variavel de escolha do uso do valor Temperatura
-#define usa_apogeu (usa_bar && 0) //Variavel de escolha do uso da detecção de apogeu
-#define usa_acpq (usa_apogeu && 0)//Variavel de escolha do uso do acionamento dos paraquedas
+#define usa_apogeu (usa_bar && 1) //Variavel de escolha do uso da detecção de apogeu
+#define usa_acpq (usa_apogeu && 1)//Variavel de escolha do uso do acionamento dos paraquedas
 
 #define usa_giro 0                //Variavel de escolha do uso do sensor
 #define usa_gx (usa_giro && 0)    //Variavel de escolha do uso do valor do giroscopio em x
@@ -393,10 +393,10 @@ void loop() {
 #if usa_apogeu
   apogeu = Apogueu(apogeu, Hmax, Afiltrada, tempoAtual);
   if (apogeu == 0) {
-    dado += "Subindo"+"\t";
+    dado += "Subindo\t";
   }
   else if (apogeu == 1) {
-    dado += "Descendo"+"\t";
+    dado += "Descendo\t";
 #if usa_acpq
     dado += Paraqueda1(tempoAtual, apogeu);
     dado += Paraqueda2(tempoAtual, apogeu);
