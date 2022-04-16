@@ -24,33 +24,19 @@ String NomeArq = "";
 float ALT = 0.0;
 float Med = 0.0;
 float M = 0.0;
-float F1 = 0.0;
-float SF1 = 0.0;
 float Vfiltro1[11];
-float F2 = 0.0;
-float SF2 = 0.0;
 float Vfiltro2[11];
+float SF1 = 0.0;
+float SF2 = 0.0;
 float Ap1 = 0.0;
-int A = 0;
-int B = 0;
-int Queda = 0;
-unsigned long TQ = 0;
-int Q1 = 0;
+unsigned long T1Ant = 0;
+unsigned long T2Ant = 0;
+unsigned long T3Ant = 0;
 
 Adafruit_BMP085 bmp;
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(1234);
 L3G gyro;
-
-int LED1ST = LOW;
-boolean LK1 = false;
-unsigned long T1Ant = 0;
-int LED2ST = LOW;
-boolean LK2 = false;
-unsigned long T2Ant = 0;
-int LED3ST = LOW;
-boolean LK3 = false;
-unsigned long T3Ant = 0;
 
 void setup()
 {
@@ -153,11 +139,11 @@ void setup()
     String Arq = "";
     String Nome = "LAQ";
     String Zeros = "";
-    //String VA = "";
+    String VA = "";
     int ValorA = 0;
     int NC = 0;
 
-    String VA = String (ValorA);
+    VA = String (ValorA);
     NC = Nome.length() + VA.length();
 
     for (int a = 0; a < 8 - NC; a++)
@@ -204,6 +190,19 @@ void loop()
 {
   String dataString = "";
   unsigned long TAtual = millis();
+  int A = 0;
+  int B = 0;
+  float F1 = 0.0;
+  float F2 = 0.0;
+  int Queda = 0;
+  unsigned long TQ = 0;
+  int Q1 = 0;
+  int LED1ST = LOW;
+  boolean LK1 = false;
+  int LED2ST = LOW;
+  boolean LK2 = false;
+  int LED3ST = LOW;
+  boolean LK3 = false;
 
   //Calculo do tempo
   dataString += String(TAtual / 1000.0);
