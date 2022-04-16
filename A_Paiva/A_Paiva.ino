@@ -21,15 +21,15 @@
 #define usa_alt (usa_bar && 1)    //Variavel de escolha do uso do valor Altura
 #define usa_altMax (usa_alt && 0) //Variavel de escolha do uso do valor Altura Máxima
 #define usa_temp (usa_bar && 0)   //Variavel de escolha do uso do valor Temperatura
-#define usa_apogeu (usa_bar && 1) //Variavel de escolha do uso da detecção de apogeu
-#define usa_acpq (usa_apogeu && 1)//Variavel de escolha do uso do acionamento dos paraquedas
+#define usa_apogeu (usa_bar && 0) //Variavel de escolha do uso da detecção de apogeu
+#define usa_acpq (usa_apogeu && 0)//Variavel de escolha do uso do acionamento dos paraquedas
 
 #define usa_giro 0                //Variavel de escolha do uso do sensor
 #define usa_gx (usa_giro && 0)    //Variavel de escolha do uso do valor do giroscopio em x
 #define usa_gy (usa_giro && 0)    //Variavel de escolha do uso do valor do giroscopio em y
 #define usa_gz (usa_giro && 0)    //Variavel de escolha do uso do valor do giroscopio em z
 
-#define usa_acel 1                //Variavel de escolha do uso de funções
+#define usa_acel 0                //Variavel de escolha do uso de funções
 #define usa_ax (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em x
 #define usa_ay (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em y
 #define usa_az (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em z
@@ -105,11 +105,12 @@ class Filtro {
 float Filtro::FuncaoFriutu(float valoratualizado) {
   float SomaMov = 0;                                 //Declara e zera o SomaMov em todo loop
   MediaMov = 0;                                      //Zera o MediaMov em todo loop
-  for (int i = QtTermos - 2; i >= 0; i--) {    //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1 de trás pra frente
+  int QtTermosm2 = QtTermos - 2;
+  for (int i = QtTermosm2; i >= 0; i--) {    //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1 de trás pra frente
     VetorFiltro[i + 1] = VetorFiltro[i];
   }
   VetorFiltro[0] = valoratualizado;                  //Esse é o valor mais atualizado do filtro1
-  for (int i = 0; i <= QtTermos - 1; i++) {    //Esse 'for' faz a soma dos valores da matriz, para a média do filtro1
+  for (int i = 0; i < QtTermos; i++) {    //Esse 'for' faz a soma dos valores da matriz, para a média do filtro1
     SomaMov = SomaMov + VetorFiltro[i];
   }
   MediaMov = SomaMov / QtTermos;               //Valor final do filtro, uma média entre "tam" quantidades de valores
@@ -140,9 +141,9 @@ class CascataDeFiltro {
 float CascataDeFiltro::FuncaoCascataFriutu(float valoratualizado) {
   float ValorFiltrado = valoratualizado;
   for (int i = 0; i < QtFiltros; i++) {
-    ValorFiltrado = MatrizFiltro[i]->FuncaoFriutu(ValorFiltrado);
+    ValorFiltrado = MatrizFiltro[i]->FuncaoFriutu(ValorFiltrado);      //o "->" chama uma função para ponteiro de ponteiro
     //dado += String(ValorFiltrado)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
-    Serial.println(ValorFiltrado);
+    //Serial.println(ValorFiltrado);
   }
   return ValorFiltrado;
 }
@@ -436,6 +437,7 @@ int Apogueu(int apogeu, float Hmax, float MediaMov, unsigned long tempoAtual) {
   }
   return apogeu;
 }
+#if usa_acpq 
 String Paraqueda1(unsigned long tempoAtual, int apogeu) {
   if (auxinicio1 == 0) {
     inicio1 = tempoAtual + duracao;
@@ -492,3 +494,4 @@ String Paraqueda3(unsigned long tempoAtual, float MediaMov, int apogeu) {
     return "";
   }
 }
+#endif
