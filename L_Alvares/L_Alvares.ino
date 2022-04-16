@@ -53,9 +53,12 @@ unsigned long T3Ant = 0;
 
 Adafruit_BMP085 bmp;
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(1234);
-Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
-L3G gyro;
 
+#if MagDbg
+Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
+#endif
+
+L3G gyro;
 
 void setup()
 {
@@ -72,7 +75,7 @@ void setup()
     while (1) {}
   }
 
-#if MagDbg == 1
+#if MagDbg
   if (!mag.begin())
   {
     Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
@@ -153,7 +156,7 @@ void setup()
   StringC += "Detecção de Apogeu";
   StringC += "\t";
 
-#if MagDbg == 1
+#if MagDbg
   StringC += "Magnetômetro X(uT)";
   StringC += "\t";
   StringC += "Magnetômetro Y(uT)";
@@ -274,7 +277,7 @@ void loop()
   //Captação dos sensores
   sensors_event_t event;
 
-#if MagDbg == 1
+#if MagDbg
   mag.getEvent(&event);
   dataString += String (event.magnetic.x);
   dataString += "\t";
