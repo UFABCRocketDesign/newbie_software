@@ -251,7 +251,7 @@ void setup() {
 #endif //SD
 
 #if EXIST_BAR
-  Serial.println("Constante que referencia o chão:");
+  Serial.print("Constante que referencia o chão:");
   Serial.println(ref_chao);
 #endif
   Serial.print(dados_string);
