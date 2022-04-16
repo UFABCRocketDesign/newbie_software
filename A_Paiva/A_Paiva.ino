@@ -51,7 +51,7 @@
 String cabecalho = "";
 #if usa_apogeu || usa_alt
 float AltitudeRef = 0;            //É o valor da média dos valores iniciais(foguete parado na base)
-float MatrizFiltros[qfa+qfg][tam];     //Vetor para guardar os valores para as médias utilizadas pelos filtros
+float MatrizFiltros[qfa + qfg][tam];   //Vetor para guardar os valores para as médias utilizadas pelos filtros
 #endif
 #if usa_apogeu || usa_altMax
 float Hmax = 0;                   //Valor máximo filtrado
@@ -88,21 +88,21 @@ const int chipSelect = 53;
 #endif
 ///////// classes ou objetos ///////////
 
-class Filtro{
+class Filtro {
   private:
-  int const QtTermos;
-  float* const VetorFiltro;  //ponteiro como vetor
-  float MediaMov;
+    int const QtTermos;
+    float* const VetorFiltro;  //ponteiro como vetor
+    float MediaMov;
   public:
-  //construtor
-  Filtro(int v_QtTermos) : QtTermos(v_QtTermos), VetorFiltro(new float[QtTermos]){}  //"new" pega o valor para tamanho do vetor
-  //destrutor
-  ~Filtro() {
-        delete[] VetorFiltro;
+    //construtor
+    Filtro(int v_QtTermos) : QtTermos(v_QtTermos), VetorFiltro(new float[QtTermos]) {} //"new" pega o valor para tamanho do vetor
+    //destrutor
+    ~Filtro() {
+      delete[] VetorFiltro;
     }
-  float FuncaoFriutu(float valoratualizado);
+    float FuncaoFriutu(float valoratualizado);
 };
-float Filtro::FuncaoFriutu(float valoratualizado){
+float Filtro::FuncaoFriutu(float valoratualizado) {
   float SomaMov = 0;                                 //Declara e zera o SomaMov em todo loop
   MediaMov = 0;                                      //Zera o MediaMov em todo loop
   for (int i = QtTermos - 2; i >= 0; i--) {    //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1 de trás pra frente
@@ -116,30 +116,30 @@ float Filtro::FuncaoFriutu(float valoratualizado){
   return MediaMov;
 }
 
-class CascataDeFiltro{
+class CascataDeFiltro {
   private:
-  int const QtTermos;
-  int const QtFiltros;
-  Filtro** MatrizFiltro;
+    int const QtTermos;
+    int const QtFiltros;
+    Filtro** MatrizFiltro;
   public:
-  //construtor
-  CascataDeFiltro(int v_QtFiltros, int v_QtTermos) : QtFiltros(v_QtFiltros), QtTermos(v_QtTermos), MatrizFiltro(new Filtro*[QtFiltros]){
-      for(int i = 0; i < QtFiltros; i++){
+    //construtor
+    CascataDeFiltro(int v_QtFiltros, int v_QtTermos) : QtFiltros(v_QtFiltros), QtTermos(v_QtTermos), MatrizFiltro(new Filtro * [QtFiltros]) {
+      for (int i = 0; i < QtFiltros; i++) {
         MatrizFiltro[i] = new Filtro(QtTermos);
       }
     }  //"new" pega o valor para tamanho do vetor de vetor
-  //destrutor
-  ~CascataDeFiltro() {
-    for(int i = 0; i < QtFiltros; i++){
+    //destrutor
+    ~CascataDeFiltro() {
+      for (int i = 0; i < QtFiltros; i++) {
         delete MatrizFiltro[i];
       }
-    delete[] MatrizFiltro;
+      delete[] MatrizFiltro;
     }
-  float FuncaoCascataFriutu(float valoratualizado);
+    float FuncaoCascataFriutu(float valoratualizado);
 };
-float CascataDeFiltro::FuncaoCascataFriutu(float valoratualizado){
+float CascataDeFiltro::FuncaoCascataFriutu(float valoratualizado) {
   float ValorFiltrado = valoratualizado;
-  for(int i = 0; i < QtFiltros; i++){
+  for (int i = 0; i < QtFiltros; i++) {
     ValorFiltrado = MatrizFiltro[i]->FuncaoFriutu(ValorFiltrado);
     //dado += String(ValorFiltrado)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
     Serial.println(ValorFiltrado);
@@ -154,7 +154,7 @@ Filtro FiltroAltitude(tam);
 CascataDeFiltro CascataFiltroAltitude(qfa, tam);
 
 void setup() {
-  #if usa_acpq
+#if usa_acpq
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(IGN_1, OUTPUT);//PINOS DA MACRO pinos.h feita pelo Heitor
   pinMode(IGN_2, OUTPUT);
@@ -165,96 +165,96 @@ void setup() {
   digitalWrite(IGN_2, LOW);
   //digitalWrite(IGN_3, LOW);
   //digitalWrite(IGN_4, LOW);
-  #endif
-  #if usa_impreSerial
+#endif
+#if usa_impreSerial
   Serial.begin(115200);
-  #endif
+#endif
   Wire.begin();
-  #if usa_Tempo
+#if usa_Tempo
   cabecalho = "Tempo\t";
-  #endif
-  #if usa_giro
+#endif
+#if usa_giro
   if (!giro.init()) {
     Serial.println("FALHA AO ENCONTRAR GIROSCÓPIO!");
   }
   giro.enableDefault();
-  #endif
-  #if usa_gx
+#endif
+#if usa_gx
   cabecalho += "Gx\t";
-  #endif
-  #if usa_gy
+#endif
+#if usa_gy
   cabecalho += "Gy\t";
-  #endif
-  #if usa_gz
+#endif
+#if usa_gz
   cabecalho += "Gz\t";
-  #endif
-  #if usa_mag
-  if(!mag.begin())
+#endif
+#if usa_mag
+  if (!mag.begin())
   {
     Serial.println("FALHA AO ENCONTRAR MAGNETÔMETRO!");
   }
-  #endif
-  #if usa_mx
+#endif
+#if usa_mx
   cabecalho += "Mx(uT)\t";
-  #endif
-  #if usa_my
+#endif
+#if usa_my
   cabecalho += "My(uT)\t";
-  #endif
-  #if usa_mz
+#endif
+#if usa_mz
   cabecalho += "Mz(uT)\t";
-  #endif  
-  #if usa_acel
-  if(!accel.begin())
+#endif
+#if usa_acel
+  if (!accel.begin())
   {
     Serial.println("FALHA AO ENCONTRAR ACELERÔMETRO");
   }
   accel.setRange(ADXL345_RANGE_16_G);
-  #endif
-  #if usa_ax
+#endif
+#if usa_ax
   cabecalho += "Ax(m/s^2)\t";
-  #endif
-  #if usa_ay
+#endif
+#if usa_ay
   cabecalho += "Ay(m/s^2)\t";
-  #endif
-  #if usa_az
+#endif
+#if usa_az
   cabecalho += "Az(m/s^2)\t";
-  #endif
-  #if usa_bar
+#endif
+#if usa_bar
   if (!bmp.begin()) {
     Serial.println("FALHA AO ENCONTRAR BARÔMETRO");
   }
-  #endif
-  #if usa_temp
+#endif
+#if usa_temp
   cabecalho += "Temperatura(°C)\t";
-  #endif
-  #if usa_pre
+#endif
+#if usa_pre
   cabecalho += "Pressao(Pa)\t";
-  #endif
-  #if usa_altMax
+#endif
+#if usa_altMax
   cabecalho += "Altura máxima(m)\t";
-  #endif
-  #if usa_alt
+#endif
+#if usa_alt
   for (int i = 0; i < qfa; i++) {
     cabecalho += "Altura do filtro ";
     cabecalho += i;
     cabecalho += "(m)\t";
   }
-  #endif
-  #if usa_acpq || usa_apogeu
+#endif
+#if usa_acpq || usa_apogeu
   cabecalho += "Statu de voo";
-  #endif
-  #if usa_alt || usa_apogeu
+#endif
+#if usa_alt || usa_apogeu
   float SomaRef = 0;
   for (int i = 0; i < 100; i++) {                       //Este 'for' serve para definir a altitude da base de lançamento como valor de referência.
     SomaRef = SomaRef + bmp.readAltitude();
   }
   AltitudeRef = SomaRef / 100;
-  #endif
-  #if usa_impreSerial
+#endif
+#if usa_impreSerial
   Serial.println("Dados de altitude de voo");
   Serial.println(cabecalho);
-  #endif
-  #if usa_SD
+#endif
+#if usa_SD
   Serial.println("Inicializando cartão SD...");
   if (!SD.begin(chipSelect)) {
     Serial.println("FALHA NO CARTÃO SD");
@@ -289,103 +289,103 @@ void setup() {
     dataFile.println(cabecalho);
     dataFile.close();
   }
-  #endif
+#endif
 }
 void loop() {
   //Serial.print("Começo do loop");
   unsigned long tempoAtual = millis();
   String dado = "";
-  #if usa_Tempo
-  dado += String(tempoAtual/1000.0)+"\t";
-  #endif
-  #if usa_giro
+#if usa_Tempo
+  dado += String(tempoAtual / 1000.0) + "\t";
+#endif
+#if usa_giro
   giro.read();
-  #if usa_gx
+#if usa_gx
   int Gx = giro.g.x;
-  dado += String(Gx)+"\t";
-  #endif
-  #if usa_gy
+  dado += String(Gx) + "\t";
+#endif
+#if usa_gy
   int Gy = giro.g.y;
-  dado += String(Gy)+"\t";
-  #endif
-  #if usa_gz
+  dado += String(Gy) + "\t";
+#endif
+#if usa_gz
   int Gz = giro.g.z;
-  dado += String(Gz)+"\t";
-  #endif
-  #endif
-  #if usa_mag
-  sensors_event_t eventM; 
+  dado += String(Gz) + "\t";
+#endif
+#endif
+#if usa_mag
+  sensors_event_t eventM;
   mag.getEvent(&eventM);
-  #if usa_mx
+#if usa_mx
   float Mx = eventM.magnetic.x;
-  dado += String(Mx)+"\t";
-  #endif
-  #if usa_my
+  dado += String(Mx) + "\t";
+#endif
+#if usa_my
   float My = eventM.magnetic.y;
-  dado += String(My)+"\t";
-  #endif
-  #if usa_mz
+  dado += String(My) + "\t";
+#endif
+#if usa_mz
   float Mz = eventM.magnetic.z;
-  dado += String(Mz)+"\t";
-  #endif
-  #endif
-  #if usa_acel
-  sensors_event_t eventA; 
+  dado += String(Mz) + "\t";
+#endif
+#endif
+#if usa_acel
+  sensors_event_t eventA;
   accel.getEvent(&eventA);
-  #if usa_ax
+#if usa_ax
   float Ax = eventA.acceleration.x;
-  dado += String(Ax)+"\t";
+  dado += String(Ax) + "\t";
   //float Axfiltrada = Friutu(Ax, qfa+1);
   float Axfiltrada = FiltroAx.FuncaoFriutu(Ax);
-  dado += String(Axfiltrada)+"\t";
-  #endif
-  #if usa_ay
+  dado += String(Axfiltrada) + "\t";
+#endif
+#if usa_ay
   float Ay = eventA.acceleration.y;
-  dado += String(Ay)+"\t";
+  dado += String(Ay) + "\t";
   //float Ayfiltrada = Friutu(Ay, qfa+2);
   float Ayfiltrada = FiltroAy.FuncaoFriutu(Ay);
-  dado += String(Ayfiltrada)+"\t";
-  #endif
-  #if usa_az
+  dado += String(Ayfiltrada) + "\t";
+#endif
+#if usa_az
   float Az = eventA.acceleration.z;
-  dado += String(Az)+"\t";
+  dado += String(Az) + "\t";
   //float Azfiltrada1 = Friutu(Az, qfa+3);
   float Azfiltrada = FiltroAz.FuncaoFriutu(Az);
-  dado += String(Azfiltrada)+"\t";
-  #endif
-  #endif
-  #if usa_temp
+  dado += String(Azfiltrada) + "\t";
+#endif
+#endif
+#if usa_temp
   float T = bmp.readTemperature();
-  dado += String(T)+"\t";
-  #endif
-  #if usa_pre
+  dado += String(T) + "\t";
+#endif
+#if usa_pre
   float P = bmp.readPressure();
   //float Pm = bmp.readSealevelPressure();
-  dado += String(P)+"\t";
-  #endif
-  #if usa_alt
+  dado += String(P) + "\t";
+#endif
+#if usa_alt
   float A = bmp.readAltitude() - AltitudeRef;
-  dado += String(A)+"\t";
-  #endif
-  #if usa_altMax  
-  dado += String(Hmax)+"\t";
-  #endif
-  #if usa_apogeu || usa_alt
-//  float Afiltrada = A;                                     //Chama a função de filtro para a altitude
-//  for(int i = 0; i < qfa; i++){
-//    Afiltrada = Friutu(Afiltrada, i);
-//    dado += String(Afiltrada)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
-//  }
+  dado += String(A) + "\t";
+#endif
+#if usa_altMax
+  dado += String(Hmax) + "\t";
+#endif
+#if usa_apogeu || usa_alt
+  //  float Afiltrada = A;                                     //Chama a função de filtro para a altitude
+  //  for(int i = 0; i < qfa; i++){
+  //    Afiltrada = Friutu(Afiltrada, i);
+  //    dado += String(Afiltrada)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
+  //  }
   float Afiltrada = CascataFiltroAltitude.FuncaoCascataFriutu(A);
-  dado += String(Afiltrada)+"\t";
-  #endif
+  dado += String(Afiltrada) + "\t";
+#endif
   //Serial.print("Meio loop,dps dos filtros");
-  #if usa_apogeu || usa_altMax
+#if usa_apogeu || usa_altMax
   if (Hmax < Afiltrada) {                                    //Pega o valor máximo da média/filtro2
     Hmax = Afiltrada;
   }
-  #endif
-  #if usa_apogeu
+#endif
+#if usa_apogeu
   apogeu = Apogueu(apogeu, Hmax, Afiltrada, tempoAtual);
   if (apogeu == 0) {
     dado += "Subindo";
@@ -394,29 +394,29 @@ void loop() {
   else if (apogeu == 1) {
     dado += "Descendo";
     dado += "\t";
-    #if usa_acpq
+#if usa_acpq
     dado += Paraqueda1(tempoAtual, apogeu);
     dado += Paraqueda2(tempoAtual, apogeu);
     dado += Paraqueda3(tempoAtual, Afiltrada, apogeu);
     dado += "\t";
-    #endif      
+#endif
   }
-  #endif
-  #if usa_SD
+#endif
+#if usa_SD
   File dataFile = SD.open(NomeFinal, FILE_WRITE);
   if (dataFile) {
     dataFile.println(dado);
     dataFile.close();
   }
-  #endif
-  #if usa_impreSerial
+#endif
+#if usa_impreSerial
   Serial.println(dado);
-  #endif
+#endif
 }
 
 ////funçoes////
 
-float Friutu(float valoratualizado, int j){
+float Friutu(float valoratualizado, int j) {
   float SomaMov = 0;                                 //Declara e zera o SomaMov em todo loop
   float MediaMov = 0;                                //Declara e zera o MediaMov em todo loop
   for (int i = tam - 2; i >= 0; i--) {               //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1 de trás pra frente
@@ -429,44 +429,44 @@ float Friutu(float valoratualizado, int j){
   MediaMov = SomaMov / tam;                          //Valor final do filtro, uma média entre "tam" quantidades de valores
   return MediaMov;
 }
-int Apogueu(int apogeu, float Hmax, float MediaMov, unsigned long tempoAtual){
+int Apogueu(int apogeu, float Hmax, float MediaMov, unsigned long tempoAtual) {
   float Delta = Hmax - MediaMov;                           //Compara o valor máximo do filtro1 com o valor atual do filtro1
   if (Delta >= 2 && apogeu == 0) {                         //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
     apogeu = 1;
   }
   return apogeu;
 }
-String Paraqueda1(unsigned long tempoAtual, int apogeu){
-  if(auxinicio1 == 0){
-      inicio1 = tempoAtual + duracao;
-      auxinicio1 =1;
+String Paraqueda1(unsigned long tempoAtual, int apogeu) {
+  if (auxinicio1 == 0) {
+    inicio1 = tempoAtual + duracao;
+    auxinicio1 = 1;
   }
   if (apogeu == 1) {
-      if (auxled1 == 0) {
-        digitalWrite(IGN_1, HIGH);
-        auxled1 = 1;
-        return "11";
-      }
-      if (tempoAtual >= inicio1 && auxled1 == 1) {
-        digitalWrite(IGN_1, LOW);
-        auxled1 = 2;
-        return "01";
-      }
+    if (auxled1 == 0) {
+      digitalWrite(IGN_1, HIGH);
+      auxled1 = 1;
+      return "11";
+    }
+    if (tempoAtual >= inicio1 && auxled1 == 1) {
+      digitalWrite(IGN_1, LOW);
+      auxled1 = 2;
+      return "01";
+    }
   }
   return "";
 }
-String Paraqueda2(unsigned long tempoAtual, int apogeu){
-  if(apogeu ==1){
-    if(auxinicio2 == 0){
-        inicio2 = tempoAtual + espera;
-        auxinicio2 = 1;
+String Paraqueda2(unsigned long tempoAtual, int apogeu) {
+  if (apogeu == 1) {
+    if (auxinicio2 == 0) {
+      inicio2 = tempoAtual + espera;
+      auxinicio2 = 1;
     }
     if (tempoAtual >= inicio2 && auxled2 == 0) {
-        digitalWrite(IGN_2, HIGH);
-        auxled2 = 1;
-        inicio3 = tempoAtual + duracao;
-        return "12";
-        //Serial.print("12");
+      digitalWrite(IGN_2, HIGH);
+      auxled2 = 1;
+      inicio3 = tempoAtual + duracao;
+      return "12";
+      //Serial.print("12");
     }
     if (tempoAtual >= inicio3 && auxled2 == 1) {
       digitalWrite(IGN_2, LOW);
@@ -476,8 +476,8 @@ String Paraqueda2(unsigned long tempoAtual, int apogeu){
     return "";
   }
 }
-String Paraqueda3(unsigned long tempoAtual, float MediaMov, int apogeu){
-  if(apogeu == 1){
+String Paraqueda3(unsigned long tempoAtual, float MediaMov, int apogeu) {
+  if (apogeu == 1) {
     if (MediaMov <= altura && auxled3 == 0) {
       digitalWrite(LED_BUILTIN, HIGH);
       auxled3 = 1;
