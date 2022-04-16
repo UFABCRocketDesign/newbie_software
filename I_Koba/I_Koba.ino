@@ -19,10 +19,14 @@ Adafruit_BMP085 bmp;
 
 #define EXIST_TEMPO 0
 #define EXIST_SD 0
+#define EXIST_BAR 1
 #define EXIST_GIRO 0
 #define EXIST_ACEl 1
 #define EXIST_MAG 0
-#define EXIST_BAR 1
+
+#define EXIST_IGN_1 (EXIST_BAR && 0)
+#define EXIST_IGN_2 (EXIST_BAR && 1)
+#define EXIST_IGN_3 (EXIST_BAR && 1)
 
 #define EXIST_GIRO_X (EXIST_GIRO && 1)
 #define EXIST_GIRO_Y (EXIST_GIRO && 1)
@@ -35,10 +39,6 @@ Adafruit_BMP085 bmp;
 #define EXIST_MAG_X (EXIST_MAG && 1)
 #define EXIST_MAG_Y (EXIST_MAG && 1)
 #define EXIST_MAG_Z (EXIST_MAG && 1)
-
-#define EXIST_IGN_1 (EXIST_BAR && 1)
-#define EXIST_IGN_2 (EXIST_BAR && 1)
-#define EXIST_IGN_3 (EXIST_BAR && 1)
 
 #define EXIST_ALTURA (EXIST_BAR && 1)
 
@@ -95,7 +95,7 @@ unsigned long time_final = 0;
 #endif //paraquedas final
 
 #if EXIST_BAR
-int var_queda;  // contem o estado do foguete, 1 para subindo e 0 para queda
+boolean var_queda;  // contem o estado do foguete, 1 para subindo e 0 para queda
 float ref_chao; // constante que será usada para referenciar o chão
 float vetor[NUMERO_FILTROS+1][INTERVALO_MEDIA_M]; // movimentaçãop dos filtros de sinal de alrura
 float sinal[NUMERO_FILTROS + 1]; // irá conter todos sinais relacionado a altura
@@ -161,7 +161,11 @@ void setup() {
   dados_string += "Tempo atual(s):\t";
 #endif
 #if EXIST_ALTURA
-  dados_string += "Alt(m):\t";
+  for (int i = 0; i < NUMERO_FILTROS; i++) {
+    dados_string += "Alt do filtro";
+    dados_string += String(i+1);
+    dados_string += " (m):\t";
+  }
   dados_string += "Detecção de queda:\t";
 #endif
 #if EXIST_IGN_1
@@ -266,9 +270,9 @@ void loop() {
 
   tempo_atual = millis();
 #if EXIST_BAR
-  // sinal[0] = bmp.readAltitude() - ref_chao;
   Filtros(bmp.readAltitude() - ref_chao);
-  Detec_queda();
+  var_queda = Detec_queda();
+  time_do_apogeu = Hora_apogeu();
 #endif
 #if EXIST_IGN_1
   Led_para_queda_piloto();
@@ -321,9 +325,9 @@ void Filtros(float valor) {
 //----------------------------------------------------------------------------------
 
 #if EXIST_BAR
-float Calculo_media_movel(int camada, float valor) {
-  for (int x = INTERVALO_MEDIA_M - 1; x > 0; x--) {
-    vetor[camada][x] = vetor[camada][x - 1];
+ float Calculo_media_movel(int camada, float valor) {
+   for (int x = INTERVALO_MEDIA_M - 1; x > 0; x--) {
+     vetor[camada][x] = vetor[camada][x - 1];
   }
   vetor[camada][0] = valor;
   float k = 0;
@@ -337,21 +341,27 @@ float Calculo_media_movel(int camada, float valor) {
 //----------------------------------------------------------------------------------
 
 #if EXIST_BAR
-void Detec_queda() {
+ boolean Detec_queda() {
   for (int x = INTERVALO_QUEDA - 1; x > 0; x--) {
     sinalzin[x] = sinalzin[x - 1];
   }
   sinalzin[0] = sinal[NUMERO_FILTROS];
-  if ( sinalzin[0] > sinalzin[INTERVALO_QUEDA - 1]) {
-    var_queda = 1;
-  } else {
-    var_queda = 0;
-    // define o a hora do ainicio do apogeu
-    if (trava_apogeu == true) {
-      time_do_apogeu = tempo_atual;
-      trava_apogeu = false;
-    }
-  }
+  
+  return sinalzin[0] < sinalzin[INTERVALO_QUEDA - 1]; // Caindo = true
+}
+#endif
+
+//----------------------------------------------------------------------------------
+
+#if EXIST_BAR
+ float Hora_apogeu() {
+   if(var_queda){
+     if (trava_apogeu) {
+     time_do_apogeu = tempo_atual;
+       trava_apogeu = false;
+     }
+   }
+  return time_do_apogeu;
 }
 #endif
 
@@ -359,8 +369,8 @@ void Detec_queda() {
 
 #if EXIST_IGN_1
 void Led_para_queda_piloto() {
-  if (var_queda == 0) {
-    if (trava_piloto == true) {
+  if (var_queda){ 
+    if (trava_piloto) {
       digitalWrite(IGN_1, HIGH);
       acendeu_piloto = 1;
       trava_piloto = false;
@@ -379,8 +389,8 @@ void Led_para_queda_piloto() {
 
 #if EXIST_IGN_2
 void Led_para_queda_secundario() {
-  if (var_queda == 0) {
-    if (trava_secundario == true) {
+  if (var_queda) {
+    if (trava_secundario) {
       if ((tempo_atual - time_do_apogeu) >= TEMPO_ATIVAR_SECUNDARIO) {
         digitalWrite(IGN_2, HIGH);
         time_secundario = tempo_atual;
@@ -402,9 +412,9 @@ void Led_para_queda_secundario() {
 
 #if EXIST_IGN_3
 void Led_para_queda_final() {
-  if (var_queda == 0) {
+  if (var_queda) {
     if (sinal[NUMERO_FILTROS] <= ALTURA_DE_ATIVACAO) {
-      if (trava_final == true) {
+      if (trava_final) {
         digitalWrite(led_final, HIGH);
         time_final = tempo_atual;
         acendeu_final = 1;
@@ -455,8 +465,7 @@ void Acelerometro() {
 #if EXIST_ACEl_Y
   estado_acelerometro += String(event.acceleration.y);
   estado_acelerometro += "\t";
-  estado_acelerometro += String(Calculo_media_movel(NUMERO_FILTROS,event.acceleration.y));
-  estado_acelerometro += "\t";
+ // estado_acelerometro += String(Calculo_media_movel(NUMERO_FILTROS,event.acceleration.y));
 #endif
 #if EXIST_ACEl_Z
   estado_acelerometro += String(event.acceleration.z);
@@ -494,15 +503,13 @@ void Salvar() {
 #endif
 #if EXIST_ALTURA
   dados_string += "\t";
- // dados_string += String(sinal[NUMERO_FILTROS]);
- // dados_string += "\t";
-
-   for (int x = NUMERO_FILTROS ; x >= 0; x--) {
-     dados_string += String(sinal[x]);
-     dados_string += "\t";
+  // dados_string += String(sinal[NUMERO_FILTROS]);
+  // dados_string += "\t";
+  for (int x = NUMERO_FILTROS ; x >= 0; x--) {
+    dados_string += String(sinal[x]);
+    dados_string += "\t";
   }
-  
-  dados_string += String(var_queda);
+  dados_string += String(var_queda,DEC);
 #endif
 #if EXIST_IGN_1
   dados_string += "\t";
