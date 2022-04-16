@@ -29,10 +29,10 @@
 #define usa_gy (usa_giro && 0)    //Variavel de escolha do uso do valor do giroscopio em y
 #define usa_gz (usa_giro && 0)    //Variavel de escolha do uso do valor do giroscopio em z
 
-#define usa_acel 0                //Variavel de escolha do uso de funções
+#define usa_acel 1                //Variavel de escolha do uso de funções
 #define usa_ax (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em x
-#define usa_ay (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em y
-#define usa_az (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em z
+#define usa_ay (usa_acel && 0)    //Variavel de escolha do uso do valor do acelerometro em y
+#define usa_az (usa_acel && 0)    //Variavel de escolha do uso do valor do acelerometro em z
 
 #define usa_mag 0                 //Variavel de escolha do uso de funções
 #define usa_mx (usa_mag && 0)     //Variavel de escolha do uso do valor do magnetometro em x
