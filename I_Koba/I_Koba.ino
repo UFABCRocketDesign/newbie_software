@@ -358,7 +358,7 @@ void Filtros(float valor) {
    if(var_queda){
      if (trava_apogeu) {
      time_do_apogeu = tempo_atual;
-       trava_apogeu = false;
+       trava_apogeu = false; 
      }
    }
   return time_do_apogeu;
