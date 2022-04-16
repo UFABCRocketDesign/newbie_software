@@ -21,7 +21,7 @@ Adafruit_BMP085 bmp;
 #define EXIST_SD 0
 #define EXIST_BAR 1
 #define EXIST_GIRO 0
-#define EXIST_ACEl 1
+#define EXIST_ACEl 0
 #define EXIST_MAG 0
 
 #define EXIST_IGN_1 (EXIST_BAR && 0)
@@ -239,8 +239,8 @@ void setup() {
   File dataFile = SD.open(projeto_name, FILE_WRITE);
   if (dataFile) {
 #if EXIST_BAR
-    dataFile.print("Constante que referencia o chão = ");
-    dataFile.println(String(ref_chao));
+    dataFile.print("Constante que referencia o chão:");
+    dataFile.println(ref_chao);
 #endif //barometro
     dataFile.println(dados_string);
     dataFile.close();
