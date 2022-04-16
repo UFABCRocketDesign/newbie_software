@@ -6,21 +6,22 @@
 #include <L3G.h>
 #include <SPI.h>
 #include <SD.h>
+
 #define IGN_1 36  /*act1*/
 #define IGN_2 61  /*act2*/
 #define IGN_3 46  /*act3*/
 #define IGN_4 55  /*act4*/
-
 #define inter 1000
 #define AtivarLED2 3000
 #define Tempo 5000
-
 #define PLED1 IGN_1
 #define PLED2 IGN_2
 #define PLED3 LED_BUILTIN
 
+const int chipSelect = 53; //pino SD
+String NomeArq = "";
+
 float ALT = 0.0;
-float i = 0.0;
 float Med = 0.0;
 float M = 0.0;
 float F1 = 0.0;
@@ -32,37 +33,24 @@ float Vfiltro2[11];
 float Ap1 = 0.0;
 int A = 0;
 int B = 0;
-int x = 0;
 int Queda = 0;
-
-const int chipSelect = 53;
-
-String NomeArq = "";
-String Nome = "LAQ";
-int ValorA = 0;
-int NC = 0;
-
 unsigned long TQ = 0;
 int Q1 = 0;
-
-int LED1ST = LOW;
-boolean LK1 = false;
-unsigned long T1Ant = 0;
-
-int LED2ST = LOW;
-boolean LK2 = false;
-unsigned long T2Ant = 0;
-
-int LED3ST = LOW;
-boolean LK3 = false;
-boolean LKc = false;
-unsigned long T3Ant = 0;
 
 Adafruit_BMP085 bmp;
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(1234);
 L3G gyro;
 
+int LED1ST = LOW;
+boolean LK1 = false;
+unsigned long T1Ant = 0;
+int LED2ST = LOW;
+boolean LK2 = false;
+unsigned long T2Ant = 0;
+int LED3ST = LOW;
+boolean LK3 = false;
+unsigned long T3Ant = 0;
 
 void setup()
 {
@@ -113,7 +101,6 @@ void setup()
   Serial.println("Card initialized.");
 
   //Cabeçalho e formatação do nome do arquivo
-  //ordem de impressão -- Tempo(s)/Altitude(m)/Filtro 1(m)/Filtro 2(m)/Detec. Apogeu/Mag X (uT)/Mag Y (uT)/Mag Z (uT)/Gyro X (rad/s)/Gyro Y (rad/s)/Gyro Z (rad/s)/Acel X (m/s^2)/Acel Y (m/s^2)/Acel Z (m/s^2)/Led P36/Led P61/Led P13
   String StringC = "";
   StringC += "Tempo(s)";
   StringC += "\t";
@@ -163,10 +150,14 @@ void setup()
 
   while (NomeArq.length() == 0)
   {
-    String Zeros = "";
     String Arq = "";
-    String VA = "";
-    VA = String (ValorA);
+    String Nome = "LAQ";
+    String Zeros = "";
+    //String VA = "";
+    int ValorA = 0;
+    int NC = 0;
+
+    String VA = String (ValorA);
     NC = Nome.length() + VA.length();
 
     for (int a = 0; a < 8 - NC; a++)
@@ -199,8 +190,8 @@ void setup()
     TesteC.close();
   }
 
-  //média
-  for ( i = 0; i < 11; i++)
+  //Cálculo da Média
+  for (int i = 0; i < 11; i++)
   {
     ALT = bmp.readAltitude();
     Med = Med + ALT;
@@ -343,7 +334,7 @@ void loop()
       }
       digitalWrite(PLED2, LED2ST);
     }
-    if (SF2 <= -0.25 || LKc == true) // Quando a queda atingir certa altura X, ligar o led
+    if (SF2 <= -0.25 || LK3 == true) // Quando a queda atingir certa altura X, ligar o led
     {
       if (LK3 == false) //se a trava estiver desativada
       {
@@ -357,7 +348,6 @@ void loop()
           LED3ST = LOW;
         }
         LK3 = true;
-        LKc = true;
       }
       else
       {
@@ -380,7 +370,6 @@ void loop()
   Ap1 = SF2;
 
   //Cartão SD
-
   Serial.println(dataString);
   File dataFile = SD.open(NomeArq , FILE_WRITE);
   if (dataFile)
