@@ -24,7 +24,7 @@ Adafruit_BMP085 bmp;
 #define EXIST_ACEl 0
 #define EXIST_MAG 0
 
-#define EXIST_IGN_1 (EXIST_BAR && 0)
+#define EXIST_IGN_1 (EXIST_BAR && 1)
 #define EXIST_IGN_2 (EXIST_BAR && 1)
 #define EXIST_IGN_3 (EXIST_BAR && 1)
 
