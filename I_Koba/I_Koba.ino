@@ -50,11 +50,11 @@ Adafruit_BMP085 bmp;
 #define MEDIA_PARA_CHAO 100 // intervalo de valores usados na para media do calculo do chão
 #define INTERVALO_MEDIA_M 20 // intervalo de valores usados na para media movel
 #define NUMERO_FILTROS 3  // Numero de filtros 
-#define INTERVALO_QUEDA 4  // intervalo de comparação para queda e suibida
+#define INTERVALO_QUEDA 8  // intervalo de comparação para queda e suibida
 #define ALTURA_DE_ATIVACAO 400 // ALTURA minima para ativar o ultimo paraquedas
 
 #define TEMPO_PILOTO_ON 5000 // intervalo de tempo que o paraquedas piloto vai ficar ligado
-#define TEMPO_ATIVAR_SECUNDARIO 5000 // intervalo de tempo necessario para ativar o paraquedas secundario pos inicio de queda
+#define TEMPO_ATIVAR_SECUNDARIO 8000 // intervalo de tempo necessario para ativar o paraquedas secundario pos inicio de queda
 #define TEMPO_SECUNDARIO_ON 5000 // intervalo de tempo que o paraquedas secundariio vai ficar ligado
 #define TEMPO_FINAL_ON 5000 // intervalo de tempo que o paraquedas final vai ficar ligado
 
