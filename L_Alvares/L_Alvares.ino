@@ -20,6 +20,8 @@
 
 const int chipSelect = 53; //pino SD
 String NomeArq = "";
+int ValorA = 0;
+int NC = 0;
 
 float ALT = 0.0;
 float Med = 0.0;
@@ -29,6 +31,13 @@ float Vfiltro2[11];
 float SF1 = 0.0;
 float SF2 = 0.0;
 float Ap1 = 0.0;
+
+int LED1ST = LOW;
+boolean LK1 = false;
+int LED2ST = LOW;
+boolean LK2 = false;
+int LED3ST = LOW;
+boolean LK3 = false;
 unsigned long T1Ant = 0;
 unsigned long T2Ant = 0;
 unsigned long T3Ant = 0;
@@ -140,8 +149,6 @@ void setup()
     String Nome = "LAQ";
     String Zeros = "";
     String VA = "";
-    int ValorA = 0;
-    int NC = 0;
 
     VA = String (ValorA);
     NC = Nome.length() + VA.length();
@@ -197,12 +204,6 @@ void loop()
   int Queda = 0;
   unsigned long TQ = 0;
   int Q1 = 0;
-  int LED1ST = LOW;
-  boolean LK1 = false;
-  int LED2ST = LOW;
-  boolean LK2 = false;
-  int LED3ST = LOW;
-  boolean LK3 = false;
 
   //Calculo do tempo
   dataString += String(TAtual / 1000.0);
