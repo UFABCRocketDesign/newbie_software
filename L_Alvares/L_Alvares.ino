@@ -26,12 +26,19 @@ int NC = 0;
 float ALT = 0.0;
 float Med = 0.0;
 float M = 0.0;
+int A = 0;
+int B = 0;
 float Vfiltro1[11];
 float Vfiltro2[11];
 float SF1 = 0.0;
 float SF2 = 0.0;
 float Ap1 = 0.0;
 
+float F1 = 0.0;
+float F2 = 0.0;
+int Queda = 0;
+unsigned long TQ = 0;
+int Q1 = 0;
 int LED1ST = LOW;
 boolean LK1 = false;
 int LED2ST = LOW;
@@ -96,6 +103,39 @@ void setup()
   Serial.println("Card initialized.");
 
   //Cabeçalho e formatação do nome do arquivo
+  while (NomeArq.length() == 0)
+  {
+    String Arq = "";
+    String Nome = "LAQ";
+    String Zeros = "";
+    String VA = "";
+
+    VA = String (ValorA);
+    NC = Nome.length() + VA.length();
+
+    for (int a = 0; a < 8 - NC; a++)
+    {
+      Zeros += "0";
+    }
+
+    Arq += Nome;
+    Arq += Zeros;
+    Arq += VA;
+    Arq += ".txt";
+
+    if (SD.exists(Arq))
+    {
+      Serial.println(Arq + " existe, fornecer outro nome.");
+      ValorA ++;
+    }
+    else
+    {
+      Serial.println(Arq + " esta disponível.");
+      NomeArq = Arq;
+      break;
+    }
+  }
+
   String StringC = "";
   StringC += "Tempo(s)";
   StringC += "\t";
@@ -131,6 +171,7 @@ void setup()
   StringC += "\t";
   StringC += "Ativação Led3";
   StringC += "\t";
+  Serial.print(StringC);
 
   //StringC += "Temperatura(°C)";
   //StringC += "\t";
@@ -142,39 +183,6 @@ void setup()
   //StringC += "\t";
   //StringC += "AltitudeReal(m)";
   //StringC += "\t";
-
-  while (NomeArq.length() == 0)
-  {
-    String Arq = "";
-    String Nome = "LAQ";
-    String Zeros = "";
-    String VA = "";
-
-    VA = String (ValorA);
-    NC = Nome.length() + VA.length();
-
-    for (int a = 0; a < 8 - NC; a++)
-    {
-      Zeros += "0";
-    }
-
-    Arq += Nome;
-    Arq += Zeros;
-    Arq += VA;
-    Arq += ".txt";
-
-    if (SD.exists(Arq))
-    {
-      Serial.println(Arq + " existe, fornecer outro nome.");
-      ValorA ++;
-    }
-    else
-    {
-      Serial.println(Arq + " esta disponível.");
-      NomeArq = Arq;
-      break;
-    }
-  }
 
   File TesteC = SD.open(NomeArq , FILE_WRITE);
   if (TesteC)
@@ -197,13 +205,6 @@ void loop()
 {
   String dataString = "";
   unsigned long TAtual = millis();
-  int A = 0;
-  int B = 0;
-  float F1 = 0.0;
-  float F2 = 0.0;
-  int Queda = 0;
-  unsigned long TQ = 0;
-  int Q1 = 0;
 
   //Calculo do tempo
   dataString += String(TAtual / 1000.0);
