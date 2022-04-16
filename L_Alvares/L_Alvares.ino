@@ -18,8 +18,8 @@
 #define PLED2 IGN_2
 #define PLED3 LED_BUILTIN
 
-#define MagDbg 1
-#define GyrDbg 1
+#define MagDbg 0
+#define GyrDbg 0
 #define AclDbg 0
 
 const int chipSelect = 53; //pino SD
