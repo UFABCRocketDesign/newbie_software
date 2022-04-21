@@ -253,11 +253,10 @@ void loop() {
   // if the LED is off turn it on and vice-versa:
   if (parachute_deployment == false &&  apogeeDetection == 1) {
 
-    if ( trav == false);
-
     if (currentMillis - previousMillis >= interval)
+   {
+      if ( trav == false);
 
-    {
       // save the last time you blinked the LED
       previousMillis = currentMillis;
 
@@ -278,7 +277,8 @@ void loop() {
     futureTime = currentMillis + interval; 
   
   if( trav = false && futureTime > interval){
-       
+
+       trav = true;
        ledState1 = LOW;
        digitalWrite(ledPin, ledState1);
    }
