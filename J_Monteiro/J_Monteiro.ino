@@ -4,8 +4,6 @@
 
 //============================================================
 
-
-const int IGN_1 =  LED_BUILTIN;        // the number of the LED pin
 const int ledPin =  LED_BUILTIN;        // the number of the LED pin
 const int chipSelect = 53;
 
@@ -59,7 +57,8 @@ unsigned long previousMillis = 0;  // will store last time LED was updated
 //========================================================================
 
 void setup() {
-  pinMode(ledPin, OUTPUT);
+  
+  pinMode(IGN_1, OUTPUT);
   // Open serial communications and wait for port to open:
   Serial.begin(115200);
   if (!bmp.begin()) {
