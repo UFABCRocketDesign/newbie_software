@@ -4,6 +4,8 @@
 
 //============================================================
 
+
+const int IGN_1 =  LED_BUILTIN;        // the number of the LED pin
 const int ledPin =  LED_BUILTIN;        // the number of the LED pin
 const int chipSelect = 53;
 
