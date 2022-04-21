@@ -9,7 +9,7 @@ const int chipSelect = 53;
 
 //The following constant is the number of milliseconds we wait to fire the parachute ejection.
 
-const long interval = 1000;           // interval at which to blink (milliseconds)
+const long interval = 5000;           // interval at which to blink (milliseconds)
 File myFile;
 
 //=============================================================
