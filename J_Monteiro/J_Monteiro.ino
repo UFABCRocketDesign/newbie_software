@@ -253,13 +253,15 @@ void loop() {
   // if the LED is off turn it on and vice-versa:
   if (parachute_deployment == false &&  apogeeDetection == 1) {
 
-    if (currentMillis - previousMillis >= interval)
-   {
-      if ( trav == false);
+    if ( trav == false);
 
-      // save the last time you blinked the LED
+      trav == true;
+     // save the last time you blinked the LED
       previousMillis = currentMillis;
 
+    if (currentMillis - previousMillis >= interval)
+   {
+     
       ledState1 = HIGH;
 
     } else {
@@ -272,17 +274,8 @@ void loop() {
      
       digitalWrite(ledPin, ledState1);
       dataString += String(ledState1);
-  
-  // tempo futuro para desligar o paraquedas
-    futureTime = currentMillis + interval; 
-  
-  if( trav = false && futureTime > interval){
 
-       trav = true;
-       ledState1 = LOW;
-       digitalWrite(ledPin, ledState1);
-   }
-    
+
   File dataFile = SD.open(jFile, FILE_WRITE);
 
   // if the file is available, write to it:
