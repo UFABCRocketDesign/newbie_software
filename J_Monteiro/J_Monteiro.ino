@@ -29,7 +29,7 @@ float relative_average;         //Média Relativa
 float vet[n] ;                 //Vetor
 float Altbase;                //Altitude no solo
 float accAltbase = 0;        //Altitude inicial base acumulativa
-float futureTime;
+float futureTime = 0;
 float Maximum_height;      //Altura máxima
 float previous = 0;       //Altitude anterior
 float moving_average;    //Média móvel
@@ -257,9 +257,9 @@ void loop() {
 
       trav = true;
      // save the last time you blinked the LED
-      previousMillis = currentMillis;
+      futureTime = currentMillis + interval;
     }
-    if (currentMillis - previousMillis >= interval)
+    if (currentMillis < futureTime)
    {
      
       ledState1 = HIGH;
