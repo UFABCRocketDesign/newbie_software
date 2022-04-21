@@ -253,12 +253,12 @@ void loop() {
   // if the LED is off turn it on and vice-versa:
   if (parachute_deployment == false &&  apogeeDetection == 1) {
 
-    if ( trav == false);
+    if ( trav == false){
 
       trav == true;
      // save the last time you blinked the LED
       previousMillis = currentMillis;
-
+    }
     if (currentMillis - previousMillis >= interval)
    {
      
@@ -267,7 +267,6 @@ void loop() {
     } else {
       parachute_deployment = true;
       ledState1 = LOW;
-      trav = true;
     }
   }
   // set the LED with the ledState of the variable:
