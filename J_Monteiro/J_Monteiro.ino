@@ -255,7 +255,7 @@ void loop() {
 
     if ( trav == false){
 
-      trav == true;
+      trav = true;
      // save the last time you blinked the LED
       previousMillis = currentMillis;
     }
