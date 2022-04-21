@@ -24,15 +24,16 @@ Adafruit_BMP085 bmp;
 bool parachute_deployment = true;
 bool trav = false;
 
-float altitude = 0;            //Altitude
-float relative_average;       //Média Relativa
-float vet[n] ;               //Vetor
-float Altbase;              //Altitude no solo
-float accAltbase = 0;      //Altitude inicial base acumulativa
-float Maximum_height;     //Altura máxima
-float previous = 0;      //Altitude anterior
-float moving_average;   //Média móvel
-float vet2[n];         //Vetor 2
+float altitude = 0;              //Altitude
+float relative_average;         //Média Relativa
+float vet[n] ;                 //Vetor
+float Altbase;                //Altitude no solo
+float accAltbase = 0;        //Altitude inicial base acumulativa
+float futureTime;
+float Maximum_height;      //Altura máxima
+float previous = 0;       //Altitude anterior
+float moving_average;    //Média móvel
+float vet2[n];          //Vetor 2
 int ledState1 = LOW;
 
 String jFile;
@@ -232,7 +233,7 @@ void loop() {
   }
 
   dataString += "\t";
-  dataString += String(cont/100.0);
+  dataString += String(cont / 100.0);
   dataString += "\t";
 
   if (cont >= 10) {
@@ -251,10 +252,11 @@ void loop() {
   //==============parachute deployment================
   // if the LED is off turn it on and vice-versa:
   if (parachute_deployment == false &&  apogeeDetection == 1) {
-   
-    if( trav = false);
+
+    if ( trav == false);
+
     if (currentMillis - previousMillis >= interval)
-       
+
     {
       // save the last time you blinked the LED
       previousMillis = currentMillis;
@@ -264,13 +266,23 @@ void loop() {
     } else {
       parachute_deployment = true;
       ledState1 = LOW;
-
+      trav = true;
     }
   }
   // set the LED with the ledState of the variable:
-  digitalWrite(ledPin, ledState1);
-  dataString += String(ledState1);
+     
+      digitalWrite(ledPin, ledState1);
+      dataString += String(ledState1);
   
+  // tempo futuro para desligar o paraquedas
+    futureTime = currentMillis + interval; 
+  
+  if( trav = false && futureTime > interval){
+       
+       ledState1 = LOW;
+       digitalWrite(ledPin, ledState1);
+   }
+    
   File dataFile = SD.open(jFile, FILE_WRITE);
 
   // if the file is available, write to it:
