@@ -17,7 +17,10 @@ File myFile;
 #define numReads 15   //Número de medições para a média da base
 #define numFiles 10  //Número de Arquivos
 Adafruit_BMP085 bmp;
-
+#define IGN_1 36  /*act1*/
+#define IGN_2 61  /*act2*/
+#define IGN_3 46  /*act3*/
+#define IGN_4 55  /*act4*/
 //=============================================================
 //-----Variáveis Globais-----
 
@@ -271,7 +274,7 @@ void loop() {
   }
   // set the LED with the ledState of the variable:
      
-      digitalWrite(ledPin, ledState1);
+      digitalWrite(IGN_1, ledState1);
       dataString += String(ledState1);
 
 
