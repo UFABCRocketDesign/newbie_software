@@ -23,7 +23,13 @@
 #define MagYDbg (MagDbg && 1)
 #define MagZDbg (MagDbg && 1)
 #define GyrDbg 1
-#define AclDbg 1
+#define GyrXDbg (GyrDbg && 1)
+#define GyrYDbg (GyrDbg && 1)
+#define GyrZDbg (GyrDbg && 0)
+#define AclDbg 0
+#define AclXDbg (AclDbg && 1)
+#define AclYDbg (AclDbg && 1)
+#define AclZDbg (AclDbg && 1)
 #define sdDbg  0
 #define TemDbg 0
 #define BarDbg 0
@@ -205,21 +211,28 @@ void setup()
   StringC += "\t";
 #endif
 
-
-#if GyrDbg
+#if GyrXDbg
   StringC += "Giroscópio X(rad/s)";
   StringC += "\t";
+#endif
+#if GyrYDbg
   StringC += "Giroscópio Y(rad/s)";
   StringC += "\t";
+#endif
+#if GyrZDbg
   StringC += "Giroscópio Z(rad/s)";
   StringC += "\t";
 #endif
 
-#if AclDbg
+#if AclXDbg
   StringC += "Acelerômetro X(m/s^2)";
   StringC += "\t";
+#endif
+#if AclYDbg
   StringC += "Acelerômetro Y(m/s^2)";
   StringC += "\t";
+#endif
+#if AclZDbg
   StringC += "Acelerômetro Z(m/s^2)";
   StringC += "\t";
 #endif
@@ -344,23 +357,36 @@ void loop()
 
 #if GyrDbg
   gyro.read();
+#if GyrXDbg
   dataString += String ((int)gyro.g.x);
   dataString += "\t";
+#endif
+#if GyrYDbg
   dataString += String ((int)gyro.g.y);
   dataString += "\t";
+#endif
+#if GyrZDbg
   dataString += String ((int)gyro.g.z);
   dataString += "\t";
+#endif
 #endif
 
 #if AclDbg
   accel.getEvent(&event);
+#if AclXDbg
   dataString += String (event.acceleration.x);
   dataString += "\t";
+#endif
+#if AclYDbg
   dataString += String (event.acceleration.y);
   dataString += "\t";
+#endif
+#if AclZDbg
   dataString += String (event.acceleration.z);
   dataString += "\t";
 #endif
+#endif
+
 
   //Timer e ativação de leds
 #if BarDbg
