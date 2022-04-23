@@ -21,10 +21,12 @@
 #define MagDbg 1
 #define GyrDbg 1
 #define AclDbg 1
-#define sdDbg  0
-//#define BarDbg 0
+#define sdDbg  1
+#define TemDbg 0
+#define BarDbg 0
+#define LedDbg 0
 
-//#if BarDbg
+#if BarDbg
 Adafruit_BMP085 bmp;
 float ALT = 0.0;
 float Med = 0.0;
@@ -38,20 +40,23 @@ float Vfiltro2[11];
 float SF1 = 0.0;
 float SF2 = 0.0;
 float Ap1 = 0.0;
-//#endif
-
-unsigned long TQ = 0;
-int Q1 = 0;
 int Queda = 0;
-int LED1ST = LOW;
+int Q1 = 0;
+unsigned long TQ = 0;
+#endif
+
+#if LedDbg
 boolean LK1 = false;
-int LED2ST = LOW;
 boolean LK2 = false;
-int LED3ST = LOW;
 boolean LK3 = false;
+int LED1ST = LOW;
+int LED2ST = LOW;
+int LED3ST = LOW;
 unsigned long T1Ant = 0;
 unsigned long T2Ant = 0;
 unsigned long T3Ant = 0;
+#endif
+
 
 #if MagDbg
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
@@ -76,19 +81,21 @@ void setup()
 {
   Serial.begin(115200);
   Wire.begin();
+
+#if LedDbg
   pinMode(PLED1, OUTPUT);
   pinMode(PLED2, OUTPUT);
   pinMode(PLED3, OUTPUT);
-
+#endif
 
   // Ligando os Sensores
-//#if BarDbg
+#if BarDbg
   if (!bmp.begin())
   {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
-//#endif
+#endif
 
 #if MagDbg
   if (!mag.begin())
@@ -168,7 +175,7 @@ void setup()
   //Cabeçalho
   String StringC = "";
 
-//#if BarDbg
+#if BarDbg
   StringC += "Tempo(s)";
   StringC += "\t";
   StringC += "Altitude(m)";
@@ -177,10 +184,9 @@ void setup()
   StringC += "\t";
   StringC += "Filtro 2(m)";
   StringC += "\t";
-//#endif
-
   StringC += "Detecção de Apogeu";
   StringC += "\t";
+#endif
 
 #if MagDbg
   StringC += "Magnetômetro X(uT)";
@@ -209,12 +215,14 @@ void setup()
   StringC += "\t";
 #endif
 
+#if LedDbg
   StringC += "Ativação Led1";
   StringC += "\t";
   StringC += "Ativação Led2";
   StringC += "\t";
   StringC += "Ativação Led3";
   StringC += "\t";
+#endif
 
   Serial.print(StringC);
 
@@ -238,7 +246,7 @@ void setup()
   }
 #endif
 
-//#if BarDbg
+#if BarDbg
   //Cálculo da Média
   for (int i = 0; i < 11; i++)
   {
@@ -246,7 +254,7 @@ void setup()
     Med = Med + ALT;
   }
   M = (Med / 11);
-//#endif
+#endif
 
 }
 
@@ -256,11 +264,13 @@ void loop()
   unsigned long TAtual = millis();
 
   //Calculo do tempo
+#if TemDbg
   dataString += String(TAtual / 1000.0);
   dataString += "\t";
+#endif
 
   //Calculos dos Filtros
-//#if BarDbg
+#if BarDbg
   ALT = (bmp.readAltitude() - M);
   dataString += String(ALT);
   dataString += "\t";
@@ -289,7 +299,6 @@ void loop()
   dataString += String (SF2);
   dataString += "\t";
   Ap1 = SF2;
-//#endif
 
   //Detecção de Apogeu
   if (Ap1 > SF2)
@@ -313,6 +322,7 @@ void loop()
     dataString += String("0");
     dataString += "\t";
   }
+#endif
 
   //Captação dos sensores
   sensors_event_t event;
@@ -348,6 +358,7 @@ void loop()
 #endif
 
   //Timer e ativação de leds
+#if LedDbg
   if (Q1 == 1) // se detectar a queda
   {
     if (LK1 == false) //se a trava estiver desativada
@@ -427,8 +438,9 @@ void loop()
   dataString += "\t";
   dataString += String(LED3ST);
   dataString += "\t";
+#endif
 
-Serial.println(dataString);
+  Serial.println(dataString);
 
 #if sdDbg
   //Cartão SD
