@@ -19,20 +19,34 @@
 #define PLED3 LED_BUILTIN
 
 #define MagDbg 1
+#define GyrDbg 1
+#define AclDbg 0
+#define sdDbg  0
+#define TemDbg 1
+#define BarDbg 1
+
 #define MagXDbg (MagDbg && 0)
 #define MagYDbg (MagDbg && 1)
 #define MagZDbg (MagDbg && 1)
-#define GyrDbg 1
+
 #define GyrXDbg (GyrDbg && 1)
 #define GyrYDbg (GyrDbg && 1)
 #define GyrZDbg (GyrDbg && 0)
-#define AclDbg 0
+
 #define AclXDbg (AclDbg && 1)
 #define AclYDbg (AclDbg && 1)
 #define AclZDbg (AclDbg && 1)
-#define sdDbg  0
-#define TemDbg 0
-#define BarDbg 0
+
+#define Led1Dbg (BarDbg && 0)
+#define Led2Dbg (BarDbg && 1)
+#define Led3Dbg (BarDbg && 1)
+
+#define BarTempDbg (BarDbg && 1)
+#define BarPresDbg (BarDbg && 0)
+#define BarPNMDbg  (BarDbg && 1)
+#define BarAltRDbr (BarDbg && 0)
+
+#define ApgDbg (BarDbg && 1)
 
 #if BarDbg
 Adafruit_BMP085 bmp;
@@ -48,20 +62,31 @@ float Vfiltro2[11];
 float SF1 = 0.0;
 float SF2 = 0.0;
 float Ap1 = 0.0;
+#endif
+
+#if ApgDbg
 int Queda = 0;
 int Q1 = 0;
 unsigned long TQ = 0;
-boolean LK1 = false;
-boolean LK2 = false;
-boolean LK3 = false;
-int LED1ST = LOW;
-int LED2ST = LOW;
-int LED3ST = LOW;
-unsigned long T1Ant = 0;
-unsigned long T2Ant = 0;
-unsigned long T3Ant = 0;
 #endif
 
+#if Led1Dbg
+boolean LK1 = false;
+int LED1ST = LOW;
+unsigned long T1Ant = 0;
+#endif
+
+#if Led2Dbg
+boolean LK2 = false;
+int LED2ST = LOW;
+unsigned long T2Ant = 0;
+#endif
+
+#if Led3Dbg
+boolean LK3 = false;
+int LED3ST = LOW;
+unsigned long T3Ant = 0;
+#endif
 
 #if MagDbg
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
@@ -94,11 +119,18 @@ void setup()
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
+#endif
 
+#if Led1Dbg
   pinMode(PLED1, OUTPUT);
-  pinMode(PLED2, OUTPUT);
-  pinMode(PLED3, OUTPUT);
+#endif
 
+#if Led2Dbg
+  pinMode(PLED2, OUTPUT);
+#endif
+
+#if Led3Dbg
+  pinMode(PLED3, OUTPUT);
 #endif
 
 #if MagDbg
@@ -179,21 +211,36 @@ void setup()
   //Cabeçalho
   String StringC = "";
 
-#if BarDbg
+#if TemDbg
   StringC += "Tempo(s)";
   StringC += "\t";
+#endif
+
+#if BarDbg
   StringC += "Altitude(m)";
   StringC += "\t";
   StringC += "Filtro 1(m)";
   StringC += "\t";
   StringC += "Filtro 2(m)";
   StringC += "\t";
+#endif
+
+#if ApgDbg
   StringC += "Detecção de Apogeu";
   StringC += "\t";
+#endif
+
+#if Led1Dbg
   StringC += "Ativação Led1";
   StringC += "\t";
+#endif
+
+#if Led2Dbg
   StringC += "Ativação Led2";
   StringC += "\t";
+#endif
+
+#if Led3Dbg
   StringC += "Ativação Led3";
   StringC += "\t";
 #endif
@@ -237,18 +284,27 @@ void setup()
   StringC += "\t";
 #endif
 
-  Serial.print(StringC);
+#if BarTempDbg
+  StringC += "Temperatura(°C)";
+  StringC += "\t";
+#endif
 
-  //StringC += "Temperatura(°C)";
-  //StringC += "\t";
-  //StringC += "Pressão(Pa)";
-  //StringC += "\t";
-  //StringC +=  "Altitude(m)";
-  //StringC += "\t";
-  //StringC += "PressãoNivelMar(Pa)";
-  //StringC += "\t";
-  //StringC += "AltitudeReal(m)";
-  //StringC += "\t";
+#if BarPresDbg
+  StringC += "Pressão(Pa)";
+  StringC += "\t";
+#endif
+
+#if BarPNMDbg
+  StringC += "PressãoNivelMar(Pa)";
+  StringC += "\t";
+#endif
+
+#if BarAltRDbg
+  StringC += "AltitudeReal(m)";
+  StringC += "\t";
+#endif
+
+  Serial.print(StringC);
 
 #if sdDbg
   File TesteC = SD.open(NomeArq , FILE_WRITE);
@@ -313,8 +369,10 @@ void loop()
   dataString += String (SF2);
   dataString += "\t";
   Ap1 = SF2;
+#endif
 
   //Detecção de Apogeu
+#if ApgDbg
   if (Ap1 > SF2)
   {
     Queda++;
@@ -392,6 +450,7 @@ void loop()
 #if BarDbg
   if (Q1 == 1) // se detectar a queda
   {
+#if Led1Dbg
     if (LK1 == false) //se a trava estiver desativada
     {
       if (TAtual - T1Ant >= inter) //se o Atual-Anterior > 1 seg, o led liga
@@ -413,6 +472,10 @@ void loop()
       }
     }
     digitalWrite(PLED1, LED1ST);
+    dataString += String(LED1ST);
+    dataString += "\t";
+#endif
+#if Led2Dbg
     if (TAtual - TQ >= AtivarLED2)
     {
       if (LK2 == false) //se a trava estiver desativada
@@ -437,6 +500,10 @@ void loop()
       }
       digitalWrite(PLED2, LED2ST);
     }
+    dataString += String(LED2ST);
+    dataString += "\t";
+#endif
+#if Led3Dbg
     if (SF2 <= -0.25 || LK3 == true) // Quando a queda atingir certa altura X, ligar o led
     {
       if (LK3 == false) //se a trava estiver desativada
@@ -461,14 +528,10 @@ void loop()
       }
       digitalWrite(PLED3, LED3ST);
     }
+    dataString += String(LED3ST);
+    dataString += "\t";
+#endif
   }
-
-  dataString += String(LED1ST);
-  dataString += "\t";
-  dataString += String(LED2ST);
-  dataString += "\t";
-  dataString += String(LED3ST);
-  dataString += "\t";
 #endif
 
   Serial.println(dataString);
