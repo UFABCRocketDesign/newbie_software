@@ -22,7 +22,9 @@
 #define GyrDbg 1
 #define AclDbg 1
 #define sdDbg  0
+//#define BarDbg 0
 
+//#if BarDbg
 Adafruit_BMP085 bmp;
 float ALT = 0.0;
 float Med = 0.0;
@@ -36,6 +38,7 @@ float Vfiltro2[11];
 float SF1 = 0.0;
 float SF2 = 0.0;
 float Ap1 = 0.0;
+//#endif
 
 unsigned long TQ = 0;
 int Q1 = 0;
@@ -79,11 +82,13 @@ void setup()
 
 
   // Ligando os Sensores
+//#if BarDbg
   if (!bmp.begin())
   {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
+//#endif
 
 #if MagDbg
   if (!mag.begin())
@@ -163,6 +168,7 @@ void setup()
   //Cabeçalho
   String StringC = "";
 
+//#if BarDbg
   StringC += "Tempo(s)";
   StringC += "\t";
   StringC += "Altitude(m)";
@@ -171,6 +177,8 @@ void setup()
   StringC += "\t";
   StringC += "Filtro 2(m)";
   StringC += "\t";
+//#endif
+
   StringC += "Detecção de Apogeu";
   StringC += "\t";
 
@@ -208,7 +216,6 @@ void setup()
   StringC += "Ativação Led3";
   StringC += "\t";
 
-
   Serial.print(StringC);
 
   //StringC += "Temperatura(°C)";
@@ -231,6 +238,7 @@ void setup()
   }
 #endif
 
+//#if BarDbg
   //Cálculo da Média
   for (int i = 0; i < 11; i++)
   {
@@ -238,6 +246,7 @@ void setup()
     Med = Med + ALT;
   }
   M = (Med / 11);
+//#endif
 
 }
 
@@ -251,6 +260,7 @@ void loop()
   dataString += "\t";
 
   //Calculos dos Filtros
+//#if BarDbg
   ALT = (bmp.readAltitude() - M);
   dataString += String(ALT);
   dataString += "\t";
@@ -278,6 +288,8 @@ void loop()
   dataString += "\t";
   dataString += String (SF2);
   dataString += "\t";
+  Ap1 = SF2;
+//#endif
 
   //Detecção de Apogeu
   if (Ap1 > SF2)
@@ -416,11 +428,10 @@ void loop()
   dataString += String(LED3ST);
   dataString += "\t";
 
-  Ap1 = SF2;
+Serial.println(dataString);
 
 #if sdDbg
   //Cartão SD
-  Serial.println(dataString);
   File dataFile = SD.open(NomeArq , FILE_WRITE);
   if (dataFile)
   {
