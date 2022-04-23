@@ -236,27 +236,6 @@ void setup()
   StringC += "\t";
 #endif
 
-
-#if ApgDbg
-  StringC += "Detecção de Apogeu";
-  StringC += "\t";
-#endif
-
-#if Led1Dbg
-  StringC += "Ativação Led1";
-  StringC += "\t";
-#endif
-
-#if Led2Dbg
-  StringC += "Ativação Led2";
-  StringC += "\t";
-#endif
-
-#if Led3Dbg
-  StringC += "Ativação Led3";
-  StringC += "\t";
-#endif
-
 #if MagXDbg
   StringC += "Magnetômetro X(uT)";
   StringC += "\t";
@@ -293,6 +272,26 @@ void setup()
 #endif
 #if AclZDbg
   StringC += "Acelerômetro Z(m/s^2)";
+  StringC += "\t";
+#endif
+
+#if ApgDbg
+  StringC += "Detecção de Apogeu";
+  StringC += "\t";
+#endif
+
+#if Led1Dbg
+  StringC += "Ativação Led1";
+  StringC += "\t";
+#endif
+
+#if Led2Dbg
+  StringC += "Ativação Led2";
+  StringC += "\t";
+#endif
+
+#if Led3Dbg
+  StringC += "Ativação Led3";
   StringC += "\t";
 #endif
 
@@ -384,19 +383,6 @@ void loop()
   {
     Queda = 0;
   }
-
-  if (Queda >= 11)
-  {
-    Q1 = 1;
-    TQ = TAtual;
-    dataString += String("1");
-    dataString += "\t";
-  }
-  else
-  {
-    dataString += String("0");
-    dataString += "\t";
-  }
 #endif
 
   //Captação dos sensores
@@ -448,9 +434,23 @@ void loop()
 #endif
 #endif
 
+#if ApgDbg
+if (Queda >= 11)
+  {
+    Q1 = 1;
+    TQ = TAtual;
+    dataString += String("1");
+    dataString += "\t";
+  }
+  else
+  {
+    dataString += String("0");
+    dataString += "\t";
+  }
+#endif
 
   //Timer e ativação de leds
-#if BarDbg
+#if ApgDbg
   if (Q1 == 1) // se detectar a queda
   {
 #if Led1Dbg
