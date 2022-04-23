@@ -19,12 +19,12 @@
 #define PLED3 LED_BUILTIN
 
 #define MagDbg 1
-#define MagXDbg 0
-#define MagYDbg 1
-#define MagZDbg 1
+#define MagXDbg (MagDbg && 0)
+#define MagYDbg (MagDbg && 1)
+#define MagZDbg (MagDbg && 1)
 #define GyrDbg 1
 #define AclDbg 1
-#define sdDbg  1
+#define sdDbg  0
 #define TemDbg 0
 #define BarDbg 0
 
@@ -192,7 +192,6 @@ void setup()
   StringC += "\t";
 #endif
 
-#if MagDbg
 #if MagXDbg
   StringC += "Magnetômetro X(uT)";
   StringC += "\t";
@@ -205,7 +204,7 @@ void setup()
   StringC += "Magnetômetro Z(uT)";
   StringC += "\t";
 #endif
-#endif
+
 
 #if GyrDbg
   StringC += "Giroscópio X(rad/s)";
