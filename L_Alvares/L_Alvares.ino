@@ -20,24 +20,24 @@
 
 #define MagDbg 1
 #define GyrDbg 1
-#define AclDbg 0
-#define sdDbg  0
+#define AclDbg 1
+#define sdDbg  1
 #define TemDbg 1
 #define BarDbg 1
 
-#define MagXDbg (MagDbg && 0)
+#define MagXDbg (MagDbg && 1)
 #define MagYDbg (MagDbg && 1)
 #define MagZDbg (MagDbg && 1)
 
 #define GyrXDbg (GyrDbg && 1)
 #define GyrYDbg (GyrDbg && 1)
-#define GyrZDbg (GyrDbg && 0)
+#define GyrZDbg (GyrDbg && 1)
 
 #define AclXDbg (AclDbg && 1)
 #define AclYDbg (AclDbg && 1)
 #define AclZDbg (AclDbg && 1)
 
-#define Led1Dbg (BarDbg && 0)
+#define Led1Dbg (BarDbg && 1)
 #define Led2Dbg (BarDbg && 1)
 #define Led3Dbg (BarDbg && 1)
 
