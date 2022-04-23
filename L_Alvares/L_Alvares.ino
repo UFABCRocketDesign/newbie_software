@@ -43,8 +43,6 @@
 
 #define BarTempDbg (BarDbg && 1)
 #define BarPresDbg (BarDbg && 0)
-#define BarPNMDbg  (BarDbg && 1)
-#define BarAltRDbr (BarDbg && 0)
 
 #define ApgDbg (BarDbg && 1)
 
@@ -216,14 +214,28 @@ void setup()
   StringC += "\t";
 #endif
 
+#if BarTempDbg
+  StringC += "Temperatura(°C)";
+  StringC += "\t";
+#endif
+
+#if BarPresDbg
+  StringC += "Pressão(Pa)";
+  StringC += "\t";
+#endif
+
 #if BarDbg
   StringC += "Altitude(m)";
   StringC += "\t";
+#endif
+
+#if BarDbg
   StringC += "Filtro 1(m)";
   StringC += "\t";
   StringC += "Filtro 2(m)";
   StringC += "\t";
 #endif
+
 
 #if ApgDbg
   StringC += "Detecção de Apogeu";
@@ -284,27 +296,7 @@ void setup()
   StringC += "\t";
 #endif
 
-#if BarTempDbg
-  StringC += "Temperatura(°C)";
-  StringC += "\t";
-#endif
-
-#if BarPresDbg
-  StringC += "Pressão(Pa)";
-  StringC += "\t";
-#endif
-
-#if BarPNMDbg
-  StringC += "PressãoNivelMar(Pa)";
-  StringC += "\t";
-#endif
-
-#if BarAltRDbg
-  StringC += "AltitudeReal(m)";
-  StringC += "\t";
-#endif
-
-  Serial.print(StringC);
+  Serial.println(StringC);
 
 #if sdDbg
   File TesteC = SD.open(NomeArq , FILE_WRITE);
@@ -332,10 +324,21 @@ void loop()
   String dataString = "";
   unsigned long TAtual = millis();
   sensors_event_t event;
-
+  
   //Calculo do tempo
 #if TemDbg
   dataString += String(TAtual / 1000.0);
+  dataString += "\t";
+#endif
+
+  // Temperatura e pressão
+#if BarTempDbg
+  dataString += String(bmp.readTemperature());
+  dataString += "\t";
+#endif
+
+#if BarPresDbg
+  dataString += String(bmp.readPressure());
   dataString += "\t";
 #endif
 
