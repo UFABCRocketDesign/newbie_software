@@ -18,15 +18,12 @@
 #define PLED2 IGN_2
 #define PLED3 LED_BUILTIN
 
-#define MagDbg 0
-#define GyrDbg 0
-#define AclDbg 0
+#define MagDbg 1
+#define GyrDbg 1
+#define AclDbg 1
+#define sdDbg  0
 
-const int chipSelect = 53; //pino SD
-String NomeArq = "";
-int ValorA = 0;
-int NC = 0;
-
+Adafruit_BMP085 bmp;
 float ALT = 0.0;
 float Med = 0.0;
 float M = 0.0;
@@ -53,8 +50,6 @@ unsigned long T1Ant = 0;
 unsigned long T2Ant = 0;
 unsigned long T3Ant = 0;
 
-Adafruit_BMP085 bmp;
-
 #if MagDbg
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 #endif
@@ -67,13 +62,21 @@ L3G gyro;
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(1234);
 #endif
 
+#if sdDbg
+const int chipSelect = 53; //pino SD
+String NomeArq = "";
+int ValorA = 0;
+int NC = 0;
+#endif
+
 void setup()
 {
+  Serial.begin(115200);
+  Wire.begin();
   pinMode(PLED1, OUTPUT);
   pinMode(PLED2, OUTPUT);
   pinMode(PLED3, OUTPUT);
-  Serial.begin(115200);
-  Wire.begin();
+
 
   // Ligando os Sensores
   if (!bmp.begin())
@@ -108,6 +111,7 @@ void setup()
   accel.setRange(ADXL345_RANGE_16_G);
 #endif
 
+#if sdDbg
   //Ligando o cartão SD
   while (!Serial)
   {
@@ -121,7 +125,7 @@ void setup()
   }
   Serial.println("Card initialized.");
 
-  //Cabeçalho e formatação do nome do arquivo
+  //Formatação do nome do arquivo
   while (NomeArq.length() == 0)
   {
     String Arq = "";
@@ -154,8 +158,11 @@ void setup()
       break;
     }
   }
+#endif
 
+  //Cabeçalho
   String StringC = "";
+
   StringC += "Tempo(s)";
   StringC += "\t";
   StringC += "Altitude(m)";
@@ -215,12 +222,14 @@ void setup()
   //StringC += "AltitudeReal(m)";
   //StringC += "\t";
 
+#if sdDbg
   File TesteC = SD.open(NomeArq , FILE_WRITE);
   if (TesteC)
   {
     TesteC.println(StringC);
     TesteC.close();
   }
+#endif
 
   //Cálculo da Média
   for (int i = 0; i < 11; i++)
@@ -409,6 +418,7 @@ void loop()
 
   Ap1 = SF2;
 
+#if sdDbg
   //Cartão SD
   Serial.println(dataString);
   File dataFile = SD.open(NomeArq , FILE_WRITE);
@@ -421,5 +431,6 @@ void loop()
   {
     Serial.println("error opening datalog.txt");
   }
+#endif
 
 }
