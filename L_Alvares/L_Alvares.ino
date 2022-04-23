@@ -323,7 +323,7 @@ void loop()
   String dataString = "";
   unsigned long TAtual = millis();
   sensors_event_t event;
-  
+
   //Calculo do tempo
 #if TemDbg
   dataString += String(TAtual / 1000.0);
@@ -435,7 +435,7 @@ void loop()
 #endif
 
 #if ApgDbg
-if (Queda >= 11)
+  if (Queda >= 11)
   {
     Q1 = 1;
     TQ = TAtual;
@@ -475,8 +475,6 @@ if (Queda >= 11)
       }
     }
     digitalWrite(PLED1, LED1ST);
-    dataString += String(LED1ST);
-    dataString += "\t";
 #endif
 #if Led2Dbg
     if (TAtual - TQ >= AtivarLED2)
@@ -503,8 +501,6 @@ if (Queda >= 11)
       }
       digitalWrite(PLED2, LED2ST);
     }
-    dataString += String(LED2ST);
-    dataString += "\t";
 #endif
 #if Led3Dbg
     if (SF2 <= -0.25 || LK3 == true) // Quando a queda atingir certa altura X, ligar o led
@@ -531,10 +527,23 @@ if (Queda >= 11)
       }
       digitalWrite(PLED3, LED3ST);
     }
-    dataString += String(LED3ST);
-    dataString += "\t";
 #endif
   }
+#endif
+
+#if Led1Dbg
+  dataString += String(LED1ST);
+  dataString += "\t";
+#endif
+
+#if Led2Dbg
+  dataString += String(LED2ST);
+  dataString += "\t";
+#endif
+
+#if Led3Dbg
+  dataString += String(LED3ST);
+  dataString += "\t";
 #endif
 
   Serial.println(dataString);
