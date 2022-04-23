@@ -42,7 +42,7 @@
 #define Led3Dbg (BarDbg && 1)
 
 #define BarTempDbg (BarDbg && 1)
-#define BarPresDbg (BarDbg && 0)
+#define BarPresDbg (BarDbg && 1)
 
 #define ApgDbg (BarDbg && 1)
 
