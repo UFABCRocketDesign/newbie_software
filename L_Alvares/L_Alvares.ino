@@ -19,12 +19,14 @@
 #define PLED3 LED_BUILTIN
 
 #define MagDbg 1
+#define MagXDbg 0
+#define MagYDbg 1
+#define MagZDbg 1
 #define GyrDbg 1
 #define AclDbg 1
 #define sdDbg  1
 #define TemDbg 0
 #define BarDbg 0
-#define LedDbg 0
 
 #if BarDbg
 Adafruit_BMP085 bmp;
@@ -43,9 +45,6 @@ float Ap1 = 0.0;
 int Queda = 0;
 int Q1 = 0;
 unsigned long TQ = 0;
-#endif
-
-#if LedDbg
 boolean LK1 = false;
 boolean LK2 = false;
 boolean LK3 = false;
@@ -82,12 +81,6 @@ void setup()
   Serial.begin(115200);
   Wire.begin();
 
-#if LedDbg
-  pinMode(PLED1, OUTPUT);
-  pinMode(PLED2, OUTPUT);
-  pinMode(PLED3, OUTPUT);
-#endif
-
   // Ligando os Sensores
 #if BarDbg
   if (!bmp.begin())
@@ -95,6 +88,11 @@ void setup()
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
+
+  pinMode(PLED1, OUTPUT);
+  pinMode(PLED2, OUTPUT);
+  pinMode(PLED3, OUTPUT);
+
 #endif
 
 #if MagDbg
@@ -186,15 +184,27 @@ void setup()
   StringC += "\t";
   StringC += "Detecção de Apogeu";
   StringC += "\t";
+  StringC += "Ativação Led1";
+  StringC += "\t";
+  StringC += "Ativação Led2";
+  StringC += "\t";
+  StringC += "Ativação Led3";
+  StringC += "\t";
 #endif
 
 #if MagDbg
+#if MagXDbg
   StringC += "Magnetômetro X(uT)";
   StringC += "\t";
+#endif
+#if MagYDbg
   StringC += "Magnetômetro Y(uT)";
   StringC += "\t";
+#endif
+#if MagZDbg
   StringC += "Magnetômetro Z(uT)";
   StringC += "\t";
+#endif
 #endif
 
 #if GyrDbg
@@ -212,15 +222,6 @@ void setup()
   StringC += "Acelerômetro Y(m/s^2)";
   StringC += "\t";
   StringC += "Acelerômetro Z(m/s^2)";
-  StringC += "\t";
-#endif
-
-#if LedDbg
-  StringC += "Ativação Led1";
-  StringC += "\t";
-  StringC += "Ativação Led2";
-  StringC += "\t";
-  StringC += "Ativação Led3";
   StringC += "\t";
 #endif
 
@@ -262,6 +263,7 @@ void loop()
 {
   String dataString = "";
   unsigned long TAtual = millis();
+  sensors_event_t event;
 
   //Calculo do tempo
 #if TemDbg
@@ -325,16 +327,20 @@ void loop()
 #endif
 
   //Captação dos sensores
-  sensors_event_t event;
-
 #if MagDbg
   mag.getEvent(&event);
+#if MagXDbg
   dataString += String (event.magnetic.x);
   dataString += "\t";
+#endif
+#if MagYDbg
   dataString += String (event.magnetic.y);
   dataString += "\t";
+#endif
+#if MagZDbg
   dataString += String (event.magnetic.z);
   dataString += "\t";
+#endif
 #endif
 
 #if GyrDbg
@@ -358,7 +364,7 @@ void loop()
 #endif
 
   //Timer e ativação de leds
-#if LedDbg
+#if BarDbg
   if (Q1 == 1) // se detectar a queda
   {
     if (LK1 == false) //se a trava estiver desativada
