@@ -153,6 +153,17 @@ float CascataDeFiltro::FuncaoCascataFriutu(float valoratualizado) {
   return ValorFiltrado;
 }
 
+//class Paraquedas{
+//  private:
+  
+//  public:
+  //construtor
+  //usar "static" para variavel compartilhada entre os objetos dessa classe (tempo atual, detecção de apogeu, altura atual)
+  //ao usar a varial static, a função que mexe com ela tem que ser static tbm, e o chamamento da função deve ser através da class e não de um objeto especifico "nomeclasse::nomefunção()"
+  //definir os pinos de acionamento, porém iniciar o pinMode em uma função chamada no setup, pois o construtor roda primeiro e pode dar ruim
+  //
+//}
+
 Filtro FiltroAx(tam);
 Filtro FiltroAy(tam);
 Filtro FiltroAz(tam);
