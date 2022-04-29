@@ -342,47 +342,54 @@ void loop()
 
   //Calculos dos Filtros
 
-//Renomear variaveis de acordo com o filtro
+                              //#define Tam 11
+                              //#define Nf 2
 
-//int IM = 0 (global);
-//vF0 = Filtro0 (); (Filtro0 seria o processo de calcular os valores do atual Filtro1)
-//vF1 = Filtro1 (); (Filtro1 seria o processo de calcular os valores do atual Filtro2)
+                              //float pos[Tam]
+                              //float Vfiltro[Nf][Tam];
+                              //float F[Nf];
+                              //float SF[Nf+1];
+
 
 #if BarDbg
-  ALT = (bmp.readAltitude() - M);
-  dataString += String(ALT);
-  dataString += "\t";
-  
-  F1 = F1 - Vfiltro1[A];
-  Vfiltro1[A] = ALT;
-  F1 = F1 + Vfiltro1[A];
-  A++;
-  if (A >= 10)
-  {
-    A = 0;
-  }
-  SF1 = F1 / 11;
+  ALT = (bmp.readAltitude() - M); //SF[0] = (bmp.readAltitude() - M); (dessa forma é possivel se livrar da variavel ALT)
+  dataString += String(ALT);      //dataString += String(SF[Nf-Nf]); (forma que eu achei de fazer SF[0] sem ALT)
+  dataString += "\t";             //dataString += "\t"; 
+                                 
+                               
+                               // for (int IF = 0; IF < Nf; IF++)
+                               //{
+  F1 = F1 - Vfiltro1[A];       //F[IF] = F[IF] - Vfiltro[IF][pos[IF]];
+  Vfiltro1[A] = ALT;           //Vfiltro[IF][pos[IF]] = SF[IF];
+  F1 = F1 + Vfiltro1[A];       //F[IF] = F[IF] + Vfiltro[IF][pos[IF]];
+  A++;                         //pos[IF]++;
+  if (A >= 10)                 //if(pos[IF] == TAM);
+  {                            //{
+    A = 0;                     //pos[IF] = 0;
+  }                            //}
+  SF1 = F1 / 11;               //SF[IF+1] = F[IF]/TAM;
+                               //}
 
-  F2 = F2 - Vfiltro2[B];
-  Vfiltro2[B] = SF1;
-  F2 = F2 + Vfiltro2[B];
-  B++;
-  if (B >= 10)
-  {
-    B = 0;
-  }
-  SF2 = F2 / 11;
+  //F2 = F2 - Vfiltro2[B];
+  //Vfiltro2[B] = SF1;
+  //F2 = F2 + Vfiltro2[B];
+  //B++;
+  //if (B >= 10)
+  //{
+  //  B = 0;
+  //}
+  //SF2 = F2 / 11;
 
-  dataString += String(SF1);
-  dataString += "\t";
-  dataString += String (SF2);
-  dataString += "\t";
-  Ap1 = SF2;
+  dataString += String(SF1);   //dataString += String(SF[Nf]); 
+  dataString += "\t";          //dataString += "\t";
+  dataString += String (SF2);  //dataString += String(SF[Nf+1]);
+  dataString += "\t";          //dataString += "\t";
+  Ap1 = SF2;                   //Ap1 = SF[NF+1]; (SF[2] é um valor unico do vetor SF e assim é possivel identifica-lo dessa forma?)
 #endif
 
   //Detecção de Apogeu
 #if ApgDbg
-  if (Ap1 > SF2)
+  if (Ap1 > SF2)               
   {
     Queda++;
   }
