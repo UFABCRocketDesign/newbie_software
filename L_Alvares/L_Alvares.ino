@@ -11,6 +11,9 @@
 #define IGN_2 61  /*act2*/
 #define IGN_3 46  /*act3*/
 #define IGN_4 55  /*act4*/
+#define inter 1000
+#define AtivarLED2 3000
+#define Tempo 5000
 #define PLED1 IGN_1
 #define PLED2 IGN_2
 #define PLED3 LED_BUILTIN
@@ -66,19 +69,19 @@ unsigned long TQ = 0;
 
 #if Led1Dbg
 int LED1ST = LOW;
-boolean LK1 = false;
+bool LK1 = false;
 unsigned long T1Ant = 0;
 #endif
 
 #if Led2Dbg
 int LED2ST = LOW;
-boolean LK2 = false;
+bool LK2 = false;
 unsigned long T2Ant = 0;
 #endif
 
 #if Led3Dbg  
 int LED3ST = LOW;
-boolean LK3 = false;
+bool LK3 = false;
 unsigned long T3Ant = 0;
 #endif
 
@@ -451,9 +454,7 @@ void loop()
 
   //Timer e ativação de leds
 #if ApgDbg
-int inter = 1000;
-int AtivarLED2 = 3000;
-int Tempo = 5000;
+
   if (Q1 == 1) // se detectar a queda
   {
 #if Led1Dbg
