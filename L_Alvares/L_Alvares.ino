@@ -310,8 +310,7 @@ int NC = 0;
 float Med = 0.0;
   for (int i = 0; i < 11; i++)
   {
-    ALT = bmp.readAltitude();
-    Med = Med + ALT;
+    Med = Med + bmp.readAltitude();
   }
   M = (Med / 11);
 #endif
@@ -342,10 +341,18 @@ void loop()
 #endif
 
   //Calculos dos Filtros
+
+//Renomear variaveis de acordo com o filtro
+
+//int IM = 0 (global);
+//vF0 = Filtro0 (); (Filtro0 seria o processo de calcular os valores do atual Filtro1)
+//vF1 = Filtro1 (); (Filtro1 seria o processo de calcular os valores do atual Filtro2)
+
 #if BarDbg
   ALT = (bmp.readAltitude() - M);
   dataString += String(ALT);
   dataString += "\t";
+  
   F1 = F1 - Vfiltro1[A];
   Vfiltro1[A] = ALT;
   F1 = F1 + Vfiltro1[A];
