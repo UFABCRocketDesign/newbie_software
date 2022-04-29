@@ -434,7 +434,7 @@ void loop()
 #if ApgDbg
   if (Queda >= 11)
   {
-    if(Q1 = 0)
+    if(Q1 == 0)
     {
     Q1 = 1;
     TQ = TAtual;
