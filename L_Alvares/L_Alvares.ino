@@ -11,9 +11,6 @@
 #define IGN_2 61  /*act2*/
 #define IGN_3 46  /*act3*/
 #define IGN_4 55  /*act4*/
-#define inter 1000
-#define AtivarLED2 3000
-#define Tempo 5000
 #define PLED1 IGN_1
 #define PLED2 IGN_2
 #define PLED3 LED_BUILTIN
@@ -49,7 +46,6 @@
 #if BarDbg
 Adafruit_BMP085 bmp;
 float ALT = 0.0;
-float Med = 0.0;
 float M = 0.0;
 int A = 0;
 int B = 0;
@@ -69,20 +65,20 @@ unsigned long TQ = 0;
 #endif
 
 #if Led1Dbg
-boolean LK1 = false;
 int LED1ST = LOW;
+boolean LK1 = false;
 unsigned long T1Ant = 0;
 #endif
 
 #if Led2Dbg
-boolean LK2 = false;
 int LED2ST = LOW;
+boolean LK2 = false;
 unsigned long T2Ant = 0;
 #endif
 
-#if Led3Dbg
-boolean LK3 = false;
+#if Led3Dbg  
 int LED3ST = LOW;
+boolean LK3 = false;
 unsigned long T3Ant = 0;
 #endif
 
@@ -101,8 +97,6 @@ Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(1234);
 #if sdDbg
 const int chipSelect = 53; //pino SD
 String NomeArq = "";
-int ValorA = 0;
-int NC = 0;
 #endif
 
 void setup()
@@ -158,6 +152,8 @@ void setup()
 #endif
 
 #if sdDbg
+int ValorA = 0;
+int NC = 0;
   //Ligando o cartão SD
   while (!Serial)
   {
@@ -308,6 +304,7 @@ void setup()
 
 #if BarDbg
   //Cálculo da Média
+float Med = 0.0;
   for (int i = 0; i < 11; i++)
   {
     ALT = bmp.readAltitude();
@@ -437,8 +434,11 @@ void loop()
 #if ApgDbg
   if (Queda >= 11)
   {
+    if(Q1 = 0)
+    {
     Q1 = 1;
     TQ = TAtual;
+    }
     dataString += String("1");
     dataString += "\t";
   }
@@ -451,6 +451,9 @@ void loop()
 
   //Timer e ativação de leds
 #if ApgDbg
+int inter = 1000;
+int AtivarLED2 = 3000;
+int Tempo = 5000;
   if (Q1 == 1) // se detectar a queda
   {
 #if Led1Dbg
