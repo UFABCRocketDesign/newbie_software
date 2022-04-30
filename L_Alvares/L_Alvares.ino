@@ -56,15 +56,6 @@ float AF[Nf];
 float SF[Nf + 1];
 float M = 0.0;
 float Ap1 = 0.0;
-//float ALT = 0.0;
-//int A = 0;
-//int B = 0;
-//float F1 = 0.0;
-//float F2 = 0.0;
-//float Vfiltro1[11];
-//float Vfiltro2[11];
-//float SF1 = 0.0;
-//float SF2 = 0.0;
 #endif
 
 #if ApgDbg
@@ -354,34 +345,23 @@ void loop()
 
   for (int IF = 0; IF < Nf; IF++)
   {
-    AF[IF] = AF[IF] - Mfiltro[IF][pos[IF]];
-    Mfiltro[IF][pos[IF]] = SF[IF];
-    AF[IF] = AF[IF] + Mfiltro[IF][pos[IF]];
-    pos[IF]++;
-    if (pos[IF] == Tam)
-    {
-      pos[IF] = 0;
-    }
-    SF[IF + 1] = AF[IF] / Tam;
+    AF[IF] = AF[IF] - Mfiltro[IF][pos[IF]]; //F2 = F2 - Vfiltro2[B];
+    Mfiltro[IF][pos[IF]] = SF[IF];          //Vfiltro2[B] = SF1;
+    AF[IF] = AF[IF] + Mfiltro[IF][pos[IF]]; //F2 = F2 + Vfiltro2[B];
+    pos[IF]++;                              //B++;
+    if (pos[IF] == Tam)                     //if (B >= 10)
+    {                                       //{
+      pos[IF] = 0;                          //B = 0;    
+    }                                       //}
+    SF[IF + 1] = AF[IF] / Tam;              //SF2 = F2 / 11;
     dataString += String(SF[IF + 1]);
     dataString += "\t";
   }
-  Ap1 = SF[Nf];  // Ap1 = SF2;
-
-  //F2 = F2 - Vfiltro2[B];
-  //Vfiltro2[B] = SF1;
-  //F2 = F2 + Vfiltro2[B];
-  //B++;
-  //if (B >= 10)
-  //{
-  //  B = 0;
-  //}
-  //SF2 = F2 / 11;
 #endif
 
   //Detecção de Apogeu
 #if ApgDbg
-  if (Ap1 > SF[Nf]) //if (Ap1 > SF2)
+  if (Ap1 > SF[Nf])
   {
     Queda++;
   }
@@ -389,6 +369,7 @@ void loop()
   {
     Queda = 0;
   }
+  Ap1 = SF[Nf];
 #endif
 
   //Captação dos sensores
