@@ -345,9 +345,9 @@ void loop()
                               //#define Tam 11
                               //#define Nf 2
 
-                              //float pos[Tam]
-                              //float Vfiltro[Nf][Tam];
-                              //float F[Nf];
+                              //float pos[Tam];
+                              //float Mfiltro[Nf][Tam];
+                              //float AF[Nf];
                               //float SF[Nf+1];
 
 
@@ -359,15 +359,15 @@ void loop()
                                
                                // for (int IF = 0; IF < Nf; IF++)
                                //{
-  F1 = F1 - Vfiltro1[A];       //F[IF] = F[IF] - Vfiltro[IF][pos[IF]];
-  Vfiltro1[A] = ALT;           //Vfiltro[IF][pos[IF]] = SF[IF];
-  F1 = F1 + Vfiltro1[A];       //F[IF] = F[IF] + Vfiltro[IF][pos[IF]];
+  F1 = F1 - Vfiltro1[A];       //AF[IF] = AF[IF] - Mfiltro[IF][pos[IF]];
+  Vfiltro1[A] = ALT;           //Mfiltro[IF][pos[IF]] = SF[IF];
+  F1 = F1 + Vfiltro1[A];       //AF[IF] = AF[IF] + Mfiltro[IF][pos[IF]];
   A++;                         //pos[IF]++;
   if (A >= 10)                 //if(pos[IF] == TAM);
   {                            //{
     A = 0;                     //pos[IF] = 0;
   }                            //}
-  SF1 = F1 / 11;               //SF[IF+1] = F[IF]/TAM;
+  SF1 = F1 / 11;               //SF[IF+1] = AF[IF]/TAM;
                                //}
 
   //F2 = F2 - Vfiltro2[B];
@@ -389,7 +389,7 @@ void loop()
 
   //Detecção de Apogeu
 #if ApgDbg
-  if (Ap1 > SF2)               
+  if (Ap1 > SF2)               //if(Ap1 > SF[N+1])               
   {
     Queda++;
   }
@@ -521,7 +521,7 @@ void loop()
     }
 #endif
 #if Led3Dbg
-    if (SF2 <= -0.25 || LK3 == true) // Quando a queda atingir certa altura X, ligar o led
+    if (SF2 <= -0.25 || LK3 == true) // if(SF[Nf+1] <= -0.25 || LK3 == true)
     {
       if (LK3 == false) //se a trava estiver desativada
       {
