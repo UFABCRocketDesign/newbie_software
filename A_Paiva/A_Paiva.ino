@@ -61,15 +61,15 @@ float Hmax = 0;                   //Valor máximo filtrado
 int apogeu = 0;
 #endif
 #if usa_acpq
-int auxled1 = 0;
-int auxled2 = 0;
-int auxled3 = 0;
-int auxinicio1 = 0;
-int auxinicio2 = 0;
-unsigned long inicio1 = 0;        // will store last time LED was updated
-unsigned long inicio2 = 0;        // will store last time LED was updated
-unsigned long inicio3 = 0;        // will store last time LED was updated
-unsigned long inicio4 = 0;        // will store last time LED was updated
+//int auxled1 = 0;
+//int auxled2 = 0;
+//int auxled3 = 0;
+//int auxinicio1 = 0;
+//int auxinicio2 = 0;
+//unsigned long inicio1 = 0;        // will store last time LED was updated
+//unsigned long inicio2 = 0;        // will store last time LED was updated
+//unsigned long inicio3 = 0;        // will store last time LED was updated
+//unsigned long inicio4 = 0;        // will store last time LED was updated
 #endif
 #if usa_bar
 Adafruit_BMP085 bmp;              //Cria variável 'bmp' para a biblioteca Adafruit_BMP085
@@ -100,7 +100,7 @@ class Filtro {
       for (int i = 0; i < QtTermos; i++) {
         VetorFiltro[i] = 0;
       }
-    } 
+    }
     //destrutor
     ~Filtro() {
       delete[] VetorFiltro;
@@ -147,31 +147,103 @@ float CascataDeFiltro::FuncaoCascataFriutu(float valoratualizado) {
   float ValorFiltrado = valoratualizado;
   for (int i = 0; i < QtFiltros; i++) {
     ValorFiltrado = MatrizFiltro[i]->FuncaoFriutu(ValorFiltrado);      //o "->" chama uma função para ponteiro de ponteiro
-    dado += String(ValorFiltrado)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
+    dado += String(ValorFiltrado) + "\t";                            //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
     //Serial.println(ValorFiltrado);
   }
   return ValorFiltrado;
 }
 
-//class Paraquedas{
-//  private:
-  
-//  public:
-  //construtor
-  //usar "static" para variavel compartilhada entre os objetos dessa classe (tempo atual, detecção de apogeu, altura atual)
-  //ao usar a varial static, a função que mexe com ela tem que ser static tbm, e o chamamento da função deve ser através da class e não de um objeto especifico "nomeclasse::nomefunção()"
-  //definir os pinos de acionamento, porém iniciar o pinMode em uma função chamada no setup, pois o construtor roda primeiro e pode dar ruim
-  //
-//}
+class Paraquedas {
+  private:
+    static int Apogeu;
+    static unsigned long TempoAtual;
+    static float AlturaAtual;
+    //tipo(1°por tempo a partir do apogeu, 2°em uma altura específica)
+    int Tipo;
+    int Pino;
+    //duração do acionamentp
+    float Duracao;
+    //espera para ser acionado
+    float Espera;
+    //altura específica para acionar após apogeu
+    float Alturaesp;
+  public:
+    //construtor
+    Paraquedas(int v_tipo, int v_pino, float v_duracao, float v_espera, float v_alturaesp): Tipo(v_tipo), Pino(v_pino), Duracao(v_duracao), Espera(v_espera), Alturaesp(v_alturaesp) {}
+    //usar "static" para variavel compartilhada entre os objetos dessa classe (tempo atual, detecção de apogeu, altura atual)
+    //ao usar a varial static, a função que mexe com ela tem que ser static tbm, e o chamamento da função deve ser através da class e não de um objeto especifico "nomeclasse::nomefunção()"
+    //definir os pinos de acionamento, porém iniciar o pinMode em uma função chamada no setup, pois o construtor roda primeiro e pode dar ruim
+    void AtualizaApogeu(int v_Apogeu) {
+      Apogeu = v_Apogeu;
+    }
+    void AtualizaTempoAtual(unsigned long v_TempoAtual) {
+      TempoAtual = v_TempoAtual;
+    }
+    void AtualizaAlturaAtual(float v_MediaMov) {
+      AlturaAtual = v_MediaMov;
+    }
+    void declaraPino() {
+      int auxpino = 0;
+      if (auxpino == 0) {
+        pinMode(Pino, OUTPUT);
+        auxpino = 1;
+      }
+    }
+    String Paraqueda() {
+      int auxled = 0;
+      int auxespera = 0;
+      unsigned long inicio = 0;
+      unsigned long fim = 0;
+      if (Tipo == 1) {
+        if (Apogeu == 1) {
+          if (auxespera == 0) {
+            inicio = TempoAtual + Espera;
+            auxespera = 1;
+          }
+          if (TempoAtual >= inicio && auxled == 0) {
+            digitalWrite(Pino, HIGH);
+            auxled = 1;
+            fim = TempoAtual + Duracao;
+            return "acionado";
+            //Serial.print("12");
+          }
+          if (TempoAtual >= fim && auxled == 1) {
+            digitalWrite(Pino, LOW);
+            auxled = 2;
+            return "desacionado";
+          }
+          return "";
+        }
+      }
+      else if (Tipo == 2) {
+        if (Apogeu == 1) {
+          if (AlturaAtual <= Alturaesp && auxled == 0) {
+            digitalWrite(Pino, HIGH);
+            auxled = 1;
+            fim = TempoAtual + Duracao;
+            return "acionado";
+          }
+          if (TempoAtual >= fim && auxled == 1) {
+            digitalWrite(Pino, LOW);
+            auxled = 2;
+            return "desacionado";
+          }
+          return "";
+        }
+      }
+    }
+};
 
 Filtro FiltroAx(tam);
 Filtro FiltroAy(tam);
 Filtro FiltroAz(tam);
 Filtro FiltroAltitude(tam);
 CascataDeFiltro CascataFiltroAltitude(qfa, tam);
+Paraquedas Parachute1(1, 35, duracao, espera, altura);
 
 void setup() {
 #if usa_acpq
+  Parachute1.declaraPino();
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(IGN_1, OUTPUT);//PINOS DA MACRO pinos.h feita pelo Heitor
   pinMode(IGN_2, OUTPUT);
@@ -311,6 +383,7 @@ void setup() {
 void loop() {
   dado = "";
   unsigned long tempoAtual = millis();
+  Paraquedas::AtualizaTempoAtual(tempoAtual);
 #if usa_Tempo
   dado += String(tempoAtual / 1000.0) + "\t";
 #endif
@@ -409,9 +482,9 @@ void loop() {
   else if (apogeu == 1) {
     dado += "Descendo\t";
 #if usa_acpq
-    dado += Paraqueda1(tempoAtual, apogeu);
-    dado += Paraqueda2(tempoAtual, apogeu);
-    dado += Paraqueda3(tempoAtual, Afiltrada, apogeu);
+    dado += Parachute1.Paraqueda();
+//    dado += Paraqueda2(tempoAtual, apogeu);
+//    dado += Paraqueda3(tempoAtual, Afiltrada, apogeu);
     dado += "\t";
 #endif
   }
@@ -443,6 +516,7 @@ float Friutu(float valoratualizado, int j) {
   MediaMov = SomaMov / tam;                          //Valor final do filtro, uma média entre "tam" quantidades de valores
   return MediaMov;
 }
+Paraquedas::AtualizaAlturaAtual(MediaMov);
 int Apogueu(int apogeu, float Hmax, float MediaMov, unsigned long tempoAtual) {
   float Delta = Hmax - MediaMov;                           //Compara o valor máximo do filtro1 com o valor atual do filtro1
   if (Delta >= 2 && apogeu == 0) {                         //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
@@ -450,7 +524,8 @@ int Apogueu(int apogeu, float Hmax, float MediaMov, unsigned long tempoAtual) {
   }
   return apogeu;
 }
-#if usa_acpq 
+Paraquedas::AtualizaApogeu(apogeu);
+/*#if usa_acpq
 String Paraqueda1(unsigned long tempoAtual, int apogeu) {
   if (auxinicio1 == 0) {
     inicio1 = tempoAtual + duracao;
@@ -507,4 +582,4 @@ String Paraqueda3(unsigned long tempoAtual, float MediaMov, int apogeu) {
     return "";
   }
 }
-#endif
+#endif*/
