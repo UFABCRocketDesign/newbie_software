@@ -19,7 +19,7 @@
 #define PLED3 LED_BUILTIN
 
 #define Tam 11
-#define Nf 2
+#define Nf 4
 #define Vmed 11
 #define VQueda 11
 
@@ -340,220 +340,226 @@ void loop()
   dataString += "\t";
 #endif
 
-  //Calculos dos Filtros
+  //Impressão dos filtros
 #if BarDbg
   SF[0] = (bmp.readAltitude() - M); //ALT = (bmp.readAltitude() - M);
   dataString += String(SF[0]); //dataString += String(ALT);
   dataString += "\t";
 
-  for (int IF = 0; IF < Nf; IF++)
-  {
-    AF[IF] = AF[IF] - Mfiltro[IF][pos[IF]]; //F2 = F2 - Vfiltro2[B];
-    Mfiltro[IF][pos[IF]] = SF[IF];          //Vfiltro2[B] = SF1;
-    AF[IF] = AF[IF] + Mfiltro[IF][pos[IF]]; //F2 = F2 + Vfiltro2[B];
-    pos[IF]++;                              //B++;
-    if (pos[IF] == Tam)                     //if (B >= 10)
-    {                                       //{
-      pos[IF] = 0;                          //B = 0;    
-    }                                       //}
-    SF[IF + 1] = AF[IF] / Tam;              //SF2 = F2 / 11;
-    dataString += String(SF[IF + 1]);
-    dataString += "\t";
-  }
-#endif
-
-  //Detecção de Apogeu
-#if ApgDbg
-  if (Ap1 > SF[Nf])
-  {
-    Queda++;
-  }
-  else
-  {
-    Queda = 0;
-  }
-  Ap1 = SF[Nf];
-#endif
-
-  //Captação dos sensores
-#if MagDbg
-  mag.getEvent(&event);
-#if MagXDbg
-  dataString += String (event.magnetic.x);
+for (int IF = 0; IF < Nf; IF++)
+{
+  SF[IF + 1] = Filtragem(IF , SF[IF]);
+  dataString += String(SF[IF + 1]);
   dataString += "\t";
+}
+#endif
+
+//Detecção de Apogeu
+#if ApgDbg
+if (Ap1 > SF[Nf])
+{
+  Queda++;
+}
+else
+{
+  Queda = 0;
+}
+Ap1 = SF[Nf];
+#endif
+
+//Captação dos sensores
+#if MagDbg
+mag.getEvent(&event);
+#if MagXDbg
+dataString += String (event.magnetic.x);
+dataString += "\t";
 #endif
 #if MagYDbg
-  dataString += String (event.magnetic.y);
-  dataString += "\t";
+dataString += String (event.magnetic.y);
+dataString += "\t";
 #endif
 #if MagZDbg
-  dataString += String (event.magnetic.z);
-  dataString += "\t";
+dataString += String (event.magnetic.z);
+dataString += "\t";
 #endif
 #endif
 
 #if GyrDbg
-  gyro.read();
+gyro.read();
 #if GyrXDbg
-  dataString += String ((int)gyro.g.x);
-  dataString += "\t";
+dataString += String ((int)gyro.g.x);
+dataString += "\t";
 #endif
 #if GyrYDbg
-  dataString += String ((int)gyro.g.y);
-  dataString += "\t";
+dataString += String ((int)gyro.g.y);
+dataString += "\t";
 #endif
 #if GyrZDbg
-  dataString += String ((int)gyro.g.z);
-  dataString += "\t";
+dataString += String ((int)gyro.g.z);
+dataString += "\t";
 #endif
 #endif
 
 #if AclDbg
-  accel.getEvent(&event);
+accel.getEvent(&event);
 #if AclXDbg
-  dataString += String (event.acceleration.x);
-  dataString += "\t";
+dataString += String (event.acceleration.x);
+dataString += "\t";
 #endif
 #if AclYDbg
-  dataString += String (event.acceleration.y);
-  dataString += "\t";
+dataString += String (event.acceleration.y);
+dataString += "\t";
 #endif
 #if AclZDbg
-  dataString += String (event.acceleration.z);
+dataString += String (event.acceleration.z);
+dataString += "\t";
+#endif
+#endif
+
+#if ApgDbg
+if (Queda >= VQueda)
+{
+  if (Q1 == 0)
+  {
+    Q1 = 1;
+    TQ = TAtual;
+  }
+  dataString += String("1");
   dataString += "\t";
-#endif
-#endif
-
-#if ApgDbg
-  if (Queda >= VQueda)
-  {
-    if (Q1 == 0)
-    {
-      Q1 = 1;
-      TQ = TAtual;
-    }
-    dataString += String("1");
-    dataString += "\t";
-  }
-  else
-  {
-    dataString += String("0");
-    dataString += "\t";
-  }
+}
+else
+{
+  dataString += String("0");
+  dataString += "\t";
+}
 #endif
 
-  //Timer e ativação de leds
+//Timer e ativação de leds
 #if ApgDbg
 
-  if (Q1 == 1) // se detectar a queda
-  {
+if (Q1 == 1) // se detectar a queda
+{
 #if Led1Dbg
-    if (LK1 == false) //se a trava estiver desativada
+  if (LK1 == false) //se a trava estiver desativada
+  {
+    if (TAtual - T1Ant >= inter) //se o Atual-Anterior > 1 seg, o led liga
     {
-      if (TAtual - T1Ant >= inter) //se o Atual-Anterior > 1 seg, o led liga
-      {
-        T1Ant = TAtual;
-        LED1ST = HIGH;
-      }
-      else
-      {
-        LED1ST = LOW;
-      }
-      LK1 = true;
+      T1Ant = TAtual;
+      LED1ST = HIGH;
     }
     else
     {
-      if (TAtual - T1Ant >= Tempo) //apos X seg, o Led 1 apaga
-      {
-        LED1ST = LOW;
-      }
+      LED1ST = LOW;
     }
-    digitalWrite(PLED1, LED1ST);
-#endif
-#if Led2Dbg
-    if (TAtual - TQ >= AtivarLED2)
-    {
-      if (LK2 == false) //se a trava estiver desativada
-      {
-        if (TAtual - T2Ant >= inter) //se o Atual-Anterior > 1 seg, o led liga
-        {
-          T2Ant = TAtual;
-          LED2ST = HIGH;
-        }
-        else
-        {
-          LED2ST = LOW;
-        }
-        LK2 = true;
-      }
-      else
-      {
-        if (TAtual - T2Ant >= Tempo)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
-        {
-          LED2ST = LOW;
-        }
-      }
-      digitalWrite(PLED2, LED2ST);
-    }
-#endif
-#if Led3Dbg
-    if (SF[Nf] <= -0.25 || LK3 == true) //if (SF2 <= -0.25 || LK3 == true)
-    {
-      if (LK3 == false) //se a trava estiver desativada
-      {
-        if (TAtual - T3Ant >= inter) //se o Atual-Anterior > 1 seg, o led liga
-        {
-          T3Ant = TAtual;
-          LED3ST = HIGH;
-        }
-        else
-        {
-          LED3ST = LOW;
-        }
-        LK3 = true;
-      }
-      else
-      {
-        if (TAtual - T3Ant >= Tempo)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
-        {
-          LED3ST = LOW;
-        }
-      }
-      digitalWrite(PLED3, LED3ST);
-    }
-#endif
-  }
-#endif
-
-#if Led1Dbg
-  dataString += String(LED1ST);
-  dataString += "\t";
-#endif
-
-#if Led2Dbg
-  dataString += String(LED2ST);
-  dataString += "\t";
-#endif
-
-#if Led3Dbg
-  dataString += String(LED3ST);
-  dataString += "\t";
-#endif
-
-  Serial.println(dataString);
-
-#if sdDbg
-  //Cartão SD
-  File dataFile = SD.open(NomeArq , FILE_WRITE);
-  if (dataFile)
-  {
-    dataFile.println(dataString);
-    dataFile.close();
+    LK1 = true;
   }
   else
   {
-    Serial.println("error opening datalog.txt");
+    if (TAtual - T1Ant >= Tempo) //apos X seg, o Led 1 apaga
+    {
+      LED1ST = LOW;
+    }
+  }
+  digitalWrite(PLED1, LED1ST);
+#endif
+#if Led2Dbg
+  if (TAtual - TQ >= AtivarLED2)
+  {
+    if (LK2 == false) //se a trava estiver desativada
+    {
+      if (TAtual - T2Ant >= inter) //se o Atual-Anterior > 1 seg, o led liga
+      {
+        T2Ant = TAtual;
+        LED2ST = HIGH;
+      }
+      else
+      {
+        LED2ST = LOW;
+      }
+      LK2 = true;
+    }
+    else
+    {
+      if (TAtual - T2Ant >= Tempo)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
+      {
+        LED2ST = LOW;
+      }
+    }
+    digitalWrite(PLED2, LED2ST);
   }
 #endif
+#if Led3Dbg
+  if (SF[Nf] <= -0.25 || LK3 == true) //if (SF2 <= -0.25 || LK3 == true)
+  {
+    if (LK3 == false) //se a trava estiver desativada
+    {
+      if (TAtual - T3Ant >= inter) //se o Atual-Anterior > 1 seg, o led liga
+      {
+        T3Ant = TAtual;
+        LED3ST = HIGH;
+      }
+      else
+      {
+        LED3ST = LOW;
+      }
+      LK3 = true;
+    }
+    else
+    {
+      if (TAtual - T3Ant >= Tempo)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
+      {
+        LED3ST = LOW;
+      }
+    }
+    digitalWrite(PLED3, LED3ST);
+  }
+#endif
+}
+#endif
 
+#if Led1Dbg
+dataString += String(LED1ST);
+dataString += "\t";
+#endif
+
+#if Led2Dbg
+dataString += String(LED2ST);
+dataString += "\t";
+#endif
+
+#if Led3Dbg
+dataString += String(LED3ST);
+dataString += "\t";
+#endif
+
+Serial.println(dataString);
+
+#if sdDbg
+//Cartão SD
+File dataFile = SD.open(NomeArq , FILE_WRITE);
+if (dataFile)
+{
+  dataFile.println(dataString);
+  dataFile.close();
+}
+else
+{
+  Serial.println("error opening datalog.txt");
+}
+#endif
+
+}
+
+//Calculo dos filtros
+float Filtragem(int a,float vmd)
+{
+  AF[a] = AF[a] - Mfiltro[a][pos[a]];   //F2 = F2 - Vfiltro2[B];
+  Mfiltro[a][pos[a]] = vmd;              //Vfiltro2[B] = SF1;
+  AF[a] = AF[a] + Mfiltro[a][pos[a]];   //F2 = F2 + Vfiltro2[B];
+  pos[a]++;                             //B++;
+  if (pos[a] == Tam)                    //if (B >= 10)
+  { //{
+    pos[a] = 0;                         //B = 0;
+  }                                     //}
+  return AF[a] / Tam;                //SF2 = F2 / 11;
 }
