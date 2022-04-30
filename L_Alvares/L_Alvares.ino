@@ -17,8 +17,11 @@
 #define PLED1 IGN_1
 #define PLED2 IGN_2
 #define PLED3 LED_BUILTIN
+
 #define Tam 11
 #define Nf 2
+#define Vmed 11
+#define VQueda 11
 
 #define MagDbg 0
 #define GyrDbg 0
@@ -305,11 +308,11 @@ void setup()
 #if BarDbg
   //Cálculo da Média
   float Med = 0.0;
-  for (int i = 0; i < 11; i++)
+  for (int i = 0; i < Vmed; i++)
   {
     Med = Med + bmp.readAltitude();
   }
-  M = (Med / 11);
+  M = (Med / Vmed);
 #endif
 
 }
@@ -422,7 +425,7 @@ void loop()
 #endif
 
 #if ApgDbg
-  if (Queda >= 11)
+  if (Queda >= VQueda)
   {
     if (Q1 == 0)
     {
