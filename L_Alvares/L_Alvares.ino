@@ -39,14 +39,14 @@
 #define AclYDbg (AclDbg && 1)
 #define AclZDbg (AclDbg && 1)
 
-#define Led1Dbg (BarDbg && 0)
-#define Led2Dbg (BarDbg && 0)
-#define Led3Dbg (BarDbg && 0)
+#define Led1Dbg (BarDbg && 1)
+#define Led2Dbg (BarDbg && 1)
+#define Led3Dbg (BarDbg && 1)
 
 #define BarTempDbg (BarDbg && 0)
 #define BarPresDbg (BarDbg && 0)
 
-#define ApgDbg (BarDbg && 0)
+#define ApgDbg (BarDbg && 1)
 
 #if BarDbg
 Adafruit_BMP085 bmp;
