@@ -358,7 +358,7 @@ void loop()
     Mfiltro[IF][pos[IF]] = SF[IF];
     AF[IF] = AF[IF] + Mfiltro[IF][pos[IF]];
     pos[IF]++;
-    if (pos[IF] == Tam);
+    if (pos[IF] == Tam)
     {
       pos[IF] = 0;
     }
