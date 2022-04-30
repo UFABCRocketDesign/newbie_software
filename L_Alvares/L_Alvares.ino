@@ -20,11 +20,11 @@
 #define Tam 11
 #define Nf 2
 
-#define MagDbg 1
-#define GyrDbg 1
-#define AclDbg 1
-#define sdDbg  1
-#define TemDbg 1
+#define MagDbg 0
+#define GyrDbg 0
+#define AclDbg 0
+#define sdDbg  0
+#define TemDbg 0
 #define BarDbg 1
 
 #define MagXDbg (MagDbg && 1)
@@ -352,7 +352,6 @@ void loop()
   dataString += String(SF[Nf - Nf]); //dataString += String(ALT);
   dataString += "\t";
 
-
   for (int IF = 0; IF < Nf; IF++)
   {
     AF[IF] = AF[IF] - Mfiltro[IF][pos[IF]];
@@ -364,7 +363,10 @@ void loop()
       pos[IF] = 0;
     }
     SF[IF + 1] = AF[IF] / Tam;
+    dataString += String(SF[IF + 1]);
+    dataString += "\t";
   }
+  Ap1 = SF[Nf];  // Ap1 = SF2;
 
   //F2 = F2 - Vfiltro2[B];
   //Vfiltro2[B] = SF1;
@@ -375,12 +377,6 @@ void loop()
   //  B = 0;
   //}
   //SF2 = F2 / 11;
-
-  dataString += String(SF[Nf - 1]); //dataString += String(SF1); (SF1 = ?)
-  dataString += "\t";
-  dataString += String(SF[Nf]); //dataString += String (SF2);
-  dataString += "\t";
-  Ap1 = SF[Nf];  // Ap1 = SF2;
 #endif
 
   //Detecção de Apogeu
