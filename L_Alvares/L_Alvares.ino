@@ -17,6 +17,8 @@
 #define PLED1 IGN_1
 #define PLED2 IGN_2
 #define PLED3 LED_BUILTIN
+#define Tam 11
+#define Nf 2
 
 #define MagDbg 1
 #define GyrDbg 1
@@ -48,17 +50,21 @@
 
 #if BarDbg
 Adafruit_BMP085 bmp;
-float ALT = 0.0;
+int pos[Tam];
+float Mfiltro[Nf][Tam];
+float AF[Nf];
+float SF[Nf + 1];
 float M = 0.0;
-int A = 0;
-int B = 0;
-float F1 = 0.0;
-float F2 = 0.0;
-float Vfiltro1[11];
-float Vfiltro2[11];
-float SF1 = 0.0;
-float SF2 = 0.0;
 float Ap1 = 0.0;
+//float ALT = 0.0;
+//int A = 0;
+//int B = 0;
+//float F1 = 0.0;
+//float F2 = 0.0;
+//float Vfiltro1[11];
+//float Vfiltro2[11];
+//float SF1 = 0.0;
+//float SF2 = 0.0;
 #endif
 
 #if ApgDbg
@@ -79,7 +85,7 @@ bool LK2 = false;
 unsigned long T2Ant = 0;
 #endif
 
-#if Led3Dbg  
+#if Led3Dbg
 int LED3ST = LOW;
 bool LK3 = false;
 unsigned long T3Ant = 0;
@@ -155,8 +161,8 @@ void setup()
 #endif
 
 #if sdDbg
-int ValorA = 0;
-int NC = 0;
+  int ValorA = 0;
+  int NC = 0;
   //Ligando o cartão SD
   while (!Serial)
   {
@@ -307,7 +313,7 @@ int NC = 0;
 
 #if BarDbg
   //Cálculo da Média
-float Med = 0.0;
+  float Med = 0.0;
   for (int i = 0; i < 11; i++)
   {
     Med = Med + bmp.readAltitude();
@@ -341,34 +347,24 @@ void loop()
 #endif
 
   //Calculos dos Filtros
-
-                              //#define Tam 11
-                              //#define Nf 2
-
-                              //float pos[Tam];
-                              //float Mfiltro[Nf][Tam];
-                              //float AF[Nf];
-                              //float SF[Nf+1];
-
-
 #if BarDbg
-  ALT = (bmp.readAltitude() - M); //SF[0] = (bmp.readAltitude() - M); (dessa forma é possivel se livrar da variavel ALT)
-  dataString += String(ALT);      //dataString += String(SF[Nf-Nf]); (forma que eu achei de fazer SF[0] sem ALT)
-  dataString += "\t";             //dataString += "\t"; 
-                                 
-                               
-                               // for (int IF = 0; IF < Nf; IF++)
-                               //{
-  F1 = F1 - Vfiltro1[A];       //AF[IF] = AF[IF] - Mfiltro[IF][pos[IF]];
-  Vfiltro1[A] = ALT;           //Mfiltro[IF][pos[IF]] = SF[IF];
-  F1 = F1 + Vfiltro1[A];       //AF[IF] = AF[IF] + Mfiltro[IF][pos[IF]];
-  A++;                         //pos[IF]++;
-  if (A >= 10)                 //if(pos[IF] == TAM);
-  {                            //{
-    A = 0;                     //pos[IF] = 0;
-  }                            //}
-  SF1 = F1 / 11;               //SF[IF+1] = AF[IF]/TAM;
-                               //}
+  SF[0] = (bmp.readAltitude() - M); //ALT = (bmp.readAltitude() - M);
+  dataString += String(SF[Nf - Nf]); //dataString += String(ALT);
+  dataString += "\t";
+
+
+  for (int IF = 0; IF < Nf; IF++)
+  {
+    AF[IF] = AF[IF] - Mfiltro[IF][pos[IF]];
+    Mfiltro[IF][pos[IF]] = SF[IF];
+    AF[IF] = AF[IF] + Mfiltro[IF][pos[IF]];
+    pos[IF]++;
+    if (pos[IF] == Tam);
+    {
+      pos[IF] = 0;
+    }
+    SF[IF + 1] = AF[IF] / Tam;
+  }
 
   //F2 = F2 - Vfiltro2[B];
   //Vfiltro2[B] = SF1;
@@ -380,16 +376,16 @@ void loop()
   //}
   //SF2 = F2 / 11;
 
-  dataString += String(SF1);   //dataString += String(SF[Nf]); 
-  dataString += "\t";          //dataString += "\t";
-  dataString += String (SF2);  //dataString += String(SF[Nf+1]);
-  dataString += "\t";          //dataString += "\t";
-  Ap1 = SF2;                   //Ap1 = SF[NF+1]; (SF[2] é um valor unico do vetor SF e assim é possivel identifica-lo dessa forma?)
+  dataString += String(SF[Nf - 1]); //dataString += String(SF1); (SF1 = ?)
+  dataString += "\t";
+  dataString += String(SF[Nf]); //dataString += String (SF2);
+  dataString += "\t";
+  Ap1 = SF[Nf];  // Ap1 = SF2;
 #endif
 
   //Detecção de Apogeu
 #if ApgDbg
-  if (Ap1 > SF2)               //if(Ap1 > SF[N+1])               
+  if (Ap1 > SF[Nf]) //if (Ap1 > SF2)
   {
     Queda++;
   }
@@ -451,10 +447,10 @@ void loop()
 #if ApgDbg
   if (Queda >= 11)
   {
-    if(Q1 == 0)
+    if (Q1 == 0)
     {
-    Q1 = 1;
-    TQ = TAtual;
+      Q1 = 1;
+      TQ = TAtual;
     }
     dataString += String("1");
     dataString += "\t";
@@ -521,7 +517,7 @@ void loop()
     }
 #endif
 #if Led3Dbg
-    if (SF2 <= -0.25 || LK3 == true) // if(SF[Nf+1] <= -0.25 || LK3 == true)
+    if (SF[Nf] <= -0.25 || LK3 == true) //if (SF2 <= -0.25 || LK3 == true)
     {
       if (LK3 == false) //se a trava estiver desativada
       {
