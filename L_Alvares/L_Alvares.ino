@@ -23,11 +23,11 @@
 #define Vmed 11
 #define VQueda 11
 
-#define MagDbg 1
-#define GyrDbg 1
-#define AclDbg 1
-#define sdDbg  1
-#define TemDbg 1
+#define MagDbg 0
+#define GyrDbg 0
+#define AclDbg 0
+#define sdDbg  0
+#define TemDbg 0
 #define BarDbg 1
 
 #define MagXDbg (MagDbg && 1)
@@ -46,8 +46,8 @@
 #define Led2Dbg (BarDbg && 1)
 #define Led3Dbg (BarDbg && 1)
 
-#define BarTempDbg (BarDbg && 1)
-#define BarPresDbg (BarDbg && 1)
+#define BarTempDbg (BarDbg && 0)
+#define BarPresDbg (BarDbg && 0)
 
 #define ApgDbg (BarDbg && 1)
 
@@ -70,18 +70,19 @@ unsigned long TQ = 0;
 #if Led1Dbg
 int LED1ST = LOW;
 bool LK1 = false;
+unsigned long OL1 = 0;
 #endif
 
 #if Led2Dbg
 int LED2ST = LOW;
 bool LK2 = false;
-unsigned long T2Ant = 0;
+unsigned long OL2 = 0;
 #endif
 
 #if Led3Dbg
 int LED3ST = LOW;
 bool LK3 = false;
-unsigned long T3Ant = 0;
+unsigned long OL3 = 0;
 #endif
 
 #if MagDbg
@@ -444,8 +445,9 @@ void loop()
     {
       LED1ST = HIGH;
       LK1 = true;
+      OL1 = TAtual + Tempo;
     }
-    if (TAtual - TQ >= Tempo) //apos X seg, o Led 1 apaga
+    if (TAtual >= OL1) //apos X seg, o Led 1 apaga
     {
       LED1ST = LOW;
     }
@@ -456,11 +458,12 @@ void loop()
     {
       if (LK2 == false) //se a trava estiver desativada
       {
-        T2Ant = TAtual;
+        
         LED2ST = HIGH;
         LK2 = true;
+        OL2 = TAtual + Tempo;
       }
-      if (TAtual - T2Ant >= Tempo)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
+      if (TAtual >= OL2)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
       {
         LED2ST = LOW;
       }
@@ -472,11 +475,12 @@ void loop()
     {
       if (LK3 == false) //se a trava estiver desativada
       {
-        T3Ant = TAtual;
+        
         LED3ST = HIGH;
         LK3 = true;
+        OL3 = TAtual + Tempo;
       }
-      if (TAtual - T3Ant >= Tempo)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
+      if (TAtual >= OL3)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
       {
         LED3ST = LOW;
       }
