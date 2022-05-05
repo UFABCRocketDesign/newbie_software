@@ -51,7 +51,6 @@ Adafruit_BMP085 bmp;
 #define INTERVALO_MEDIA_M 20 // intervalo de valores usados na para media movel
 #define SOMA_FINAL_QUEDA 12 // Numero define o valor final para queda 
 #define NUMERO_FILTROS 3  // Numero de filtros 
-#define INTERVALO_QUEDA 4  // intervalo de comparação para queda e suibida
 #define ALTURA_DE_ATIVACAO 400 // ALTURA minima para ativar o ultimo paraquedas
 
 #define TEMPO_PILOTO_ON 5000 // intervalo de tempo que o paraquedas piloto vai ficar ligado
@@ -101,7 +100,7 @@ float ref_chao; // constante que será usada para referenciar o chão
 int arm_queda;
 float vetor[NUMERO_FILTROS+1][INTERVALO_MEDIA_M]; // movimentaçãop dos filtros de sinal de alrura
 float sinal[NUMERO_FILTROS + 1]; // irá conter todos sinais relacionado a altura
-float sinalzin[INTERVALO_QUEDA]; // contem os dados usados para comparar a altura
+float sinalzin;
 unsigned long time_do_apogeu = 0;
 bool trava_apogeu = true; //trava usado para o led piloto
 #endif //barometro
@@ -344,16 +343,14 @@ void Filtros(float valor) {
 
 #if EXIST_BAR
  boolean Detec_queda() {
-  for (int x = INTERVALO_QUEDA - 1; x > 0; x--) {
-    sinalzin[x] = sinalzin[x - 1];
-  }
-  sinalzin[0] = sinal[NUMERO_FILTROS];
 
-  if (sinalzin[0] < sinalzin[INTERVALO_QUEDA - 1]){
+  if (sinal[NUMERO_FILTROS] < sinalzin){
     arm_queda ++;
   }else {
     arm_queda = 0;
     }
+  
+  sinalzin = sinal[NUMERO_FILTROS];
   
   return arm_queda == SOMA_FINAL_QUEDA; // Caindo = true
 }
