@@ -19,15 +19,15 @@
 #define PLED3 LED_BUILTIN
 
 #define Tam 11
-#define Nf 2
+#define Nf 3
 #define Vmed 11
 #define VQueda 11
 
-#define MagDbg 0
-#define GyrDbg 0
-#define AclDbg 0
-#define sdDbg  0
-#define TemDbg 0
+#define MagDbg 1
+#define GyrDbg 1
+#define AclDbg 1
+#define sdDbg  1
+#define TemDbg 1
 #define BarDbg 1
 
 #define MagXDbg (MagDbg && 1)
@@ -46,8 +46,8 @@
 #define Led2Dbg (BarDbg && 1)
 #define Led3Dbg (BarDbg && 1)
 
-#define BarTempDbg (BarDbg && 0)
-#define BarPresDbg (BarDbg && 0)
+#define BarTempDbg (BarDbg && 1)
+#define BarPresDbg (BarDbg && 1)
 
 #define ApgDbg (BarDbg && 1)
 
@@ -228,10 +228,12 @@ void setup()
 #endif
 
 #if BarDbg
-  StringC += "Filtro 1(m)";
-  StringC += "\t";
-  StringC += "Filtro 2(m)";
-  StringC += "\t";
+  for (int F = 0; F < Nf; F++)
+  {
+    StringC += "Filtro ";
+    StringC += String(F+1);
+    StringC += "\t";
+  }
 #endif
 
 #if MagXDbg
@@ -364,10 +366,6 @@ void loop()
     Queda = 0;
   }
   Ap1 = SF[Nf];
-
-  dataString += String(Queda);
-  dataString += "\t";
-
 #endif
 
   //Captação dos sensores
