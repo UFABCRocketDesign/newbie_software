@@ -70,7 +70,6 @@ unsigned long TQ = 0;
 #if Led1Dbg
 int LED1ST = LOW;
 bool LK1 = false;
-unsigned long T1Ant = 0;
 #endif
 
 #if Led2Dbg
@@ -366,9 +365,9 @@ void loop()
   }
   Ap1 = SF[Nf];
 
-    dataString += String(Queda);
-    dataString += "\t";
-  
+  dataString += String(Queda);
+  dataString += "\t";
+
 #endif
 
   //Captação dos sensores
@@ -445,23 +444,12 @@ void loop()
 #if Led1Dbg
     if (LK1 == false) //se a trava estiver desativada
     {
-      if (TAtual - T1Ant >= inter) //se o Atual-Anterior > 1 seg, o led liga
-      {
-        T1Ant = TAtual;
-        LED1ST = HIGH;
-      }
-      else
-      {
-        LED1ST = LOW;
-      }
+      LED1ST = HIGH;
       LK1 = true;
     }
-    else
+    if (TAtual - TQ >= Tempo) //apos X seg, o Led 1 apaga
     {
-      if (TAtual - T1Ant >= Tempo) //apos X seg, o Led 1 apaga
-      {
-        LED1ST = LOW;
-      }
+      LED1ST = LOW;
     }
     digitalWrite(PLED1, LED1ST);
 #endif
@@ -470,23 +458,13 @@ void loop()
     {
       if (LK2 == false) //se a trava estiver desativada
       {
-        if (TAtual - T2Ant >= inter) //se o Atual-Anterior > 1 seg, o led liga
-        {
-          T2Ant = TAtual;
-          LED2ST = HIGH;
-        }
-        else
-        {
-          LED2ST = LOW;
-        }
+        T2Ant = TAtual;
+        LED2ST = HIGH;
         LK2 = true;
       }
-      else
+      if (TAtual - T2Ant >= Tempo)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
       {
-        if (TAtual - T2Ant >= Tempo)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
-        {
-          LED2ST = LOW;
-        }
+        LED2ST = LOW;
       }
       digitalWrite(PLED2, LED2ST);
     }
@@ -496,23 +474,13 @@ void loop()
     {
       if (LK3 == false) //se a trava estiver desativada
       {
-        if (TAtual - T3Ant >= inter) //se o Atual-Anterior > 1 seg, o led liga
-        {
-          T3Ant = TAtual;
-          LED3ST = HIGH;
-        }
-        else
-        {
-          LED3ST = LOW;
-        }
+        T3Ant = TAtual;
+        LED3ST = HIGH;
         LK3 = true;
       }
-      else
+      if (TAtual - T3Ant >= Tempo)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
       {
-        if (TAtual - T3Ant >= Tempo)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
-        {
-          LED3ST = LOW;
-        }
+        LED3ST = LOW;
       }
       digitalWrite(PLED3, LED3ST);
     }
