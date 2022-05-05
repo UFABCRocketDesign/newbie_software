@@ -352,7 +352,7 @@ void Filtros(float valor) {
   
   sinalzin = sinal[NUMERO_FILTROS];
   
-  return arm_queda == SOMA_FINAL_QUEDA; // Caindo = true
+  return arm_queda >= SOMA_FINAL_QUEDA; // Caindo = true
 }
 #endif
 
