@@ -365,6 +365,10 @@ void loop()
     Queda = 0;
   }
   Ap1 = SF[Nf];
+
+    dataString += String(Queda);
+    dataString += "\t";
+  
 #endif
 
   //Captação dos sensores
@@ -436,7 +440,6 @@ void loop()
 
   //Timer e ativação de leds
 #if ApgDbg
-
   if (Q1 == 1) // se detectar a queda
   {
 #if Led1Dbg
