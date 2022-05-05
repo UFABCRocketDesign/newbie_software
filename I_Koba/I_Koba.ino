@@ -49,8 +49,9 @@ Adafruit_BMP085 bmp;
 
 #define MEDIA_PARA_CHAO 100 // intervalo de valores usados na para media do calculo do chão
 #define INTERVALO_MEDIA_M 20 // intervalo de valores usados na para media movel
+#define SOMA_FINAL_QUEDA 12 // Numero define o valor final para queda 
 #define NUMERO_FILTROS 3  // Numero de filtros 
-#define INTERVALO_QUEDA 8  // intervalo de comparação para queda e suibida
+#define INTERVALO_QUEDA 4  // intervalo de comparação para queda e suibida
 #define ALTURA_DE_ATIVACAO 400 // ALTURA minima para ativar o ultimo paraquedas
 
 #define TEMPO_PILOTO_ON 5000 // intervalo de tempo que o paraquedas piloto vai ficar ligado
@@ -97,6 +98,7 @@ unsigned long time_final = 0;
 #if EXIST_BAR
 boolean var_queda;  // contem o estado do foguete, 1 para subindo e 0 para queda
 float ref_chao; // constante que será usada para referenciar o chão
+int arm_queda;
 float vetor[NUMERO_FILTROS+1][INTERVALO_MEDIA_M]; // movimentaçãop dos filtros de sinal de alrura
 float sinal[NUMERO_FILTROS + 1]; // irá conter todos sinais relacionado a altura
 float sinalzin[INTERVALO_QUEDA]; // contem os dados usados para comparar a altura
@@ -346,8 +348,14 @@ void Filtros(float valor) {
     sinalzin[x] = sinalzin[x - 1];
   }
   sinalzin[0] = sinal[NUMERO_FILTROS];
+
+  if (sinalzin[0] < sinalzin[INTERVALO_QUEDA - 1]){
+    arm_queda ++;
+  }else {
+    arm_queda = 0;
+    }
   
-  return sinalzin[0] < sinalzin[INTERVALO_QUEDA - 1]; // Caindo = true
+  return arm_queda == SOMA_FINAL_QUEDA; // Caindo = true
 }
 #endif
 
