@@ -13,7 +13,7 @@
 #define IGN_4 55  /*act4*/
 #define inter 1000
 #define AtivarLED2 3000
-#define Tempo 5000
+#define TL 5000
 #define PLED1 IGN_1
 #define PLED2 IGN_2
 #define PLED3 LED_BUILTIN
@@ -76,6 +76,7 @@ unsigned long OL1 = 0;
 #if Led2Dbg
 int LED2ST = LOW;
 bool LK2 = false;
+bool LC2 = false;
 unsigned long OL2 = 0;
 #endif
 
@@ -232,7 +233,7 @@ void setup()
   for (int F = 0; F < Nf; F++)
   {
     StringC += "Filtro ";
-    StringC += String(F+1);
+    StringC += String(F + 1);
     StringC += "\t";
   }
 #endif
@@ -445,7 +446,7 @@ void loop()
     {
       LED1ST = HIGH;
       LK1 = true;
-      OL1 = TAtual + Tempo;
+      OL1 = TAtual + TL;
     }
     if (TAtual >= OL1) //apos X seg, o Led 1 apaga
     {
@@ -454,14 +455,23 @@ void loop()
     digitalWrite(PLED1, LED1ST);
 #endif
 #if Led2Dbg
-    if (TAtual - TQ >= AtivarLED2)
+
+    if (LC2 == false)
+    {
+      if (TAtual - TQ >= AtivarLED2)
+      {
+        LC2 == true;
+      }
+    }
+
+    if (LC2 == true)
     {
       if (LK2 == false) //se a trava estiver desativada
       {
-        
+
         LED2ST = HIGH;
         LK2 = true;
-        OL2 = TAtual + Tempo;
+        OL2 = TAtual + TL;
       }
       if (TAtual >= OL2)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
       {
@@ -475,10 +485,10 @@ void loop()
     {
       if (LK3 == false) //se a trava estiver desativada
       {
-        
+
         LED3ST = HIGH;
         LK3 = true;
-        OL3 = TAtual + Tempo;
+        OL3 = TAtual + TL;
       }
       if (TAtual >= OL3)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
       {
