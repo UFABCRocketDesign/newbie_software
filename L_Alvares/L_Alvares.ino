@@ -77,6 +77,7 @@ unsigned long OL1 = 0;
 int LED2ST = LOW;
 bool LK2 = false;
 bool LC2 = false;
+unsigned long TAL2 = 0;
 unsigned long OL2 = 0;
 #endif
 
@@ -455,80 +456,74 @@ void loop()
     digitalWrite(PLED1, LED1ST);
 #endif
 #if Led2Dbg
-
     if (LC2 == false)
     {
-      if (TAtual - TQ >= AtivarLED2)
-      {
-        LC2 == true;
-      }
+      TAL2 = TQ + AtivarLED2;
+      LC2 = true;
     }
-
-    if (LC2 == true)
+    if (TAtual > TA2 && LK2 == false) //se a trava estiver desativada
     {
-      if (LK2 == false) //se a trava estiver desativada
-      {
 
-        LED2ST = HIGH;
-        LK2 = true;
-        OL2 = TAtual + TL;
-      }
-      if (TAtual >= OL2)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
-      {
-        LED2ST = LOW;
-      }
-      digitalWrite(PLED2, LED2ST);
+      LED2ST = HIGH;
+      LK2 = true;
+      OL2 = TAtual + TL;
     }
+    if (TAtual >= OL2)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
+    {
+      LED2ST = LOW;
+    }
+    digitalWrite(PLED2, LED2ST);
+  }
 #endif
 #if Led3Dbg
-    if (SF[Nf] <= -0.25 || LK3 == true) //if (SF2 <= -0.25 || LK3 == true)
+  if (SF[Nf] <= -0.25 || LK3 == true) //if (SF2 <= -0.25 || LK3 == true)
+  {
+    if (LK3 == false) //se a trava estiver desativada
     {
-      if (LK3 == false) //se a trava estiver desativada
-      {
 
-        LED3ST = HIGH;
-        LK3 = true;
-        OL3 = TAtual + TL;
-      }
-      if (TAtual >= OL3)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
-      {
-        LED3ST = LOW;
-      }
-      digitalWrite(PLED3, LED3ST);
+      LED3ST = HIGH;
+      LK3 = true;
+      OL3 = TAtual + TL;
     }
-#endif
+    if (TAtual >= OL3)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
+    {
+      LED3ST = LOW;
+    }
+    digitalWrite(PLED3, LED3ST);
   }
+#endif
+}
 #endif
 
 #if Led1Dbg
-  dataString += String(LED1ST);
-  dataString += "\t";
+dataString += String(LED1ST);
+dataString += "\t";
 #endif
 
 #if Led2Dbg
-  dataString += String(LED2ST);
-  dataString += "\t";
+dataString += String(LED2ST);
+dataString += "\t";
 #endif
 
 #if Led3Dbg
-  dataString += String(LED3ST);
-  dataString += "\t";
+dataString += String(LED3ST);
+dataString += "\t";
 #endif
 
-  Serial.println(dataString);
+Serial.println(dataString);
 
 #if sdDbg
-  //Cartão SD
-  File dataFile = SD.open(NomeArq , FILE_WRITE);
-  if (dataFile)
-  {
-    dataFile.println(dataString);
-    dataFile.close();
-  }
-  else
-  {
-    Serial.println("error opening datalog.txt");
-  }
+//Cartão SD
+File dataFile = SD.open(NomeArq , FILE_WRITE);
+if (dataFile)
+{
+  dataFile.println(dataString);
+  dataFile.close();
+}
+else
+{
+  Serial.println("error opening datalog.txt");
+}
 #endif
 
 }
