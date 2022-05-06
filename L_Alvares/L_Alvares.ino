@@ -461,24 +461,21 @@ void loop()
       TAL2 = TQ + AtivarLED2;
       LC2 = true;
     }
-    if (TAtual > TA2 && LK2 == false) //se a trava estiver desativada
+    if (TAtual > TAL2 && LK2 == false) //se a trava estiver desativada
     {
 
       LED2ST = HIGH;
       LK2 = true;
       OL2 = TAtual + TL;
     }
-    if (TAtual >= OL2)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
+    if (TAtual >= OL2 && LK2 == true)// Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
     {
       LED2ST = LOW;
     }
     digitalWrite(PLED2, LED2ST);
-  }
 #endif
 #if Led3Dbg
-  if (SF[Nf] <= -0.25 || LK3 == true) //if (SF2 <= -0.25 || LK3 == true)
-  {
-    if (LK3 == false) //se a trava estiver desativada
+    if (SF[Nf] <= -0.25 && LK3 == false) //se a trava estiver desativada
     {
 
       LED3ST = HIGH;
@@ -490,40 +487,39 @@ void loop()
       LED3ST = LOW;
     }
     digitalWrite(PLED3, LED3ST);
-  }
 #endif
-}
+  }
 #endif
 
 #if Led1Dbg
-dataString += String(LED1ST);
-dataString += "\t";
+  dataString += String(LED1ST);
+  dataString += "\t";
 #endif
 
 #if Led2Dbg
-dataString += String(LED2ST);
-dataString += "\t";
+  dataString += String(LED2ST);
+  dataString += "\t";
 #endif
 
 #if Led3Dbg
-dataString += String(LED3ST);
-dataString += "\t";
+  dataString += String(LED3ST);
+  dataString += "\t";
 #endif
 
-Serial.println(dataString);
+  Serial.println(dataString);
 
 #if sdDbg
-//Cartão SD
-File dataFile = SD.open(NomeArq , FILE_WRITE);
-if (dataFile)
-{
-  dataFile.println(dataString);
-  dataFile.close();
-}
-else
-{
-  Serial.println("error opening datalog.txt");
-}
+  //Cartão SD
+  File dataFile = SD.open(NomeArq , FILE_WRITE);
+  if (dataFile)
+  {
+    dataFile.println(dataString);
+    dataFile.close();
+  }
+  else
+  {
+    Serial.println("error opening datalog.txt");
+  }
 #endif
 
 }
