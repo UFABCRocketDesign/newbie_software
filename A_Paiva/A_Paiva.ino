@@ -173,13 +173,13 @@ class Paraquedas {
     //usar "static" para variavel compartilhada entre os objetos dessa classe (tempo atual, detecção de apogeu, altura atual)
     //ao usar a varial static, a função que mexe com ela tem que ser static tbm, e o chamamento da função deve ser através da class e não de um objeto especifico "nomeclasse::nomefunção()"
     //definir os pinos de acionamento, porém iniciar o pinMode em uma função chamada no setup, pois o construtor roda primeiro e pode dar ruim
-    void AtualizaApogeu(int v_Apogeu) {
+    static void AtualizaApogeu(int v_Apogeu) {
       Apogeu = v_Apogeu;
     }
-    void AtualizaTempoAtual(unsigned long v_TempoAtual) {
+    static void AtualizaTempoAtual(unsigned long v_TempoAtual) {
       TempoAtual = v_TempoAtual;
     }
-    void AtualizaAlturaAtual(float v_MediaMov) {
+    static void AtualizaAlturaAtual(float v_MediaMov) {
       AlturaAtual = v_MediaMov;
     }
     void declaraPino() {
@@ -466,6 +466,7 @@ void loop() {
   //    dado += String(Afiltrada)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
   //  }
   float Afiltrada = CascataFiltroAltitude.FuncaoCascataFriutu(A);
+  Paraquedas::AtualizaAlturaAtual(Afiltrada);
   dado += String(Afiltrada) + "\t";
 #endif
   //Serial.print("Meio loop,dps dos filtros");
@@ -476,6 +477,7 @@ void loop() {
 #endif
 #if usa_apogeu
   apogeu = Apogueu(apogeu, Hmax, Afiltrada, tempoAtual);
+  Paraquedas::AtualizaApogeu(apogeu);
   if (apogeu == 0) {
     dado += "Subindo\t";
   }
@@ -516,7 +518,7 @@ float Friutu(float valoratualizado, int j) {
   MediaMov = SomaMov / tam;                          //Valor final do filtro, uma média entre "tam" quantidades de valores
   return MediaMov;
 }
-Paraquedas::AtualizaAlturaAtual(MediaMov);
+//Paraquedas::AtualizaAlturaAtual(MediaMov);
 int Apogueu(int apogeu, float Hmax, float MediaMov, unsigned long tempoAtual) {
   float Delta = Hmax - MediaMov;                           //Compara o valor máximo do filtro1 com o valor atual do filtro1
   if (Delta >= 2 && apogeu == 0) {                         //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
@@ -524,7 +526,7 @@ int Apogueu(int apogeu, float Hmax, float MediaMov, unsigned long tempoAtual) {
   }
   return apogeu;
 }
-Paraquedas::AtualizaApogeu(apogeu);
+//Paraquedas::AtualizaApogeu(apogeu);
 /*#if usa_acpq
 String Paraqueda1(unsigned long tempoAtual, int apogeu) {
   if (auxinicio1 == 0) {
