@@ -272,7 +272,7 @@ void loop() {
   tempo_atual = millis();
 #if EXIST_BAR
   Filtros(bmp.readAltitude() - ref_chao);
-  var_queda = Detec_queda();
+  var_queda = Detec_queda(sinal[NUMERO_FILTROS]);
   time_do_apogeu = Hora_apogeu();
 #endif
 #if EXIST_IGN_1
@@ -342,15 +342,15 @@ void Filtros(float valor) {
 //----------------------------------------------------------------------------------
 
 #if EXIST_BAR
- boolean Detec_queda() {
+ boolean Detec_queda(float sinal_atual) {
 
-  if (sinal[NUMERO_FILTROS] < sinalzin){
+  if (sinal_atual < sinalzin){
     arm_queda ++;
   }else {
     arm_queda = 0;
     }
   
-  sinalzin = sinal[NUMERO_FILTROS];
+  sinalzin = sinal_atual;
   
   return arm_queda >= SOMA_FINAL_QUEDA; // Caindo = true
 }
