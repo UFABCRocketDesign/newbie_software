@@ -85,12 +85,13 @@ bool trava_piloto = true; //trava usado para o led piloto
 #if EXIST_IGN_2
 int acendeu_secundario;  // contem o estado do led secundario, 1 para acesso e 0 para apagado
 bool trava_secundario = true; //trava usado para o led secundario
+unsigned long time_secundario;
 #endif //paraquedas secundario
 
 #if EXIST_IGN_3
 int acendeu_final; // contem o estado do led final, 1 para acesso e 0 para apagado
 bool trava_final = true; //trava usado para o led secundario
-
+unsigned long time_final;
 #endif //paraquedas final
 
 #if EXIST_BAR
@@ -101,6 +102,8 @@ float vetor[NUMERO_FILTROS+1][INTERVALO_MEDIA_M]; // movimentaçãop dos filtros
 float sinal[NUMERO_FILTROS + 1]; // irá conter todos sinais relacionado a altura
 float sinalzin;
 bool trava_apogeu = true; //trava usado para o led piloto
+unsigned long intervalo_piloto;
+unsigned long intervalo_secundario;
 #endif //barometro
 
 String dados_string = ""; // irá conter os dados dos sensores
@@ -362,6 +365,8 @@ void Filtros(float valor) {
    if(caindo){
      if (trava_apogeu) {
        time_do_apogeu = tempo_atual;
+       intervalo_piloto = TEMPO_PILOTO_ON + time_do_apogeu;
+       intervalo_secundario = TEMPO_ATIVAR_SECUNDARIO + time_do_apogeu;
        trava_apogeu = false; 
      }
    }
@@ -380,7 +385,7 @@ void Led_para_queda_piloto(bool caindo, unsigned long hora_do_apogeu ) {
       trava_piloto = false;
     }
     if (trava_piloto == false) {
-      if ((tempo_atual - hora_do_apogeu) >= TEMPO_PILOTO_ON) {
+      if (tempo_atual >= intervalo_piloto) {
         digitalWrite(IGN_1, LOW);
         acendeu_piloto = 0;
       }
@@ -393,10 +398,9 @@ void Led_para_queda_piloto(bool caindo, unsigned long hora_do_apogeu ) {
 
 #if EXIST_IGN_2
 void Led_para_queda_secundario(bool caindo, unsigned long hora_do_apogeu) {
-  unsigned long time_secundario;
   if (caindo) {
     if (trava_secundario) {
-      if ((tempo_atual - hora_do_apogeu) >= TEMPO_ATIVAR_SECUNDARIO) {
+      if (tempo_atual >= intervalo_secundario) {
         digitalWrite(IGN_2, HIGH);
         time_secundario = tempo_atual;
         acendeu_secundario = 1;
@@ -417,7 +421,6 @@ void Led_para_queda_secundario(bool caindo, unsigned long hora_do_apogeu) {
 
 #if EXIST_IGN_3
 void Led_para_queda_final(bool caindo, float sinal_atual) {
-  unsigned long time_final;
   if (caindo) {
     if (sinal_atual <= ALTURA_DE_ATIVACAO) {
       if (trava_final) {
