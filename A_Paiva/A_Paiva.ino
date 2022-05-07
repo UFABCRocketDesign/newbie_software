@@ -233,6 +233,9 @@ class Paraquedas {
       }
     }
 };
+int Paraquedas::Apogeu=0;
+unsigned long Paraquedas::TempoAtual=0;
+float Paraquedas::AlturaAtual=0;
 
 Filtro FiltroAx(tam);
 Filtro FiltroAy(tam);
@@ -505,19 +508,19 @@ void loop() {
 
 ////funçoes////
 
-float Friutu(float valoratualizado, int j) {
-  float SomaMov = 0;                                 //Declara e zera o SomaMov em todo loop
-  float MediaMov = 0;                                //Declara e zera o MediaMov em todo loop
-  for (int i = tam - 2; i >= 0; i--) {               //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1 de trás pra frente
-    MatrizFiltros[j][i + 1] = MatrizFiltros[j][i];
-  }
-  MatrizFiltros[j][0] = valoratualizado;             //Esse é o valor mais atualizado do filtro1
-  for (int i = 0; i <= tam - 1; i++) {               //Esse 'for' faz a soma dos valores da matriz, para a média do filtro1
-    SomaMov = SomaMov + MatrizFiltros[j][i];
-  }
-  MediaMov = SomaMov / tam;                          //Valor final do filtro, uma média entre "tam" quantidades de valores
-  return MediaMov;
-}
+//float Friutu(float valoratualizado, int j) {
+//  float SomaMov = 0;                                 //Declara e zera o SomaMov em todo loop
+//  float MediaMov = 0;                                //Declara e zera o MediaMov em todo loop
+//  for (int i = tam - 2; i >= 0; i--) {               //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1 de trás pra frente
+//    MatrizFiltros[j][i + 1] = MatrizFiltros[j][i];
+//  }
+//  MatrizFiltros[j][0] = valoratualizado;             //Esse é o valor mais atualizado do filtro1
+//  for (int i = 0; i <= tam - 1; i++) {               //Esse 'for' faz a soma dos valores da matriz, para a média do filtro1
+//    SomaMov = SomaMov + MatrizFiltros[j][i];
+//  }
+//  MediaMov = SomaMov / tam;                          //Valor final do filtro, uma média entre "tam" quantidades de valores
+//  return MediaMov;
+//}
 //Paraquedas::AtualizaAlturaAtual(MediaMov);
 int Apogueu(int apogeu, float Hmax, float MediaMov, unsigned long tempoAtual) {
   float Delta = Hmax - MediaMov;                           //Compara o valor máximo do filtro1 com o valor atual do filtro1
