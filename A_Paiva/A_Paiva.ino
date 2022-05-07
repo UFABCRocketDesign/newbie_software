@@ -17,24 +17,24 @@
 #define altura 10                 //Altura para abertura do terceiro paraquedas (m)
 
 #define usa_bar 1                 //Variavel de escolha do uso do sensor BMP
-#define usa_pre (usa_bar && 1)    //Variavel de escolha do uso do valor Pressão
-#define usa_alt (usa_bar && 1)    //Variavel de escolha do uso do valor Altura
-#define usa_altMax (usa_alt && 1) //Variavel de escolha do uso do valor Altura Máxima
-#define usa_temp (usa_bar && 1)   //Variavel de escolha do uso do valor Temperatura
+#define usa_pre (usa_bar && 0)    //Variavel de escolha do uso do valor Pressão
+#define usa_alt (usa_bar && 0)    //Variavel de escolha do uso do valor Altura
+#define usa_altMax (usa_alt && 0) //Variavel de escolha do uso do valor Altura Máxima
+#define usa_temp (usa_bar && 0)   //Variavel de escolha do uso do valor Temperatura
 #define usa_apogeu (usa_bar && 1) //Variavel de escolha do uso da detecção de apogeu
 #define usa_acpq (usa_apogeu && 1)//Variavel de escolha do uso do acionamento dos paraquedas
 
-#define usa_giro 1                //Variavel de escolha do uso do sensor
+#define usa_giro 0                //Variavel de escolha do uso do sensor
 #define usa_gx (usa_giro && 1)    //Variavel de escolha do uso do valor do giroscopio em x
 #define usa_gy (usa_giro && 1)    //Variavel de escolha do uso do valor do giroscopio em y
 #define usa_gz (usa_giro && 1)    //Variavel de escolha do uso do valor do giroscopio em z
 
-#define usa_acel 1                //Variavel de escolha do uso de funções
+#define usa_acel 0                //Variavel de escolha do uso de funções
 #define usa_ax (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em x
 #define usa_ay (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em y
 #define usa_az (usa_acel && 1)    //Variavel de escolha do uso do valor do acelerometro em z
 
-#define usa_mag 1                 //Variavel de escolha do uso de funções
+#define usa_mag 0                 //Variavel de escolha do uso de funções
 #define usa_mx (usa_mag && 1)     //Variavel de escolha do uso do valor do magnetometro em x
 #define usa_my (usa_mag && 1)     //Variavel de escolha do uso do valor do magnetometro em y
 #define usa_mz (usa_mag && 1)     //Variavel de escolha do uso do valor do magnetometro em z
@@ -456,13 +456,14 @@ void loop() {
   dado += String(P) + "\t";
 #endif
 #if usa_alt
-  float A = bmp.readAltitude() - AltitudeRef;
+  //float A = bmp.readAltitude() - AltitudeRef;
   dado += String(A) + "\t";
 #endif
 #if usa_altMax
   dado += String(Hmax) + "\t";
 #endif
 #if usa_apogeu || usa_alt
+  float A = bmp.readAltitude() - AltitudeRef;
   //  float Afiltrada = A;                                     //Chama a função de filtro para a altitude
   //  for(int i = 0; i < qfa; i++){
   //    Afiltrada = Friutu(Afiltrada, i);
