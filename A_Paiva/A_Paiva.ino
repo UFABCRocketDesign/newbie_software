@@ -167,6 +167,10 @@ class Paraquedas {
     float Espera;
     //altura específica para acionar após apogeu
     float Alturaesp;
+    int auxled = 0;
+    int auxespera = 0;
+    unsigned long inicio = 0;
+    unsigned long fim = 0;
   public:
     //construtor
     Paraquedas(int v_tipo, int v_pino, float v_duracao, float v_espera, float v_alturaesp): Tipo(v_tipo), Pino(v_pino), Duracao(v_duracao), Espera(v_espera), Alturaesp(v_alturaesp) {}
@@ -190,10 +194,6 @@ class Paraquedas {
       }
     }
     String Paraqueda() {
-      int auxled = 0;
-      int auxespera = 0;
-      unsigned long inicio = 0;
-      unsigned long fim = 0;
       if (Tipo == 1) {
         if (Apogeu == 1) {
           if (auxespera == 0) {
@@ -242,7 +242,7 @@ Filtro FiltroAy(tam);
 Filtro FiltroAz(tam);
 Filtro FiltroAltitude(tam);
 CascataDeFiltro CascataFiltroAltitude(qfa, tam);
-Paraquedas Parachute1(1, 35, duracao, espera, altura);
+Paraquedas Parachute1(1, IGN_1, duracao, espera, altura);
 
 void setup() {
 #if usa_acpq
