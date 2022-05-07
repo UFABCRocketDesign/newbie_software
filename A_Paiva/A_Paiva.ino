@@ -242,7 +242,7 @@ Filtro FiltroAy(tam);
 Filtro FiltroAz(tam);
 Filtro FiltroAltitude(tam);
 CascataDeFiltro CascataFiltroAltitude(qfa, tam);
-Paraquedas Parachute1(1, IGN_1, duracao, espera, altura);
+Paraquedas Parachute1(1, IGN_1, duracao, 0, altura);
 Paraquedas Parachute2(1, IGN_2, duracao, espera, altura);
 Paraquedas Parachute3(3, IGN_3, duracao, espera, altura);
 
