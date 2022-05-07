@@ -244,7 +244,7 @@ Filtro FiltroAltitude(tam);
 CascataDeFiltro CascataFiltroAltitude(qfa, tam);
 Paraquedas Parachute1(1, IGN_1, duracao, 0, altura);
 Paraquedas Parachute2(1, IGN_2, duracao, espera, altura);
-Paraquedas Parachute3(3, IGN_3, duracao, espera, altura);
+Paraquedas Parachute3(2, IGN_3, duracao, espera, altura);
 
 void setup() {
 #if usa_acpq
