@@ -64,7 +64,6 @@ float Ap1 = 0.0;
 #if ApgDbg
 float AltApg = 0.0;
 int CQueda = 0;
-int Queda = 0;
 int DQueda = 0;
 int Q1 = 0;
 unsigned long TQ = 0;
@@ -369,38 +368,8 @@ void loop()
     TQ = TAtual;
   }
   dataString += String (DQueda);
+  dataString += "\t";
 #endif
-
-  //Detecção de Apogeu
-  //#if ApgDbg
-  // if (Ap1 > SF[Nf])
-  // {
-  //   Queda++;
-  // }
-  // else
-  // {
-  //   Queda = 0;
-  // }
-  //  Ap1 = SF[Nf];
-  //#endif
-
-  //#if ApgDbg
-  // if (Queda >= VQueda)
-  // {
-  //  if (Q1 == 0)
-  //  {
-  //    Q1 = 1;
-  //   TQ = TAtual;
-  //  }
-  //  dataString += String("1");
-  //  dataString += "\t";
-  // }
-  // else
-  // {
-  //   dataString += String("0");
-  //  dataString += "\t";
-  //}
-  //#endif
 
   //Captação dos sensores
 #if MagDbg
@@ -552,7 +521,7 @@ float Filtragem(int a, float vmd)
 }
 
 //Detecção de Apogeu
-float Apogeu(float AltAtual, int VQueda)
+int Apogeu(float AltAtual, int VQueda)
 {
   if (AltApg > AltAtual)
   {
@@ -563,13 +532,5 @@ float Apogeu(float AltAtual, int VQueda)
     CQueda = 0;
   }
   AltApg = AltAtual;
-  if (CQueda >= VQueda)
-  {
-    Queda = 1;
-  }
-  else
-  {
-    Queda = 0;
-  }
-  return Queda;
+  return CQueda >= VQueda;
 }
