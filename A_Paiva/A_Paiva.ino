@@ -173,13 +173,13 @@ class Paraquedas {
     //usar "static" para variavel compartilhada entre os objetos dessa classe (tempo atual, detecção de apogeu, altura atual)
     //ao usar a varial static, a função que mexe com ela tem que ser static tbm, e o chamamento da função deve ser através da class e não de um objeto especifico "nomeclasse::nomefunção()"
     //definir os pinos de acionamento, porém iniciar o pinMode em uma função chamada no setup, pois o construtor roda primeiro e pode dar ruim
-    void AtualizaApogeu(int v_Apogeu) {
+    static void AtualizaApogeu(int v_Apogeu) {
       Apogeu = v_Apogeu;
     }
-    void AtualizaTempoAtual(unsigned long v_TempoAtual) {
+    static void AtualizaTempoAtual(unsigned long v_TempoAtual) {
       TempoAtual = v_TempoAtual;
     }
-    void AtualizaAlturaAtual(float v_MediaMov) {
+    static void AtualizaAlturaAtual(float v_MediaMov) {
       AlturaAtual = v_MediaMov;
     }
     void declaraPino() {
@@ -233,6 +233,9 @@ class Paraquedas {
       }
     }
 };
+int Paraquedas::Apogeu=0;
+unsigned long Paraquedas::TempoAtual=0;
+float Paraquedas::AlturaAtual=0;
 
 Filtro FiltroAx(tam);
 Filtro FiltroAy(tam);
@@ -466,6 +469,7 @@ void loop() {
   //    dado += String(Afiltrada)+"\t";                              //Printa a altura média de cada linha da matriz, ou seja, de cada filtro
   //  }
   float Afiltrada = CascataFiltroAltitude.FuncaoCascataFriutu(A);
+  Paraquedas::AtualizaAlturaAtual(Afiltrada);
   dado += String(Afiltrada) + "\t";
 #endif
   //Serial.print("Meio loop,dps dos filtros");
@@ -476,6 +480,7 @@ void loop() {
 #endif
 #if usa_apogeu
   apogeu = Apogueu(apogeu, Hmax, Afiltrada, tempoAtual);
+  Paraquedas::AtualizaApogeu(apogeu);
   if (apogeu == 0) {
     dado += "Subindo\t";
   }
@@ -503,20 +508,20 @@ void loop() {
 
 ////funçoes////
 
-float Friutu(float valoratualizado, int j) {
-  float SomaMov = 0;                                 //Declara e zera o SomaMov em todo loop
-  float MediaMov = 0;                                //Declara e zera o MediaMov em todo loop
-  for (int i = tam - 2; i >= 0; i--) {               //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1 de trás pra frente
-    MatrizFiltros[j][i + 1] = MatrizFiltros[j][i];
-  }
-  MatrizFiltros[j][0] = valoratualizado;             //Esse é o valor mais atualizado do filtro1
-  for (int i = 0; i <= tam - 1; i++) {               //Esse 'for' faz a soma dos valores da matriz, para a média do filtro1
-    SomaMov = SomaMov + MatrizFiltros[j][i];
-  }
-  MediaMov = SomaMov / tam;                          //Valor final do filtro, uma média entre "tam" quantidades de valores
-  return MediaMov;
-}
-Paraquedas::AtualizaAlturaAtual(MediaMov);
+//float Friutu(float valoratualizado, int j) {
+//  float SomaMov = 0;                                 //Declara e zera o SomaMov em todo loop
+//  float MediaMov = 0;                                //Declara e zera o MediaMov em todo loop
+//  for (int i = tam - 2; i >= 0; i--) {               //Esse 'for' anda com os valores do vetor do filtro1 de 1 em 1 de trás pra frente
+//    MatrizFiltros[j][i + 1] = MatrizFiltros[j][i];
+//  }
+//  MatrizFiltros[j][0] = valoratualizado;             //Esse é o valor mais atualizado do filtro1
+//  for (int i = 0; i <= tam - 1; i++) {               //Esse 'for' faz a soma dos valores da matriz, para a média do filtro1
+//    SomaMov = SomaMov + MatrizFiltros[j][i];
+//  }
+//  MediaMov = SomaMov / tam;                          //Valor final do filtro, uma média entre "tam" quantidades de valores
+//  return MediaMov;
+//}
+//Paraquedas::AtualizaAlturaAtual(MediaMov);
 int Apogueu(int apogeu, float Hmax, float MediaMov, unsigned long tempoAtual) {
   float Delta = Hmax - MediaMov;                           //Compara o valor máximo do filtro1 com o valor atual do filtro1
   if (Delta >= 2 && apogeu == 0) {                         //Quando a diferença de altitude for acima de 2 (metros), provavelmente o foguete está descendo ou pode haver um controle de quando se quer que abra o paraquedas
@@ -524,7 +529,7 @@ int Apogueu(int apogeu, float Hmax, float MediaMov, unsigned long tempoAtual) {
   }
   return apogeu;
 }
-Paraquedas::AtualizaApogeu(apogeu);
+//Paraquedas::AtualizaApogeu(apogeu);
 /*#if usa_acpq
 String Paraqueda1(unsigned long tempoAtual, int apogeu) {
   if (auxinicio1 == 0) {

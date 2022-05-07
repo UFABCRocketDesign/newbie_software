@@ -19,9 +19,9 @@
 #define PLED3 LED_BUILTIN
 
 #define Tam 11
-#define Nf 3
+#define Nf 2
 #define Vmed 11
-#define VQueda 11
+#define VEQ 11
 
 #define MagDbg 0
 #define GyrDbg 0
@@ -62,7 +62,10 @@ float Ap1 = 0.0;
 #endif
 
 #if ApgDbg
+float AltApg = 0.0;
+int CQueda = 0;
 int Queda = 0;
+int DQueda = 0;
 int Q1 = 0;
 unsigned long TQ = 0;
 #endif
@@ -358,18 +361,46 @@ void loop()
   }
 #endif
 
-  //Detecção de Apogeu
 #if ApgDbg
-  if (Ap1 > SF[Nf])
+  DQueda = Apogeu (SF[Nf], VEQ);
+  if (Q1 == 0 && DQueda == 1)
   {
-    Queda++;
+    Q1 = 1;
+    TQ = TAtual;
   }
-  else
-  {
-    Queda = 0;
-  }
-  Ap1 = SF[Nf];
+  dataString += String (DQueda);
 #endif
+
+  //Detecção de Apogeu
+  //#if ApgDbg
+  // if (Ap1 > SF[Nf])
+  // {
+  //   Queda++;
+  // }
+  // else
+  // {
+  //   Queda = 0;
+  // }
+  //  Ap1 = SF[Nf];
+  //#endif
+
+  //#if ApgDbg
+  // if (Queda >= VQueda)
+  // {
+  //  if (Q1 == 0)
+  //  {
+  //    Q1 = 1;
+  //   TQ = TAtual;
+  //  }
+  //  dataString += String("1");
+  //  dataString += "\t";
+  // }
+  // else
+  // {
+  //   dataString += String("0");
+  //  dataString += "\t";
+  //}
+  //#endif
 
   //Captação dos sensores
 #if MagDbg
@@ -418,24 +449,6 @@ void loop()
   dataString += String (event.acceleration.z);
   dataString += "\t";
 #endif
-#endif
-
-#if ApgDbg
-  if (Queda >= VQueda)
-  {
-    if (Q1 == 0)
-    {
-      Q1 = 1;
-      TQ = TAtual;
-    }
-    dataString += String("1");
-    dataString += "\t";
-  }
-  else
-  {
-    dataString += String("0");
-    dataString += "\t";
-  }
 #endif
 
   //Timer e ativação de leds
@@ -536,4 +549,27 @@ float Filtragem(int a, float vmd)
     pos[a] = 0;                         //B = 0;
   }                                     //}
   return AF[a] / Tam;                //SF2 = F2 / 11;
+}
+
+//Detecção de Apogeu
+float Apogeu(float AltAtual, int VQueda)
+{
+  if (AltApg > AltAtual)
+  {
+    CQueda++;
+  }
+  else
+  {
+    CQueda = 0;
+  }
+  AltApg = AltAtual;
+  if (CQueda >= VQueda)
+  {
+    Queda = 1;
+  }
+  else
+  {
+    Queda = 0;
+  }
+  return Queda;
 }
