@@ -243,10 +243,14 @@ Filtro FiltroAz(tam);
 Filtro FiltroAltitude(tam);
 CascataDeFiltro CascataFiltroAltitude(qfa, tam);
 Paraquedas Parachute1(1, IGN_1, duracao, espera, altura);
+Paraquedas Parachute2(1, IGN_2, duracao, espera, altura);
+Paraquedas Parachute3(3, IGN_3, duracao, espera, altura);
 
 void setup() {
 #if usa_acpq
   Parachute1.declaraPino();
+  Parachute2.declaraPino();
+  Parachute3.declaraPino();
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(IGN_1, OUTPUT);//PINOS DA MACRO pinos.h feita pelo Heitor
   pinMode(IGN_2, OUTPUT);
@@ -489,6 +493,10 @@ void loop() {
     dado += "Descendo\t";
 #if usa_acpq
     dado += Parachute1.Paraqueda();
+    dado += "\t";
+    dado += Parachute2.Paraqueda();
+    dado += "\t";
+    dado += Parachute3.Paraqueda();
 //    dado += Paraqueda2(tempoAtual, apogeu);
 //    dado += Paraqueda3(tempoAtual, Afiltrada, apogeu);
     dado += "\t";
