@@ -494,8 +494,8 @@ void loop() {
 #if usa_acpq
     dado += Parachute1.Paraqueda();
     dado += "\t";
-//    dado += Parachute2.Paraqueda();
-//    dado += "\t";
+    dado += Parachute2.Paraqueda();
+    dado += "\t";
 //    dado += Parachute3.Paraqueda();
 //    dado += Paraqueda2(tempoAtual, apogeu);
 //    dado += Paraqueda3(tempoAtual, Afiltrada, apogeu);
