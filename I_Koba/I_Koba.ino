@@ -17,7 +17,7 @@ Adafruit_BMP085 bmp;
 //#define IGN_3 46  /*act3*/
 //#define IGN_4 55  /*act4*/
 
-#define EXIST_TEMPO 0
+#define EXIST_TEMPO 1
 #define EXIST_SD 0
 #define EXIST_BAR 1
 #define EXIST_GIRO 0
@@ -85,13 +85,12 @@ bool trava_piloto = true; //trava usado para o led piloto
 #if EXIST_IGN_2
 int acendeu_secundario;  // contem o estado do led secundario, 1 para acesso e 0 para apagado
 bool trava_secundario = true; //trava usado para o led secundario
-unsigned long time_secundario = 0;
 #endif //paraquedas secundario
 
 #if EXIST_IGN_3
 int acendeu_final; // contem o estado do led final, 1 para acesso e 0 para apagado
 bool trava_final = true; //trava usado para o led secundario
-unsigned long time_final = 0;
+
 #endif //paraquedas final
 
 #if EXIST_BAR
@@ -101,12 +100,11 @@ int arm_queda;
 float vetor[NUMERO_FILTROS+1][INTERVALO_MEDIA_M]; // movimentaçãop dos filtros de sinal de alrura
 float sinal[NUMERO_FILTROS + 1]; // irá conter todos sinais relacionado a altura
 float sinalzin;
-unsigned long time_do_apogeu = 0;
 bool trava_apogeu = true; //trava usado para o led piloto
 #endif //barometro
 
 String dados_string = ""; // irá conter os dados dos sensores
-float tempo_atual;
+unsigned long tempo_atual;
 
 
 
@@ -273,16 +271,16 @@ void loop() {
 #if EXIST_BAR
   Filtros(bmp.readAltitude() - ref_chao);
   var_queda = Detec_queda(sinal[NUMERO_FILTROS]);
-  time_do_apogeu = Hora_apogeu();
+  unsigned long time_do_apogeu = Hora_apogeu(var_queda);
 #endif
 #if EXIST_IGN_1
-  Led_para_queda_piloto();
+  Led_para_queda_piloto(var_queda, time_do_apogeu);
 #endif
 #if EXIST_IGN_2
-  Led_para_queda_secundario();
+  Led_para_queda_secundario(var_queda, time_do_apogeu);
 #endif
 #if EXIST_IGN_3
-  Led_para_queda_final();
+  Led_para_queda_final(var_queda, sinal[NUMERO_FILTROS]);
 #endif
 #if EXIST_GIRO
   Giroscopio();
@@ -359,10 +357,11 @@ void Filtros(float valor) {
 //----------------------------------------------------------------------------------
 
 #if EXIST_BAR
- float Hora_apogeu() {
-   if(var_queda){
+ unsigned long Hora_apogeu(bool caindo) {
+  unsigned long time_do_apogeu;
+   if(caindo){
      if (trava_apogeu) {
-     time_do_apogeu = tempo_atual;
+       time_do_apogeu = tempo_atual;
        trava_apogeu = false; 
      }
    }
@@ -373,15 +372,15 @@ void Filtros(float valor) {
 //----------------------------------------------------------------------------------
 
 #if EXIST_IGN_1
-void Led_para_queda_piloto() {
-  if (var_queda){ 
+void Led_para_queda_piloto(bool caindo, unsigned long hora_do_apogeu ) {
+  if (caindo){ 
     if (trava_piloto) {
       digitalWrite(IGN_1, HIGH);
       acendeu_piloto = 1;
       trava_piloto = false;
     }
     if (trava_piloto == false) {
-      if ((tempo_atual - time_do_apogeu) >= TEMPO_PILOTO_ON) {
+      if ((tempo_atual - hora_do_apogeu) >= TEMPO_PILOTO_ON) {
         digitalWrite(IGN_1, LOW);
         acendeu_piloto = 0;
       }
@@ -393,10 +392,11 @@ void Led_para_queda_piloto() {
 //----------------------------------------------------------------------------------
 
 #if EXIST_IGN_2
-void Led_para_queda_secundario() {
-  if (var_queda) {
+void Led_para_queda_secundario(bool caindo, unsigned long hora_do_apogeu) {
+  unsigned long time_secundario;
+  if (caindo) {
     if (trava_secundario) {
-      if ((tempo_atual - time_do_apogeu) >= TEMPO_ATIVAR_SECUNDARIO) {
+      if ((tempo_atual - hora_do_apogeu) >= TEMPO_ATIVAR_SECUNDARIO) {
         digitalWrite(IGN_2, HIGH);
         time_secundario = tempo_atual;
         acendeu_secundario = 1;
@@ -416,9 +416,10 @@ void Led_para_queda_secundario() {
 //----------------------------------------------------------------------------------
 
 #if EXIST_IGN_3
-void Led_para_queda_final() {
-  if (var_queda) {
-    if (sinal[NUMERO_FILTROS] <= ALTURA_DE_ATIVACAO) {
+void Led_para_queda_final(bool caindo, float sinal_atual) {
+  unsigned long time_final;
+  if (caindo) {
+    if (sinal_atual <= ALTURA_DE_ATIVACAO) {
       if (trava_final) {
         digitalWrite(led_final, HIGH);
         time_final = tempo_atual;
