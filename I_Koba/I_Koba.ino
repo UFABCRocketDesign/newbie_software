@@ -107,7 +107,7 @@ unsigned long intervalo_secundario;
 #endif //barometro
 
 String dados_string = ""; // irá conter os dados dos sensores
-float tempo_atual;
+unsigned long tempo_atual;
 
 
 
@@ -508,7 +508,7 @@ void Magsensor() {
 void Salvar() {
   dados_string = "";
 #if EXIST_TEMPO
-  dados_string += String(tempo_atual / 1000);
+  dados_string += String(tempo_atual / 1000.0);
 #endif
 #if EXIST_ALTURA
   dados_string += "\t";
