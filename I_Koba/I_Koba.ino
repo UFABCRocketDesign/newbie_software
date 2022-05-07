@@ -107,7 +107,7 @@ unsigned long intervalo_secundario;
 #endif //barometro
 
 String dados_string = ""; // irá conter os dados dos sensores
-unsigned long tempo_atual;
+float tempo_atual;
 
 
 
