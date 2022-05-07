@@ -14,7 +14,7 @@
 #define NomeArq "apm"             //Nome do arquivo para o cartão SD entre aspas
 #define espera 1000               //Tempo de espera para acionamento do paraquedas 2 (ms)
 #define duracao 2000              //Tempo de duracao do acionamento dos paraquedas (ms)
-#define altura 10                 //Altura para abertura do terceiro paraquedas (m)
+#define altura -3                 //Altura para abertura do terceiro paraquedas (m)
 
 #define usa_bar 1                 //Variavel de escolha do uso do sensor BMP
 #define usa_pre (usa_bar && 0)    //Variavel de escolha do uso do valor Pressão
@@ -244,18 +244,18 @@ Filtro FiltroAltitude(tam);
 CascataDeFiltro CascataFiltroAltitude(qfa, tam);
 Paraquedas Parachute1(1, IGN_1, duracao, 0, altura);
 Paraquedas Parachute2(1, IGN_2, duracao, espera, altura);
-Paraquedas Parachute3(2, IGN_3, duracao, espera, altura);
+Paraquedas Parachute3(2, LED_BUILTIN, duracao, espera, altura);
 
 void setup() {
 #if usa_acpq
   Parachute1.declaraPino();
   Parachute2.declaraPino();
   Parachute3.declaraPino();
-  pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(IGN_1, OUTPUT);//PINOS DA MACRO pinos.h feita pelo Heitor
-  pinMode(IGN_2, OUTPUT);
-  //pinMode(IGN_3, OUTPUT);
-  //pinMode(IGN_4, OUTPUT);
+//  pinMode(LED_BUILTIN, OUTPUT);
+//  pinMode(IGN_1, OUTPUT);//PINOS DA MACRO pinos.h feita pelo Heitor
+//  pinMode(IGN_2, OUTPUT);
+//  //pinMode(IGN_3, OUTPUT);
+//  //pinMode(IGN_4, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
   digitalWrite(IGN_1, LOW);
   digitalWrite(IGN_2, LOW);
