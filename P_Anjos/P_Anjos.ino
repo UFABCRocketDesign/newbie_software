@@ -392,6 +392,7 @@ void loop() {
 #endif
 
   // ======================== ETAPA PARA GRAVAR NO CARTÃO SD ===================================== //
+Serial.println(dataString);
 #if GravacaoSD
   File dataFile = SD.open(nome, FILE_WRITE);                                                     // Só curiosidade: este é o ponto que mais consome de processamento
 
@@ -399,8 +400,6 @@ void loop() {
   if (dataFile) {
     dataFile.println(dataString);
     dataFile.close();
-    // print to the serial port too:
-    Serial.println(dataString);
   } else {  // if the file isn't open, pop up an error:
     Serial.println("error opening P_ANJOS.txt");
   }
