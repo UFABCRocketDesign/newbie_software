@@ -187,38 +187,38 @@ void setup() {
   Serial.println("card initialized.");
   File dataFile = SD.open(nome, FILE_WRITE);
 // ==================================== CABEÇALHO ============================================================================================================= //
-  dataCabecalho = +"Tempo\t";
+  dataCabecalho +="Tempo\t";
 #if Barometro
-  dataCabecalho = +"Apogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\t";
+  dataCabecalho +="Apogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\t";
 #endif
 #if gyrox
-  dataCabecalho = +"X\t";
+  dataCabecalho +="X\t";
 #endif
 #if gyroy
-  dataCabecalho = +"Y\t";
+  dataCabecalho +="Y\t";
 #endif
 #if gyroz
-  dataCabecalho = +"Z\t";
+  dataCabecalho +="Z\t";
 #endif
 #if Accx
-  dataCabecalho = +"X_ddot\t";
+  dataCabecalho +="X_ddot\t";
 #endif
 #if Accy
-  dataCabecalho = +"Y_ddot\t";
+  dataCabecalho +="Y_ddot\t";
 #endif
 #if Accz
-  dataCabecalho = +"Z_ddot\t";
+  dataCabecalho +="Z_ddot\t";
 #endif
 #if Magx
-  dataCabecalho = +"magX(uT)\t";
+  dataCabecalho +="magX(uT)\t";
 #endif
 #if Magy
-  dataCabecalho = +"magY(uT)\t";
+  dataCabecalho +="magY(uT)\t";
 #endif
 #if Magz
-  dataCabecalho = +"magZ(uT)\t";
+  dataCabecalho +="magZ(uT)\t";
 #endif
-  dataCabecalho = +"Situacao";
+  dataCabecalho +="Situacao";
   Serial.println(dataCabecalho);
   dataFile.println(dataCabecalho);
   dataFile.close();
