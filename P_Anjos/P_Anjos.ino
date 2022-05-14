@@ -16,15 +16,23 @@
 #undef  IGN_3 46  /*act3*/
 #define IGN_3 13
 #define IGN_4 55  /*act4*/
-#define InterDesligTimer 2000           //Intervalo de tempo para desligar o paraquedas A em segundos
+#define InterDesligTimer 2000          //Intervalo de tempo para desligar o paraquedas A em segundos
 #define InterA2 4000                   //Intervalo de tempo para ligar o 2º acionamento do paraquedas A
 #define HParaquedasB 5                 //Altura de acionamento do paraquedas B em metros
 #define dfaltura 2                     //Define o delta de altura que serve de critério para a determinação do apogeu
-#define giroscopio 0                   //Definindo a presença ou não de um sensor giroscópio no sistema
-#define Acelerometro 0                 //Definindo a presença ou não de um sensor acelerômetro no sistema
-#define Magnetometro 0                 //Definindo a presença ou não de um sensor magnetômetro no sistema
+#define Barometro 1                    //Definindo a presença ou não de um sensor barométrico no sistema
+#define giroscopio 1                   //Definindo a presença ou não de um sensor giroscópio no sistema
+#define gyrox 1                        //Definindo a presença de dados no eixo X do giroscópio
+#define gyroy 0                        //Definindo a presença de dados no eixo Y do giroscópio
+#define gyroz 0                        //Definindo a presença de dados no eixo Z do giroscópio
+#define Acelerometro 1                 //Definindo a presença ou não de um sensor acelerômetro no sistema
+#define Magnetometro 1                 //Definindo a presença ou não de um sensor magnetômetro no sistema
+
+// ======================================================================================================================= //
+#if Barometro
 Adafruit_BMP085 bmp;
 /* Assign a unique ID to this sensor at the same time */
+#endif
 #if Acelerometro
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
 /* Assign a unique ID to this sensor at the same time */
@@ -35,6 +43,7 @@ Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 #if giroscopio
 L3G gyro;
 #endif
+// =========================================== VARIAVEIS DECLARADAS ============================================================================ //
 const int chipSelect = 53;            //Define o pino para o chipselect para gravar no cartão SD
 float H1 = 0;                         // Variável global - Não é ressetada a cada loop. Armazena o dado.
 float H2 = 0;
@@ -74,6 +83,7 @@ bool Aceso = false;                   // A variável booleana para verificar se 
 bool Fim = true;                      // A variável booleana para parar a verificação do paraquedas
 bool ResetA2 = true;                  // A variável booleana para parar resetar o timer do A2
 bool ResetB = true;                   // A variável booleana para parar resetar o timer do B
+//============================================================================================================================================= //
 
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
@@ -88,6 +98,7 @@ void setup() {
     ;                                 // wait for serial port to connect. Needed for native USB port only
   }
 #endif
+  // ============================= PARTE APENAS DO GIROSCOPIO ======================================= //
 #if giroscopio
   if (!gyro.init())
   {
@@ -96,11 +107,14 @@ void setup() {
   }
   gyro.enableDefault();
 #endif
+  // ============================= PARTE APENAS DO BAROMETRO ========================================= //
+#if Barometro
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
-  // ======================= PARTE APENAS DO ACELEROMETRO ================================= //
+#endif
+  // ========================== PARTE APENAS DO ACELEROMETRO ===================================== //
 #if Acelerometro
   Serial.println("Accelerometer Test"); Serial.println("");
 
@@ -125,7 +139,7 @@ void setup() {
   //displayDataRate(); //Reitirei do código pois não era interessante. Se precisar olhe na biblioteca original
   //displayRange(); //Reitirei do código pois não era interessante. Se precisar olhe na biblioteca original
 #endif
-  // ============================ PARTE APENAS DO MAGNETÔMETRO ================================== //
+  // =============================== PARTE APENAS DO MAGNETÔMETRO ========================================= //
 #if Magnetometro
   Serial.println("HMC5883 Magnetometer Test"); Serial.println("");
 
@@ -166,62 +180,238 @@ void setup() {
   Serial.println(nome);
   Serial.println("card initialized.");
   File dataFile = SD.open(nome, FILE_WRITE);
-#if (giroscopio && Acelerometro && Magnetometro)
+  // ==================================== CABEÇALHO ============================================================================================================= //
+#if (Barometro && giroscopio && gyrox && gyroy && gyroz && Acelerometro && Magnetometro)
   Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");//Cabecalho no acompanhamento ( NÃO ESQUECE DE COLOCAR \tPressure(Pa) DE NOVO)
   dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao"); //Cabecalho no SD ( NÃO ESQUECE DE COLOCAR \tPressure(Pa) DE NOVO)
-#elif (!giroscopio && Acelerometro && Magnetometro)
-  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
-  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
-#elif (giroscopio && !Acelerometro && Magnetometro)
-  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
-  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
-#elif (giroscopio && Acelerometro && !Magnetometro)
-  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tSituacao");
-  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tSituacao");
-#elif (!giroscopio && !Acelerometro && Magnetometro)
-  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
-  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
-#elif (!giroscopio && Acelerometro && !Magnetometro)
-  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX_ddot\tY_ddot\tZ_ddot\tSituacao");
-  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX_ddot\tY_ddot\tZ_ddot\tSituacao");
-#elif (giroscopio && !Acelerometro && !Magnetometro)
-  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tSituacao");
-  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tSituacao");
-#elif (!giroscopio && !Acelerometro && !Magnetometro)
+#elif(Barometro && giroscopio && gyrox && !gyroy && !gyroz && Acelerometro && Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+#elif(Barometro && giroscopio && !gyrox && gyroy && !gyroz && Acelerometro && Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tY\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tY\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+#elif(Barometro && giroscopio && gyrox && gyroy && !gyroz && Acelerometro && Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+#elif(Barometro && giroscopio && !gyrox && !gyroy && gyroz && Acelerometro && Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tZ\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tZ\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+#elif(Barometro && giroscopio && gyrox && !gyroy && gyroz && Acelerometro && Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tZ\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tZ\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+#elif(Barometro && giroscopio && !gyrox && gyroy && gyroz && Acelerometro && Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+// -------------------------------------------------------------------------------------
+#elif (!Barometro && !giroscopio && !Acelerometro && !Magnetometro)
+  Serial.println("Tempo\t");
+  dataFile.println("Tempo\t");
+#elif (!Barometro && !giroscopio && !Acelerometro && Magnetometro)
+  Serial.println("Tempo\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+  dataFile.println("Tempo\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+#elif (!Barometro && !giroscopio && Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tX_ddot\tY_ddot\tZ_ddot");
+  dataFile.println("Tempo\tX_ddot\tY_ddot\tZ_ddot");
+#elif (!Barometro && !giroscopio && Acelerometro && Magnetometro)
+  Serial.println("Tempo\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+  dataFile.println("Tempo\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+// ------------------------------------------------------------------------------------
+#elif (!Barometro && giroscopio && gyrox && gyroy && gyroz && !Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tX\tY\tZ");
+  dataFile.println("Tempo\tX\tY\tZ");
+#elif (!Barometro && giroscopio && gyrox && !gyroy && !gyroz && !Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tX");
+  dataFile.println("Tempo\tX");
+#elif (!Barometro && giroscopio && !gyrox && gyroy && !gyroz && !Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tY");
+  dataFile.println("Tempo\tY");
+#elif (!Barometro && giroscopio && gyrox && gyroy && !gyroz && !Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tX\tY");
+  dataFile.println("Tempo\tX\tY");
+#elif (!Barometro && giroscopio && !gyrox && !gyroy && gyroz && !Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tZ");
+  dataFile.println("Tempo\tZ");
+#elif (!Barometro && giroscopio && gyrox && !gyroy && gyroz && !Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tX\tZ");
+  dataFile.println("Tempo\tX\tZ");
+#elif (!Barometro && giroscopio && !gyrox && gyroy && gyroz && !Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tY\tZ");
+  dataFile.println("Tempo\tY\tZ");
+#elif (!Barometro && giroscopio && gyrox && gyroy && gyroz && !Acelerometro && Magnetometro)
+  Serial.println("Tempo\tX\tY\tZ\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+  dataFile.println("Tempo\tX\tY\tZ\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+#elif (!Barometro && giroscopio && gyrox && !gyroy && !gyroz && !Acelerometro && Magnetometro)
+  Serial.println("Tempo\tX\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+  dataFile.println("Tempo\tX\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+#elif (!Barometro && giroscopio && !gyrox && gyroy && !gyroz && !Acelerometro && Magnetometro)
+  Serial.println("Tempo\tY\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+  dataFile.println("Tempo\tY\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+#elif (!Barometro && giroscopio && gyrox && gyroy && !gyroz && !Acelerometro && Magnetometro)
+  Serial.println("Tempo\tX\tY\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+  dataFile.println("Tempo\tX\tY\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+#elif (!Barometro && giroscopio && !gyrox && !gyroy && gyroz && !Acelerometro && Magnetometro)
+  Serial.println("Tempo\tZ\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+  dataFile.println("Tempo\tZ\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+#elif (!Barometro && giroscopio && gyrox && !gyroy && gyroz && !Acelerometro && Magnetometro)
+  Serial.println("Tempo\tX\tZ\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+  dataFile.println("Tempo\tX\tZ\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+#elif (!Barometro && giroscopio && !gyrox && gyroy && gyroz && !Acelerometro && Magnetometro)
+  Serial.println("Tempo\tY\tZ\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+  dataFile.println("Tempo\tY\tZ\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+#elif (!Barometro && giroscopio && gyrox && gyroy && gyroz && Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot");
+  dataFile.println("Tempo\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot");
+#elif (!Barometro && giroscopio && gyrox && !gyroy && !gyroz && Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tX\tX_ddot\tY_ddot\tZ_ddot");
+  dataFile.println("Tempo\tX\tX_ddot\tY_ddot\tZ_ddot");
+#elif (!Barometro && giroscopio && !gyrox && gyroy && !gyroz && Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tY\tX_ddot\tY_ddot\tZ_ddot");
+  dataFile.println("Tempo\tY\tX_ddot\tY_ddot\tZ_ddot");
+#elif (!Barometro && giroscopio && gyrox && gyroy && !gyroz && Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tX\tY\tX_ddot\tY_ddot\tZ_ddot");
+  dataFile.println("Tempo\tX\tY\tX_ddot\tY_ddot\tZ_ddot");
+#elif (!Barometro && giroscopio && !gyrox && !gyroy && gyroz && Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tZ\tX_ddot\tY_ddot\tZ_ddot");
+  dataFile.println("Tempo\tZ\tX_ddot\tY_ddot\tZ_ddot");
+#elif (!Barometro && giroscopio && gyrox && !gyroy && gyroz && Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tX\tZ\tX_ddot\tY_ddot\tZ_ddot");
+  dataFile.println("Tempo\tX\tZ\tX_ddot\tY_ddot\tZ_ddot");
+#elif (!Barometro && giroscopio && !gyrox && gyroy && gyroz && Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tY\tZ\tX_ddot\tY_ddot\tZ_ddot");
+  dataFile.println("Tempo\tY\tZ\tX_ddot\tY_ddot\tZ_ddot");
+#elif (!Barometro && giroscopio && gyrox && gyroy && gyroz && Acelerometro && Magnetometro)
+  Serial.println("Tempo\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+  dataFile.println("Tempo\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+#elif (!Barometro && giroscopio && gyrox && !gyroy && !gyroz && Acelerometro && Magnetometro)
+  Serial.println("Tempo\tX\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+  dataFile.println("Tempo\tX\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+#elif (!Barometro && giroscopio && !gyrox && gyroy && !gyroz && Acelerometro && Magnetometro)
+  Serial.println("Tempo\tY\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+  dataFile.println("Tempo\tY\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+#elif (!Barometro && giroscopio && gyrox && gyroy && !gyroz && Acelerometro && Magnetometro)
+  Serial.println("Tempo\tX\tY\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+  dataFile.println("Tempo\tX\tY\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+#elif (!Barometro && giroscopio && !gyrox && !gyroy && gyroz && Acelerometro && Magnetometro)
+  Serial.println("Tempo\tZ\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+  dataFile.println("Tempo\tZ\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+#elif (!Barometro && giroscopio && gyrox && !gyroy && gyroz && Acelerometro && Magnetometro)
+  Serial.println("Tempo\tX\tZ\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+  dataFile.println("Tempo\tX\tZ\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+#elif (!Barometro && giroscopio && !gyrox && gyroy && gyroz && Acelerometro && Magnetometro)
+  Serial.println("Tempo\tX\tY\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)");
+  dataFile.println("Tempo\tX\tY\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)");   
+// ----------------------------------------------------------------------------
+#elif (Barometro && !giroscopio && !Acelerometro && !Magnetometro)
   Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tSituacao");
   dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tSituacao");
+#elif (Barometro && !giroscopio && !Acelerometro && Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+#elif (Barometro && !giroscopio && Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX_ddot\tY_ddot\tZ_ddot\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX_ddot\tY_ddot\tZ_ddot\tSituacao");
+#elif (Barometro && !giroscopio && Acelerometro && Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX_ddot\tY_ddot\tZ_ddot\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+// -----------------------------------------------------------------------
+#elif (Barometro && giroscopio && gyrox && gyroy && gyroz && !Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tSituacao");
+#elif (Barometro && giroscopio && gyrox && !gyroy && !gyroz && !Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tSituacao");
+#elif (Barometro && giroscopio && !gyrox && gyroy && !gyroz && !Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tY\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tY\tSituacao");
+#elif (Barometro && giroscopio && gyrox && gyroy && !gyroz && !Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tSituacao");
+#elif (Barometro && giroscopio && !gyrox && !gyroy && gyroz && !Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tZ\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tZ\tSituacao");
+#elif (Barometro && giroscopio && gyrox && !gyroy && gyroz && !Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tZ\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tZ\tSituacao");
+#elif (Barometro && giroscopio && !gyrox && gyroy && gyroz && !Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tY\tZ\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tY\tZ\tSituacao");
+#elif (Barometro && giroscopio && gyrox && gyroy && gyroz && !Acelerometro && Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+#elif (Barometro && giroscopio && gyrox && !gyroy && !gyroz && !Acelerometro && Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+#elif (Barometro && giroscopio && !gyrox && gyroy && !gyroz && !Acelerometro && Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tY\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tY\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+#elif (Barometro && giroscopio && gyrox && gyroy && !gyroz && !Acelerometro && Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+#elif (Barometro && giroscopio && !gyrox && !gyroy && gyroz && !Acelerometro && Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tZ\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tZ\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+#elif (Barometro && giroscopio && gyrox && !gyroy && gyroz && !Acelerometro && Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tZ\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tZ\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+#elif (Barometro && giroscopio && !gyrox && gyroy && gyroz && !Acelerometro && Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tY\tZ\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tY\tZ\tmagX(uT)\tmagY(uT)\tmagZ(uT)\tSituacao");
+#elif (Barometro && giroscopio && gyrox && gyroy && gyroz && Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tSituacao");
+#elif (Barometro && giroscopio && gyrox && !gyroy && !gyroz && Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tX_ddot\tY_ddot\tZ_ddot\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tX_ddot\tY_ddot\tZ_ddot\tSituacao");
+#elif (Barometro && giroscopio && !gyrox && gyroy && !gyroz && Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tY\tX_ddot\tY_ddot\tZ_ddot\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tY\tX_ddot\tY_ddot\tZ_ddot\tSituacao");
+#elif (Barometro && giroscopio && gyrox && gyroy && !gyroz && Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tX_ddot\tY_ddot\tZ_ddot\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tY\tX_ddot\tY_ddot\tZ_ddot\tSituacao");
+#elif (Barometro && giroscopio && !gyrox && !gyroy && gyroz && Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tZ\tX_ddot\tY_ddot\tZ_ddot\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tZ\tX_ddot\tY_ddot\tZ_ddot\tSituacao");
+#elif (Barometro && giroscopio && gyrox && !gyroy && gyroz && Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tZ\tX_ddot\tY_ddot\tZ_ddot\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tX\tZ\tX_ddot\tY_ddot\tZ_ddot\tSituacao");
+#elif (Barometro && giroscopio && !gyrox && gyroy && gyroz && Acelerometro && !Magnetometro)
+  Serial.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tSituacao");
+  dataFile.println("Tempo\tApogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\tY\tZ\tX_ddot\tY_ddot\tZ_ddot\tSituacao");
+// -----------------------------------------------------------------------  
 #endif
   dataFile.close();
-
+  // =========================================================================================================================================================== //
+#if Barometro
   for (int i = 0; i < 100; i++) {                                                            //Este "for" serve para definir a altitude da base de lancamento como valor de referencia.
     Soma = Soma + bmp.readAltitude();
   }
   AltitudeRef = Soma / 100;
+#endif
 }
-
 // the loop function runs over and over again forever
 void loop() {
-  unsigned long currentMillis = millis();                                                     // Regsitra em que instante do tempo está em milisegundos
+  unsigned long currentMillis = millis();                                                     // Regsitra em milisegundos em que instante do tempo está
 #if giroscopio
   gyro.read();                                                                                // Faz a leitura do sensor giroscópio
 #endif
   String dataString = "";                                                                     // Serve para criar a string que vai guardar os dados para que eles sejam gravados no SD
 
   // ========================= MÉDIA MÓVEL E DETECÇÃO DE APOGEU =============================== //
+#if Barometro
   SomaMov = 0;
   MediaMov = bmp.readAltitude() - AltitudeRef;
   for (int j = 0; j < 3; j++) {
-    for (int i = 8; i >= 0; i--) {                                                            // Laco apenas para a movimentação
+    for (int i = 8; i >= 0; i--) {                                                            // Laço apenas para a movimentação
       Vetor[j][i + 1] = Vetor[j][i];
     }
     Vetor[j][0] = MediaMov;
     SomaMov = 0;
-    for (int i = 0; i < 10; i++) {                                                            // Laco para a somatoria dos valores
+    for (int i = 0; i < 10; i++) {                                                            // Laço para a somatória dos valores
       SomaMov = SomaMov + Vetor[j][i];
     }
     MediaMov = SomaMov / 10;
   }
-  H2 = H1;                                                                                    // Guardei a altitude de referencia (medicao anterior)
+  H2 = H1;                                                                                    // Guardei a altitude de referência (medicao anterior)
   H1 = MediaMov;                                                                              // Nova leitura de altitude
 
   if (Hmax < H1) {
@@ -243,18 +433,26 @@ void loop() {
   dataString += "\t";
   //dataString += String(bmp.readPressure());
   //dataString += "\t";
+#endif
 #if giroscopio
+#if gyrox
   dataString += String((int)gyro.g.x);
   dataString += "\t";
+#endif
+#if gyroy
   dataString += String((int)gyro.g.y);
   dataString += "\t";
+#endif
+#if gyroz
   dataString += String((int)gyro.g.z);
   dataString += "\t";
 #endif
+#endif
   // ================================= ETAPA DO ACELERÔMETRO ==================================== //
-#if Acelerometro
   /* Get a new sensor event */
   sensors_event_t event;
+#if Acelerometro
+
   accel.getEvent(&event);
   /* Display the results (acceleration is measured in m/s^2) */
   dataString += String(event.acceleration.x); dataString += "\t";
@@ -274,6 +472,7 @@ void loop() {
   // Caso precise, olhe na biblioteca original
 #endif
   // ======================== ETAPA PARA ACIONAMENTO DE PARAQUEDAS ============================== //
+#if Barometro
   if (Delta > 0 || Apogeu == true) {                                                              // Só serve para imprimir na tela. Se a diferença da média móvel com o Hmáx é maior que 0, significa que pode estar descendo
     if (Delta >= dfaltura || Apogeu == true) {                                                    // Se a diferença for maior ou igual ao delta de ref. ou já tenha detectado o apogeu
       Apogeu = true;                                                                              // Imprime na tela: Encontrou o apogeu
@@ -318,7 +517,7 @@ void loop() {
   } else {
     dataString += String("Subindo");                                                             // Só imprime na tela para acompanhar o funcionamento do código
   }
-
+#endif
   // ======================== ETAPA PARA GRAVAR NO CARTÃO SD ===================================== //
   File dataFile = SD.open(nome, FILE_WRITE);                                                     // Só curiosidade: este é o ponto que mais consome de processamento
 
