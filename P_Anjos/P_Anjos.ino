@@ -36,7 +36,7 @@
 #define Magx (0 && Magnetometro)
 #define Magy (1 && Magnetometro)
 #define Magz (1 && Magnetometro)
-#define GravacaoSD 1                      //Definindo se irá gravar os dados no cartão SD
+#define GravacaoSD 0                      //Definindo se irá gravar os dados no cartão SD
 // ======================================================================================================================= //
 #if Barometro
 Adafruit_BMP085 bmp;
