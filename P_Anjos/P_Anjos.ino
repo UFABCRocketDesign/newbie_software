@@ -16,23 +16,27 @@
 #undef  IGN_3 46  /*act3*/
 #define IGN_3 13
 #define IGN_4 55  /*act4*/
-#define InterDesligTimer 2000          //Intervalo de tempo para desligar o paraquedas A em segundos
-#define InterA2 4000                   //Intervalo de tempo para ligar o 2º acionamento do paraquedas A
-#define HParaquedasB 5                 //Altura de acionamento do paraquedas B em metros
-#define dfaltura 2                     //Define o delta de altura que serve de critério para a determinação do apogeu
-#define Barometro 1                    //Definindo a presença ou não de um sensor barométrico no sistema
-#define giroscopio 1                   //Definindo a presença ou não de um sensor giroscópio no sistema
-#define gyrox (1 && giroscopio)        //Definindo a presença de dados no eixo X do giroscópio
-#define gyroy (0 && giroscopio)        //Definindo a presença de dados no eixo Y do giroscópio
-#define gyroz (0 && giroscopio)        //Definindo a presença de dados no eixo Z do giroscópio
-#define Acelerometro 1                 //Definindo a presença ou não de um sensor acelerômetro no sistema
+#define InterDesligTimer 2000             //Intervalo de tempo para desligar o paraquedas A em segundos
+#define InterA2 4000                      //Intervalo de tempo para ligar o 2º acionamento do paraquedas A
+#define HParaquedasB 5                    //Altura de acionamento do paraquedas B em metros
+#define dfaltura 2                        //Define o delta de altura que serve de critério para a determinação do apogeu
+#define Barometro 1                       //Definindo a presença ou não de um sensor barométrico no sistema
+#define altitude    (1 && Barometro)      //Definindo a presença de dados de altitude
+#define temperatura (1&& Barometro)       //Definindo a presença de dados de temperatura
+#define pressao     (0 && Barometro)      //Definindo a presença de dados de pressão
+#define giroscopio 1                      //Definindo a presença ou não de um sensor giroscópio no sistema
+#define gyrox (1 && giroscopio)           //Definindo a presença de dados no eixo X do giroscópio
+#define gyroy (0 && giroscopio)           //Definindo a presença de dados no eixo Y do giroscópio
+#define gyroz (0 && giroscopio)           //Definindo a presença de dados no eixo Z do giroscópio
+#define Acelerometro 1                    //Definindo a presença ou não de um sensor acelerômetro no sistema
 #define Accx (0 && Acelerometro)
 #define Accy (1 && Acelerometro)
 #define Accz (0 && Acelerometro)
-#define Magnetometro 1                 //Definindo a presença ou não de um sensor magnetômetro no sistema
-#define Magx (1 && Magnetometro)
+#define Magnetometro 1                    //Definindo a presença ou não de um sensor magnetômetro no sistema
+#define Magx (0 && Magnetometro)
 #define Magy (1 && Magnetometro)
 #define Magz (1 && Magnetometro)
+#define GravacaoSD 1                      //Definindo se irá gravar os dados no cartão SD
 // ======================================================================================================================= //
 #if Barometro
 Adafruit_BMP085 bmp;
@@ -122,7 +126,7 @@ void setup() {
 #endif
   // ========================== PARTE APENAS DO ACELEROMETRO ===================================== //
 #if Acelerometro
-  Serial.println("Accelerometer Test"); Serial.println("");
+  //Serial.println("Accelerometer Test"); Serial.println("");Informações validas apenas quando está realizando testes
 
   /* Initialise the sensor */
   if (!accel.begin())
@@ -147,7 +151,7 @@ void setup() {
 #endif
   // =============================== PARTE APENAS DO MAGNETÔMETRO ========================================= //
 #if Magnetometro
-  Serial.println("HMC5883 Magnetometer Test"); Serial.println("");
+  //Serial.println("HMC5883 Magnetometer Test"); Serial.println(""); Informações validas apenas quando está realizando testes
 
   /* Initialise the sensor */
   if (!mag.begin())
@@ -161,7 +165,7 @@ void setup() {
   //displaySensorDetails(); //Reitirei do código pois não era interessante. Se precisar olhe na biblioteca original
 #endif
   // ================================================================================================ //
-
+#if GravacaoSD
   // see if the card is present and can be initialized:
   if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present");
@@ -185,44 +189,53 @@ void setup() {
   Serial.print("O arquivo será gravado com nome ");
   Serial.println(nome);
   Serial.println("card initialized.");
-  File dataFile = SD.open(nome, FILE_WRITE);
-// ==================================== CABEÇALHO ============================================================================================================= //
-  dataCabecalho +="Tempo\t";
-#if Barometro
-  dataCabecalho +="Apogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\tTemperature(*C)\t";
+#endif
+  // ==================================== CABEÇALHO ============================================================================================================= //
+  dataCabecalho += "Tempo\t";
+#if altitude
+  dataCabecalho += "Apogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\t";
+#endif
+#if temperatura
+  dataCabecalho += "Temperature(*C)\t";
+#endif
+#if pressao
+  dataCabecalho += "Pressão(bar)\t";
 #endif
 #if gyrox
-  dataCabecalho +="X\t";
+  dataCabecalho += "X\t";
 #endif
 #if gyroy
-  dataCabecalho +="Y\t";
+  dataCabecalho += "Y\t";
 #endif
 #if gyroz
-  dataCabecalho +="Z\t";
+  dataCabecalho += "Z\t";
 #endif
 #if Accx
-  dataCabecalho +="X_ddot\t";
+  dataCabecalho += "X_ddot\t";
 #endif
 #if Accy
-  dataCabecalho +="Y_ddot\t";
+  dataCabecalho += "Y_ddot\t";
 #endif
 #if Accz
-  dataCabecalho +="Z_ddot\t";
+  dataCabecalho += "Z_ddot\t";
 #endif
 #if Magx
-  dataCabecalho +="magX(uT)\t";
+  dataCabecalho += "magX(uT)\t";
 #endif
 #if Magy
-  dataCabecalho +="magY(uT)\t";
+  dataCabecalho += "magY(uT)\t";
 #endif
 #if Magz
-  dataCabecalho +="magZ(uT)\t";
+  dataCabecalho += "magZ(uT)\t";
 #endif
-  dataCabecalho +="Situacao";
+  dataCabecalho += "Situacao";
   Serial.println(dataCabecalho);
+#if GravacaoSD
+  File dataFile = SD.open(nome, FILE_WRITE);
   dataFile.println(dataCabecalho);
   dataFile.close();
-// =========================================================================================================================================================== //
+#endif
+  // =========================================================================================================================================================== //
 #if Barometro
   for (int i = 0; i < 100; i++) {                                                            //Este "for" serve para definir a altitude da base de lancamento como valor de referencia.
     Soma = Soma + bmp.readAltitude();
@@ -237,9 +250,11 @@ void loop() {
   gyro.read();                                                                                // Faz a leitura do sensor giroscópio
 #endif
   String dataString = "";                                                                     // Serve para criar a string que vai guardar os dados para que eles sejam gravados no SD
-
-// ========================= MÉDIA MÓVEL E DETECÇÃO DE APOGEU =============================== //
+  dataString += String(currentMillis / 1000.0);                                                 // Registra o tempo em segundos
+  dataString += "\t";
+  // ========================= MÉDIA MÓVEL E DETECÇÃO DE APOGEU =============================== //
 #if Barometro
+#if altitude
   SomaMov = 0;
   MediaMov = bmp.readAltitude() - AltitudeRef;
   for (int j = 0; j < 3; j++) {
@@ -261,8 +276,6 @@ void loop() {
   }
   Delta = Hmax - H1;
   // ============================= DADOS QUE VÃO PARA STRING ================================== //
-  dataString += String(currentMillis / 1000.0);                                                 // Registra o tempo em segundos
-  dataString += "\t";
   dataString += String(Hmax);
   dataString += "\t";
   dataString += String(H1);
@@ -271,10 +284,15 @@ void loop() {
   dataString += "\t";
   dataString += String(Vetor[0][0]);
   dataString += "\t";
+#endif
+#if temperatura
   dataString += String(bmp.readTemperature());
   dataString += "\t";
-  //dataString += String(bmp.readPressure());
-  //dataString += "\t";
+#endif
+#if pressao
+  dataString += String(bmp.readPressure());
+  dataString += "\t";
+#endif
 #endif
 #if giroscopio
 #if gyrox
@@ -372,7 +390,9 @@ void loop() {
     dataString += String("Subindo");                                                             // Só imprime na tela para acompanhar o funcionamento do código
   }
 #endif
+
   // ======================== ETAPA PARA GRAVAR NO CARTÃO SD ===================================== //
+#if GravacaoSD
   File dataFile = SD.open(nome, FILE_WRITE);                                                     // Só curiosidade: este é o ponto que mais consome de processamento
 
   // if the file is available, write to it:
@@ -384,4 +404,5 @@ void loop() {
   } else {  // if the file isn't open, pop up an error:
     Serial.println("error opening P_ANJOS.txt");
   }
+#endif
 }
