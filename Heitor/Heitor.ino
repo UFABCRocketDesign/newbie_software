@@ -201,5 +201,5 @@ void loop() {
   else digitalWrite(A0,HIGH);
 #endif
 
-  Serial.println(datalog);
+  Serial.println(datalog);;
 }
