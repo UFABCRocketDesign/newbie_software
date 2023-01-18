@@ -48,13 +48,14 @@ void apagar(){
 void loop() {
 
     Serial.print(bmp.readTemperature());
-    Serial.println("      ");
+    Serial.print("      ");
     Serial.print(bmp.readPressure());
-    Serial.println("      ");
+    Serial.print("      ");
     Serial.print(bmp.readAltitude());
-    Serial.println("      ");
+    Serial.print("      ");
     Serial.print(bmp.readSealevelPressure());
-
+    Serial.println(" ");
+  
   delay(1000);
 //    piscar();
 //    Serial.print("Temperature = ");
