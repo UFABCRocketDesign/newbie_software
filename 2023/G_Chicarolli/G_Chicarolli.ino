@@ -25,12 +25,16 @@
 
 Adafruit_BMP085 bmp;
 
-int temperatura_i = bmp.readTemperature();
-int pressao_i = bmp.readPressure();
-int altitude_i = bmp.readAltitude();
+int temperatura_i = 0;
+int pressao_i = 0;
+int altitude_i = 0;
 
 void setup() {
   Serial.begin(115200);
+  temperatura_i = bmp.readTemperature();
+  pressao_i = bmp.readPressure();
+  altitude_i = bmp.readAltitude();
+
   Serial.print("Temperature(*C)   Pressure(Pa)   Altitude(m)");
   Serial.println(' ');
   if (!bmp.begin()) {
@@ -40,14 +44,6 @@ void setup() {
 
 }
 
-void piscar(){
-  digitalWrite(LED_BUILTIN, HIGH); 
-}
-
-void apagar(){
-  digitalWrite(LED_BUILTIN, LOW); 
-  delay(2000);    
-}
 
 
 void loop() {
@@ -58,8 +54,13 @@ void loop() {
     Serial.print("      ");
     Serial.print(bmp.readAltitude()- altitude_i);
     Serial.println(" ");
-  
-  delay(1000);
+
+// Como lidar com o ruído??
+    //temperatura_i = (bmp.readTemperature() + temperatura_i)/2;
+    //pressao_i = bmp.readPressure();
+    //altitude_i = bmp.readAltitude();
+
+    delay(1000);
 //    piscar();
 //    Serial.print("Temperature = ");
 //    Serial.print(bmp.readTemperature());
