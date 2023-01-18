@@ -27,11 +27,12 @@ Adafruit_BMP085 bmp;
   
 void setup() {
   Serial.begin(115200);
-
+  Serial.print("Temperature(*C)   Pressure(Pa)   Altitude(m)   Pressure_at_sea_level(Pa");
   if (!bmp.begin()) {
 	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
 	while (1) {}
   }
+
 }
 
 void piscar(){
@@ -46,45 +47,55 @@ void apagar(){
 
 void loop() {
 
-    piscar();
-    Serial.print("Temperature = ");
     Serial.print(bmp.readTemperature());
-    Serial.println(" *C");
-    apagar();
-
-
-    piscar();
-    Serial.print("Pressure = ");
+    Serial.println("      ");
     Serial.print(bmp.readPressure());
-    Serial.println(" Pa");
-    apagar();
+    Serial.println("      ");
+    Serial.print(bmp.readAltitude());
+    Serial.println("      ");
+    Serial.print(bmp.readSealevelPressure());
+
+  delay(1000);
+//    piscar();
+//    Serial.print("Temperature = ");
+//    Serial.print(bmp.readTemperature());
+//    Serial.println(" *C");
+//    apagar();
+
+
+//   piscar();
+//    Serial.print("Pressure = ");
+//    Serial.print(bmp.readPressure());
+//    Serial.println(" Pa");
+//    apagar();
 
     // Calculate altitude assuming 'standard' barometric
     // pressure of 1013.25 millibar = 101325 Pascal
     
 
-    piscar();
-    Serial.print("Altitude = ");
-    Serial.print(bmp.readAltitude());
-    Serial.println(" meters");
-    apagar();
+//    piscar();
+//    Serial.print("Altitude = ");
+//    Serial.print(bmp.readAltitude());
+//    Serial.println(" meters");
+//    apagar();
 
 
-    piscar();
-    Serial.print("Pressure at sealevel (calculated) = ");
-    Serial.print(bmp.readSealevelPressure());
-    Serial.println(" Pa");
-    apagar();
+//    piscar();
+//    Serial.print("Pressure at sealevel (calculated) = ");
+//    Serial.print(bmp.readSealevelPressure());
+//    Serial.println(" Pa");
+//    apagar();
 
   // you can get a more precise measurement of altitude
   // if you know the current sea level pressure which will
   // vary with weather and such. If it is 1015 millibars
   // that is equal to 101500 Pascals.
 
-    piscar();
-    Serial.print("Real altitude = ");
-    Serial.print(bmp.readAltitude(101500));
-    Serial.println(" meters");
-    apagar();
+//    piscar();
+//    Serial.print("Real altitude = ");
+//    Serial.print(bmp.readAltitude(101500));
+//    Serial.println(" meters");
+//    apagar();
+
 
 }
