@@ -17,8 +17,8 @@ void loop (){
   digitalWrite(13,LOW);
   delay(2000);
   //medicoes           
-    Serial.print(bmp.readTemperature());
-    Serial.print(bmp.readAltitude());
-    Serial.print(bmp.readSealevelPressure());
+    Serial.print(bmp.readTemperature()   );
+    Serial.print(bmp.readAltitude()   );
+    Serial.print(bmp.readSealevelPressure()  );
     Serial.println();
 }
