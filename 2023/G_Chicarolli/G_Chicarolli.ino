@@ -24,10 +24,15 @@
 // XCLR is a reset pin, also not used here
 
 Adafruit_BMP085 bmp;
-  
+
+int temperatura_i = bmp.readTemperature();
+int pressao_i = bmp.readPressure();
+int altitude_i = bmp.readAltitude();
+
 void setup() {
   Serial.begin(115200);
-  Serial.print("Temperature(*C)   Pressure(Pa)   Altitude(m)   Pressure_at_sea_level(Pa");
+  Serial.print("Temperature(*C)   Pressure(Pa)   Altitude(m)");
+  Serial.println(' ');
   if (!bmp.begin()) {
 	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
 	while (1) {}
@@ -47,13 +52,11 @@ void apagar(){
 
 void loop() {
 
-    Serial.print(bmp.readTemperature());
+    Serial.print(bmp.readTemperature()- temperatura_i);
     Serial.print("      ");
-    Serial.print(bmp.readPressure());
+    Serial.print(bmp.readPressure()- pressao_i);
     Serial.print("      ");
-    Serial.print(bmp.readAltitude());
-    Serial.print("      ");
-    Serial.print(bmp.readSealevelPressure());
+    Serial.print(bmp.readAltitude()- altitude_i);
     Serial.println(" ");
   
   delay(1000);
