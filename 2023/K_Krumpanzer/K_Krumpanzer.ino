@@ -15,9 +15,7 @@ void loop (){
   digitalWrite(13,LOW);
   delay(2000);
   delay(1000);
-}
 
-void loop (){
   Serial.print("Temperature = ");
     Serial.print(bmp.readTemperature());
     Serial.println(" *C");
