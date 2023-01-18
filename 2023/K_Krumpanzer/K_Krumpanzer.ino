@@ -26,5 +26,4 @@ void loop (){
 
   Serial.print(bmp.readAltitude());
 
-  Serial.println();
 }
