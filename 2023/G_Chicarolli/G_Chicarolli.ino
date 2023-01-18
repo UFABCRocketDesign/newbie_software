@@ -31,9 +31,6 @@ int altitude_i = 0;
 
 void setup() {
   Serial.begin(115200);
-  temperatura_i = bmp.readTemperature();
-  pressao_i = bmp.readPressure();
-  altitude_i = bmp.readAltitude();
 
   Serial.print("Temperature(*C)   Pressure(Pa)   Altitude(m)");
   Serial.println(' ');
@@ -41,6 +38,9 @@ void setup() {
 	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
 	while (1) {}
   }
+  temperatura_i = bmp.readTemperature();
+  pressao_i = bmp.readPressure();
+  altitude_i = bmp.readAltitude();
 
 }
 
