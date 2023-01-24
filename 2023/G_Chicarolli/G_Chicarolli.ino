@@ -37,16 +37,18 @@ void setup() {
 	while (1) {}
   }
 
-  void valores_iniciais(int altitude){
-    delay(400)
-    altitude_i = (altitude + bmp.readAltitude())/2;
-  }
-  
   altitude_i = bmp.readAltitude();
-  valores_iniciais(altitude_i); 
-  valores_iniciais(altitude_i);
-  valores_iniciais(altitude_i);
-  valores_iniciais(altitude_i);
+  altitude_i = altitude_i+ bmp.readAltitude();
+  altitude_i = altitude_i+ bmp.readAltitude(); 
+  altitude_i = altitude_i+ bmp.readAltitude();
+  altitude_i = altitude_i+ bmp.readAltitude();
+  altitude_i = altitude_i+ bmp.readAltitude();
+  altitude_i = altitude_i+ bmp.readAltitude(); 
+  altitude_i = altitude_i+ bmp.readAltitude();
+  altitude_i = altitude_i+ bmp.readAltitude();
+  altitude_i = altitude_i+ bmp.readAltitude();
+
+  altitude_i = altitude_i/10;
   
 }
 
