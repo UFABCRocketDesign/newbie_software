@@ -38,17 +38,12 @@ void setup() {
   }
 
   altitude_i = bmp.readAltitude();
-  altitude_i = altitude_i+ bmp.readAltitude();
-  altitude_i = altitude_i+ bmp.readAltitude(); 
-  altitude_i = altitude_i+ bmp.readAltitude();
-  altitude_i = altitude_i+ bmp.readAltitude();
-  altitude_i = altitude_i+ bmp.readAltitude();
-  altitude_i = altitude_i+ bmp.readAltitude(); 
-  altitude_i = altitude_i+ bmp.readAltitude();
-  altitude_i = altitude_i+ bmp.readAltitude();
-  altitude_i = altitude_i+ bmp.readAltitude();
+  for (int i = 0; i <= 10; i++) {
 
-  altitude_i = altitude_i/10;
+    altitude_i = altitude_i+bmp.readAltitude();
+
+  }
+  altitude_i = altitude_i/11;
   
 }
 
