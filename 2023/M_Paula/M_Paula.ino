@@ -4,7 +4,7 @@ Adafruit_BMP085 bmp;
 float alt_inicial;
 //----------------------------------------------------------------------
 void setup (){
-  float sinal[n_media];
+  float sinal;
   float soma = 0;
   Serial.begin(115200);
   pinMode(13,OUTPUT);
@@ -14,8 +14,7 @@ void setup (){
   }
 
   for(int i = 0; i < n_media; ++i){
-    sinal[i] = bmp.readAltitude();
-    soma = soma + sinal[i];
+    soma = soma + bmp.readAltitude();
   } 
    alt_inicial = soma /5;
   Serial.print("Temperature (*C) ");
