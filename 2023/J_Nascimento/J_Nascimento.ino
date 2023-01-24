@@ -13,6 +13,9 @@ void setup() {
     }
     // initialize digital pin LED_BUILTIN as an output.
     pinMode(LED_BUILTIN, OUTPUT);
+
+    // showing the header
+    Serial.println("Temperature                Pressure                 Altitude                  RealAltitude");
 }
 
 // the loop function runs over and over again forever
@@ -22,21 +25,21 @@ void loop() {
     digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
     delay(5000);   
   
-    Serial.print("Temperature = ");
+    //Serial.print("Temperature = ");
     Serial.print(bmp.readTemperature());
     Serial.print(" *C");
     
-    Serial.print("       Pressure = ");
+    Serial.print("             ");
     Serial.print(bmp.readPressure());
     Serial.print(" Pa");
     
     // Calculate altitude assuming 'standard' barometric
     // pressure of 1013.25 millibar = 101325 Pascal
-    Serial.print("       Altitude = ");
+    Serial.print("           ");
     Serial.print(bmp.readAltitude());
     Serial.print(" meters");
 
-    Serial.print("       Pressure at sealevel (calculated) = ");
+    Serial.print("        ");
     Serial.print(bmp.readSealevelPressure());
     Serial.print(" Pa");
 
@@ -44,7 +47,7 @@ void loop() {
     // if you know the current sea level pressure which will
     // vary with weather and such. If it is 1015 millibars
     // that is equal to 101500 Pascals.
-    Serial.print("       Real altitude = ");
+    Serial.print("             ");
     Serial.print(bmp.readAltitude(101500));
     Serial.print(" meters");
     
