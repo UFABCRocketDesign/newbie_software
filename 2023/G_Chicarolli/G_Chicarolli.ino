@@ -25,8 +25,6 @@
 
 Adafruit_BMP085 bmp;
 
-int temperatura_i = 0;
-int pressao_i = 0;
 int altitude_i = 0;
 
 void setup() {
@@ -38,19 +36,27 @@ void setup() {
 	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
 	while (1) {}
   }
-  temperatura_i = bmp.readTemperature();
-  pressao_i = bmp.readPressure();
-  altitude_i = bmp.readAltitude();
 
+  void valores_iniciais(int altitude){
+    delay(400)
+    altitude_i = (altitude + bmp.readAltitude())/2;
+  }
+  
+  altitude_i = bmp.readAltitude();
+  valores_iniciais(altitude_i); 
+  valores_iniciais(altitude_i);
+  valores_iniciais(altitude_i);
+  valores_iniciais(altitude_i);
+  
 }
 
 
 
 void loop() {
 
-    Serial.print(bmp.readTemperature()- temperatura_i);
+    Serial.print(bmp.readTemperature());
     Serial.print("      ");
-    Serial.print(bmp.readPressure()- pressao_i);
+    Serial.print(bmp.readPressure());
     Serial.print("      ");
     Serial.print(bmp.readAltitude()- altitude_i);
     Serial.println(" ");
@@ -60,7 +66,7 @@ void loop() {
     //pressao_i = bmp.readPressure();
     //altitude_i = bmp.readAltitude();
 
-    delay(1000);
+    delay(300);
 //    piscar();
 //    Serial.print("Temperature = ");
 //    Serial.print(bmp.readTemperature());
