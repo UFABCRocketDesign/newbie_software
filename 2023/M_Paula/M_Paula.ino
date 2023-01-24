@@ -14,8 +14,7 @@ void setup (){
   }
 
   for(int i = 0; i < n_media; ++i){
-    sinal = bmp.readAltitude();
-    soma = soma + sinal;
+    soma = soma + bmp.readAltitude();
   } 
    alt_inicial = soma /5;
   Serial.print("Temperature (*C) ");
