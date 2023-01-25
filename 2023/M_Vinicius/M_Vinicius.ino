@@ -1,4 +1,6 @@
 // BPM085 SENSOR ( PRESSÃO / TEMPERATURA / ALTITUDE)
+#include <Adafruit_BMP085.h>
+Adafruit_BMP085 bmp;
 
 void setup() {
   Serial.begin (9600);
