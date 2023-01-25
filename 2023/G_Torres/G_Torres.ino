@@ -24,10 +24,15 @@ void loop() {
     Serial.print("Real altitude = ");
 
     Serial.print(bmp.readTemperature());
+    Serial.print("  ");
     Serial.print(bmp.readPressure());
+    Serial.print("  ");
     Serial.print(bmp.readAltitude());
+    Serial.print("  ");
     Serial.print(bmp.readSealevelPressure());
+    Serial.print("  ");
     Serial.print(bmp.readAltitude(101500));
+    
 
     Serial.println(" *C");
     Serial.println(" Pa");
