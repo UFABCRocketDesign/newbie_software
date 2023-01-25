@@ -32,6 +32,7 @@ void loop() {
     Serial.print(bmp.readSealevelPressure());
     Serial.print("  ");
     Serial.print(bmp.readAltitude(101500));
+    Serial.print("  ");
     
 
     Serial.println(" *C");
