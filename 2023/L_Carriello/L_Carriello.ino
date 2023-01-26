@@ -31,11 +31,8 @@ void loop() {
    
    
     Serial.println();
-    delay(500);
+    delay(10);
 
-    digitalWrite(13, HIGH);
-    delay(3000); 
-    digitalWrite(13, LOW);
 
   
 }
