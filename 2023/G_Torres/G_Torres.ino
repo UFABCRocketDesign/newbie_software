@@ -1,8 +1,13 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 
+float alt_inicial;
+float pressu_re;
+
+
+
 void setup() {
-  // initialize digital pin LED_BUILTIN as an output.
+ 
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
   if (!bmp.begin()) {
@@ -20,10 +25,11 @@ void loop() {
   Serial.print("  ");
   Serial.print(bmp.readPressure());
   Serial.print("  ");
-  Serial.print(bmp.readAltitude());
+  Serial.print(bmp.readAltitude() - alt_inicial );
   Serial.print("  ");
 
 
+
   Serial.println();
-  delay(500);
+  delay(5);
 }
