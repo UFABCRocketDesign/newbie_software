@@ -2,12 +2,13 @@
 Adafruit_BMP085 bmp;
 
 float alt_inicial;
-float pressu_re;
-
-
+float pressure;
 
 void setup() {
- 
+
+alt_inicial = 1;
+pressure = 101325;
+
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
   if (!bmp.begin()) {
