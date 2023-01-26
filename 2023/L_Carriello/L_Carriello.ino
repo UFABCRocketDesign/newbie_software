@@ -31,8 +31,18 @@ void setup() {
 void loop() {
     
     Serial.print(bmp.readTemperature());
-    Serial.print("       ");    
+    Serial.print("       "); 
+    if (bmp.readAltitude() - alt_inicial > 1.5 || bmp.readAltitude() < -1.5){
+      for(i=0; i<10; i++){
+        soma += bmp.readAltitude();
+      }
+  
+      alt_inicial = soma/10;
+      Serial.print(bmp.readAltitude() - alt_inicial);
+    }  
+    else{
     Serial.print(bmp.readAltitude() - alt_inicial);
+    }
     Serial.print("       ");  
     Serial.print(bmp.readSealevelPressure());
    
