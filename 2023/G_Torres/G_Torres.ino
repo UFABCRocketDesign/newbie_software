@@ -9,10 +9,10 @@ void setup() {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
-}
 
 Serial.println(" Temperature(*C) | Pressure(Pa) | Altitude(meters)");
 Serial.println();
+}
 
 void loop() {
   digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
