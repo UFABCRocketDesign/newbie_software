@@ -20,11 +20,11 @@ void setup() {
   Serial.print("Pressure at sealevel(Pa) ");
   Serial.println();
 
-  for(i=0; i<5; i++){
+  for(i=0; i<10; i++){
     soma += bmp.readAltitude();
   }
  
-  alt_inicial = soma/5;
+  alt_inicial = soma/10;
 
 }
   
