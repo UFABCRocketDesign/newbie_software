@@ -3,7 +3,7 @@
 
 Adafruit_BMP085 bmp;
   
-float alt_inicial 
+float alt_inicial; 
 
 void setup() {
   pinMode(13,OUTPUT);
@@ -18,7 +18,7 @@ void setup() {
   Serial.print("Pressure at sealevel(Pa) ");
   Serial.println();
 
-  alt_inicial = bmp.readAltitude()
+  alt_inicial = bmp.readAltitude();
 }
   
 void loop() {
