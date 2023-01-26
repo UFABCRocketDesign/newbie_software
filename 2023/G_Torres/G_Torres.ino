@@ -15,10 +15,6 @@ Serial.println();
 }
 
 void loop() {
-  digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
-  delay(2500);                      // wait for a second
-  digitalWrite(LED_BUILTIN, LOW);   // turn the LED off by making the voltage LOW
-  delay(1700);                      // wait for a second
 
   Serial.print(bmp.readTemperature());
   Serial.print("  ");
@@ -26,10 +22,7 @@ void loop() {
   Serial.print("  ");
   Serial.print(bmp.readAltitude());
   Serial.print("  ");
-  Serial.print(bmp.readSealevelPressure());
-  Serial.print("  ");
-  Serial.print(bmp.readAltitude(101500));
-  Serial.print("  ");
+
 
   Serial.println();
   delay(500);
