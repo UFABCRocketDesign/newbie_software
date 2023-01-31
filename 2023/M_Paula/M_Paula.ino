@@ -7,10 +7,10 @@ float values[num];
 float media_movel(float sinal){
   int i;
   float acc = 0;
-  values [0] = sinal;
   for(i = num-1; i > 0; i--){
     values [i] = values [i-1];
   }
+  values [0] = sinal;
   for(i = num; i < num; i++){
     acc += values [i];
   }
