@@ -3,7 +3,6 @@
 
 Adafruit_BMP085 bmp;
 float alt = 0;
-alt = bmp.readAltitude();
 
 void setup() {
 
@@ -18,8 +17,8 @@ void setup() {
 
     // showing the header
     Serial.println("Temperature( Cº)                Pressure (Pa)                 Altitude (Meters)                  RealAltitude (Pa)");
-
     
+    alt = bmp.readAltitude();
 }
 
 // the loop function runs over and over again forever
@@ -30,6 +29,7 @@ void loop() {
     delay(5000);   
   
     Serial.print(bmp.readTemperature());
+
     
     
     Serial.print("             ");
