@@ -52,7 +52,7 @@
 // XCLR is a reset pin, also not used here
 
 Adafruit_BMP085 bmp;
-  
+float altitude; 
 void setup() {
   Serial.begin(115200);
   if (!bmp.begin()) {
@@ -60,9 +60,8 @@ void setup() {
 	while (1) {}
   }
   pinMode(13, OUTPUT);
-  Serial.print("Temperature (*C)     Pressure (Pa)      Altitude (meters)     Pressure at sealevel (calculated) (Pa)     Real altitude (meters)");
-<<<<<<< HEAD
-=======
+  Serial.print("Temperature (*C)     Pressure (Pa)      Altitude (m)     Altura (m)     Pressure at sealevel (calculated) (Pa)     Real altitude (m)");
+
 }
   
 void loop() {
@@ -79,9 +78,12 @@ void loop() {
     // Calculate altitude assuming 'standard' barometric
     // pressure of 1013.25 millibar = 101325 Pascal
     //Serial.print("Altitude = ");
-    Serial.print(bmp.readAltitude());
+    altitude = bmp.readAltitude();
+    Serial.print(altitude);
     Serial.print("			");
     //Serial.println(" meters");
+    Serial.print(altitude - int(altitude));
+    Serial.print("			");
 
     //Serial.print("Pressure at sealevel (calculated) = ");
     Serial.print(bmp.readSealevelPressure());
@@ -103,45 +105,6 @@ void loop() {
     digitalWrite(13, LOW);   // turn the LED off by making the voltage LOW 
     
     delay(500);
->>>>>>> 7d5a458a470c6a4a2318185b6635ef3d87400bf2
+
 }
   
-void loop() {
-    
-    Serial.print(bmp.readTemperature());
-    Serial.print("			");
-    //Serial.println(" *C");
-    
-    //Serial.print("Pressure = ");
-    Serial.print(bmp.readPressure());
-    Serial.print("			");
-    //Serial.println(" Pa");
-    
-    // Calculate altitude assuming 'standard' barometric
-    // pressure of 1013.25 millibar = 101325 Pascal
-    //Serial.print("Altitude = ");
-    Serial.print(bmp.readAltitude());
-    Serial.print("			");
-    //Serial.println(" meters");
-
-    //Serial.print("Pressure at sealevel (calculated) = ");
-    Serial.print(bmp.readSealevelPressure());
-    Serial.print("			");
-    //Serial.println(" Pa");
-
-  // you can get a more precise measurement of altitude
-  // if you know the current sea level pressure which will
-  // vary with weather and such. If it is 1015 millibars
-  // that is equal to 101500 Pascals.
-    //Serial.print("Real altitude = ");
-    Serial.print(bmp.readAltitude(101500));
-    Serial.print("			");
-    //Serial.println(" meters");
-    
-    Serial.println();
-    digitalWrite(13, HIGH);  // turn the LED on (HIGH is the voltage level)
-    delay(7000);                      // wait for a second
-    digitalWrite(13, LOW);   // turn the LED off by making the voltage LOW 
-    
-    delay(500);
-}
