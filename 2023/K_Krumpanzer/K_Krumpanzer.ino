@@ -24,13 +24,13 @@ void setup (){
 }
 void loop (){
 
-  Serial.print(bmp.readTemperature()-alt_inicial);
+  Serial.print(bmp.readTemperature());
   Serial.print("     ");
 
   Serial.print(bmp.readSealevelPressure());
   Serial.print("     ");
 
-  Serial.print(bmp.readAltitude());
+  Serial.print(bmp.readAltitude()-alt_inicial);
 
   Serial.println();
   delay(10);
