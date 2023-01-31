@@ -1,3 +1,23 @@
+/*
+  Blink
+  Turns an LED on for one second, then off for one second, repeatedly.
+  Most Arduinos have an on-board LED you can control. On the UNO, MEGA and ZERO
+  it is attached to digital pin 13, on MKR1000 on pin 6. LED_BUILTIN is set to
+  the correct LED pin independent of which board is used.
+  If you want to know what pin the on-board LED is connected to on your Arduino
+  model, check the Technical Specs of your board at:
+  https://www.arduino.cc/en/Main/Products
+  modified 8 May 2014
+  by Scott Fitzgerald
+  modified 2 Sep 2016
+  by Arturo Guadalupi
+  modified 8 Sep 2016
+  by Colby Newman
+  This example code is in the public domain.
+  https://www.arduino.cc/en/Tutorial/BuiltInExamples/Blink
+*/
+
+
 #include <Adafruit_BMP085.h>
 
 /*************************************************** 
@@ -21,8 +41,7 @@
 // XCLR is a reset pin, also not used here
 
 Adafruit_BMP085 bmp;
-float altitude;
-
+  
 void setup() {
   Serial.begin(115200);
   if (!bmp.begin()) {
@@ -30,26 +49,26 @@ void setup() {
 	while (1) {}
   }
   pinMode(13, OUTPUT);
-  Serial.print("Temperature (*C)     Pressure (Pa)      Altitude (m)     Altura(m)     Pressure at sealevel (calculated) (Pa)     Real altitude (m)");
+  Serial.print("Temperature (*C)     Pressure (Pa)      Altitude (meters)     Pressure at sealevel (calculated) (Pa)     Real altitude (meters)");
 }
   
 void loop() {
     
     Serial.print(bmp.readTemperature());
     Serial.print("			");
-
+    //Serial.println(" *C");
+    
+    //Serial.print("Pressure = ");
     Serial.print(bmp.readPressure());
     Serial.print("			");
-
+    //Serial.println(" Pa");
     
     // Calculate altitude assuming 'standard' barometric
     // pressure of 1013.25 millibar = 101325 Pascal
-    altitude = bmp.readAltitude();
-    Serial.print(altitude);
+    //Serial.print("Altitude = ");
+    Serial.print(bmp.readAltitude());
     Serial.print("			");
-
-    Serial.print(altitude - int(altitude));
-    Serial.print("			");
+    //Serial.println(" meters");
 
     //Serial.print("Pressure at sealevel (calculated) = ");
     Serial.print(bmp.readSealevelPressure());
