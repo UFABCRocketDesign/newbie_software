@@ -2,10 +2,11 @@
 #include <Adafruit_BMP085.h>
 
 Adafruit_BMP085 bmp;
-
+float alt = 0;
 
 void setup() {
 
+    
     Serial.begin(115200);
     if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
@@ -16,6 +17,8 @@ void setup() {
 
     // showing the header
     Serial.println("Temperature( Cº)                Pressure (Pa)                 Altitude (Meters)                  RealAltitude (Pa)");
+    
+    alt = bmp.readAltitude();
 }
 
 // the loop function runs over and over again forever
@@ -26,6 +29,7 @@ void loop() {
     delay(5000);   
   
     Serial.print(bmp.readTemperature());
+
     
     
     Serial.print("             ");
@@ -44,7 +48,8 @@ void loop() {
     // vary with weather and such. If it is 1015 millibars
     // that is equal to 101500 Pascals.
     Serial.print("             ");
-    Serial.print(bmp.readAltitude(101500));
+    Serial.print("%f - %f", alt, bmp.readAltitude(101500)); 
+    //Serial.print(bmp.readAltitude(101500));
     
     Serial.println();
     delay(500);
