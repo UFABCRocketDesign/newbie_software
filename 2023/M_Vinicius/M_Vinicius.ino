@@ -1,4 +1,4 @@
-// BPM085 SENSOR ( PRESSÃO / TEMPERATURA / ALTITUDE)
+// BPM085 SENSOR ( PRESSÃO / TEMPERATURA / ALTITUDE) 
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 
@@ -21,22 +21,23 @@ void loop() {
   delay(3000);
 
 
-  Serial.print ("Temperature =   ");
-  Serial.print ("Pressure =   ");
-  Serial.print("Altitude =  ");
-  Serial.println("Real altitude =   ");
+  Serial.print ("Temperature (*C) =   ");
+  Serial.print ("Pressure (Pa) =   ");
+  Serial.print("Altitude (meters) =  ");
+  Serial.println("Real altitude (meters) =   ");
 
   Serial.print(bmp.readTemperature());
-  Serial.print(" *C   ");
+  Serial.print("    ");
 
+//
   Serial.print(bmp.readPressure());
-  Serial.println(" Pa  ");
+  Serial.print("    ");
 
   Serial.print(bmp.readAltitude());
-  Serial.println(" meters  ");
+  Serial.print("    ");
 
   Serial.print(bmp.readAltitude(101500));
-  Serial.println("meters  ");
+  Serial.print("    ");
 
   Serial.println();
     delay(500); 
