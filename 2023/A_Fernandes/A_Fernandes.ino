@@ -24,7 +24,8 @@
 // XCLR is a reset pin, also not used here
 
 Adafruit_BMP085 bmp;
-float altitude, altitude_inicial;
+float altitude, altitude_inicial=0;
+int i;
 void setup() {
   Serial.begin(115200);
   if (!bmp.begin()) {
@@ -33,7 +34,11 @@ void setup() {
   }
   pinMode(13, OUTPUT);
   Serial.print("Temperature (*C)\t Pressure (Pa)\t Altitude (m)\t Altura(m)\t");
-  altitude_inicial = bmp.readAltitude();
+  for(i=0;i<5;i++){
+    altitude_inicial += bmp.readAltitude();
+  }
+  altitude_inicial = altitude_inicial/5;
+
 }
   
 void loop() {
