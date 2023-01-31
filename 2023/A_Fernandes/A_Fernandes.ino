@@ -84,6 +84,7 @@ void loop() {
     //Serial.print("Pressure at sealevel (calculated) = ");
     Serial.print(bmp.readSealevelPressure());
     Serial.print("			");
+    
     //Serial.println(" Pa");
 
   // you can get a more precise measurement of altitude
