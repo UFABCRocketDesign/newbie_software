@@ -3,6 +3,7 @@
 
 Adafruit_BMP085 bmp;
 float alt = 0;
+float altV = 0;
 
 void setup() {
 
@@ -23,10 +24,6 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-    delay(5000);                       // wait for a second
-    digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-    delay(5000);   
   
     Serial.print(bmp.readTemperature());
 
@@ -48,7 +45,8 @@ void loop() {
     // vary with weather and such. If it is 1015 millibars
     // that is equal to 101500 Pascals.
     Serial.print("             ");
-    Serial.print("%f - %f", alt, bmp.readAltitude(101500)); 
+    altV = (bmp.readAltitude(101500)) - alt;
+    Serial.print(altV); 
     //Serial.print(bmp.readAltitude(101500));
     
     Serial.println();
