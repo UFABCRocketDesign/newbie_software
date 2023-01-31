@@ -2,6 +2,7 @@
 Adafruit_BMP085 bmp;
 
 float alt_inicial; 
+float b_alt; 
 int i;
 
 void setup (){
@@ -18,19 +19,19 @@ void setup (){
   Serial.println("Altitude  =     ");
 
   for(i=0; i<5; i++){
-    alt_inicial += bmp.readAltitude();
+    b_alt += bmp.readAltitude();
   } 
- 
+ alt_inicial = b_alt/5;
 }
 void loop (){
 
-  Serial.print(bmp.readTemperature()-alt_inicial);
+  Serial.print(bmp.readTemperature());
   Serial.print("     ");
 
   Serial.print(bmp.readSealevelPressure());
   Serial.print("     ");
 
-  Serial.print(bmp.readAltitude());
+  Serial.print(bmp.readAltitude()-alt_inicial);
 
   Serial.println();
   delay(10);

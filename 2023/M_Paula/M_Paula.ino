@@ -31,20 +31,21 @@ void setup (){
   } 
    alt_inicial = soma /5;
   Serial.print("Temperature (*C) ");
-  Serial.print("Altitude (meters) ");
+  Serial.print("Altitude com ruido (meters) ");
+  Serial.print("Altitude sem ruido (meters) ");
   Serial.println("Pressure at sealevel (Pa)");
 } 
 //----------------------------------------------------------------------
 void loop (){
-  digitalWrite(13,HIGH);
-  delay(3000);
-  digitalWrite(13,LOW);
-  delay(2000);
   //medicoes           
     Serial.print(bmp.readTemperature());
     Serial.print("                 ");
-    Serial.print(media_movel(bmp.readAltitude() - alt_inicial));
+    float altura_com_ruido = bmp.readAltitude() - alt_inicial;
+    Serial.print(altura_com_ruido);
     Serial.print("                  ");
-    Serial.print(bmp.readSealevelPressure());
+    float altura_sem_ruido = media_movel(bmp.readAltitude() - alt_inicial);
+    Serial.print(altura_sem_ruido);
+    Serial.print("                  ");
+    Serial.print(bmp.readPressure());
     Serial.println();
 }
