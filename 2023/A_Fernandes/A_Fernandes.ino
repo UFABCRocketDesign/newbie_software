@@ -24,7 +24,7 @@
 // XCLR is a reset pin, also not used here
 
 Adafruit_BMP085 bmp;
-float altitude;
+float altitude, altitude_inicial;
 void setup() {
   Serial.begin(115200);
   if (!bmp.begin()) {
@@ -32,17 +32,18 @@ void setup() {
 	while (1) {}
   }
   pinMode(13, OUTPUT);
-  Serial.print("Temperature (*C)     Pressure (Pa)      Altitude (m)     Altura(m)     Pressure at sealevel (calculated) (Pa)     Real altitude (m)");
+  Serial.print("Temperature (*C)\t Pressure (Pa)\t Altitude (m)\t Altura(m)\t");
+  altitude_inicial = bmp.readAltitude();
 }
   
 void loop() {
     Serial.println();
     Serial.print(bmp.readTemperature());
-    Serial.print("			");
+    Serial.print("\t");
 
   
     Serial.print(bmp.readPressure());
-    Serial.print("			");
+    Serial.print("\t");
    
     
     // Calculate altitude assuming 'standard' barometric
@@ -50,14 +51,14 @@ void loop() {
     //Serial.print("Altitude = ");
     altitude = bmp.readAltitude();
     Serial.print(altitude);
-    Serial.print("			");
+    Serial.print("\t");
     //Serial.println(" meters");
-    Serial.print(altitude - int(altitude));
-    Serial.print("			");
+    Serial.print(altitude - altitude_inicial);
+    Serial.print("\t");
 
     //Serial.print("Pressure at sealevel (calculated) = ");
-    Serial.print(bmp.readSealevelPressure());
-    Serial.print("			");
+    //Serial.print(bmp.readSealevelPressure());
+    //Serial.print("\t");
 
 
   // you can get a more precise measurement of altitude
@@ -65,8 +66,8 @@ void loop() {
   // vary with weather and such. If it is 1015 millibars
   // that is equal to 101500 Pascals.
     //Serial.print("Real altitude = ");
-    Serial.print(bmp.readAltitude(101500));
-    Serial.print("			");
+    //Serial.print(bmp.readAltitude(101500));
+    //Serial.print("\t");
 
     
     Serial.println();
