@@ -1,8 +1,21 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
-#define n_media  5
 float alt_inicial;
-float Pressao_1;
+#define n_media  5
+#define num  10
+float values[num];
+float media_movel(float sinal){
+  int i;
+  float acc = 0;
+  values [0] = sinal;
+  for(i = num; i > 0; i--){
+    values [i] = values [i-1];
+  }
+  for(i = num; i < num; i++){
+    acc += values [i];
+  }
+  return acc/num;
+}
 //----------------------------------------------------------------------
 void setup (){
   float soma = 0;
@@ -30,10 +43,8 @@ void loop (){
   //medicoes           
     Serial.print(bmp.readTemperature());
     Serial.print("                 ");
-    if(((bmp.readAltitude() - alt_inicial) == alt_inicial + 0.1) || ((bmp.readAltitude() - alt_inicial) == alt_inicial - 0.1)){
-      Serial.print(bmp.readAltitude() - alt_inicial);
-      Serial.print("                  ");
-    }
+    Serial.print(media_movel(bmp.readAltitude() - alt_inicial));
+    Serial.print("                  ");
     Serial.print(bmp.readSealevelPressure());
     Serial.println();
 }
