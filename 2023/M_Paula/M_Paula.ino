@@ -11,7 +11,7 @@ float media_movel(float sinal){
     values [i] = values [i-1];
   }
   values [0] = sinal;
-  for(i = num; i < num; i++){
+  for(i = 0; i < num; i++){
     acc += values [i];
   }
   return acc/num;
@@ -39,13 +39,13 @@ void setup (){
 void loop (){
   //medicoes           
     Serial.print(bmp.readTemperature());
-    Serial.print("                 ");
+    Serial.print("\t");
     float altura_com_ruido = bmp.readAltitude() - alt_inicial;
     Serial.print(altura_com_ruido);
-    Serial.print("                  ");
+    Serial.print("\t");
     float altura_sem_ruido = media_movel(altura_com_ruido);
     Serial.print(altura_sem_ruido);
-    Serial.print("                  ");
+    Serial.print("\t");
     Serial.print(bmp.readPressure());
     Serial.println();
 }
