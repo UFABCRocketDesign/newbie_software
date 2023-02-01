@@ -2,12 +2,12 @@
 #include <Adafruit_BMP085.h>
 
 Adafruit_BMP085 bmp;
-float alt = 0;
-float altV = 0;
+float alt_sem_ruido = 0;
+float values[49];
+float alt_average = 0;
 
 void setup() {
 
-    
     Serial.begin(115200);
     if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
@@ -16,30 +16,29 @@ void setup() {
     // initialize digital pin LED_BUILTIN as an output.
     pinMode(LED_BUILTIN, OUTPUT);
 
+
+    // calculating average altitude value's
+    for(int i = 0; i < 49; i++){
+      values[i] = bmp.readAltitude();
+      alt_average = alt_average + values[i];
+    }
+    alt_average = alt_average/50;
+
     // showing the header
-    Serial.println("Temperature( Cº)                Pressure (Pa)                 Altitude (Meters)                  RealAltitude (Pa)");
+    Serial.println("Temperature( Cº)\tPressure (Pa)\tAltitude_sem_ruido");
     
-    alt = bmp.readAltitude();
 }
 
-// the loop function runs over and over again forever
+//----------------------------------------------------------------------------------------------------
 void loop() {
-  
     Serial.print(bmp.readTemperature());
 
-    Serial.print("             ");
+    Serial.print("\t");
     Serial.print(bmp.readPressure());
     
-    Serial.print("           ");
-    altV = (bmp.readAltitude()) - alt;
-    Serial.print(altV);
+    Serial.print("\t");
+    alt_sem_ruido = (bmp.readAltitude()) - alt_average;
+    Serial.print(alt_sem_ruido);
 
-    //Serial.print("        ");
-    //Serial.print(bmp.readSealevelPressure());
-
-    //Serial.print("             ");
-     
     Serial.println();
-    delay(500);
-    // wait for a second
 }
