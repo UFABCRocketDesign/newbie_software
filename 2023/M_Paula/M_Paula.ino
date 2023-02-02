@@ -5,12 +5,24 @@ Adafruit_BMP085 bmp;
 float alt_inicial;
 float values[num];
 //----------------------------------------------------------------------
-float media_movel(float sinal){
+float media_movel_1(float sinal_com_ruido){
   float acc = 0;
   for(int i = num-1; i > 0; i--){
     values [i] = values [i-1];
   }
-  values [0] = sinal;
+  values [0] = sinal_com_ruido;
+  for(int i = 0; i < num; i++){
+  acc += values [i];
+  }
+  return acc/num;
+}
+//----------------------------------------------------------------------
+float media_movel_2(float sinal_sem_ruido){
+  float acc = 0;
+  for(int i = num-1; i > 0; i--){
+    values [i] = values [i-1];
+  }
+  values [0] = sinal_sem_ruido;
   for(int i = 0; i < num; i++){
   acc += values [i];
   }
@@ -34,7 +46,7 @@ void setup (){
   Serial.print("Altura com ruido (meters) ");
   Serial.print("Altura sem ruido (meters) ");
   Serial.println("Pressão (Pa)");
-} 
+}
 //----------------------------------------------------------------------
 void loop (){
   //medicoes           
@@ -43,10 +55,7 @@ void loop (){
     float altura_com_ruido = bmp.readAltitude() - alt_inicial;
     Serial.print(altura_com_ruido);
     Serial.print("\t");
-    float altura_sem_ruido;
-    for(int i = 0; i > num; i++){
-      altura_sem_ruido = media_movel(altura_sem_ruido);
-    }
+    float altura_sem_ruido = media_movel_2(media_movel_1(altura_com_ruido));
     Serial.print(altura_sem_ruido);
     Serial.print("\t");
     Serial.print(bmp.readPressure());
