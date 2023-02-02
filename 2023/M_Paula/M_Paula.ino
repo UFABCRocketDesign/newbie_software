@@ -5,13 +5,15 @@ Adafruit_BMP085 bmp;
 float alt_inicial;
 float values[num];
 float media_movel(float sinal){
-  int i;
   float acc = 0;
-  for(i = num-1; i > 0; i--){
+  for(int j = num -1; j > 0;j--){
+    values [j] = values [j-1];
+    for(int i = num-1; i > 0; i--){
     values [i] = values [i-1];
+    }
   }
   values [0] = sinal;
-  for(i = 0; i < num; i++){
+  for(int i = 0; i < num; i++){
     acc += values [i];
   }
   return acc/num;
