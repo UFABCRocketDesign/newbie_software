@@ -1,7 +1,7 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 #define n_media  5
-#define num  10
+#define num  50
 float alt_inicial;
 float values[num];
 float media_movel(float sinal){
@@ -30,10 +30,10 @@ void setup (){
     soma = soma + bmp.readAltitude();
   } 
    alt_inicial = soma /5;
-  Serial.print("Temperature (*C) ");
+  Serial.print("Temperatura (*C) ");
   Serial.print("Altura com ruido (meters) ");
   Serial.print("Altura sem ruido (meters) ");
-  Serial.println("Pressure at sealevel (Pa)");
+  Serial.println("Pressão (Pa)");
 } 
 //----------------------------------------------------------------------
 void loop (){
