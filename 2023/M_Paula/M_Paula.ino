@@ -3,16 +3,17 @@ Adafruit_BMP085 bmp;
 #define n_media  5
 #define num  50
 float alt_inicial;
-float values[num];
+float values_1[num];
+float values_2[num];
 //----------------------------------------------------------------------
 float media_movel_1(float sinal_com_ruido){
   float acc = 0;
   for(int i = num-1; i > 0; i--){
-    values [i] = values [i-1];
+    values_1[i] = values_1[i-1];
   }
-  values [0] = sinal_com_ruido;
+  values_1[0] = sinal_com_ruido;
   for(int i = 0; i < num; i++){
-  acc += values [i];
+  acc += values_1[i];
   }
   return acc/num;
 }
@@ -20,11 +21,11 @@ float media_movel_1(float sinal_com_ruido){
 float media_movel_2(float sinal_sem_ruido){
   float acc = 0;
   for(int i = num-1; i > 0; i--){
-    values [i] = values [i-1];
+    values_2[i] = values_2[i-1];
   }
-  values [0] = sinal_sem_ruido;
+  values_2[0] = sinal_sem_ruido;
   for(int i = 0; i < num; i++){
-  acc += values [i];
+  acc += values_2[i];
   }
   return acc/num;
 }
