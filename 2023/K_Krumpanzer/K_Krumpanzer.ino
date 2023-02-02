@@ -49,8 +49,10 @@ void loop (){
   Serial.print("\t");
 
   float altura = bmp.readAltitude() - alt_inicial;
-  Serial.print(altura, "\t");
+  Serial.print(altura);
+  Serial.print("\t");
   float altura_filtrada = filtro(altura);
+  Serial.print(altura_filtrada);
 
   Serial.println();
   delay(10);
