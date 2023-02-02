@@ -1,9 +1,24 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 
-float alt_inicial[5]; 
-float b_alt; 
+float alt_inicial; 
+float soma; 
 int i;
+
+float filtro(float med_movel) {
+    float media = 0;
+    int qtd_media = 5;
+
+    if (qtd_media == 0 or qtd_media == 35) {
+      qtd_media = 5;
+      media = 0;
+    }
+
+    media += (med_movel - media) / qtd_media++;
+
+    return media;
+}
+
 
 void setup (){
   Serial.begin(115200);
@@ -14,14 +29,15 @@ void setup (){
   }
 
 
-  Serial.print("Temperature  = \t");
-  Serial.print("Pressure  = \t");
-  Serial.println("Altitude  = ");
+  Serial.print("Temperatura (°C) = \t");
+  Serial.print("Pressão (Pa) = \t");
+  Serial.print("Altitude (m) = \t");
+  Serial.println("Altitude com filtro (m) =");
 
   for(i=0; i<5; i++){
-    b_alt += bmp.readAltitude();
+    soma += bmp.readAltitude();
   } 
- alt_inicial[5] = b_alt/5;
+ alt_inicial = soma/5;
 
 }
 void loop (){
@@ -32,7 +48,9 @@ void loop (){
   Serial.print(bmp.readSealevelPressure());
   Serial.print("\t");
 
-  Serial.print(bmp.readAltitude()-alt_inicial[0]);
+  float altura = bmp.readAltitude() - alt_inicial;
+  Serial.print(altura, "\t");
+  float altura_filtrada = filtro(altura);
 
   Serial.println();
   delay(10);
