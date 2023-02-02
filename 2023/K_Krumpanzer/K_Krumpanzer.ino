@@ -6,11 +6,11 @@ float soma;
 int i;
 
 float filtro(float med_movel) {
-    float media = 0;
-    int qtd_media = 5;
+    float static media = 0;
+    int static qtd_media = 1;
 
-    if (qtd_media == 0 or qtd_media == 35) {
-      qtd_media = 5;
+    if (qtd_media == 0 or qtd_media == 33) {
+      qtd_media = 1;
       media = 0;
     }
 
