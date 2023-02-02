@@ -1,7 +1,7 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 #define n_media  5
-#define num  50
+#define num  10
 float alt_inicial;
 float values_1[num];
 float values_2[num];
@@ -56,8 +56,11 @@ void loop (){
     float altura_com_ruido = bmp.readAltitude() - alt_inicial;
     Serial.print(altura_com_ruido);
     Serial.print("\t");
-    float altura_sem_ruido = media_movel_2(media_movel_1(altura_com_ruido));
-    Serial.print(altura_sem_ruido);
+    float altura_sem_ruido_1= media_movel_1(altura_com_ruido);
+    Serial.print(altura_sem_ruido_1);
+    Serial.print("\t");
+    float altura_sem_ruido_2= media_movel_2(altura_sem_ruido_1);
+    Serial.print(altura_sem_ruido_2);
     Serial.print("\t");
     Serial.print(bmp.readPressure());
     Serial.println();
