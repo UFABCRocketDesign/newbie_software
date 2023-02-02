@@ -4,17 +4,15 @@ Adafruit_BMP085 bmp;
 #define num  50
 float alt_inicial;
 float values[num];
+//----------------------------------------------------------------------
 float media_movel(float sinal){
   float acc = 0;
-  for(int j = num -1; j > 0;j--){
-    values [j] = values [j-1];
-    for(int i = num-1; i > 0; i--){
+  for(int i = num-1; i > 0; i--){
     values [i] = values [i-1];
-    }
   }
   values [0] = sinal;
   for(int i = 0; i < num; i++){
-    acc += values [i];
+  acc += values [i];
   }
   return acc/num;
 }
@@ -45,7 +43,10 @@ void loop (){
     float altura_com_ruido = bmp.readAltitude() - alt_inicial;
     Serial.print(altura_com_ruido);
     Serial.print("\t");
-    float altura_sem_ruido = media_movel(altura_com_ruido);
+    float altura_sem_ruido;
+    for(int i = 0; i > num; i++){
+      altura_sem_ruido = media_movel(altura_sem_ruido);
+    }
     Serial.print(altura_sem_ruido);
     Serial.print("\t");
     Serial.print(bmp.readPressure());
