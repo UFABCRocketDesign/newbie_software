@@ -5,7 +5,10 @@ Adafruit_BMP085 bmp;
 float alt_inicial;
 float values_1[num];
 float values_2[num];
-//----------------------------------------------------------------------
+
+
+
+//filtragem da altura com ruido
 float media_movel_1(float sinal_com_ruido){
   float acc = 0;
   for(int i = num-1; i > 0; i--){
@@ -17,7 +20,9 @@ float media_movel_1(float sinal_com_ruido){
   }
   return acc/num;
 }
-//----------------------------------------------------------------------
+
+
+//filtragem de altura sem ruido
 float media_movel_2(float sinal_sem_ruido){
   float acc = 0;
   for(int i = num-1; i > 0; i--){
@@ -29,7 +34,9 @@ float media_movel_2(float sinal_sem_ruido){
   }
   return acc/num;
 }
-//----------------------------------------------------------------------
+
+
+
 void setup (){
   float soma = 0;
   Serial.begin(115200);
@@ -38,17 +45,20 @@ void setup (){
 	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
 	while (1) {}
   }
-
+  //cálculo da altura inicial
   for(int i = 0; i < n_media; ++i){
     soma = soma + bmp.readAltitude();
   } 
    alt_inicial = soma /5;
+  //print dos rótulos das medicoes
   Serial.print("Temperatura (*C) ");
   Serial.print("Altura com ruido (meters) ");
   Serial.print("Altura sem ruido (meters) ");
   Serial.println("Pressão (Pa)");
 }
-//----------------------------------------------------------------------
+
+
+
 void loop (){
   //medicoes           
     Serial.print(bmp.readTemperature());
