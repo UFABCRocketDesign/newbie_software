@@ -3,17 +3,15 @@
 
 Adafruit_BMP085 bmp;
 
-#define nmax 5
 
 float alt_inicial;
 float soma;
 int i;
-int index = 0;
-float valor = 0;
-float sum = 0;
-int leituras[nmax];
-float media = 0;
 int j = 0;
+float sum = 0;
+int valores[5];
+float media = 0;
+float altura = 0;
 float altura_sem_ruido = 0;
 
 void setup() {
@@ -39,25 +37,27 @@ void setup() {
 
 void loop() {
 
-  for(j; j < nmax; j++){
-    valor = bmp.readAltitude();
-    leituras[index] = valor;
-    sum += valor;
+  altura = bmp.readAltitude();
 
-     if(index == nmax){
-      sum += leituras[index];
-      sum -= leituras[0];
+  for(j=0; j < 5; j++){
+    valores[j] = bmp.readAltitude();
+    valores[j] = valores[j+1];
+    sum += valores[j+1];
+
+     if(j == 5){
+      sum += valores[j];
+      sum -= valores[0];
     }
   }
  
-  media = sum/nmax;
-  altura_sem_ruido = bmp.readAltitude() - media;
+  media = sum/j;
+  altura_sem_ruido = altura - media;
   
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
   Serial.print(bmp.readSealevelPressure());
   Serial.print("\t");
-  Serial.print(bmp.readAltitude() - alt_inicial);
+  Serial.print(altura - alt_inicial);
   Serial.print("\t");
   Serial.print(altura_sem_ruido);
 
