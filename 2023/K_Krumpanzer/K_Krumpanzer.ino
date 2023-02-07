@@ -1,24 +1,21 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 
+#define n 10
+
 float alt_inicial; 
 float soma; 
 int i;
+int num[n];
 
-float filtro(float med_movel) {
-    float static media = 0;
-    int static qtd_media = 1;
+long filtro(float medmovel){
+  for(i = n-1; i>0; i--) num[i] = num[i-1];
+  num[0] = alt_inicial;
+  medmovel = 0;
+  for(i=0; i<n; i++) medmovel += num[i];
 
-    if (qtd_media == 0 or qtd_media == 33) {
-      qtd_media = 1;
-      media = 0;
-    }
-
-    media += (med_movel - media) / qtd_media++;
-
-    return media;
+  return medmovel/n;
 }
-
 
 void setup (){
   Serial.begin(115200);
