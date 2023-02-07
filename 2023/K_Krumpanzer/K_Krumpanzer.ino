@@ -6,15 +6,15 @@ Adafruit_BMP085 bmp;
 float alt_inicial; 
 float soma; 
 int i;
-int num[n];
+float num[n];
 
-long filtro(float medmovel){
+long filtro(){
   for(i = n-1; i>0; i--) num[i] = num[i-1];
   num[0] = alt_inicial;
-  medmovel = 0;
-  for(i=0; i<n; i++) medmovel += num[i];
+  float acc = 0;
+  for(i=0; i<n; i++) acc += num[i];
 
-  return medmovel/n;
+  return acc/n;
 }
 
 void setup (){
