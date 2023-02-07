@@ -1,7 +1,7 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 
-#define n 10
+#define n 30
 
 float alt_inicial; 
 float soma; 
