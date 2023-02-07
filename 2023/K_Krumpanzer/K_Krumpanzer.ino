@@ -8,9 +8,9 @@ float soma;
 int i;
 float num[n];
 
-long filtro(float mediamovel){
+float filtro(float mediamovel){
   for(i = n-1; i>0; i--) num[i] = num[i-1];
-  num[0] = alt_inicial;
+  num[0] = mediamovel;
   float acc = 0;
   for(i=0; i<n; i++) acc += num[i];
 
@@ -35,7 +35,6 @@ void setup (){
     soma += bmp.readAltitude();
   } 
  alt_inicial = soma/5;
-
 }
 void loop (){
 
@@ -54,3 +53,4 @@ void loop (){
   Serial.println();
   delay(10);
 }
+
