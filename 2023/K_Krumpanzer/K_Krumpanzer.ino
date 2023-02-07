@@ -8,7 +8,7 @@ float soma;
 int i;
 float num[n];
 
-long filtro(){
+long filtro(float mediamovel){
   for(i = n-1; i>0; i--) num[i] = num[i-1];
   num[0] = alt_inicial;
   float acc = 0;
