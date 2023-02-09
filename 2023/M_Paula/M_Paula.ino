@@ -1,10 +1,16 @@
+//Importando Bibliotecas
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
+
+
+
+//Declaração de variáveis
 #define n_media 5
 #define num 10
 float alt_inicial;
 float values_1[num];
 float values_2[num];
+float values_3[num];
 
 
 
@@ -22,6 +28,7 @@ float media_movel_1(float sinal_com_ruido) {
 }
 
 
+
 //filtragem de altura sem ruido
 float media_movel_2(float sinal_sem_ruido) {
   float acc = 0;
@@ -33,6 +40,24 @@ float media_movel_2(float sinal_sem_ruido) {
     acc += values_2[i];
   }
   return acc / num;
+}
+
+
+
+//Detecção de queda
+float queda(float sinal_sem_ruido_2) {
+  int acc = 0;
+  values_3[0] = sinal_sem_ruido_2;
+  for (int i = num - 1; i > 0; i--) {
+    if(values_3[i] < values_3[i-1]){
+      acc ++;
+    }
+  }
+  if(acc ++ == 10){
+    return(Serial.println("Queda!!"));
+  }else{
+    return(Serial.println("Estável"));
+  }
 }
 
 
@@ -69,6 +94,8 @@ void loop() {
   float altura_sem_ruido_1 = media_movel_1(altura_com_ruido);
   float altura_sem_ruido_2 = media_movel_2(altura_sem_ruido_1);
   float temperatura = bmp.readTemperature();
+  float pressao = bmp.readPressure();
+  float situacao = queda(altura_sem_ruido_2);
   
   //impressão dos dados
   Serial.print(temperatura);
@@ -79,6 +106,9 @@ void loop() {
   Serial.print("\t");
   Serial.print(altura_sem_ruido_2);
   Serial.print("\t");
-  Serial.print(bmp.readPressure());
+  Serial.print(pressao);
+  Serial.print("\t");
+  Serial.print(situacao);
   Serial.println();
+
 }
