@@ -12,14 +12,31 @@ void setup() {
   Serial.print ("Pressure (Pa) \t");
   Serial.print("Altitude (meters) \t");
   Serial.println("Real altitude (meters)");
-  int w, i;
+  int w, i, soma;
   float alt_in = 0;
   float vetor[100];
-  w = 0; 
+   
 
-  while (w<100) {
+  
+  if (!bmp.begin()) {
+    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+    while (1) {}
+
+    
+  }
+}
+
+void loop() {
+
+
+  // FILTRO DE ALTITUDE
+    
+    w = 0;
+    soma = 0;
+
+   while (w<100) {
      
-    for (i = 0, i<5, i++) {
+    for (int i = 0, i<5, i++) {
       alt_in = alt_in + bmp.readAltitude();
     }
 
@@ -32,24 +49,12 @@ void setup() {
 
   }
 
-  int soma = 0;
-
   for (i=0, i<100, i++)
   {
     soma = soma + vetor[i];
   }
 
   alt_in = soma/100;
-
-  if (!bmp.begin()) {
-    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-    while (1) {}
-
-    
-  }
-}
-
-void loop() {
 
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
