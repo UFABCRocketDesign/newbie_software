@@ -45,7 +45,7 @@ float media_movel_2(float sinal_sem_ruido) {
 
 
 //Detecção de queda
-float queda(float sinal_sem_ruido_2) {
+int queda(float sinal_sem_ruido_2) {
   int acc = 0;
   values_3[0] = sinal_sem_ruido_2;
   for (int i = num - 1; i > 0; i--) {
@@ -54,9 +54,9 @@ float queda(float sinal_sem_ruido_2) {
     }
   }
   if(acc == 10){
-    return(Serial.println("Queda!!"));
+    return 1;
   }else{
-    return(Serial.println("Estável"));
+    return 0;
   }
 }
 
