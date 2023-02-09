@@ -65,10 +65,11 @@ void loop() {
     soma_altura=0;
     //altura sem ruido teste
     for(i=0;i<5;i++){
-      soma_altura += bmp.readAltitude();
+      altitude = bmp.readAltitude();
+      soma_altura += altitude - altitude_inicial;
     }
-    soma_altura = soma_altura/5;
-    sem_ruido = altura - soma_altura;
+    sem_ruido = soma_altura/5;
+    //sem_ruido = altura - soma_altura;
     Serial.print(sem_ruido);
     Serial.print("\t");
 
