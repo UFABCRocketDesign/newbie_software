@@ -12,14 +12,34 @@ void setup() {
   Serial.print ("Pressure (Pa) \t");
   Serial.print("Altitude (meters) \t");
   Serial.println("Real altitude (meters)");
-  
+  int w, i;
   float alt_in = 0;
+  float vetor[100];
+  w = 0; 
 
-  for (i = 0, i<6, i++) {
-    alt_in = alt_in + bmp.readAltitude();
+  while (w<100) {
+     
+    for (i = 0, i<5, i++) {
+      alt_in = alt_in + bmp.readAltitude();
+    }
+
+    alt_in = alt_in/5;
+    vetor[w] = alt_in;
+    
+    alt_in = 0;
+
+    w++;
+
   }
 
-  alt_in = alt_in/6;
+  int soma = 0;
+
+  for (i=0, i<100, i++)
+  {
+    soma = soma + vetor[i];
+  }
+
+  alt_in = soma/100;
 
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
