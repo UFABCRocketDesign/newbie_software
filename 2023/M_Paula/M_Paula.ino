@@ -53,7 +53,7 @@ float queda(float sinal_sem_ruido_2) {
       acc ++;
     }
   }
-  if(acc ++ == 10){
+  if(acc == 10){
     return(Serial.println("Queda!!"));
   }else{
     return(Serial.println("Estável"));
@@ -83,7 +83,8 @@ void setup() {
   Serial.print("Temperatura (*C) ");
   Serial.print("Altura com ruido (meters) ");
   Serial.print("Altura sem ruido (meters) ");
-  Serial.println("Pressão (Pa)");
+  Serial.print("Pressão (Pa)");
+  Serial.println("Situação");
 }
 
 
