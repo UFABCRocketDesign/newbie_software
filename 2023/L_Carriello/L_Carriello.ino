@@ -62,6 +62,7 @@ void loop() {
   Serial.print(alt0);
   Serial.print("\t");
   Serial.print(altura_sem_ruido);
+  Serial.print(sum);
 
   Serial.println();
   delay(10);
