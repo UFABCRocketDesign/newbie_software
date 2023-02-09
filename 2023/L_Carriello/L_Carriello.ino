@@ -13,6 +13,8 @@ int valores[5];
 float media = 0;
 float altura = 0;
 float altura_sem_ruido = 0;
+float alt0 = 0;
+
 
 void setup() {
   pinMode(13, OUTPUT);
@@ -38,12 +40,12 @@ void setup() {
 void loop() {
 
   altura = bmp.readAltitude();
-
+  alt0 = altura - alt_inicial;
   for(j=0; j < 5; j++){
-    valores[j] = bmp.readAltitude();
-    valores[j] = valores[j+1];
+    valores[j] = altura;
     sum += valores[j+1];
-
+    valores[j] = valores[j+1];
+    
      if(j == 5){
       sum += valores[j];
       sum -= valores[0];
@@ -57,7 +59,7 @@ void loop() {
   Serial.print("\t");
   Serial.print(bmp.readSealevelPressure());
   Serial.print("\t");
-  Serial.print(altura - alt_inicial);
+  Serial.print(alt0);
   Serial.print("\t");
   Serial.print(altura_sem_ruido);
 
