@@ -71,7 +71,7 @@ void loop() {
       soma_altura += v[i];
     }
     v[0] = altura;
-    soma_altura += 3;
+    soma_altura += v[0];
 
     sem_ruido = soma_altura/5;
     //sem_ruido = altura - soma_altura;
