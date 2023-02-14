@@ -42,7 +42,7 @@ void loop() {
   altura = bmp.readAltitude();
   alt0 = altura - alt_inicial;
 
-
+  sum = 0;
   for(j=0; j < 6; j++){
     valores[j] = altura;
     sum += valores[j];
