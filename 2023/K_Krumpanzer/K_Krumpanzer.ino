@@ -41,7 +41,7 @@ void setup (){
   Serial.print("Temperatura (°C) = \t");
   Serial.print("Pressão (Pa) = \t");
   Serial.print("Altitude (m) = \t");
-  Serial.println("Altitude com filtro (m) =");
+  Serial.println("Altitude com filtro (m) = \t");
   Serial.println("Altitude com filtro 2 (m) =");
 
   for(i=0; i<5; i++){
@@ -65,12 +65,16 @@ void loop (){
   Serial.print("\t");
   float altura_filtrada2 = filtro2(altura_filtrada);
   Serial.print(altura_filtrada2);
+  Serial.print("\t");  
+
 
   for(i = n1-1; i>0; i--)num3[i] = num3[i-1];
   num3[0] = altura_filtrada2;
 
-  if(num3[0]>num3[1]>num3[2]){
-  Serial.print("A altura está caindo!");
+  if(num3[0]>num3[1]>num3[2]>num3[3]>num3[4]){
+  Serial.print("0");
+  }else{
+    Serial.print("1");
   }
 
 
