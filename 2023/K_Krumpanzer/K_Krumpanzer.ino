@@ -5,7 +5,7 @@ Adafruit_BMP085 bmp;
 
 float alt_inicial; 
 float soma; 
-int i, j;
+int i;
 float num[n];
 float num2[n];
 
