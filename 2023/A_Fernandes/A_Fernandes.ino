@@ -24,7 +24,7 @@
 // XCLR is a reset pin, also not used here
 
 Adafruit_BMP085 bmp;
-float altitude, altitude_inicial=0, altura, soma_altura=0, sem_ruido;
+float altitude, altitude_inicial=0, altura, soma_altura=0, sem_ruido, v[5];
 int i;
 void setup() {
   Serial.begin(115200);
@@ -57,18 +57,23 @@ void loop() {
     altitude = bmp.readAltitude();
     Serial.print(altitude);
     Serial.print("\t");
-    //Serial.println(" meters");
+  
+
+
     altura = altitude - altitude_inicial;
     Serial.print(altura);
     Serial.print("\t");
 
     soma_altura=0;
     //altura sem ruido teste
-    for(i=0;i<15;i++){
-      altitude = bmp.readAltitude();
-      soma_altura += altitude - altitude_inicial;
+    for(i=4;i>0;i--){
+      v[i] = v[i-1]; 
+      soma_altura += v[i];
     }
-    sem_ruido = soma_altura/15;
+    v[0] = altura;
+    soma_altura += 3;
+
+    sem_ruido = soma_altura/5;
     //sem_ruido = altura - soma_altura;
     Serial.print(sem_ruido);
     Serial.print("\t");
@@ -89,5 +94,5 @@ void loop() {
     
     Serial.println();
 
-    delay(50);
+    
 }
