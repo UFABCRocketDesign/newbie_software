@@ -1,12 +1,58 @@
-void setup() {
-  // initialize digital pin LED_BUILTIN as an output.
-  pinMode(LED_BUILTIN, OUTPUT);
-}
+#include <Adafruit_BMP085.h>
 
-// the loop function runs over and over again forever
+
+Adafruit_BMP085 bmp;
+  
+void setup() {
+  Serial.begin(9600);
+  if (!bmp.begin()) {
+	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+	while (1) {}
+  }
+}
+  
 void loop() {
-  digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
-  delay(1000);                      // wait for a second
-  digitalWrite(LED_BUILTIN, LOW);   // turn the LED off by making the voltage LOW
-  delay(1000);                      // wait for a second
+    Serial.print("Temperature = ");
+    Serial.print(bmp.readTemperature());
+    Serial.println(" *C");
+    digitalWrite(LED_BUILTIN, HIGH); 
+    delay(1000);
+    digitalWrite(LED_BUILTIN, LOW);  
+    delay(1000); 
+    
+    Serial.print("Pressure = ");
+    Serial.print(bmp.readPressure());
+    Serial.println(" Pa");
+    digitalWrite(LED_BUILTIN, HIGH); 
+    delay(1000);
+    digitalWrite(LED_BUILTIN, LOW);  
+    delay(1000); 
+    
+    Serial.print("Altitude = ");
+    Serial.print(bmp.readAltitude());
+    Serial.println(" meters");
+    digitalWrite(LED_BUILTIN, HIGH); 
+    delay(1000);
+    digitalWrite(LED_BUILTIN, LOW);  
+    delay(1000); 
+
+    Serial.print("Pressure at sealevel (calculated) = ");
+    Serial.print(bmp.readSealevelPressure());
+    Serial.println(" Pa");
+    digitalWrite(LED_BUILTIN, HIGH); 
+    delay(1000);
+    digitalWrite(LED_BUILTIN, LOW);  
+    delay(1000); 
+
+
+    Serial.print("Real altitude = ");
+    Serial.print(bmp.readAltitude(101500));
+    Serial.println(" meters");
+    digitalWrite(LED_BUILTIN, HIGH); 
+    delay(1000);
+    digitalWrite(LED_BUILTIN, LOW);  
+    delay(1000); 
+    
+    Serial.println();
+    delay(500);
 }

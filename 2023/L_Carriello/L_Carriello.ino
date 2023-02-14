@@ -41,9 +41,11 @@ void loop() {
 
   altura = bmp.readAltitude();
   alt0 = altura - alt_inicial;
-  for(j=0; j < 5; j++){
+
+  sum = 0;
+  for(j=0; j < 6; j++){
     valores[j] = altura;
-    sum += valores[j+1];
+    sum += valores[j];
     valores[j] = valores[j+1];
     
      if(j == 5){
@@ -62,7 +64,7 @@ void loop() {
   Serial.print(alt0);
   Serial.print("\t");
   Serial.print(altura_sem_ruido);
-  Serial.print(sum);
+  //Serial.print(sum);
 
   Serial.println();
   delay(10);
