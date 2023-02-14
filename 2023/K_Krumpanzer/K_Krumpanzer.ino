@@ -2,12 +2,14 @@
 Adafruit_BMP085 bmp;
 
 #define n 10
+#define n1 5
 
 float alt_inicial; 
 float soma; 
 int i;
 float num[n];
 float num2[n];
+float num3[n];
 
 float filtro(float mediamovel){
   for(i = n-1; i>0; i--) num[i] = num[i-1];
@@ -63,6 +65,14 @@ void loop (){
   Serial.print("\t");
   float altura_filtrada2 = filtro2(altura_filtrada);
   Serial.print(altura_filtrada2);
+
+  for(i = n-1; i>0; i--)num3[i] = num3[i-1];
+  num3[0] = altura_filtrada2;
+
+  if(num3[0]>num3[1]>num3[2]){
+  Serial.print("A altura está caindo!");
+  }
+
 
   Serial.println();
   delay(10);
