@@ -71,7 +71,7 @@ void loop (){
   for(i = n1-1; i>0; i--)num3[i] = num3[i-1];
   num3[0] = altura_filtrada2;
 
-  if(num3[0]>num3[1] && num3[1]>num3[2] && num3[2]>num3[3] && num3[3]>num3[4]){
+  if(num3[0]<num3[1] && num3[1]<num3[2] && num3[2]<num3[3] && num3[3]<num3[4]){
   Serial.print("0");
   }else{
     Serial.print("1");
