@@ -24,7 +24,7 @@
 // XCLR is a reset pin, also not used here
 
 Adafruit_BMP085 bmp;
-float altitude, altitude_inicial=0, altura, soma_altura=0, sem_ruido, v[5];
+float altitude, altitude_inicial=0, altura, soma_altura=0, sem_ruido1, sem_ruido2, v[15], v2[15];
 int i;
 void setup() {
   Serial.begin(115200);
@@ -33,7 +33,7 @@ void setup() {
 	while (1) {}
   }
   pinMode(13, OUTPUT);
-  Serial.print("Temperature (*C)\t Pressure (Pa)\t Altitude (m)\t Altura(m)\t Altura sem ruído(m)");
+  Serial.print("Temperature (*C)\t Pressure (Pa)\t Altitude (m)\t Altura(m)\t Altura sem ruído 1(m)\t Altura sem ruído 2(m)\t ");
   for(i=0;i<5;i++){
     altitude_inicial += bmp.readAltitude();
   }
@@ -65,18 +65,35 @@ void loop() {
     Serial.print("\t");
 
     soma_altura=0;
-    //altura sem ruido teste
-    for(i=4;i>0;i--){
+    //altura sem ruido 1
+    for(i=14;i>0;i--){
       v[i] = v[i-1]; 
       soma_altura += v[i];
     }
     v[0] = altura;
     soma_altura += v[0];
 
-    sem_ruido = soma_altura/5;
+    sem_ruido1 = soma_altura/15;
     //sem_ruido = altura - soma_altura;
-    Serial.print(sem_ruido);
+    Serial.print(sem_ruido1);
     Serial.print("\t");
+
+
+    //altura sem ruido 2
+    soma_altura=0;
+    for(i=14;i>0;i--){
+      v2[i] = v2[i-1]; 
+      soma_altura += v2[i];
+    }
+    v2[0] = sem_ruido1;
+    soma_altura += v2[0];
+
+    sem_ruido2 = soma_altura/15;
+    //sem_ruido = altura - soma_altura;
+    Serial.print(sem_ruido2);
+    Serial.print("\t");
+
+
 
     //Serial.print("Pressure at sealevel (calculated) = ");
     //Serial.print(bmp.readSealevelPressure());
@@ -93,6 +110,6 @@ void loop() {
 
     
     Serial.println();
-
+    delay(10);
     
 }
