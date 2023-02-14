@@ -72,9 +72,9 @@ void loop (){
   num3[0] = altura_filtrada2;
 
   if(num3[0]>num3[1] && num3[1]>num3[2] && num3[2]>num3[3] && num3[3]>num3[4]){
-  Serial.print("1");
+  Serial.print("0");
   }else{
-    Serial.print("0");
+    Serial.print("1");
   }
 
 
