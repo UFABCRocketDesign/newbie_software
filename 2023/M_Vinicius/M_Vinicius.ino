@@ -23,7 +23,7 @@ Adafruit_BMP085 bmp;
     while (1) {}
    
   }
-  
+
   for (i = 0; i<5; i++) {              
       alt_in = alt_in + bmp.readAltitude();
     }
@@ -47,7 +47,7 @@ void loop() {
   Serial.print(bmp.readAltitude(101500));
   Serial.print("\t");
     
-    for (i = 0; i<10; i++)
+   /* for (i = 0; i<10; i++)
     {
       vetor[i] = bmp.readAltitude()-alt_in
       for (w=0; w<9; w++)
@@ -60,7 +60,7 @@ void loop() {
           Serial.print("1");
         }        
       }
-    }
+    }*/
 
     
 
