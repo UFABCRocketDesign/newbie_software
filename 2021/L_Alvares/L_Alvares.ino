@@ -23,11 +23,11 @@
 #define Vmed 11
 #define VEQ 11
 
-#define MagDbg 0
-#define GyrDbg 0
-#define AclDbg 0
+#define MagDbg 1
+#define GyrDbg 1
+#define AclDbg 1
 #define sdDbg  0
-#define TemDbg 0
+#define TemDbg 1
 #define BarDbg 1
 
 #define MagXDbg (MagDbg && 1)
@@ -241,6 +241,11 @@ void setup()
   }
 #endif
 
+#if ApgDbg
+  StringC += "Detecção de Apogeu";
+  StringC += "\t";
+#endif
+
 #if MagXDbg
   StringC += "Magnetômetro X(uT)";
   StringC += "\t";
@@ -280,10 +285,6 @@ void setup()
   StringC += "\t";
 #endif
 
-#if ApgDbg
-  StringC += "Detecção de Apogeu";
-  StringC += "\t";
-#endif
 
 #if Led1Dbg
   StringC += "Ativação Led1";
