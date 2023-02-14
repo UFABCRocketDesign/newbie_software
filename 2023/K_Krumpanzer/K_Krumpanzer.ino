@@ -66,7 +66,7 @@ void loop (){
   float altura_filtrada2 = filtro2(altura_filtrada);
   Serial.print(altura_filtrada2);
 
-  for(i = n-1; i>0; i--)num3[i] = num3[i-1];
+  for(i = n1-1; i>0; i--)num3[i] = num3[i-1];
   num3[0] = altura_filtrada2;
 
   if(num3[0]>num3[1]>num3[2]){
