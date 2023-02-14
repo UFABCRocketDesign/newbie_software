@@ -32,7 +32,7 @@ void loop() {
 
    while (w<100) {
      
-    for (i = 0, i<5, i++) {
+    for (i = 0; i<5; i++) {              
       alt_in = alt_in + bmp.readAltitude();
     }
 
@@ -45,14 +45,13 @@ void loop() {
 
   }
 
-  for (i=0, i<100, i++)
-  {
+  for (i=0; i<100; i++)   {
     soma = soma + vetor[i];
   }
 
   alt_in = soma/100;
 
-  Serial.print(bmp.readTemperature());
+  Serial.print(bmp.readTemperature());            
   Serial.print("\t");
 
 //
