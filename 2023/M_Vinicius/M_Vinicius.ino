@@ -4,7 +4,7 @@ Adafruit_BMP085 bmp;
   int i, w;
   float alt_in = 0;
   float atura_atual = 0;
-  float vetor[10]
+  //float vetor[10];
   
   void setup() {
 
