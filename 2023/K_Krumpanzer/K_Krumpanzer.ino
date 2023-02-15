@@ -1,5 +1,9 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
+#include <SPI.h>
+#include <SD.h>
+
+const int chipSelect = 4;
 
 #define n 10
 #define n1 5
@@ -48,13 +52,24 @@ void setup (){
     soma += bmp.readAltitude();
   } 
  alt_inicial = soma/5;
+
+  Serial.print(F("Lendo cartao SD"));
+  delay(100);
+    if (!SD.begin(chipSelect)) {
+      Serial.println(F("Leitura Falhou"));
+      while (1);
+    }
+  Serial.println(F("Cartao SD Inicializado!"));
 }
 void loop (){
 
-  Serial.print(bmp.readTemperature());
+  float temp = bmp.readTemperature();
+  float pres = bmp.readSealevelPressure();
+
+  Serial.print(temp);
   Serial.print("\t");
 
-  Serial.print(bmp.readSealevelPressure());
+  Serial.print(pres);
   Serial.print("\t");
 
   float altura = bmp.readAltitude() - alt_inicial;
@@ -79,6 +94,30 @@ void loop (){
 
 
   Serial.println();
+
+  String dataString = "";
+          dataString += String(temp);
+          dataString += ",";
+          dataString += String(pres);
+          dataString += ",";
+          dataString += String(altura);
+          dataString += ",";
+          dataString += String(altura_filtrada);
+          dataString += ",";
+          dataString += String(altura_filtrada2);
+           
+      File dataFile = SD.open("dados.csv", FILE_WRITE);
+       
+        if (dataFile) {
+          dataFile.println(dataString);
+          dataFile.close();
+          Serial.println(dataString);
+        }
+          
+        else {
+          Serial.println(F("ERRO"));
+       }
+       
   delay(10);
 }
 
