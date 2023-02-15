@@ -58,7 +58,7 @@ int queda(float sinal_sem_ruido_2) {
       accc = 0;
     }
   Serial.print(accc);
-  if(accc == 10){
+  if(accc >= 10){
     return 1;
   }else{
     return 0;
@@ -89,7 +89,7 @@ void setup() {
   Serial.print("Altura com ruido (meters) ");
   Serial.print("Altura sem ruido (meters) ");
   Serial.print("Pressão (Pa)");
-   Serial.println("Valor do acc");
+   Serial.println("Valor do accc");
   Serial.println("Situação");
 
 }
@@ -103,6 +103,7 @@ void loop() {
   float altura_sem_ruido_2 = media_movel_2(altura_sem_ruido_1);
   float temperatura = bmp.readTemperature();
   float pressao = bmp.readPressure();
+  int situacao = queda(altura_sem_ruido_2);
  
   
   //impressão dos dados
@@ -116,7 +117,7 @@ void loop() {
   Serial.print("\t");
   Serial.print(pressao);
   Serial.print("\t");
-  int situacao = queda(altura_sem_ruido_2);
+  Serial.print(accc);
   Serial.print("\t");
   Serial.print(situacao);
   Serial.println();
