@@ -3,7 +3,7 @@ Adafruit_BMP085 bmp;
 #include <SPI.h>
 #include <SD.h>
 
-const int chipSelect = 4;
+const int chipSelect = 53;
 
 #define n 10
 #define n1 5
@@ -106,7 +106,7 @@ void loop (){
           dataString += ",";
           dataString += String(altura_filtrada2);
            
-      File dataFile = SD.open("dados.csv", FILE_WRITE);
+      File dataFile = SD.open("kaua.csv", FILE_WRITE);
        
         if (dataFile) {
           dataFile.println(dataString);
