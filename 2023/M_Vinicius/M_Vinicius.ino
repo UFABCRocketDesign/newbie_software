@@ -3,10 +3,9 @@
 Adafruit_BMP085 bmp;
   int i, w;
   float alt_in = 0;
-  float atura_atual = 0;
+  int count = 0;
   float altura_semRuido = 0;
   //float vetor[10];
-  float altura[10];
 
   
   void setup() {
@@ -18,6 +17,7 @@ Adafruit_BMP085 bmp;
   Serial.print ("Temperature (*C) \t");
   Serial.print ("Pressure (Pa) \t");
   Serial.print("Altitude (meters) \t");
+  Serial.print("Altitude sem ruido (meters) \t");
   
 
   
@@ -36,11 +36,7 @@ Adafruit_BMP085 bmp;
 
 void loop() {
 
-  for (i=0;i<10;i++)
-  {
-    altura[i] = bmp.readAltitude()-alt_in;    
-  }
- altura_semRuido = altura[i]/10;
+ 
 
   Serial.print(bmp.readTemperature());            
   Serial.print("\t");
@@ -52,10 +48,19 @@ void loop() {
   Serial.print(bmp.readAltitude()-alt_in);
   Serial.print("\t");
   
+  if (count % 10 == 0 )
+   {
+     altura_semRuido = bmp.readAltitude()-alt_in;
+   }
+    else if (count == 0)
+    {
+        altura_semRuido = bmp.readAltitude()-alt_in;
+    }
+    
    Serial.print(altura_semRuido);
   Serial.print("\t");
-
   
+  count++;
   
   Serial.println();
     delay(5); 
