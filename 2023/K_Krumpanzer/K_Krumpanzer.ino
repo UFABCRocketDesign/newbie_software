@@ -41,12 +41,22 @@ void setup (){
 	while (1) {}
   }
 
+  String dataString = "";
+  File dataFile = SD.open("kaua.txt", FILE_WRITE); 
+      
+        if (dataFile) {
+          dataFile.println(dataString);
+          dataFile.close();
+            Serial.print("Temperatura (°C) = \t");
+            Serial.print("Pressão (Pa) = \t");
+            Serial.print("Altitude (m) = \t");
+            Serial.print("Altitude com filtro (m) = \t");
+            Serial.println("Altitude com filtro 2 (m) =");
+        }     
+        else {
+          Serial.println(F("ERRO"));
+       }
 
-  Serial.print("Temperatura (°C) = \t");
-  Serial.print("Pressão (Pa) = \t");
-  Serial.print("Altitude (m) = \t");
-  Serial.println("Altitude com filtro (m) = \t");
-  Serial.println("Altitude com filtro 2 (m) =");
 
   for(i=0; i<5; i++){
     soma += bmp.readAltitude();
@@ -89,10 +99,13 @@ void loop (){
            
       File dataFile = SD.open("kaua.txt", FILE_WRITE);
        
+      dataFile.println(dataString);
+      
+      Serial.println(dataString);
+
         if (dataFile) {
           dataFile.println(dataString);
           dataFile.close();
-          Serial.println(dataString);
         }
           
         else {
