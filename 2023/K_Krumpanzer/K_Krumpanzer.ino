@@ -42,13 +42,21 @@ void setup (){
 	while (1) {}
   }
 
+  Serial.print(F("Lendo cartao SD"));
+  delay(100);
+    if (!SD.begin(chipSelect)) {
+      Serial.println(F("Leitura Falhou"));
+      while (1);
+    }
+  Serial.println(F("Cartao SD Inicializado!"));
+
     String dataString = "";
-          dataString += String("Temperatura (°C) \t");
-          dataString += String("Pressão (Pa) \t");
-          dataString += String("Altitude (m) \t");
-          dataString += String("Altitude com filtro (m) \t");
-          dataString += String("Altitude com filtro 2 (m) \t");
-          dataString += String("Detecção de Apogeu ");
+          dataString += ("Temperatura (°C) \t");
+          dataString += ("Pressão (Pa) \t");
+          dataString += ("Altitude (m) \t");
+          dataString += ("Altitude com filtro (m) \t");
+          dataString += ("Altitude com filtro 2 (m) \t");
+          dataString += ("Detecção de Apogeu ");
 
       File dataFile = SD.open("kaua.txt", FILE_WRITE);
        
@@ -69,14 +77,9 @@ void setup (){
   } 
  alt_inicial = soma/5;
 
-  Serial.print(F("Lendo cartao SD"));
-  delay(100);
-    if (!SD.begin(chipSelect)) {
-      Serial.println(F("Leitura Falhou"));
-      while (1);
-    }
-  Serial.println(F("Cartao SD Inicializado!"));
 }
+
+
 void loop (){
 
   float altura = bmp.readAltitude() - alt_inicial;
