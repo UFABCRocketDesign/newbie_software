@@ -14,6 +14,7 @@ int i;
 float num[n];
 float num2[n];
 float num3[n];
+int apogeu;
 
 float filtro(float mediamovel){
   for(i = n-1; i>0; i--) num[i] = num[i-1];
@@ -41,18 +42,23 @@ void setup (){
 	while (1) {}
   }
 
-  String dataString = "";
-  File dataFile = SD.open("kaua.txt", FILE_WRITE); 
-      
+    String dataString = "";
+          dataString += String("Temperatura (°C) \t");
+          dataString += String("Pressão (Pa) \t");
+          dataString += String("Altitude (m) \t");
+          dataString += String("Altitude com filtro (m) \t");
+          dataString += String("Altitude com filtro 2 (m) \t");
+          dataString += String("Detecção de Apogeu ");
+
+      File dataFile = SD.open("kaua.txt", FILE_WRITE);
+       
+      Serial.println(dataString);
+
         if (dataFile) {
           dataFile.println(dataString);
           dataFile.close();
-            Serial.print("Temperatura (°C) = \t");
-            Serial.print("Pressão (Pa) = \t");
-            Serial.print("Altitude (m) = \t");
-            Serial.print("Altitude com filtro (m) = \t");
-            Serial.println("Altitude com filtro 2 (m) =");
-        }     
+        }
+          
         else {
           Serial.println(F("ERRO"));
        }
@@ -80,9 +86,9 @@ void loop (){
   num3[0] = altura_filtrada2;
 
   if(num3[0]<num3[1] && num3[1]<num3[2] && num3[2]<num3[3] && num3[3]<num3[4]){
-  Serial.print("1");
+  apogeu = 1;
   }else{
-    Serial.print("0");
+    apogeu = 0;
   }
 
 
@@ -96,11 +102,11 @@ void loop (){
           dataString += String(filtro(altura));
           dataString += "\t";
           dataString += String(altura_filtrada2);
+          dataString += "\t";
+          dataString += String(apogeu);
            
       File dataFile = SD.open("kaua.txt", FILE_WRITE);
        
-      dataFile.println(dataString);
-      
       Serial.println(dataString);
 
         if (dataFile) {
@@ -111,6 +117,7 @@ void loop (){
         else {
           Serial.println(F("ERRO"));
        }
+
        
   delay(10);
 }
