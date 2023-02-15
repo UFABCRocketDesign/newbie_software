@@ -11,6 +11,7 @@ float alt_inicial;
 float values_1[num];
 float values_2[num];
 float values_3[num];
+int accc = 0;
 
 
 
@@ -46,14 +47,17 @@ float media_movel_2(float sinal_sem_ruido) {
 
 //Detecção de queda
 int queda(float sinal_sem_ruido_2) {
-  int acc = 0;
-  values_3[0] = sinal_sem_ruido_2;
   for (int i = num - 1; i > 0; i--) {
-    if(values_3[i] < values_3[i-1]){
-      acc ++;
-    }
+    values_3[i] = values_3[i - 1];
   }
-  if(acc == 10){
+  values_3[0] = sinal_sem_ruido_2;
+  
+    if(values_3[0] < values_3[num-1]){
+      accc ++;
+    }else{
+      accc = 0;
+    }
+  if(accc == 10){
     return 1;
   }else{
     return 0;
