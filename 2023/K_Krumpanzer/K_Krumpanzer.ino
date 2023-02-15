@@ -63,25 +63,8 @@ void setup (){
 }
 void loop (){
 
-  float temp = bmp.readTemperature();
-  float pres = bmp.readSealevelPressure();
-
-  Serial.print(temp);
-  Serial.print("\t");
-
-  Serial.print(pres);
-  Serial.print("\t");
-
   float altura = bmp.readAltitude() - alt_inicial;
-  Serial.print(altura);
-  Serial.print("\t");
-  float altura_filtrada = filtro(altura);
-  Serial.print(altura_filtrada);
-  Serial.print("\t");
-  float altura_filtrada2 = filtro2(altura_filtrada);
-  Serial.print(altura_filtrada2);
-  Serial.print("\t");  
-
+  float altura_filtrada2 = filtro(filtro2(altura));
 
   for(i = n1-1; i>0; i--)num3[i] = num3[i-1];
   num3[0] = altura_filtrada2;
@@ -93,20 +76,18 @@ void loop (){
   }
 
 
-  Serial.println();
-
   String dataString = "";
-          dataString += String(temp);
-          dataString += ",";
-          dataString += String(pres);
-          dataString += ",";
+          dataString += String(bmp.readTemperature());
+          dataString += "\t";
+          dataString += String(bmp.readSealevelPressure());
+          dataString += "\t";
           dataString += String(altura);
-          dataString += ",";
-          dataString += String(altura_filtrada);
-          dataString += ",";
+          dataString += "\t";
+          dataString += String(filtro(altura));
+          dataString += "\t";
           dataString += String(altura_filtrada2);
            
-      File dataFile = SD.open("kaua.csv", FILE_WRITE);
+      File dataFile = SD.open("kaua.txt", FILE_WRITE);
        
         if (dataFile) {
           dataFile.println(dataString);
