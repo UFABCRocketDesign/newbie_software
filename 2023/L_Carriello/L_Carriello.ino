@@ -78,7 +78,7 @@ void loop() {
   Serial.print("\t");
 
   float alt_filtrada2 = filtro2(altura_sem_ruido);
-  Serial.print(altura_sem_ruido);
+  Serial.print(alt_filtrada2);
 
   Serial.println();
   delay(10);
