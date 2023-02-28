@@ -2,7 +2,7 @@
 
 
 Adafruit_BMP085 bmp;
-float(p0);
+float p0;
 void setup() {
   Serial.begin(115200);
   if (!bmp.begin()) {
@@ -21,7 +21,7 @@ void loop() {
     Serial.print("  ");
     
 
-    Serial.print(p0-bmp.readAltitude());
+    Serial.print(bmp.readAltitude()-p0);
     Serial.print("  ");
     
     Serial.println();
