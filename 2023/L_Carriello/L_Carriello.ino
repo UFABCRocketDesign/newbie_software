@@ -9,6 +9,7 @@ float alt_inicial;
 float soma;
 int i;
 float num[n];  //vetor c/valores pra média móvel
+float num2[n];
 float altura_sem_ruido;
 float altura = 0;
 
@@ -24,6 +25,16 @@ float altura = 0;
 
   }
 
+  float filtro2(float media2){
+    for(i = n-1; i>0; i--) num2[i] = num2[i-1];
+    num2[0] = media2;
+
+    float acc2 = 0; //soma os pontos da média móvel
+    for(i=0; i<n; i++) acc2 += num2[i]; //somatória do número de pontos
+
+    return acc2/n; //retorna média móvel
+
+  }
 
 
 void setup() {
@@ -65,6 +76,8 @@ void loop() {
   altura_sem_ruido = filtro(altura);
   Serial.print(altura_sem_ruido);
   
+  float alt_filtrada2 = filtro2(altura_sem_ruido);
+  Serial.print(altura_sem_ruido);
 
   Serial.println();
   delay(10);
