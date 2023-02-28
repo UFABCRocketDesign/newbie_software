@@ -41,6 +41,7 @@ void loop() {
 
   filtro[index] = altura;
   index = (index + 1) % 10;
+  total = 0;
   for (int i = 0; i < 10; i++) {
     total += filtro[i];
   }
