@@ -2,10 +2,12 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
   int i, w;
-  float alt_in = 0;
-  int count = 0;
+  float  alt_in = 0;  
   float altura_semRuido = 0;
   //float vetor[10];
+  float filtro[10];
+  int index = 0;
+  int total = 0;
 
   
   void setup() {
@@ -20,7 +22,6 @@ Adafruit_BMP085 bmp;
   Serial.print("Altitude sem ruido (meters) \t");
   
 
-  
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
@@ -34,9 +35,18 @@ Adafruit_BMP085 bmp;
     alt_in = alt_in/5;
 }
 
+ float altura = bmp.readAltitude()- alt_in;
+
 void loop() {
 
- 
+  filtro[index] = altura;
+  index = (index + 1) % 10;
+    for (int i = 0; i<10; i++)
+    {
+      total += filtro[i];
+    }
+    altura_semRuido = total/10;
+
 
   Serial.print(bmp.readTemperature());            
   Serial.print("\t");
@@ -45,22 +55,15 @@ void loop() {
   Serial.print(bmp.readPressure());
   Serial.print("\t");
 
-  Serial.print(bmp.readAltitude()-alt_in);
+  Serial.print(altura);
   Serial.print("\t");
   
-  if (count % 10 == 0 )
-   {
-     altura_semRuido = bmp.readAltitude()-alt_in;
-   }
-    else if (count == 0)
-    {
-        altura_semRuido = bmp.readAltitude()-alt_in;
-    }
-    
+ 
+
    Serial.print(altura_semRuido);
   Serial.print("\t");
   
-  count++;
+  
   
   Serial.println();
     delay(5); 
