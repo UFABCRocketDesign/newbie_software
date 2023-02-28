@@ -7,7 +7,7 @@ float altura_semRuido = 0;
 //float vetor[10];
 float filtro[10];
 int index = 0;
-int total = 0;
+float total = 0;
 
 
 void setup() {
