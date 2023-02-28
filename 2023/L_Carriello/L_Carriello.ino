@@ -3,17 +3,27 @@
 
 Adafruit_BMP085 bmp;
 
+#define n 10
 
 float alt_inicial;
 float soma;
 int i;
-int j = 0;
-float sum = 0;
-int valores[5];
-float media = 0;
+int num[n];  //vetor c/valores pra média móvel
+float altura_sem_ruido;
 float altura = 0;
-float altura_sem_ruido = 0;
-float alt0 = 0;
+
+
+  float filtro(float media){
+    for(i = n-1; i>0; i--) num[i] = num[i-1];
+    num[0] = media;
+
+    float acc = 0; //soma os pontos da média móvel
+    for(i=0; i<n; i++) acc += num[i]; //somatória do número de pontos
+
+    return acc/n; //retorna média móvel
+
+  }
+
 
 
 void setup() {
@@ -36,35 +46,25 @@ void setup() {
   alt_inicial = soma / 10;
 }
 
+float alturo_sem_ruido;
 
 void loop() {
 
-  altura = bmp.readAltitude();
-  alt0 = altura - alt_inicial;
-
-  sum = 0;
-  for(j=0; j < 6; j++){
-    valores[j] = altura;
-    sum += valores[j];
-    valores[j] = valores[j+1];
-    
-     if(j == 5){
-      sum += valores[j];
-      sum -= valores[0];
-    }
-  }
- 
-  media = sum/j;
-  altura_sem_ruido = altura - media;
+  altura = bmp.readAltitude()- alt_inicial;
+  
   
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
+
   Serial.print(bmp.readSealevelPressure());
   Serial.print("\t");
-  Serial.print(alt0);
+
+  Serial.print(altura);
   Serial.print("\t");
+
+  altura_sem_ruido = filtro(altura);
   Serial.print(altura_sem_ruido);
-  //Serial.print(sum);
+  
 
   Serial.println();
   delay(10);
