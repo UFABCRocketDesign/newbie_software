@@ -8,7 +8,7 @@ Adafruit_BMP085 bmp;
 float alt_inicial;
 float soma;
 int i;
-int num[n];  //vetor c/valores pra média móvel
+float num[n];  //vetor c/valores pra média móvel
 float altura_sem_ruido;
 float altura = 0;
 
