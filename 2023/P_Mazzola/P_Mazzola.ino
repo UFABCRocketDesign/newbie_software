@@ -13,7 +13,7 @@ void setup() {
   }
   Serial.print("temperatura "); Serial.print( "pressao  "); Serial.print("altitude  "); Serial.print("pressao no nvl do mar "); Serial.print ("real altitude  ");
  // definindo condiçoes iniciais 
-  for (i= 1; i<= passo; i++);
+  for (i= 1; i<= passo; i++)
   {
     p0= bmp.readAltitude()+p0;
   }
