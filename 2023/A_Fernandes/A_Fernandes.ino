@@ -109,7 +109,7 @@ void loop() {
     Serial.print(soma_altura_queda);
     Serial.print("\t");  
     
-    if (soma_altura_queda>=10){
+    if (soma_altura_queda>=9){
       Serial.print(1);
       Serial.print("\t");
     }
