@@ -42,7 +42,6 @@ void setup() {
 }
   
 void loop() {
-    Serial.println();
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
 
@@ -107,12 +106,12 @@ void loop() {
     }
       
     
-    if (soma_altura_queda==10){
-      Serial.print(1);
+    if (soma_altura_queda>=10){
+      Serial.print(0);
       Serial.print("\t");
     }
     else{
-      Serial.print(0);
+      Serial.print(1);
       Serial.print("\t");      
     }
 
