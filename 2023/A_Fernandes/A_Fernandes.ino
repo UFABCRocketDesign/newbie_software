@@ -24,7 +24,7 @@
 // XCLR is a reset pin, also not used here
 
 Adafruit_BMP085 bmp;
-float altitude, altitude_inicial=0, altura, soma_altura=0, sem_ruido1, sem_ruido2, v[15], v2[15];
+float altitude, altitude_inicial=0, altura, soma_altura=0, sem_ruido1, sem_ruido2, v[10], v2[10],v3[10],soma_altura_queda=0;
 int i;
 void setup() {
   Serial.begin(115200);
@@ -33,7 +33,7 @@ void setup() {
 	while (1) {}
   }
   pinMode(13, OUTPUT);
-  Serial.print("Temperature (*C)\t Pressure (Pa)\t Altitude (m)\t Altura(m)\t Altura sem ruído 1(m)\t Altura sem ruído 2(m)\t ");
+  Serial.print("Temperature (*C)\t Pressure (Pa)\t Altitude (m)\t Altura(m)\t Altura sem ruído 1(m)\t Altura sem ruído 2(m)\t Queda\t ");
   for(i=0;i<5;i++){
     altitude_inicial += bmp.readAltitude();
   }
@@ -66,14 +66,14 @@ void loop() {
 
     soma_altura=0;
     //altura sem ruido 1
-    for(i=14;i>0;i--){
+    for(i=9;i>0;i--){
       v[i] = v[i-1]; 
       soma_altura += v[i];
     }
     v[0] = altura;
     soma_altura += v[0];
 
-    sem_ruido1 = soma_altura/15;
+    sem_ruido1 = soma_altura/10;
     //sem_ruido = altura - soma_altura;
     Serial.print(sem_ruido1);
     Serial.print("\t");
@@ -81,17 +81,40 @@ void loop() {
 
     //altura sem ruido 2
     soma_altura=0;
-    for(i=14;i>0;i--){
+    for(i=9;i>0;i--){
       v2[i] = v2[i-1]; 
       soma_altura += v2[i];
     }
     v2[0] = sem_ruido1;
     soma_altura += v2[0];
 
-    sem_ruido2 = soma_altura/15;
+    sem_ruido2 = soma_altura/9;
     //sem_ruido = altura - soma_altura;
     Serial.print(sem_ruido2);
     Serial.print("\t");
+
+    //detecção de queda
+    soma_altura_queda=0;
+    for(i=9;i>0;i--){
+      if (v3[i]<v3[i-1]){
+        soma_altura_queda += 1;
+      }
+      v3[i] = v3[i-1]; 
+    }
+    v3[0] = sem_ruido2;
+    if (v3[1]<v3[0]){
+      soma_altura_queda += 1;      
+    }
+      
+    
+    if (soma_altura_queda==10){
+      Serial.print(1);
+      Serial.print("\t");
+    }
+    else{
+      Serial.print(0);
+      Serial.print("\t");      
+    }
 
 
 
@@ -110,6 +133,6 @@ void loop() {
 
     
     Serial.println();
-    delay(10);
+    delay(40);
     
 }
