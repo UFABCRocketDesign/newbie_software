@@ -1,7 +1,8 @@
 //Importando Bibliotecas
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
-
+#include <SPI.h>
+#include <SD.h>
 
 
 //Declaração de variáveis
@@ -12,6 +13,7 @@ float values_1[num];
 float values_2[num];
 float values_3[num];
 int accc = 0;
+const int chipSelect = 53;
 
 
 
@@ -57,7 +59,6 @@ int queda(float sinal_sem_ruido_2) {
     }else{
       accc = 0;
     }
-  Serial.print(accc);
   if(accc >= 10){
     return 1;
   }else{
@@ -92,6 +93,36 @@ void setup() {
    Serial.println("Valor do accc");
   Serial.println("Situação");
 
+  //inicializando a leitura do SD
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for native USB port only
+  }
+  
+  Serial.print("Initializing SD card...");
+
+  // see if the card is present and can be initialized:
+  if (!SD.begin(chipSelect)) {
+    Serial.println("Card failed, or not present");
+    // don't do anything more:
+    while (1);
+  }
+  Serial.println("card initialized.");
+  File dataFile = SD.open("marina.txt", FILE_WRITE);
+
+  // if the file is available, write to it:
+  if (dataFile) {
+    dataFile.print("Temperatura (*C) ");
+    dataFile.print("Altura com ruido (meters) ");
+    dataFile.print("Altura sem ruido (meters) ");
+    dataFile.print("Pressão (Pa)");
+    dataFile.println("Valor do accc");
+    dataFile.println("Situação");
+    dataFile.close();
+  }
+  // if the file isn't open, pop up an error:
+  else {
+    Serial.println("error opening datalog.txt");
+  }
 }
 
 
@@ -121,5 +152,31 @@ void loop() {
   Serial.print("\t");
   Serial.print(situacao);
   Serial.println();
+
+  File dataFile = SD.open("marina.txt", FILE_WRITE);
+
+  // if the file is available, write to it:
+  if (dataFile) {
+    dataFile.print(temperatura);
+    dataFile.print("\t");
+    dataFile.print(altura_com_ruido);
+    dataFile.print("\t");
+    dataFile.print(altura_sem_ruido_1);
+    dataFile.print("\t");
+    dataFile.print(altura_sem_ruido_2);
+    dataFile.print("\t");
+    dataFile.print(pressao);
+    dataFile.print("\t");
+    dataFile.print(accc);
+    dataFile.print("\t");
+    dataFile.print(situacao);
+    dataFile.println();
+    dataFile.close();
+  
+  }
+  // if the file isn't open, pop up an error:
+  else {
+    Serial.println("error opening datalog.txt");
+  }
 
 }
