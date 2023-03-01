@@ -95,24 +95,26 @@ void loop() {
     //detecção de queda
     soma_altura_queda=0;
     for(i=9;i>0;i--){
-      if (v3[i]<v3[i-1]){
+      v3[i] = v3[i-1]; 
+    }
+    v3[0] = sem_ruido2;
+
+    for(i=9;i>0;i--){
+      if(v3[i]<v3[i-1]){
         soma_altura_queda += 1;
       }
       v3[i] = v3[i-1]; 
     }
-    v3[0] = sem_ruido2;
-    if (v3[1]<v3[0]){
-      soma_altura_queda += 1;      
-    }
+    
     Serial.print(soma_altura_queda);
     Serial.print("\t");  
     
     if (soma_altura_queda>=10){
-      Serial.print(0);
+      Serial.print(1);
       Serial.print("\t");
     }
     else{
-      Serial.print(1);
+      Serial.print(0);
       Serial.print("\t");      
     }
 
