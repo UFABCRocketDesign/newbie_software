@@ -104,7 +104,8 @@ void loop() {
     if (v3[1]<v3[0]){
       soma_altura_queda += 1;      
     }
-      
+    Serial.print(soma_altura_queda);
+    Serial.print("\t");  
     
     if (soma_altura_queda>=10){
       Serial.print(0);
