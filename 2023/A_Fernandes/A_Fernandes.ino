@@ -24,7 +24,7 @@
 // XCLR is a reset pin, also not used here
 
 Adafruit_BMP085 bmp;
-float altitude, altitude_inicial=0, altura, soma_altura=0, sem_ruido1, sem_ruido2, v[10], v2[10],v3[10],soma_altura_queda=0;
+float altitude, altitude_inicial=0, altura, soma_altura=0, sem_ruido1, sem_ruido2, v[10], v2[10],v3[15],soma_altura_queda=0;
 int i;
 void setup() {
   Serial.begin(115200);
@@ -94,12 +94,12 @@ void loop() {
 
     //detecção de queda
     soma_altura_queda=0;
-    for(i=9;i>0;i--){
+    for(i=14;i>0;i--){
       v3[i] = v3[i-1]; 
     }
     v3[0] = sem_ruido2;
 
-    for(i=9;i>0;i--){
+    for(i=14;i>0;i--){
       if(v3[i]>v3[i-1]){
         soma_altura_queda += 1;
       }
@@ -109,7 +109,7 @@ void loop() {
     Serial.print(soma_altura_queda);
     Serial.print("\t");  
     
-    if (soma_altura_queda>=9){
+    if (soma_altura_queda>=14){
       Serial.print(1);
       Serial.print("\t");
     }
