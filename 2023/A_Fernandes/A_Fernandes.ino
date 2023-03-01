@@ -100,10 +100,10 @@ void loop() {
     v3[0] = sem_ruido2;
 
     for(i=9;i>0;i--){
-      if(v3[i]<v3[i-1]){
+      if(v3[i]>v3[i-1]){
         soma_altura_queda += 1;
       }
-      v3[i] = v3[i-1]; 
+
     }
     
     Serial.print(soma_altura_queda);
