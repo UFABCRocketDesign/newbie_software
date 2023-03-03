@@ -69,7 +69,11 @@ int queda(float sinal_sem_ruido_2) {
 
 
 void setup() {
+  //Declaração de variáveis
   float soma = 0;
+  String dataString = "";
+  
+  //
   Serial.begin(115200);
   pinMode(13, OUTPUT);
   
@@ -85,13 +89,18 @@ void setup() {
   }
   alt_inicial = soma / 5;
   
-  //print dos rótulos das medicoes
-  Serial.print("Temperatura (*C) ");
-  Serial.print("Altura com ruido (meters) ");
-  Serial.print("Altura sem ruido (meters) ");
-  Serial.print("Pressão (Pa)");
-   Serial.println("Valor do accc");
-  Serial.println("Situação");
+  //Salvando os rótulos das medicoes em uma variável
+  dataString += String("Temperatura (*C) ");
+  dataString += String("Altura com ruido (meters) ");
+  dataString += String("Altura sem ruido (meters) ");
+  dataString += String("Pressão (Pa)");
+  dataString += String("Valor do accc");
+  dataString += String("Situação");
+  
+  //print dos rótulos das medições
+  Serial.print(dataString);
+  Serial.print("\n");
+
 
   //inicializando a leitura do SD
   while (!Serial) {
@@ -99,6 +108,7 @@ void setup() {
   }
   
   Serial.print("Initializing SD card...");
+  
 
   // see if the card is present and can be initialized:
   if (!SD.begin(chipSelect)) {
@@ -111,12 +121,7 @@ void setup() {
 
   // if the file is available, write to it:
   if (dataFile) {
-    dataFile.print("Temperatura (*C) ");
-    dataFile.print("Altura com ruido (meters) ");
-    dataFile.print("Altura sem ruido (meters) ");
-    dataFile.print("Pressão (Pa)");
-    dataFile.println("Valor do accc");
-    dataFile.println("Situação");
+    dataFile.print(dataString);
     dataFile.close();
   }
   // if the file isn't open, pop up an error:
@@ -155,6 +160,7 @@ void loop() {
 
   File dataFile = SD.open("marina.txt", FILE_WRITE);
 
+  
   // if the file is available, write to it:
   if (dataFile) {
     dataFile.print(temperatura);
