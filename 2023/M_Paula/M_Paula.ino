@@ -141,21 +141,25 @@ void loop() {
   float pressao = bmp.readPressure();
   int situacao = queda(altura_sem_ruido_2);
  
+ //Salvando os dados espaçados em uma variável 
+  String dataString = "";
+  dataString += String(temperatura);
+  dataString += String("\t");
+  dataString += String(altura_com_ruido);
+  dataString += String("\t");
+  dataString += String(altura_sem_ruido_1);
+  dataString += String("\t");
+  dataString += String(altura_sem_ruido_2);
+  dataString += String("\t");
+  dataString += String(pressao);
+  dataString += String("\t");
+  dataString += String(accc);
+  dataString += String("\t");
+  dataString += String(situacao);
+
   
   //impressão dos dados
-  Serial.print(temperatura);
-  Serial.print("\t");
-  Serial.print(altura_com_ruido);
-  Serial.print("\t");
-  Serial.print(altura_sem_ruido_1);
-  Serial.print("\t");
-  Serial.print(altura_sem_ruido_2);
-  Serial.print("\t");
-  Serial.print(pressao);
-  Serial.print("\t");
-  Serial.print(accc);
-  Serial.print("\t");
-  Serial.print(situacao);
+  Serial.print(dataString);
   Serial.println();
 
   File dataFile = SD.open("marina.txt", FILE_WRITE);
@@ -163,19 +167,7 @@ void loop() {
   
   // if the file is available, write to it:
   if (dataFile) {
-    dataFile.print(temperatura);
-    dataFile.print("\t");
-    dataFile.print(altura_com_ruido);
-    dataFile.print("\t");
-    dataFile.print(altura_sem_ruido_1);
-    dataFile.print("\t");
-    dataFile.print(altura_sem_ruido_2);
-    dataFile.print("\t");
-    dataFile.print(pressao);
-    dataFile.print("\t");
-    dataFile.print(accc);
-    dataFile.print("\t");
-    dataFile.print(situacao);
+    dataFile.print(dataString);
     dataFile.println();
     dataFile.close();
   
