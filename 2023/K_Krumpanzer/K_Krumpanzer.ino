@@ -2,6 +2,7 @@
 Adafruit_BMP085 bmp;
 #include <SPI.h>
 #include <SD.h>
+#include <String.h>
 
 const int chipSelect = 53;
 
@@ -16,7 +17,9 @@ float num[n];
 float num2[n];
 float num3[n];
 int apogeu;
-char kaua000;
+int nun = 0;
+String nome = "kaua";
+String arq = nome + nun + ".txt";
 
 float filtro(float mediamovel){
   for(i = n-1; i>0; i--) num[i] = num[i-1];
@@ -50,10 +53,11 @@ void setup (){
       Serial.println(F("Leitura Falhou"));
       while (1);
     }
-  if (SD.exists("kaua000.txt")) {
-    Serial.println("kaua000.txt exists.");
-    kaua000++;
+  if (SD.exists(arq)) {
     Serial.println(F("Cartao SD Inicializado!"));
+
+    nun++;
+    String arq = nome + nun + ".txt";
 
     String dataString = "";
           dataString += ("Temperatura (°C) \t");
@@ -63,7 +67,7 @@ void setup (){
           dataString += ("Altitude com filtro 2 (m) \t");
           dataString += ("Detecção de Apogeu ");
 
-      File dataFile = SD.open("kaua000.txt", FILE_WRITE);
+      File dataFile = SD.open(arq , FILE_WRITE);
        
       Serial.println(dataString);
 
@@ -86,7 +90,7 @@ void setup (){
           dataString += ("Altitude com filtro 2 (m) \t");
           dataString += ("Detecção de Apogeu ");
 
-      File dataFile = SD.open("kaua000.txt", FILE_WRITE);
+      File dataFile = SD.open(arq , FILE_WRITE);
        
       Serial.println(dataString);
 
@@ -138,7 +142,7 @@ void loop (){
           dataString += "\t";
           dataString += String(apogeu);
            
-      File dataFile = SD.open("kaua.txt", FILE_WRITE);
+      File dataFile = SD.open(arq , FILE_WRITE);
        
       Serial.println(dataString);
 
