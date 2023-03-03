@@ -14,6 +14,7 @@ float values_2[num];
 float values_3[num];
 int accc = 0;
 const int chipSelect = 53;
+String file_nome;
 
 
 
@@ -73,7 +74,7 @@ void setup() {
   float soma = 0;
   String dataString = "";
   
-  //
+  //Abrindo serial
   Serial.begin(115200);
   pinMode(13, OUTPUT);
   
@@ -90,16 +91,15 @@ void setup() {
   alt_inicial = soma / 5;
   
   //Salvando os rótulos das medicoes em uma variável
-  dataString += String("Temperatura (*C) ");
-  dataString += String("Altura com ruido (meters) ");
-  dataString += String("Altura sem ruido (meters) ");
-  dataString += String("Pressão (Pa)");
-  dataString += String("Valor do accc");
-  dataString += String("Situação");
+  dataString += "Temperatura (*C) ";
+  dataString += "Altura com ruido (meters) ";
+  dataString += "Altura sem ruido (meters) ";
+  dataString += "Pressão (Pa)";
+  dataString += "Valor do accc";
+  dataString += "Situação";
   
   //print dos rótulos das medições
-  Serial.print(dataString);
-  Serial.print("\n");
+  Serial.println(dataString);
 
 
   //inicializando a leitura do SD
@@ -117,8 +117,17 @@ void setup() {
     while (1);
   }
   Serial.println("card initialized.");
-  File dataFile = SD.open("marina.txt", FILE_WRITE);
-
+  File dataFile = SD.open("marina00.txt", FILE_WRITE);
+  if (SD.exists("marina00.txt")) {
+      File dataFile = SD.open(file_nome, FILE_WRITE);
+      for(int i = 0; i < 100; ++i){
+        file_nome += "marina0";
+        file_nome += String(i);
+        file_nome += ".txt";
+       }
+  } else {
+    Serial.println("example.txt doesn't exist.");
+  }
   // if the file is available, write to it:
   if (dataFile) {
     dataFile.print(dataString);
@@ -144,23 +153,23 @@ void loop() {
  //Salvando os dados espaçados em uma variável 
   String dataString = "";
   dataString += String(temperatura);
-  dataString += String("\t");
+  dataString += "\t";
   dataString += String(altura_com_ruido);
-  dataString += String("\t");
+  dataString += "\t";
   dataString += String(altura_sem_ruido_1);
-  dataString += String("\t");
+  dataString += "\t";
   dataString += String(altura_sem_ruido_2);
-  dataString += String("\t");
+  dataString += "\t";
   dataString += String(pressao);
-  dataString += String("\t");
+  dataString += "\t";
   dataString += String(accc);
-  dataString += String("\t");
+  dataString += "\t";
   dataString += String(situacao);
 
   
   //impressão dos dados
-  Serial.print(dataString);
-  Serial.println();
+  Serial.println(dataString);
+ 
 
   File dataFile = SD.open("marina.txt", FILE_WRITE);
 
