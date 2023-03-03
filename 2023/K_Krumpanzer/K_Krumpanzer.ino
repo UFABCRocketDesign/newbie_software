@@ -53,56 +53,31 @@ void setup (){
       Serial.println(F("Leitura Falhou"));
       while (1);
     }
-  if (SD.exists(arq)) {
-    Serial.println(F("Cartao SD Inicializado!"));
 
+  while (SD.exists(arq)) {
     nun++;
-    String arq = nome + nun + ".txt";
-
-    String dataString = "";
-          dataString += ("Temperatura (°C) \t");
-          dataString += ("Pressão (Pa) \t");
-          dataString += ("Altitude (m) \t");
-          dataString += ("Altitude com filtro (m) \t");
-          dataString += ("Altitude com filtro 2 (m) \t");
-          dataString += ("Detecção de Apogeu ");
-
-      File dataFile = SD.open(arq , FILE_WRITE);
-       
-      Serial.println(dataString);
-
-        if (dataFile) {
-          dataFile.println(dataString);
-          dataFile.close();
-        }
-          
-        else {
-          Serial.println(F("ERRO"));
-       }
-  } else {
-    Serial.println(F("Cartao SD Inicializado!"));
-
-    String dataString = "";
-          dataString += ("Temperatura (°C) \t");
-          dataString += ("Pressão (Pa) \t");
-          dataString += ("Altitude (m) \t");
-          dataString += ("Altitude com filtro (m) \t");
-          dataString += ("Altitude com filtro 2 (m) \t");
-          dataString += ("Detecção de Apogeu ");
-
-      File dataFile = SD.open(arq , FILE_WRITE);
-       
-      Serial.println(dataString);
-
-        if (dataFile) {
-          dataFile.println(dataString);
-          dataFile.close();
-        }
-          
-        else {
-          Serial.println(F("ERRO"));
-       }
+    arq = nome + nun + ".txt";
   }
+
+
+  Serial.println(F("Cartao SD Inicializado!"));
+
+  String dataString = "";
+        dataString += ("Temperatura (°C) \t");
+        dataString += ("Pressão (Pa) \t");
+        dataString += ("Altitude (m) \t");
+        dataString += ("Altitude com filtro (m) \t");
+        dataString += ("Altitude com filtro 2 (m) \t");
+        dataString += ("Detecção de Apogeu ");
+
+      File dataFile = SD.open(arq , FILE_WRITE);
+       
+      Serial.println(dataString);
+
+        if (dataFile) {
+          dataFile.println(dataString);
+          dataFile.close();
+        }
   
 
 
