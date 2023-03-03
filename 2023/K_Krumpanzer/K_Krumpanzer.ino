@@ -59,7 +59,7 @@ void setup (){
     arq = nome + nun + ".txt";
   }
 
-
+  Serial.println(arq);
   Serial.println(F("Cartao SD Inicializado!"));
 
   String dataString = "";
