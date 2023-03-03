@@ -8,6 +8,7 @@ const int chipSelect = 53;
 #define n 10
 #define n1 5
 
+
 float alt_inicial; 
 float soma; 
 int i;
@@ -15,6 +16,7 @@ float num[n];
 float num2[n];
 float num3[n];
 int apogeu;
+char kaua000;
 
 float filtro(float mediamovel){
   for(i = n-1; i>0; i--) num[i] = num[i-1];
@@ -48,7 +50,10 @@ void setup (){
       Serial.println(F("Leitura Falhou"));
       while (1);
     }
-  Serial.println(F("Cartao SD Inicializado!"));
+  if (SD.exists("kaua000.txt")) {
+    Serial.println("kaua000.txt exists.");
+    kaua000++;
+    Serial.println(F("Cartao SD Inicializado!"));
 
     String dataString = "";
           dataString += ("Temperatura (°C) \t");
@@ -58,7 +63,7 @@ void setup (){
           dataString += ("Altitude com filtro 2 (m) \t");
           dataString += ("Detecção de Apogeu ");
 
-      File dataFile = SD.open("kaua.txt", FILE_WRITE);
+      File dataFile = SD.open("kaua000.txt", FILE_WRITE);
        
       Serial.println(dataString);
 
@@ -70,6 +75,31 @@ void setup (){
         else {
           Serial.println(F("ERRO"));
        }
+  } else {
+    Serial.println(F("Cartao SD Inicializado!"));
+
+    String dataString = "";
+          dataString += ("Temperatura (°C) \t");
+          dataString += ("Pressão (Pa) \t");
+          dataString += ("Altitude (m) \t");
+          dataString += ("Altitude com filtro (m) \t");
+          dataString += ("Altitude com filtro 2 (m) \t");
+          dataString += ("Detecção de Apogeu ");
+
+      File dataFile = SD.open("kaua000.txt", FILE_WRITE);
+       
+      Serial.println(dataString);
+
+        if (dataFile) {
+          dataFile.println(dataString);
+          dataFile.close();
+        }
+          
+        else {
+          Serial.println(F("ERRO"));
+       }
+  }
+  
 
 
   for(i=0; i<5; i++){
@@ -94,7 +124,7 @@ void loop (){
     apogeu = 0;
   }
 
-
+  
   String dataString = "";
           dataString += String(bmp.readTemperature());
           dataString += "\t";
