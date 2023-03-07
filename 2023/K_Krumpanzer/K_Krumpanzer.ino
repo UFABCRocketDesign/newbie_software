@@ -95,7 +95,8 @@ void setup (){
 void loop (){
 
   float altura = bmp.readAltitude() - alt_inicial;
-  float altura_filtrada2 = filtro(filtro2(altura));
+  float altura_filtrada = filtro(altura);
+  float altura_filtrada2 = filtro2(altura_filtrada);
 
   for(i = n1-1; i>0; i--)num3[i] = num3[i-1];
   num3[0] = altura_filtrada2;
@@ -114,7 +115,7 @@ void loop (){
           dataString += "\t";
           dataString += String(altura);
           dataString += "\t";
-          dataString += String(filtro(altura));
+          dataString += String(altura_filtrada);
           dataString += "\t";
           dataString += String(altura_filtrada2);
           dataString += "\t";
