@@ -2,14 +2,16 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 int i, w;
-float altura, alt_in = 0;
+float altura, alt_in = 0;                       // fazer o sensor pro foguete cair, 1 --> ta caindo
 float altura_semRuido = 0;
 float altura_sRuido2 = 0;
-//float vetor[10];
+float vetor[10];
 float filtro[10];
 float filtro2[10];
+float queda;
 int index = 0;
 int indi = 0;
+int p = 0;
 float total = 0;
 float acum = 0;
 
@@ -25,6 +27,7 @@ void setup() {
   Serial.print("Altitude (meters) \t");
   Serial.print("Altitude sem ruido (meters) \t");
   Serial.print("Altitude s. ruido 2 (meters) \t");
+  Serial.print("Detector de queda \t");
 
 
 
@@ -82,23 +85,41 @@ void loop() {
   Serial.print(altura_sRuido2);
   Serial.print("\t");
 
+      vetor[p] = altura_sRuido2;
+      p = (p + 1) % 10;
+      for (w=0; w<9; w++)
+      {
+        if (vetor[w+1]>vetor[w])
+        {
+          queda = 0;
+        }
+        else {
+          queda = 1;
+        }        
+      }
+    
+
+    Serial.print(queda);
+    Serial.print("\t");
+    
 
 
   Serial.println();
   delay(5);
 
-  /* for (i = 0; i<10; i++)
+}
+
+/*for (i = 0; i<10; i++)
     {
-      vetor[i] = bmp.readAltitude()-alt_in
+      vetor[i] = altura_sRuido2;
       for (w=0; w<9; w++)
       {
         if (vetor[w+1]>vetor[w])
         {
-          Serial.print("0");
+          queda = 0;
         }
         else {
-          Serial.print("1");
+          queda = 1;
         }        
       }
     }*/
-}
