@@ -29,7 +29,7 @@ void setup() {
 void loop() {
 
 float L = bmp.readAltitude() - alt_inicial;
-float L1 = bmp.readAltitude() - alt_inicial;
+float L1 = L;
 
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
@@ -46,12 +46,12 @@ float L1 = bmp.readAltitude() - alt_inicial;
     float sum = 0.0;
     for (int i = 0; i<N; i++){
       sum += V[i];
-      
+    }
 
     for(int i = N-1; i>0; i--){
-    V1[i] = V[i-1];
+    V1[i] = V[i];
     }
-    V1[0] = L1;
+    V1[0] = V[0];
     float sum = 0.0;
     for (int i = 0; i<N; i++){
       sum += V1[i];
@@ -62,4 +62,4 @@ float L1 = bmp.readAltitude() - alt_inicial;
   Serial.print(media);
   Serial.println();
   delay(5);
-}}
+}
