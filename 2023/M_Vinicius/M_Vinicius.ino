@@ -1,7 +1,7 @@
 // BPM085 SENSOR ( PRESSÃO / TEMPERATURA / ALTITUDE)
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
-int i, w;
+int i;
 float altura, alt_in = 0;                       // fazer o sensor pro foguete cair, 1 --> ta caindo
 float altura_semRuido = 0;
 float altura_sRuido2 = 0;
@@ -11,7 +11,6 @@ float filtro2[10];
 float queda;
 int index = 0;
 int indi = 0;
-int p = 0;
 float total = 0;
 float acum = 0;
 
@@ -85,11 +84,15 @@ void loop() {
   Serial.print(altura_sRuido2);
   Serial.print("\t");
 
-      vetor[p] = altura_sRuido2;
-      p = (p + 1) % 10;
-      for (w=0; w<9; w++)
+      
+      for(i=0;i<10;i++)
       {
-        if (vetor[w+1]>vetor[w])
+        vetor[i] = altura_sRuido2;
+      }
+  
+      for (i=0; i<9; i++)
+      {
+        if (vetor[i+1]>vetor[i])
         {
           queda = 0;
         }
