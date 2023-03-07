@@ -59,10 +59,10 @@ void setup (){
   while (SD.exists(arq)) {
     nun++;
     nome = "kaua" + nun;
-    arq = nome + ".txt";
-     while (arq.length() < 8) {
+    while (arq.length() < 8) {
   nome = "0" + nome;
     }
+    arq = nome + ".txt";
   }
 
   Serial.println(arq);
