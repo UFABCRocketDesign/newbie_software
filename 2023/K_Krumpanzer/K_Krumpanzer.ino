@@ -54,6 +54,10 @@ void setup (){
       while (1);
     }
 
+  while (arq.length() < 8) {
+  arq = "0" + arq;
+  }
+
   while (SD.exists(arq)) {
     nun++;
     arq = nome + nun + ".txt";
