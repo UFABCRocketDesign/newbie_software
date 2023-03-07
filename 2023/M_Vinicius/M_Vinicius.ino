@@ -13,7 +13,7 @@ int index = 0;
 int indi = 0;
 float total = 0;
 float acum = 0;
-
+float last_altitude = 0;
 
 void setup() {
 
@@ -84,23 +84,17 @@ void loop() {
   Serial.print(altura_sRuido2);
   Serial.print("\t");
 
-      
-      for(i=0;i<10;i++)
-      {
-        vetor[i] = altura_sRuido2;
-      }
-  
-      for (i=0; i<9; i++)
-      {
-        if (vetor[i+1]>vetor[i])
-        {
-          queda = 0;
-        }
-        else {
-          queda = 1;
-        }        
-      }
-    
+     
+  float delta = altura_sRuido2 - last_altitude;  
+  last_altitude = altura_sRuido2; 
+
+    if (delta < 0)
+    {
+      queda = 1;
+    }
+    else{
+      queda = 0;
+    }
 
     Serial.print(queda);
     Serial.print("\t");
