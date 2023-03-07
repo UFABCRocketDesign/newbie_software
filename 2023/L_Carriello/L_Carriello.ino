@@ -4,15 +4,18 @@
 Adafruit_BMP085 bmp;
 
 #define n 10
+#define n2 5
 
 float alt_inicial;
 float soma;
 int i;
 float num[n];  //vetor c/valores pra média móvel
 float num2[n];
+float num3[n2];
 float altura_sem_ruido;
 float altura = 0;
-
+float alt_filtrada2;
+int queda;
 
   float filtro(float media){
     for(i = n-1; i>0; i--) num[i] = num[i-1];
@@ -47,7 +50,9 @@ void setup() {
   Serial.print("Temperature(C) \t");
   Serial.print("Pressure at sealevel(Pa) \t");
   Serial.print("Altitude(m) \t");
-  Serial.print("Altitude sem ruído(m) \t");
+  Serial.print("Altitude filtrada 1(m) \t");
+  Serial.print("Altitude filtrada 2(m) \t");
+  Serial.print("Detecção de queda \t");
   Serial.println();
 
   for (i = 0; i < 10; i++) {
@@ -62,8 +67,21 @@ float alturo_sem_ruido;
 void loop() {
 
   altura = bmp.readAltitude()- alt_inicial;
+
+  for(i = n2-1; i>0; i--){
+    num3[i] = num3[i-1];
+    num3[0] = alt_filtrada2;
+  }
   
-  
+  if (num3[0]<num3[1] && num3[1]<num3[2] && num3[2]<num3[3] && num3[3]<num3[4]){
+    queda = 1;
+  }
+  else{
+    queda = 0;
+  }
+
+
+
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
 
@@ -79,6 +97,9 @@ void loop() {
 
   float alt_filtrada2 = filtro2(altura_sem_ruido);
   Serial.print(alt_filtrada2);
+  Serial.print("\t");
+
+  Serial.print(queda);
 
   Serial.println();
   delay(10);
