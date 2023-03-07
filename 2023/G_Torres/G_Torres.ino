@@ -8,7 +8,6 @@ int i;
 
 
   float V[N] = {};
-  int indx = 0;
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
@@ -34,7 +33,7 @@ float L = bmp.readAltitude() - alt_inicial;
     Serial.print("\t");
     Serial.print(bmp.readPressure());
     Serial.print("\t");
-    Serial.print("L");
+    Serial.print(L);
     Serial.print("\t");
 
     for(int i = N-1; i>0; i--){
@@ -48,6 +47,8 @@ float L = bmp.readAltitude() - alt_inicial;
   }
   float media = sum / N;
 
+  Serial.println(media);
+  Serial.println(L);
   Serial.println();
   delay(5);
 }
