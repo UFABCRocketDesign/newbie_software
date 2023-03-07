@@ -70,8 +70,8 @@ void loop() {
 
   for(i = n2-1; i>0; i--){
     num3[i] = num3[i-1];
-    num3[0] = alt_filtrada2;
   }
+  num3[0] = alt_filtrada2;
   
   if (num3[0]<num3[1] && num3[1]<num3[2] && num3[2]<num3[3] && num3[3]<num3[4]){
     queda = 1;
