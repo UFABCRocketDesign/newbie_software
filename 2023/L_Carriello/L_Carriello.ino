@@ -14,7 +14,6 @@ float num2[n];
 float num3[n2];
 float altura_sem_ruido;
 float altura = 0;
-float alt_filtrada2;
 int queda;
 
   float filtro(float media){
@@ -67,6 +66,8 @@ float alturo_sem_ruido;
 void loop() {
 
   altura = bmp.readAltitude()- alt_inicial;
+   altura_sem_ruido = filtro(altura);
+  float alt_filtrada2 = filtro2(altura_sem_ruido);
 
   for(i = n2-1; i>0; i--){
     num3[i] = num3[i-1];
@@ -91,11 +92,9 @@ void loop() {
   Serial.print(altura);
   Serial.print("\t");
 
-  altura_sem_ruido = filtro(altura);
   Serial.print(altura_sem_ruido);
   Serial.print("\t");
 
-  float alt_filtrada2 = filtro2(altura_sem_ruido);
   Serial.print(alt_filtrada2);
   Serial.print("\t");
 
