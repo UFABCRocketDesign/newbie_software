@@ -19,6 +19,7 @@ float num3[n];
 int apogeu;
 int nun = 0;
 String nome = "kaua";
+String zeros;
 String arq = nome + nun + ".txt";
 
 float filtro(float mediamovel){
@@ -56,10 +57,10 @@ void setup (){
 
   while (SD.exists(arq)) {
     nun++;
-    while (String(nun).length()+String(nome).length()< 8) {
-   nome = "0" + nun;
-}
-    arq = nome + ".txt";
+    for(i=String(nun).length()+String(nome).length(); i<8; i++){
+      zeros = zeros + "0";
+  } 
+    arq = nome + zeros + nun + ".txt";
   }
 
   Serial.println(arq);
