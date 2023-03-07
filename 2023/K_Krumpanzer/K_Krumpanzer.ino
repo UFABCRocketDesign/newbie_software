@@ -134,8 +134,9 @@ void loop (){
         else {
           Serial.println(F("ERRO"));
        }
+  
+  Serial.println();
 
-       
   delay(10);
 }
 
