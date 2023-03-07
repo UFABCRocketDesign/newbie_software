@@ -4,7 +4,7 @@ float alt_inicial;
 float alt;
 int i;
 
- #define N 5
+ #define N 15
 
 
   float V[N] = {};
