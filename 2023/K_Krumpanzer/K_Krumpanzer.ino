@@ -18,8 +18,8 @@ float num2[n];
 float num3[n];
 int apogeu;
 int nun = 0;
-String nome = "kaua";
-String arq = nome + nun + ".txt";
+String nome = "kaua" + nun;
+String arq = nome + ".txt";
 
 float filtro(float mediamovel){
   for(i = n-1; i>0; i--) num[i] = num[i-1];
@@ -55,12 +55,12 @@ void setup (){
     }
 
   while (arq.length() < 8) {
-  arq = "0" + arq;
+  nome = "0" + nome;
   }
 
   while (SD.exists(arq)) {
     nun++;
-    arq = nome + nun + ".txt";
+    arq = nome + ".txt";
   }
 
   Serial.println(arq);
