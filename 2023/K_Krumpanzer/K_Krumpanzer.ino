@@ -54,13 +54,15 @@ void setup (){
       while (1);
     }
 
-  while (arq.length() < 8) {
-  nome = "0" + nome;
-  }
+
 
   while (SD.exists(arq)) {
     nun++;
+    nome = "kaua" + nun;
     arq = nome + ".txt";
+     while (arq.length() < 8) {
+  nome = "0" + nome;
+    }
   }
 
   Serial.println(arq);
