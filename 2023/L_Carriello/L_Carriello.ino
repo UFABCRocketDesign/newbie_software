@@ -73,7 +73,7 @@ void loop() {
     num3[0] = alt_filtrada2;
   }
   
-  if (num3[0]<num3[1]<num3[2]<num3[3]<num3[4]<num3[5]){
+  if (num3[0]<num3[1] && num3[1]<num3[2] && num3[2]<num3[3] && num3[3]<num3[4]){
     queda = 1;
   }
   else{
