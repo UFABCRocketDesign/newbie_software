@@ -59,7 +59,7 @@ void setup (){
   while (SD.exists(arq)) {
     nun++;
     nome = "kaua" + nun;
-    while (arq.length() < 8) {
+    while (nome.length() < 8) {
   nome = "0" + nome;
     }
     arq = nome + ".txt";
