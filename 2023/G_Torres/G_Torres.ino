@@ -47,8 +47,7 @@ float L = bmp.readAltitude() - alt_inicial;
   }
   float media = sum / N;
 
-  Serial.println(media);
-  Serial.println(L);
+  Serial.print(media);
   Serial.println();
   delay(5);
 }
