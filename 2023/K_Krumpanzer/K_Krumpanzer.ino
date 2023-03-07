@@ -56,10 +56,10 @@ void setup (){
 
   while (SD.exists(arq)) {
     nun++;
-    while (String(nun).length()< 4) {
-  nun = "0" + nun;
+    while (String(nun).length()+String(nome).length()< 8) {
+   nome = "0" + nun;
 }
-    arq = nome + nun + ".txt";
+    arq = nome + ".txt";
   }
 
   Serial.println(arq);
