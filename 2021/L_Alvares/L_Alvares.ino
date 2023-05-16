@@ -509,30 +509,47 @@ int Apogeu(float AltAtual, int VQueda) {
 }
 
 //Paraquedas
-
-int Paraquedas(int Dapg, unsigned long Tqueda, unsigned long Tatual)  // Detecção de apogeu, tempo de queda, Tempo atual
+void Paraquedas(int Dapg, unsigned long TQd, unsigned long TAt, int StPqd ,int TAc)  // Detecção de apogeu, tempo de queda, Tempo atual,Numero do paraquedas e tempo de acionamento 
 {
-  int AcPqd = LOW;
-  int NPqd;
-  int StPqd = LOW;  //Valor para definir acionamento, Numero do paraquedas (led) a ser acionado
+  //int StPqd = LOW;  //Valor para definir acionamento, Numero do paraquedas (led) a ser acionado
   bool LK = false;
 
-  if (Dapg == 1 && AcPqd == 0) {  // se detectou queda, acionar paraquedas
+  if (Dapg == 1) 
+  {  
     if (LK == false) {
       StPqd = HIGH;
       LK = true;
-      //OL1 = TAtual + TL;
+      //Tp1 = TAtual + TL;
     }
-    //if (TAtual >= OL1)  //apos X seg, o Led 1 apaga
+    //if (TAtual >= Tp)  //apos X seg, o Led 1 apaga
     {
       StPqd = LOW;
     }
     digitalWrite(NPqd, StPqd);
-  } else if (AcPqd == 1)  // se detectou queda, após estar em queda X seg, acionar paraquedas
+  } 
+  else if (AcPqd == 1)  // se detectou queda, após estar em queda X seg, acionar paraquedas
   {
     digitalWrite(NPqd, StPqd);
-  } else  // se detectou queda e está a X metros, acionar paraquedas
+  } 
+  else  // se detectou queda e está a X metros, acionar paraquedas
   {
     digitalWrite(NPqd, StPqd);
   }
+}
+
+int Paraquedas(unsigned long TAt, int StPqd, int TAc, int LK, int TDs) //Tempo atual, Estado do paraquedas, Tempo de acionamento do paraquedas, Trava do paraquedas, Tempo de desligamento do paraquedas
+{
+  if(LK == FALSE)
+  {
+    StPqd = HIGH;
+    LK = HIGH;
+    TDs = TAt + TAc
+  }
+  if(TAt > TDs)
+  {
+    StPqD = LOW;
+  }
+  
+return StPqD;
+
 }
