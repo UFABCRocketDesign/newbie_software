@@ -119,11 +119,13 @@ void setup() {
       ;
   }
   Serial.println("card initialized.");
+  int i = 0;
   do{
     file_name = name_base;
     file_name += String(i);
     file_name += ".txt";
-  }while(SD.exists(file_name))
+    i++;
+  }while(SD.exists(file_name));
     
   File dataFile = SD.open(file_name, FILE_WRITE);
 
