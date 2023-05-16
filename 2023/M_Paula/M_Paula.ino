@@ -8,13 +8,14 @@ Adafruit_BMP085 bmp;
 //Declaração de variáveis
 #define n_media 5
 #define num 10
+#define name_base "marina"
 float alt_inicial;
 float values_1[num];
 float values_2[num];
 float values_3[num];
 int accc = 0;
 const int chipSelect = 53;
-String file_nome;
+String file_name;
 
 
 
@@ -54,15 +55,15 @@ int queda(float sinal_sem_ruido_2) {
     values_3[i] = values_3[i - 1];
   }
   values_3[0] = sinal_sem_ruido_2;
-  
-    if(values_3[0] < values_3[1]){
-      accc ++;
-    }else{
-      accc = 0;
-    }
-  if(accc >= 10){
+
+  if (values_3[0] < values_3[1]) {
+    accc++;
+  } else {
+    accc = 0;
+  }
+  if (accc >= 10) {
     return 1;
-  }else{
+  } else {
     return 0;
   }
 }
@@ -73,23 +74,23 @@ void setup() {
   //Declaração de variáveis
   float soma = 0;
   String dataString = "";
-  
+
   //Abrindo serial
   Serial.begin(115200);
   pinMode(13, OUTPUT);
-  
+
   //Inicializando o sensor de barômetro
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
-  
+
   //cálculo da altitude inicial
   for (int i = 0; i < n_media; ++i) {
     soma = soma + bmp.readAltitude();
   }
   alt_inicial = soma / 5;
-  
+
   //Salvando os rótulos das medicoes em uma variável
   dataString += "Temperatura (*C) ";
   dataString += "Altura com ruido (meters) ";
@@ -97,37 +98,41 @@ void setup() {
   dataString += "Pressão (Pa)";
   dataString += "Valor do accc";
   dataString += "Situação";
-  
+
   //print dos rótulos das medições
   Serial.println(dataString);
 
 
   //inicializando a leitura do SD
   while (!Serial) {
-    ; // wait for serial port to connect. Needed for native USB port only
+    ;  // wait for serial port to connect. Needed for native USB port only
   }
-  
+
   Serial.print("Initializing SD card...");
-  
+
 
   // see if the card is present and can be initialized:
   if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present");
     // don't do anything more:
-    while (1);
+    while (1)
+      ;
   }
   Serial.println("card initialized.");
-  File dataFile = SD.open("marina00.txt", FILE_WRITE);
-  if (SD.exists("marina00.txt")) {
-      File dataFile = SD.open(file_nome, FILE_WRITE);
-      for(int i = 0; i < 100; ++i){
-        file_nome += "marina0";
-        file_nome += String(i);
-        file_nome += ".txt";
-       }
-  } else {
-    Serial.println("example.txt doesn't exist.");
+  for (int i = 0; i < 100; ++i) {
+    file_name = name_base;
+    file_name += String(i);
+    file_name += ".txt";
+
+    if (!SD.exists(file_name)) {
+        Serial.println("example.txt doesn't exist.");
+        break;
+    } else {
+        
+    } 
   }
+  File dataFile = SD.open(file_name, FILE_WRITE);
+
   // if the file is available, write to it:
   if (dataFile) {
     dataFile.print(dataString);
@@ -149,8 +154,8 @@ void loop() {
   float temperatura = bmp.readTemperature();
   float pressao = bmp.readPressure();
   int situacao = queda(altura_sem_ruido_2);
- 
- //Salvando os dados espaçados em uma variável 
+
+  //Salvando os dados espaçados em uma variável
   String dataString = "";
   dataString += String(temperatura);
   dataString += "\t";
@@ -166,24 +171,23 @@ void loop() {
   dataString += "\t";
   dataString += String(situacao);
 
-  
+
   //impressão dos dados
   Serial.println(dataString);
- 
 
-  File dataFile = SD.open("marina.txt", FILE_WRITE);
 
-  
+  File dataFile = SD.open(file_name, FILE_WRITE);
+
+
   // if the file is available, write to it:
   if (dataFile) {
     dataFile.print(dataString);
     dataFile.println();
     dataFile.close();
-  
+
   }
   // if the file isn't open, pop up an error:
   else {
     Serial.println("error opening datalog.txt");
   }
-
 }
