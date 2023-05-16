@@ -119,18 +119,12 @@ void setup() {
       ;
   }
   Serial.println("card initialized.");
-  for (int i = 0; i < 100; ++i) {
+  do{
     file_name = name_base;
     file_name += String(i);
     file_name += ".txt";
-
-    if (!SD.exists(file_name)) {
-        Serial.println("example.txt doesn't exist.");
-        break;
-    } else {
-        
-    } 
-  }
+  }while(SD.exists(file_name))
+    
   File dataFile = SD.open(file_name, FILE_WRITE);
 
   // if the file is available, write to it:
