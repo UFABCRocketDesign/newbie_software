@@ -209,6 +209,9 @@ void loop() {
   }
 
   //acionamento paraquedas
-  digitalWrite(IGN_1, HIGH); 
-  digitalWrite(IGN_1, LOW);
+  if(accc >= 10 ){
+    digitalWrite(IGN_1, HIGH);
+    digitalWrite(IGN_1, LOW);
+  }
+  
 }
