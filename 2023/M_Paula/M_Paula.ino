@@ -125,9 +125,11 @@ void setup() {
   do{
     p = String(i);
     file_name = name_base;
-    qtd_zeros = 8 - String(name_base).length() - p.length();
+    if(i<10){
+      qtd_zeros = 8 - String(name_base).length() - p.length();
     for(int j = 0; j < qtd_zeros; j++){
       file_name += "0";
+      }
     }
     file_name += String(i);
     file_name += ".txt";
