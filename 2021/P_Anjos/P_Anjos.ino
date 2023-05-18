@@ -53,7 +53,7 @@ Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 L3G gyro;
 #endif
 // =========================================== VARIAVEIS DECLARADAS ============================================================================ //
-const int chipSelect = 53;            //Define o pino para o chipselect para gravar no cartão SD
+
 float H1 = 0;                         // Variável global - Não é ressetada a cada loop. Armazena o dado.
 float H2 = 0;
 float Hmax = 0;
@@ -71,7 +71,6 @@ float SomaFA = 0;
 float SomaFB = 0;
 float Aux = 0;
 int cont = 0;
-String dataCabecalho;
 String nome;
 String parteA;
 String parteB;
@@ -167,6 +166,7 @@ void setup() {
   // ================================================================================================ //
 #if GravacaoSD
   // see if the card is present and can be initialized:
+  const int chipSelect = 53;            //Define o pino para o chipselect para gravar no cartão SD. Variavel Local
   if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present");
     // don't do anything more:
@@ -191,6 +191,7 @@ void setup() {
   Serial.println("card initialized.");
 #endif
   // ==================================== CABEÇALHO ============================================================================================================= //
+  String dataCabecalho;
   dataCabecalho += "Tempo\t";
 #if altitude
   dataCabecalho += "Apogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\t";
@@ -392,7 +393,7 @@ void loop() {
 #endif
 
   // ======================== ETAPA PARA GRAVAR NO CARTÃO SD ===================================== //
-Serial.println(dataString);
+  Serial.println(dataString);
 #if GravacaoSD
   File dataFile = SD.open(nome, FILE_WRITE);                                                     // Só curiosidade: este é o ponto que mais consome de processamento
 
