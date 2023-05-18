@@ -125,13 +125,12 @@ void setup() {
   do{
     p = String(i);
     file_name = name_base;
-    if(i<10){
-      qtd_zeros = 8 - String(name_base).length() - p.length();
+    qtd_zeros = 8 - String(name_base).length() - p.length();
     for(int j = 0; j < qtd_zeros; j++){
       file_name += "0";
-      }
+      Serial.println(file_name);
     }
-    file_name += String(i);
+    file_name += p;
     file_name += ".txt";
     i++;
   }while(SD.exists(file_name));
