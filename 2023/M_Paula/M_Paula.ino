@@ -120,13 +120,22 @@ void setup() {
   }
   Serial.println("card initialized.");
   int i = 0;
+  int qtd_zeros = 0;
+  String p;
   do{
+    p = String(i);
     file_name = name_base;
+    qtd_zeros = 8 - String(name_base).length() - p.length();
+    for(int j = 0; j < qtd_zeros; j++){
+      file_name += "0";
+    }
     file_name += String(i);
     file_name += ".txt";
     i++;
   }while(SD.exists(file_name));
     
+  Serial.println(file_name);
+
   File dataFile = SD.open(file_name, FILE_WRITE);
 
   // if the file is available, write to it:
