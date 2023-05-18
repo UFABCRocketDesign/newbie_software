@@ -9,6 +9,10 @@ Adafruit_BMP085 bmp;
 #define n_media 5
 #define num 10
 #define name_base "marina"
+#define IGN_1 36	/*act1*/
+#define IGN_2 61	/*act2*/
+#define IGN_3 46	/*act3*/
+#define IGN_4 55	/*act4*/
 float alt_inicial;
 float values_1[num];
 float values_2[num];
@@ -148,6 +152,13 @@ void setup() {
   else {
     Serial.println("error opening datalog.txt");
   }
+
+  //pino de saída paraquedas
+  pinMode(IGN_1, OUTPUT);
+  pinMode(IGN_2, OUTPUT);
+  pinMode(IGN_3, OUTPUT);
+  pinMode(IGN_4, OUTPUT);
+
 }
 
 
@@ -196,4 +207,8 @@ void loop() {
   else {
     Serial.println("error opening datalog.txt");
   }
+
+  //acionamento paraquedas
+  digitalWrite(IGN_1, HIGH); 
+  digitalWrite(IGN_1, LOW);
 }
