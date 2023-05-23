@@ -1,6 +1,8 @@
 #include <Adafruit_BMP085.h>
+#include <SPI.h>
+#include <SD.h>
 
-
+const int chipSelect = 53;
 Adafruit_BMP085 bmp;
 
 #define n 10
@@ -59,14 +61,31 @@ void setup() {
   }
 
   alt_inicial = soma / 10;
+
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for native USB port only
+  }
+
+  Serial.print("Initializing SD card...");
+
+ // see if the card is present and can be initialized:
+  if (!SD.begin(chipSelect)) {
+    Serial.println("Card failed, or not present");
+    // don't do anything more:
+    while (1);
+  }
+  Serial.println("card initialized.");
+
 }
 
-float alturo_sem_ruido;
 
 void loop() {
 
+ // make a string for assembling the data to log:
+  String dataString = "";
+
   altura = bmp.readAltitude()- alt_inicial;
-   altura_sem_ruido = filtro(altura);
+  altura_sem_ruido = filtro(altura);
   float alt_filtrada2 = filtro2(altura_sem_ruido);
 
   for(i = n2-1; i>0; i--){
@@ -80,7 +99,6 @@ void loop() {
   else{
     queda = 0;
   }
-
 
 
   Serial.print(bmp.readTemperature());
@@ -100,6 +118,31 @@ void loop() {
 
   Serial.print(queda);
 
+  File dataFile = SD.open("lais.txt", FILE_WRITE);
+
+  if (dataFile) {
+    dataFile.print(bmp.readTemperature());
+    dataFile.print("\t");
+    dataFile.print(bmp.readSealevelPressure());
+    dataFile.print("\t");
+    dataFile.print(altura);
+    dataFile.print("\t");
+    dataFile.print(altura_sem_ruido);
+    dataFile.print("\t");
+    dataFile .print(alt_filtrada2);
+    dataFile.print("\t");
+    dataFile.print(queda);
+    dataFile.println();
+    dataFile.close();
+    // print to the serial port too:
+    Serial.println(dataString);
+  }
+  // if the file isn't open, pop up an error:
+  else {
+    Serial.println("error opening lais.txt");
+  }
+
   Serial.println();
   delay(10);
+
 }
