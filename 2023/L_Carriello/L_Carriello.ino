@@ -81,6 +81,17 @@ void setup() {
   }
   Serial.println("card initialized.");
 
+  File dataFile = SD.open("lais.txt", FILE_WRITE);
+
+  if (dataFile) {
+    dataFile.println(dataString);    
+    dataFile.close();
+  }
+  // if the file isn't open, pop up an error:
+  else {
+    Serial.println("error opening lais.txt");
+  }
+
 }
 
 
