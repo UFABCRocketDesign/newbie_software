@@ -48,13 +48,18 @@ void setup() {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
-  Serial.print("Temperature(C) \t");
-  Serial.print("Pressure at sealevel(Pa) \t");
-  Serial.print("Altitude(m) \t");
-  Serial.print("Altitude filtrada 1(m) \t");
-  Serial.print("Altitude filtrada 2(m) \t");
-  Serial.print("Detecção de queda \t");
-  Serial.println();
+
+  String dataString = "";
+
+  dataString += "Temperature(C) \t";
+  dataString += "Pressure at sealevel(Pa) \t";
+  dataString += "Altitude(m) \t";
+  dataString += "Altitude filtrada 1(m) \t";
+  dataString += "Altitude filtrada 2(m) \t";
+  dataString += "Detecção de queda \t";
+  
+  //imprimindo o cabeçalho
+  Serial.println(dataString);
 
   for (i = 0; i < 10; i++) {
     soma += bmp.readAltitude();
@@ -101,38 +106,27 @@ void loop() {
   }
 
   
-  Serial.print(temperatura);
-  Serial.print("\t");
-  Serial.print(pressao);
-  Serial.print("\t");
-  Serial.print(altura);
-  Serial.print("\t");
-  Serial.print(altura_sem_ruido);
-  Serial.print("\t");
-  Serial.print(alt_filtrada2);
-  Serial.print("\t");
-  Serial.print(queda);
 
 // make a string for assembling the data to log:
   String dataString = "";
   dataString += String(temperatura);
-  dataString += String("\t");
+  dataString += "\t";
   dataString += String(pressao);
-  dataString += String("\t");
+  dataString += "\t";
   dataString += String(altura);
-  dataString += String("\t");
+  dataString += "\t";
   dataString += String(altura_sem_ruido);
-  dataString += String("\t");
+  dataString += "\t";
   dataString += String(alt_filtrada2);
-  dataString += String("\t");
+  dataString += "\t";
   dataString += String(queda);
   
+  Serial.println(dataString);
 
   File dataFile = SD.open("lais.txt", FILE_WRITE);
 
   if (dataFile) {
-    dataFile.print(dataString);    
-    dataFile.println();
+    dataFile.println(dataString);    
     dataFile.close();
   }
   // if the file isn't open, pop up an error:
