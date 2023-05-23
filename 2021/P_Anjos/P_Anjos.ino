@@ -19,24 +19,25 @@
 #define InterDesligTimer 2000             //Intervalo de tempo para desligar o paraquedas A em segundos
 #define InterA2 4000                      //Intervalo de tempo para ligar o 2º acionamento do paraquedas A
 #define HParaquedasB 5                    //Altura de acionamento do paraquedas B em metros
-#define dfaltura 2                        //Define o delta de altura que serve de critério para a determinação do apogeu
+#define dfaltura 2                        //Define o delta de altura de ref. que serve de critério para a determinação do apogeu
 #define Barometro 1                       //Definindo a presença ou não de um sensor barométrico no sistema
 #define altitude    (1 && Barometro)      //Definindo a presença de dados de altitude
 #define temperatura (1&& Barometro)       //Definindo a presença de dados de temperatura
 #define pressao     (0 && Barometro)      //Definindo a presença de dados de pressão
 #define giroscopio 1                      //Definindo a presença ou não de um sensor giroscópio no sistema
-#define gyrox (1 && giroscopio)           //Definindo a presença de dados no eixo X do giroscópio
-#define gyroy (0 && giroscopio)           //Definindo a presença de dados no eixo Y do giroscópio
-#define gyroz (0 && giroscopio)           //Definindo a presença de dados no eixo Z do giroscópio
+#define gyrox (1 && giroscopio)           //Definindo a presença de dados do giroscópio no eixo X
+#define gyroy (0 && giroscopio)           //Definindo a presença de dados do giroscópio no eixo Y
+#define gyroz (0 && giroscopio)           //Definindo a presença de dados do giroscópio no eixo Z
 #define Acelerometro 1                    //Definindo a presença ou não de um sensor acelerômetro no sistema
-#define Accx (0 && Acelerometro)
-#define Accy (1 && Acelerometro)
-#define Accz (0 && Acelerometro)
+#define Accx (0 && Acelerometro)          //Definindo a presença de dados do acelerômetro no eixo X
+#define Accy (1 && Acelerometro)          //Definindo a presença de dados do acelerômetro no eixo Y
+#define Accz (0 && Acelerometro)          //Definindo a presença de dados do acelerômetro no eixo Z
 #define Magnetometro 1                    //Definindo a presença ou não de um sensor magnetômetro no sistema
-#define Magx (0 && Magnetometro)
-#define Magy (1 && Magnetometro)
-#define Magz (1 && Magnetometro)
+#define Magx (0 && Magnetometro)          //Definindo a presença de dados do campo magnético no eixo X
+#define Magy (1 && Magnetometro)          //Definindo a presença de dados do campo magnético no eixo Y
+#define Magz (1 && Magnetometro)          //Definindo a presença de dados do campo magnético no eixo Z
 #define GravacaoSD 0                      //Definindo se irá gravar os dados no cartão SD
+
 // ======================================================================================================================= //
 #if Barometro
 Adafruit_BMP085 bmp;
@@ -52,14 +53,25 @@ Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 #if giroscopio
 L3G gyro;
 #endif
-// =========================================== VARIAVEIS DECLARADAS ============================================================================ //
 
-float H1 = 0;                         // Variável global - Não é ressetada a cada loop. Armazena o dado.
+// ================================= VARIAVEIS GLOBAIS DECLARADAS - Não é ressetada a cada loop  ================================ //
+float AltitudeRef = 0;                // Variável para armazenar a altitude da base delançamento
+int a;                                // Variável para a nomenclatura de versões do arquivo no SD
+int b;                                // Variável para a nomenclatura de versões do arquivo no SD
+int c;                                // Variável para a nomenclatura de versões do arquivo no SD
+int cont = 0;                         // Contador para nomenclatura de versões do arquivo no SD
+String nome;                          // Variável para a nomenclatura de versões do arquivo no SD
+String parteA;
+String parteB;
+bool Apogeu = false;
+bool Tia = true;
+
+// =========================================== VARIAVEIS LOCAIS DECLARADAS ====================================================== //
+float H1 = 0;                         // Variável GLOBAL - Não é ressetada a cada loop. Armazena o dado.
 float H2 = 0;
 float Hmax = 0;
 float Soma = 0;
 float SomaMov = 0;
-float AltitudeRef = 0;
 float MediaMov = 0;
 float MediaMA = 0;
 float MediaMB = 0;
@@ -70,20 +82,11 @@ float FiltroB[10];                    // terceira filtragem para a média móvel
 float SomaFA = 0;
 float SomaFB = 0;
 float Aux = 0;
-int cont = 0;
-String nome;
-String parteA;
-String parteB;
-int a;
-int b;
-int c;
 float Timer = 0;                      // Guarda o tempo do timer
 unsigned long previousMillis = 0;     // Guarda o momento de tempo para iniciar A e B
 unsigned long previousMillis2 = 0;    // Guarda o momento para o timer para manter B ligado
 const long interval = 2000;           // O intervalo de tempo que o LED deve ficar ligado em milesegundos
 int Intervalo = 3000;                 //Intervalo de tempo do Timer antes do acionamento do paraquedas
-bool Apogeu = false;
-bool Tia = true;
 int TA_Piloto = 0;                    //Intervalo de tempo para desligar o paraquedas A em segundos
 int TA_PilotoBackup = 0;               //Intervalo de tempo para ligar o 2º acionamento paraquedas A em segundos
 int TDA_PilotoBackup = 0;              //Intervalo de tempo que o 2º acionamento paraquedas A fica ligado em segundos
@@ -92,7 +95,8 @@ bool Aceso = false;                   // A variável booleana para verificar se 
 bool Fim = true;                      // A variável booleana para parar a verificação do paraquedas
 bool ResetA2 = true;                  // A variável booleana para parar resetar o timer do A2
 bool ResetB = true;                   // A variável booleana para parar resetar o timer do B
-//============================================================================================================================================= //
+
+//================================================================================================================== //
 
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
@@ -107,7 +111,8 @@ void setup() {
     ;                                 // wait for serial port to connect. Needed for native USB port only
   }
 #endif
-  // ============================= PARTE APENAS DO GIROSCOPIO ======================================= //
+
+ // ====================================== GIROSCOPIO - INICIALIZACAO =============================================== //
 #if giroscopio
   if (!gyro.init())
   {
@@ -116,17 +121,18 @@ void setup() {
   }
   gyro.enableDefault();
 #endif
-  // ============================= PARTE APENAS DO BAROMETRO ========================================= //
+
+  // ====================================== BAROMETRO - INICIALIZACAO ================================================= //
 #if Barometro
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
 #endif
-  // ========================== PARTE APENAS DO ACELEROMETRO ===================================== //
-#if Acelerometro
-  //Serial.println("Accelerometer Test"); Serial.println("");Informações validas apenas quando está realizando testes
 
+  // ==================================== ACELEROMETRO - INICIALIZACAO ================================================= //
+#if Acelerometro
+  //Serial.println("Accelerometer Test"); Serial.println("");Informações válidas apenas quando está realizando testes
   /* Initialise the sensor */
   if (!accel.begin())
   {
@@ -134,24 +140,21 @@ void setup() {
     Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
     while (1);
   }
-
   /* Set the range to whatever is appropriate for your project */
   accel.setRange(ADXL345_RANGE_16_G);
   // accel.setRange(ADXL345_RANGE_8_G);
   // accel.setRange(ADXL345_RANGE_4_G);
   // accel.setRange(ADXL345_RANGE_2_G);
-
   /* Display some basic information on this sensor */
-  //displaySensorDetails();  //Reitirei do código pois não era interessante. Se precisar olhe na biblioteca original
-
+  //displaySensorDetails();  //Reitirei do código pois não era interessante. Se precisar, olhe na biblioteca original
   /* Display additional settings (outside the scope of sensor_t) */
-  //displayDataRate(); //Reitirei do código pois não era interessante. Se precisar olhe na biblioteca original
-  //displayRange(); //Reitirei do código pois não era interessante. Se precisar olhe na biblioteca original
+  //displayDataRate(); //Reitirei do código pois não era interessante. Se precisar, olhe na biblioteca original
+  //displayRange(); //Reitirei do código pois não era interessante. Se precisar, olhe na biblioteca original
 #endif
-  // =============================== PARTE APENAS DO MAGNETÔMETRO ========================================= //
+
+  // ======================================= MAGNETOMETRO - INICIALIZACAO ================================================ //
 #if Magnetometro
   //Serial.println("HMC5883 Magnetometer Test"); Serial.println(""); Informações validas apenas quando está realizando testes
-
   /* Initialise the sensor */
   if (!mag.begin())
   {
@@ -159,11 +162,11 @@ void setup() {
     Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
     while (1);
   }
-
   /* Display some basic information on this sensor */
   //displaySensorDetails(); //Reitirei do código pois não era interessante. Se precisar olhe na biblioteca original
 #endif
-  // ================================================================================================ //
+
+ // ============================================ CARTAO SD - INICIALIZACAO ============================================== //
 #if GravacaoSD
   // see if the card is present and can be initialized:
   const int chipSelect = 53;            //Define o pino para o chipselect para gravar no cartão SD. Variavel Local
@@ -177,7 +180,7 @@ void setup() {
     a = nome.length();
     parteB = String(cont);
     b = parteB.length();
-    c = 8 - (a + b);                                                                          // Guarda a quantidade de zeros necessária para se colocar entre "PA" e o nº da versão.
+    c = 8 - (a + b);                // Guarda a quantidade de zeros necessária para se colocar entre "PA" e o nº da versão.
     for (int i = 0; i < c; i++) {
       nome += "0";
     }
@@ -190,8 +193,9 @@ void setup() {
   Serial.println(nome);
   Serial.println("card initialized.");
 #endif
-  // ==================================== CABEÇALHO ============================================================================================================= //
-  String dataCabecalho;
+
+// ======================================= CRIACAO DO CABECALHO DA TABELA DE DADOS ========================================= //
+  String dataCabecalho;     // Variável GLOBAL para armazenar o cabecalho. Não é ressetada todo loop
   dataCabecalho += "Tempo\t";
 #if altitude
   dataCabecalho += "Apogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\t";
@@ -229,87 +233,89 @@ void setup() {
 #if Magz
   dataCabecalho += "magZ(uT)\t";
 #endif
-  dataCabecalho += "Situacao";
+  dataCabecalho += "Situacao"; // Fim da string cabecalho
   Serial.println(dataCabecalho);
 #if GravacaoSD
-  File dataFile = SD.open(nome, FILE_WRITE);
+  File dataFile = SD.open(nome, FILE_WRITE); // Variável GLOBAL para escrever o cabecalho no cartao SD. Não muda com a mudança de loop
   dataFile.println(dataCabecalho);
   dataFile.close();
 #endif
-  // =========================================================================================================================================================== //
+  // ================================================================================================================================== //
 #if Barometro
-  for (int i = 0; i < 100; i++) {                                                            //Este "for" serve para definir a altitude da base de lancamento como valor de referencia.
-    Soma = Soma + bmp.readAltitude();
+  for (int i = 0; i < 100; i++) {         //Este "for" serve para definir a altitude da base de lançamento como valor de referência.
+    Soma = Soma + bmp.readAltitude();     //O intuito é tirar a média aritmética das leituras de altitude do barômetro
   }
-  AltitudeRef = Soma / 100;
+  AltitudeRef = Soma / 100;               // Altitude da base é uma variável GLOBAL. Utilizada em outra parte do código
 #endif
 }
 // the loop function runs over and over again forever
 void loop() {
-  unsigned long currentMillis = millis();                                                     // Regsitra em milisegundos em que instante do tempo está
+  unsigned long currentMillis = millis();                    // Regsitra em milisegundos em que instante do tempo está
 #if giroscopio
-  gyro.read();                                                                                // Faz a leitura do sensor giroscópio
+  gyro.read();                                               // Faz a leitura do sensor giroscópio
 #endif
-  String dataString = "";                                                                     // Serve para criar a string que vai guardar os dados para que eles sejam gravados no SD
-  dataString += String(currentMillis / 1000.0);                                                 // Registra o tempo em segundos
+  String dataString = "";                                    // Serve para criar a string que vai guardar os dados para que eles sejam gravados no SD
+  dataString += String(currentMillis / 1000.0);              // Registra o tempo em segundos
   dataString += "\t";
-  // ========================= MÉDIA MÓVEL E DETECÇÃO DE APOGEU =============================== //
+  // =========================================== MÉDIA MÓVEL E DETECÇÃO DE APOGEU ===================================================== //
 #if Barometro
 #if altitude
   SomaMov = 0;
   MediaMov = bmp.readAltitude() - AltitudeRef;
   for (int j = 0; j < 3; j++) {
-    for (int i = 8; i >= 0; i--) {                                                            // Laço apenas para a movimentação
+    for (int i = 8; i >= 0; i--) {                          // Laço apenas para a movimentação
       Vetor[j][i + 1] = Vetor[j][i];
     }
     Vetor[j][0] = MediaMov;
     SomaMov = 0;
-    for (int i = 0; i < 10; i++) {                                                            // Laço para a somatória dos valores
+    for (int i = 0; i < 10; i++) {                         // Laço para a somatória dos valores
       SomaMov = SomaMov + Vetor[j][i];
     }
     MediaMov = SomaMov / 10;
   }
-  H2 = H1;                                                                                    // Guardei a altitude de referência (medicao anterior)
-  H1 = MediaMov;                                                                              // Nova leitura de altitude
+  H2 = H1;                                                  // Guardei a altitude de referência (medição anterior)
+  H1 = MediaMov;                                            // Nova leitura de altitude. Variável LOCAL
 
   if (Hmax < H1) {
-    Hmax = H1;
+    Hmax = H1;                                              // Guardou a nova altitude máxima
   }
-  Delta = Hmax - H1;
-  // ============================= DADOS QUE VÃO PARA STRING ================================== //
-  dataString += String(Hmax);
+  Delta = Hmax - H1;                                        // Diferença entre a altitude máxima e altitude atual
+  
+  // ============================================== DADOS QUE VÃO PARA STRING ========================================================== //
+  dataString += String(Hmax);                               // Maior altura registrada
   dataString += "\t";
-  dataString += String(H1);
+  dataString += String(H1);                                 // Altura atual já filtrada
   dataString += "\t";
-  dataString += String(Delta);
+  dataString += String(Delta);                              // Diferença em relação a altura máxima
   dataString += "\t";
-  dataString += String(Vetor[0][0]);
+  dataString += String(Vetor[0][0]);                        // Altura atual sem filtro nenhum. A fim de comparação de valores apenas
   dataString += "\t";
 #endif
 #if temperatura
-  dataString += String(bmp.readTemperature());
+  dataString += String(bmp.readTemperature());              // Valores de temperatura, se for relevante
   dataString += "\t";
 #endif
 #if pressao
-  dataString += String(bmp.readPressure());
+  dataString += String(bmp.readPressure());                 // Valores de pressão, se for relevante
   dataString += "\t";
 #endif
 #endif
+ // ================================================== ETAPA DO GIROSCÓPIO ========================================================== //
 #if giroscopio
 #if gyrox
-  dataString += String((int)gyro.g.x);
+  dataString += String((int)gyro.g.x);                      // Valores do giroscópio no eixo X, se houver a possibilidade de medir em X
   dataString += "\t";
 #endif
 #if gyroy
-  dataString += String((int)gyro.g.y);
+  dataString += String((int)gyro.g.y);                      // Valores do giroscópio no eixo Y, se houver a possibilidade de medir em Y
   dataString += "\t";
 #endif
 #if gyroz
-  dataString += String((int)gyro.g.z);
+  dataString += String((int)gyro.g.z);                      // Valores do giroscópio no eixo Z, se houver a possibilidade de medir em Z
   dataString += "\t";
 #endif
 #endif
-  // ================================= ETAPA DO ACELERÔMETRO ==================================== //
+ // ================================================== ETAPA DO ACELERÔMETRO ========================================================== //
   /* Get a new sensor event */
   sensors_event_t event;
 #if Acelerometro
@@ -317,51 +323,51 @@ void loop() {
   accel.getEvent(&event);
   /* Display the results (acceleration is measured in m/s^2) */
 #if Accx
-  dataString += String(event.acceleration.x); dataString += "\t";
+  dataString += String(event.acceleration.x); dataString += "\t"; // Valores do acelerômetro no eixo X, se houver a possibilidade de medir em X
 #endif
 #if Accy
-  dataString += String(event.acceleration.y); dataString += "\t";
+  dataString += String(event.acceleration.y); dataString += "\t"; // Valores do acelerômetro no eixo Y, se houver a possibilidade de medir em Y
 #endif
 #if Accz
-  dataString += String(event.acceleration.z); dataString += "\t";
+  dataString += String(event.acceleration.z); dataString += "\t"; // Valores do acelerômetro no eixo Z, se houver a possibilidade de medir em Z
 #endif
 #endif
-  // ================================== ETAPA DO MAGNETÔMETRO ==================================== //
+  // ================================================= ETAPA DO MAGNETÔMETRO =========================================================== //
 #if Magnetometro
   /* Get a new sensor event */
   mag.getEvent(&event);
 
   /* Display the results (magnetic vector values are in micro-Tesla (uT)) */
 #if Magx
-  dataString += String(event.magnetic.x); dataString += "\t";
+  dataString += String(event.magnetic.x); dataString += "\t"; // Valores do campo magnético no eixo X, se houver a possibilidade de medir em X
 #endif
 #if Magy
-  dataString += String(event.magnetic.y); dataString += "\t";
+  dataString += String(event.magnetic.y); dataString += "\t"; // Valores do campo magnético no eixo Y, se houver a possibilidade de medir em Y
 #endif
 #if Magz
-  dataString += String(event.magnetic.z); dataString += "\t";
+  dataString += String(event.magnetic.z); dataString += "\t"; // Valores do campo magnético no eixo Z, se houver a possibilidade de medir em Z
 #endif
-  // O código permite reajustar a oritenção para o Norte. Neste código isso não é necessário.
+  // A biblioteca permite reajustar a oritenção para o Norte. Neste código isso não é necessário.
   // Caso precise, olhe na biblioteca original
 #endif
-  // ======================== ETAPA PARA ACIONAMENTO DE PARAQUEDAS ============================== //
+  // ========================================== ETAPA PARA ACIONAMENTO DE PARAQUEDAS ===================================================== //
 #if Barometro
-  if (Delta > 0 || Apogeu == true) {                                                              // Só serve para imprimir na tela. Se a diferença da média móvel com o Hmáx é maior que 0, significa que pode estar descendo
-    if (Delta >= dfaltura || Apogeu == true) {                                                    // Se a diferença for maior ou igual ao delta de ref. ou já tenha detectado o apogeu
-      Apogeu = true;                                                                              // Imprime na tela: Encontrou o apogeu
+  if (Delta > 0 || Apogeu == true) {                                     // Só serve para imprimir na tela. Se a diferença da média móvel com o Hmax é maior que 0, significa que pode estar descendo
+    if (Delta >= dfaltura || Apogeu == true) {                           // Se a diferença for maior ou igual ao delta de ref. ou já tenha detectado o apogeu
+      Apogeu = true;                                                     // Imprime na tela e na tabela de dados: Encontrou o apogeu
       dataString += String("Encontrou o apogeu");
       if (Tia) {
-        previousMillis = currentMillis;                                                           // Começa a considerar este momento para inciar os timers
-        TA_Piloto = InterDesligTimer + previousMillis;                                            // Guarda o instante para desligar o paraquedas A
-        TA_PilotoBackup = InterA2 + previousMillis;                                               // Guarda o instante para o segundo acionamento do Paraquedas A (segurança)
+        previousMillis = currentMillis;                                  // Começa a considerar este momento para inciar os timers
+        TA_Piloto = InterDesligTimer + previousMillis;                   // Guarda o instante para desligar o paraquedas A
+        TA_PilotoBackup = InterA2 + previousMillis;                      // Guarda o instante para o segundo acionamento do Paraquedas A (segurança)
         Tia = false;
       }
       if (currentMillis >= TA_Piloto) {
-        dataString += String("PA - Off");                                                         // Desliga o paraquedas A
+        dataString += String("PA - Off");                                // Desliga o paraquedas A
         digitalWrite(IGN_1, LOW);
       } else {
         dataString += String("PA - On ");
-        digitalWrite(IGN_1, HIGH);                                                                // Ligou o paraquedas A
+        digitalWrite(IGN_1, HIGH);                                       // Ligou o paraquedas A
       }
       if (TA_PilotoBackup <= currentMillis && (currentMillis < TDA_PilotoBackup || TDA_PilotoBackup == 0)) {
         dataString += String("PA2 - On  ");                                                       // Segundo acionamento paraquedas A
