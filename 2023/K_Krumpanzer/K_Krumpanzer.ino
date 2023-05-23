@@ -24,6 +24,10 @@ int apogeu;
 int nun = 0;
 String nome = "kaua";
 String arq = nome + nun + ".txt";
+int startTime;
+int duration = 10000; 
+bool ledState = false;
+
 
 float filtro(float mediamovel){
   for(i = n-1; i>0; i--) num[i] = num[i-1];
@@ -47,6 +51,7 @@ void setup (){
   Serial.begin(115200);
   pinMode(IGN_1, OUTPUT);
   pinMode(13,OUTPUT);
+  startTime = millis();
   if (!bmp.begin()) {
 	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
 	while (1) {}
@@ -114,10 +119,20 @@ void loop (){
     apogeu = 0;
   }
 
-  if(apogeu==1){
-    digitalWrite(IGN_1, HIGH);
-    delay(10000); 
-    digitalWrite(IGN_1, LOW);
+  if (apogeu == 1) {
+    unsigned long currentTime = millis(); 
+    if (currentTime - startTime < duration) {
+      if (!ledState) {
+        digitalWrite(IGN_1, HIGH); 
+        ledState = true;
+      }
+    } else {
+      if (ledState) {
+        digitalWrite(IGN_1, LOW); 
+        ledState = false;
+        startTime = currentTime; 
+      }
+    }
   }
 
   
