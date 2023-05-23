@@ -8,6 +8,10 @@ const int chipSelect = 53;
 
 #define n 10
 #define n1 5
+#define IGN_1 36	/*act1*/
+#define IGN_2 61	/*act2*/
+#define IGN_3 46	/*act3*/
+#define IGN_4 55	/*act4*/
 
 
 float alt_inicial; 
@@ -41,13 +45,14 @@ float filtro2(float mediamovel2){
 
 void setup (){
   Serial.begin(115200);
+  pinMode(IGN_1, OUTPUT);
   pinMode(13,OUTPUT);
   if (!bmp.begin()) {
 	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
 	while (1) {}
   }
 
-  Serial.print(F("Lendo cartao SD"));
+  Serial.println(F("Lendo cartao SD"));
   delay(100);
     if (!SD.begin(chipSelect)) {
       Serial.println(F("Leitura Falhou"));
@@ -90,6 +95,7 @@ void setup (){
   } 
  alt_inicial = soma/5;
 
+  
 }
 
 
@@ -106,6 +112,12 @@ void loop (){
   apogeu = 1;
   }else{
     apogeu = 0;
+  }
+
+  if(apogeu==1){
+    digitalWrite(IGN_1, HIGH);
+    delay(10000); 
+    digitalWrite(IGN_1, LOW);
   }
 
   
