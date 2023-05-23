@@ -81,12 +81,12 @@ void setup() {
 
 void loop() {
 
- // make a string for assembling the data to log:
-  String dataString = "";
-
-  altura = bmp.readAltitude()- alt_inicial;
-  altura_sem_ruido = filtro(altura);
+  float temperatura = bmp.readTemperature();
+  float pressao = bmp.readSealevelPressure();
+  float altura = bmp.readAltitude()- alt_inicial;
+  float altura_sem_ruido = filtro(altura);
   float alt_filtrada2 = filtro2(altura_sem_ruido);
+  int queda;
 
   for(i = n2-1; i>0; i--){
     num3[i] = num3[i-1];
@@ -100,42 +100,40 @@ void loop() {
     queda = 0;
   }
 
-
-  Serial.print(bmp.readTemperature());
+  
+  Serial.print(temperatura);
   Serial.print("\t");
-
-  Serial.print(bmp.readSealevelPressure());
+  Serial.print(pressao);
   Serial.print("\t");
-
   Serial.print(altura);
   Serial.print("\t");
-
   Serial.print(altura_sem_ruido);
   Serial.print("\t");
-
   Serial.print(alt_filtrada2);
   Serial.print("\t");
-
   Serial.print(queda);
+
+// make a string for assembling the data to log:
+  String dataString = "";
+  dataString += String(temperatura);
+  dataString += String("\t");
+  dataString += String(pressao);
+  dataString += String("\t");
+  dataString += String(altura);
+  dataString += String("\t");
+  dataString += String(altura_sem_ruido);
+  dataString += String("\t");
+  dataString += String(alt_filtrada2);
+  dataString += String("\t");
+  dataString += String(queda);
+  
 
   File dataFile = SD.open("lais.txt", FILE_WRITE);
 
   if (dataFile) {
-    dataFile.print(bmp.readTemperature());
-    dataFile.print("\t");
-    dataFile.print(bmp.readSealevelPressure());
-    dataFile.print("\t");
-    dataFile.print(altura);
-    dataFile.print("\t");
-    dataFile.print(altura_sem_ruido);
-    dataFile.print("\t");
-    dataFile .print(alt_filtrada2);
-    dataFile.print("\t");
-    dataFile.print(queda);
+    dataFile.print(dataString);    
     dataFile.println();
     dataFile.close();
-    // print to the serial port too:
-    Serial.println(dataString);
   }
   // if the file isn't open, pop up an error:
   else {
