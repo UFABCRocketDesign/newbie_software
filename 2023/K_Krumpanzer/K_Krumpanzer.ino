@@ -54,14 +54,14 @@ void setup (){
       while (1);
     }
 
-  while (SD.exists(arq)) {
-    nun++;
-    String zeros;
-    for(i=String(nun).length()+String(nome).length(); i<8; i++){
+  do {
+      String zeros;
+      for(i=String(nun).length()+String(nome).length(); i<8; i++){
       zeros = zeros + "0";
-  } 
+    } 
     arq = nome + zeros + nun + ".txt";
-  }
+    nun++;
+  } while (SD.exists(arq));
 
   Serial.println(arq);
   Serial.println(F("Cartao SD Inicializado!"));
