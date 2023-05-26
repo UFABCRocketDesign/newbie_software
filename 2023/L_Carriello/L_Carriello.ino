@@ -17,6 +17,8 @@ float num3[n2];
 float altura_sem_ruido;
 float altura = 0;
 int queda;
+String file_name;
+String nume;
 
   float filtro(float media){
     for(i = n-1; i>0; i--) num[i] = num[i-1];
@@ -82,7 +84,13 @@ void setup() {
   Serial.println("card initialized.");
 
   File dataFile = SD.open("lais.txt", FILE_WRITE);
-
+  if (SD.exists("lais.txt")){
+    for(int i=0; i<1000; i++){
+      nume = String(i);
+      file_name = "lais" + nume + ".txt";
+    File dataFile = SD.open(file_name, FILE_WRITE);
+    }
+  }
   if (dataFile) {
     dataFile.println(dataString);    
     dataFile.close();
