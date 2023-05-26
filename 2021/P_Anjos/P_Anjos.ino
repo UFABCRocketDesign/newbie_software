@@ -54,48 +54,46 @@ Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 L3G gyro;
 #endif
 
-// ================================= VARIAVEIS GLOBAIS DECLARADAS - Não é ressetada a cada loop  ================================ //
-float AltitudeRef = 0;                // Variável para armazenar a altitude da base delançamento
-int a;                                // Variável para a nomenclatura de versões do arquivo no SD
-int b;                                // Variável para a nomenclatura de versões do arquivo no SD
-int c;                                // Variável para a nomenclatura de versões do arquivo no SD
-int cont = 0;                         // Contador para nomenclatura de versões do arquivo no SD
-String nome;                          // Variável para a nomenclatura de versões do arquivo no SD
-String parteA;
-String parteB;
-bool Apogeu = false;
-bool Tia = true;
+// Obs importante: Variáveis mutaveis =! de variáveis ressetadas
+// Variável global é aquela que sempre será necessário saber o seu valor anterior a cada loop.
 
-// =========================================== VARIAVEIS LOCAIS DECLARADAS ====================================================== //
-float H1 = 0;                         // Variável GLOBAL - Não é ressetada a cada loop. Armazena o dado.
-float H2 = 0;
-float Hmax = 0;
+// ================================= VARIAVEIS GLOBAIS DECLARADAS - Não é ressetada a cada loop  ================================ //
+float AltitudeRef = 0;                // Variável para armazenar a altitude da base de lançamento
+int cont = 0;                         // Contador para nomenclatura de versões do arquivo no SD. Preciso sempre do valor anterior, por isso não é ressetada.
+String nome;                          // Variável para a nomenclatura de versões do arquivo no SD
+float H1 = 0;                         // Variável GLOBAL - Não é ressetada a cada loop. Valor da altitude medida no sensor.
+float H2 = 0;                         // Variável para armazenar a última medida do sensor
+float Hmax = 0;                       // Variável que armazena a altura máxima detectada
 float Soma = 0;
-float SomaMov = 0;
-float MediaMov = 0;
-float MediaMA = 0;
-float MediaMB = 0;
-float Delta;                          //Diferença da altitude anterior com a nova que foi medida
-float Vetor[3][10];                   //Vetor para guardar os últimos 10 valores para a média móvel
-float FiltroA[10];                    //Segunda filtragem para a média móvel
-float FiltroB[10];                    // terceira filtragem para a média móvel
-float SomaFA = 0;
-float SomaFB = 0;
+float SomaMov = 0;                    // Soma dos últimos 10 valores para o filtro principal de média móvel
+float SomaFA = 0;                     // Soma dos últimos 10 valores para o filtro A de média móvel - 2ª filtragem (Atualmente, em DESUSO)
+float SomaFB = 0;                     // Soma dos últimos 10 valores para o filtro B de média móvel - 3ª filtragem (Atualmente, em DESUSO)
+float MediaMov = 0;                   // Média móvel principal
+float MediaMA = 0;                    // Média móvel do filtro A - 2ª filtragem (Atualmente, em DESUSO)
+float MediaMB = 0;                    // Média móvel do filtro B - 3ª filtragem (Atualmente, em DESUSO)
+float FiltroA[10];                    // Vetor do filtro A - 2ª filtragem (Atualmente, em DESUSO)
+float FiltroB[10];                    // Vetor do filtro B - 3ª filtragem (Atualmente, em DESUSO)
+float Delta;                          // Diferença da altitude anterior com a nova que foi medida
+float Vetor[3][10];                   // Vetor para guardar os últimos 10 valores para a média móvel (Na verdade é uma matriz)
+bool Apogeu = false;                  // Detecção do apogeu em variável booleana
+bool Tia = true;                      // Variável booleana para assim que apogeu foi detectado, liberar o cronometro para contar o tempo do paraquedas
 float Aux = 0;
 float Timer = 0;                      // Guarda o tempo do timer
 unsigned long previousMillis = 0;     // Guarda o momento de tempo para iniciar A e B
 unsigned long previousMillis2 = 0;    // Guarda o momento para o timer para manter B ligado
 const long interval = 2000;           // O intervalo de tempo que o LED deve ficar ligado em milesegundos
-int Intervalo = 3000;                 //Intervalo de tempo do Timer antes do acionamento do paraquedas
-int TA_Piloto = 0;                    //Intervalo de tempo para desligar o paraquedas A em segundos
-int TA_PilotoBackup = 0;               //Intervalo de tempo para ligar o 2º acionamento paraquedas A em segundos
-int TDA_PilotoBackup = 0;              //Intervalo de tempo que o 2º acionamento paraquedas A fica ligado em segundos
-int TB_Main = 0;                      //Intervalo de tempo para desligar o paraquedas B em segundos
+int Intervalo = 3000;                 // Intervalo de tempo do Timer antes do acionamento do paraquedas (Provavelmente em DESUSO)
+int TA_Piloto = 0;                    // Guarda o instante de tempo para desligar o paraquedas A.
+int TA_PilotoBackup = 0;              // Guarda o instante de tempo para ligar o 2º acionamento paraquedas A
+int TDA_PilotoBackup = 0;             // Guarda o instante de tempo que o 2º acionamento paraquedas A deve ser desligado
+int TB_Main = 0;                      // Guarda o instante de tempo para desligar o paraquedas B
 bool Aceso = false;                   // A variável booleana para verificar se o LED ta ligado
 bool Fim = true;                      // A variável booleana para parar a verificação do paraquedas
 bool ResetA2 = true;                  // A variável booleana para parar resetar o timer do A2
 bool ResetB = true;                   // A variável booleana para parar resetar o timer do B
+float AltitudeSensor = 0;
 
+// =========================================== VARIAVEIS LOCAIS DECLARADAS ====================================================== //
 //================================================================================================================== //
 
 void setup() {
@@ -112,7 +110,7 @@ void setup() {
   }
 #endif
 
- // ====================================== GIROSCOPIO - INICIALIZACAO =============================================== //
+  // ====================================== GIROSCOPIO - INICIALIZACAO =============================================== //
 #if giroscopio
   if (!gyro.init())
   {
@@ -166,7 +164,7 @@ void setup() {
   //displaySensorDetails(); //Reitirei do código pois não era interessante. Se precisar olhe na biblioteca original
 #endif
 
- // ============================================ CARTAO SD - INICIALIZACAO ============================================== //
+  // ============================================ CARTAO SD - INICIALIZACAO ============================================== //
 #if GravacaoSD
   // see if the card is present and can be initialized:
   const int chipSelect = 53;            //Define o pino para o chipselect para gravar no cartão SD. Variavel Local
@@ -177,6 +175,11 @@ void setup() {
   }
   do {
     nome = "PA";
+    int a;                                // Variável para a nomenclatura de versões do arquivo no SD
+    int b;                                // Variável para a nomenclatura de versões do arquivo no SD
+    int c;                                // Variável para a nomenclatura de versões do arquivo no SD
+    String parteA;
+    String parteB;                        // Variável para a nomenclatura de versões do arquivo no SD
     a = nome.length();
     parteB = String(cont);
     b = parteB.length();
@@ -194,8 +197,8 @@ void setup() {
   Serial.println("card initialized.");
 #endif
 
-// ======================================= CRIACAO DO CABECALHO DA TABELA DE DADOS ========================================= //
-  String dataCabecalho;     // Variável GLOBAL para armazenar o cabecalho. Não é ressetada todo loop
+  // ======================================= CRIACAO DO CABECALHO DA TABELA DE DADOS ========================================= //
+  String dataCabecalho;     // Variável local para armazenar o cabecalho. Não é ressetada todo loop e eu só uso aqui no void setup
   dataCabecalho += "Tempo\t";
 #if altitude
   dataCabecalho += "Apogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\t";
@@ -236,7 +239,7 @@ void setup() {
   dataCabecalho += "Situacao"; // Fim da string cabecalho
   Serial.println(dataCabecalho);
 #if GravacaoSD
-  File dataFile = SD.open(nome, FILE_WRITE); // Variável GLOBAL para escrever o cabecalho no cartao SD. Não muda com a mudança de loop
+  File dataFile = SD.open(nome, FILE_WRITE); // Variável local para escrever o cabecalho no cartao SD. Não muda com a mudança de loop
   dataFile.println(dataCabecalho);
   dataFile.close();
 #endif
@@ -261,26 +264,28 @@ void loop() {
 #if Barometro
 #if altitude
   SomaMov = 0;
-  MediaMov = bmp.readAltitude() - AltitudeRef;
-  for (int j = 0; j < 3; j++) {
-    for (int i = 8; i >= 0; i--) {                          // Laço apenas para a movimentação
-      Vetor[j][i + 1] = Vetor[j][i];
-    }
-    Vetor[j][0] = MediaMov;
-    SomaMov = 0;
-    for (int i = 0; i < 10; i++) {                         // Laço para a somatória dos valores
-      SomaMov = SomaMov + Vetor[j][i];
-    }
-    MediaMov = SomaMov / 10;
-  }
+  //MediaMov = bmp.readAltitude() - AltitudeRef;
+  AltitudeSensor = bmp.readAltitude() - AltitudeRef;
+  filtroMediaMovel(AltitudeSensor);
+//  for (int j = 0; j < 3; j++) {
+//    for (int i = 8; i >= 0; i--) {                          // Laço apenas para a movimentação
+//      Vetor[j][i + 1] = Vetor[j][i];
+//    }
+//    Vetor[j][0] = MediaMov;
+//    SomaMov = 0;
+//    for (int i = 0; i < 10; i++) {                         // Laço para a somatória dos valores
+//      SomaMov = SomaMov + Vetor[j][i];
+//    }
+//    MediaMov = SomaMov / 10;
+//  }
   H2 = H1;                                                  // Guardei a altitude de referência (medição anterior)
-  H1 = MediaMov;                                            // Nova leitura de altitude. Variável LOCAL
+  H1 = MediaMov;                                            // Nova leitura filtrada de altitude.
 
   if (Hmax < H1) {
     Hmax = H1;                                              // Guardou a nova altitude máxima
   }
   Delta = Hmax - H1;                                        // Diferença entre a altitude máxima e altitude atual
-  
+
   // ============================================== DADOS QUE VÃO PARA STRING ========================================================== //
   dataString += String(Hmax);                               // Maior altura registrada
   dataString += "\t";
@@ -300,7 +305,7 @@ void loop() {
   dataString += "\t";
 #endif
 #endif
- // ================================================== ETAPA DO GIROSCÓPIO ========================================================== //
+  // ================================================== ETAPA DO GIROSCÓPIO ========================================================== //
 #if giroscopio
 #if gyrox
   dataString += String((int)gyro.g.x);                      // Valores do giroscópio no eixo X, se houver a possibilidade de medir em X
@@ -315,7 +320,7 @@ void loop() {
   dataString += "\t";
 #endif
 #endif
- // ================================================== ETAPA DO ACELERÔMETRO ========================================================== //
+  // ================================================== ETAPA DO ACELERÔMETRO ========================================================== //
   /* Get a new sensor event */
   sensors_event_t event;
 #if Acelerometro
@@ -360,7 +365,7 @@ void loop() {
         previousMillis = currentMillis;                                  // Começa a considerar este momento para inciar os timers
         TA_Piloto = InterDesligTimer + previousMillis;                   // Guarda o instante para desligar o paraquedas A
         TA_PilotoBackup = InterA2 + previousMillis;                      // Guarda o instante para o segundo acionamento do Paraquedas A (segurança)
-        Tia = false;
+        Tia = false;                                                     // Pronto. Já registrei o tempo e não preciso entrar nessa condição de novo
       }
       if (currentMillis >= TA_Piloto) {
         dataString += String("PA - Off");                                // Desliga o paraquedas A
@@ -374,7 +379,7 @@ void loop() {
         if (ResetA2) {
           digitalWrite(IGN_2, HIGH);
           TDA_PilotoBackup = InterDesligTimer + currentMillis;                                    // Atualiza o instante para desligar o segundo acionamento do paraquedas
-          ResetA2 = false;
+          ResetA2 = false;                                                                        // Uma vez definido esse instante, não preciso mais entrar nessa condição
         }
       } else {
         dataString += String("PA2 - Off ");                                                       // Desliga o segundo acionamento paraquedas A
@@ -385,7 +390,7 @@ void loop() {
         if (ResetB) {
           digitalWrite(IGN_3, HIGH);
           TB_Main = InterDesligTimer + currentMillis;                                             // Atualiza o instante para desligar o paraquedas B
-          ResetB = false;
+          ResetB = false;                                                                         // Uma vez definido esse instante, não preciso mais entrar nessa condição
         }
       } else {
         dataString += String("PB - Off  ");                                                       // Desliga paraquedas B
@@ -412,3 +417,26 @@ void loop() {
   }
 #endif
 }
+
+// =============================== CRIAÇÃO DAS FUNÇÔES ============================================= //
+
+// Função para média móvel - 3 filtros em uma função 
+#if Barometro
+#if altitude
+float filtroMediaMovel(float AltitudeSensor) {
+  MediaMov = AltitudeSensor;
+  for (int j = 0; j < 3; j++) {
+    for (int i = 8; i >= 0; i--) {                          // Laço apenas para a movimentação
+      Vetor[j][i + 1] = Vetor[j][i];
+    }
+    Vetor[j][0] = MediaMov;
+    SomaMov = 0;
+    for (int i = 0; i < 10; i++) {                         // Laço para a somatória dos valores
+      SomaMov = SomaMov + Vetor[j][i];
+    }
+    MediaMov = SomaMov / 10;
+  }
+  return MediaMov;
+}
+#endif
+#endif
