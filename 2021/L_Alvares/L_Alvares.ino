@@ -72,21 +72,24 @@ unsigned long TQ = 0;
 #if Led1Dbg
 int LED1ST = LOW;
 bool LK1 = false;
-unsigned long OL1 = 0;
+int P1 = LOW;
+unsigned long TDes1 = 0;
 #endif
 
 #if Led2Dbg
 int LED2ST = LOW;
 bool LK2 = false;
 bool LC2 = false;
+int P2 = LOW;
 unsigned long TAL2 = 0;
-unsigned long OL2 = 0;
+unsigned long TDes2 = 0;
 #endif
 
 #if Led3Dbg
 int LED3ST = LOW;
 bool LK3 = false;
-unsigned long OL3 = 0;
+int P3 = LOW;
+unsigned long TDes3 = 0;
 #endif
 
 #if MagDbg
@@ -410,47 +413,26 @@ void loop() {
   if (Q1 == 1)  // se detectar a queda
   {
 #if Led1Dbg
-    if (LK1 == false)  //se a trava estiver desativada
-    {
-      LED1ST = HIGH;
-      LK1 = true;
-      OL1 = TAtual + TL;
-    }
-    if (TAtual >= OL1)  //apos X seg, o Led 1 apaga
-    {
-      LED1ST = LOW;
-    }
-    digitalWrite(PLED1, LED1ST);
+    P1 = Paraquedas(TAtual,LED1ST,TL,LK1,TDes1);
+    digitalWrite(PLED1, P1);
 #endif
 #if Led2Dbg
     if (LC2 == false) {
       TAL2 = TQ + AtivarLED2;
       LC2 = true;
     }
-    if (TAtual > TAL2 && LK2 == false)  //se a trava estiver desativada
+    if (TAtual > TAL2)
     {
-      LED2ST = HIGH;
-      LK2 = true;
-      OL2 = TAtual + TL;
+      P2 = Paraquedas(TAtual,LED2ST,TL,LK2,TDes2);
     }
-    if (TAtual >= OL2 && LK2 == true)  // Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
-    {
-      LED2ST = LOW;
-    }
-    digitalWrite(PLED2, LED2ST);
+    digitalWrite(PLED2, P2);
 #endif
 #if Led3Dbg
-    if (SF[Nf] <= -0.25 && LK3 == false)  //se a trava estiver desativada
+    if (SF[Nf] <= -0.25)  //se a trava estiver desativada
     {
-      LED3ST = HIGH;
-      LK3 = true;
-      OL3 = TAtual + TL;
+      P3 = Paraquedas(TAtual,LED3ST,TL,LK3,TDes3);
     }
-    if (TAtual >= OL3)  // Caso a trava esteja ativada, Apos X tempo, do Led 2 apaga
-    {
-      LED3ST = LOW;
-    }
-    digitalWrite(PLED3, LED3ST);
+    digitalWrite(PLED3, P3);
 #endif
   }
 #endif
@@ -509,47 +491,19 @@ int Apogeu(float AltAtual, int VQueda) {
 }
 
 //Paraquedas
-void Paraquedas(int Dapg, unsigned long TQd, unsigned long TAt, int StPqd ,int TAc)  // Detecção de apogeu, tempo de queda, Tempo atual,Numero do paraquedas e tempo de acionamento 
+int Paraquedas(unsigned long TAt, int StPqd, int TAc, bool LK, int TDs) //Tempo atual, Estado do paraquedas, Tempo de acionamento do paraquedas, Trava do paraquedas, Tempo de desligamento do paraquedas
 {
-  //int StPqd = LOW;  //Valor para definir acionamento, Numero do paraquedas (led) a ser acionado
-  bool LK = false;
-
-  if (Dapg == 1) 
-  {  
-    if (LK == false) {
-      StPqd = HIGH;
-      LK = true;
-      //Tp1 = TAtual + TL;
-    }
-    //if (TAtual >= Tp)  //apos X seg, o Led 1 apaga
-    {
-      StPqd = LOW;
-    }
-    digitalWrite(NPqd, StPqd);
-  } 
-  else if (AcPqd == 1)  // se detectou queda, após estar em queda X seg, acionar paraquedas
-  {
-    digitalWrite(NPqd, StPqd);
-  } 
-  else  // se detectou queda e está a X metros, acionar paraquedas
-  {
-    digitalWrite(NPqd, StPqd);
-  }
-}
-
-int Paraquedas(unsigned long TAt, int StPqd, int TAc, int LK, int TDs) //Tempo atual, Estado do paraquedas, Tempo de acionamento do paraquedas, Trava do paraquedas, Tempo de desligamento do paraquedas
-{
-  if(LK == FALSE)
+  if(LK == false)
   {
     StPqd = HIGH;
     LK = HIGH;
-    TDs = TAt + TAc
+    TDs = TAt + TAc;
   }
+
   if(TAt > TDs)
   {
-    StPqD = LOW;
+    StPqd = LOW;
   }
-  
-return StPqD;
 
+return StPqd;
 }
