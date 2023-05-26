@@ -418,7 +418,7 @@ float filtroMediaMovel(float AltitudeSensor, int linhaFiltro) {
   float MediaMov = 0;                                       // Média móvel principal
   float SomaMov = 0;                                        // Soma dos últimos 10 valores para o filtro principal de média móvel
   MediaMov = AltitudeSensor;
-  for (int j = 0; j < 3; j++) {
+  for (int j = 0; j < linhaFiltro + 1; j++) {
     for (int i = 8; i >= 0; i--) {                          // Laço apenas para a movimentação
       Vetor[j][i + 1] = Vetor[j][i];
     }
@@ -429,13 +429,7 @@ float filtroMediaMovel(float AltitudeSensor, int linhaFiltro) {
     }
     MediaMov = SomaMov / 10;
   }
-  // Tendo já os valores endereçados
-  SomaMov = 0;
-  for (int i = 0; i < 10; i++) {                         // Laço para a somatória APENAS da linha desejada
-    SomaMov = SomaMov + Vetor[linhaFiltro][i];
-  }
-  MediaMov = SomaMov / 10;
-return MediaMov;
+  return MediaMov;
 }
 #endif
 #endif
