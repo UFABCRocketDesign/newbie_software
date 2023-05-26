@@ -70,7 +70,8 @@ int linhaFiltro = 0;                  // Parâmetro de entrada da minha função
 float Filtro1 = 0;                    // Média móvel do filtro 1 - 1ª filtragem
 float Filtro2 = 0;                    // Média móvel do filtro 2 - 2ª filtragem
 float Delta;                          // Diferença da altitude anterior com a nova que foi medida
-float Vetor[3][10];                   // Vetor para guardar os últimos 10 valores para a média móvel (Na verdade é uma matriz)
+//int QntFilt = 3;                      // Quantidade de filtros que eu ter disponível ao usar a média móvel
+float Vetor[3][10];             // Vetor para guardar os últimos 10 valores para a média móvel (Na verdade é uma matriz)
 bool Apogeu = false;                  // Detecção do apogeu em variável booleana
 bool Tia = true;                      // Variável booleana para assim que apogeu foi detectado, liberar o cronometro para contar o tempo do paraquedas
 float Aux = 0;
@@ -261,11 +262,11 @@ void loop() {
   //SomaMov = 0;
   //MediaMov = bmp.readAltitude() - AltitudeRef;
   AltitudeSensor = bmp.readAltitude() - AltitudeRef;
-  Filtro1 = filtroMediaMovel(AltitudeSensor, 0);
-  Filtro2 = filtroMediaMovel(AltitudeSensor, 1);
+  Filtro1 = MediaMovel(AltitudeSensor, 0);
+  Filtro2 = MediaMovel(Filtro1, 1);
 
   H2 = H1;                                                  // Guardei a altitude de referência (medição anterior)
-  H1 = filtroMediaMovel(AltitudeSensor, 2);                 // Nova leitura filtrada de altitude.
+  H1 = MediaMovel(Filtro2, 2);                              // Nova leitura filtrada de altitude.
 
   if (Hmax < H1) {
     Hmax = H1;                                              // Guardou a nova altitude máxima
@@ -411,25 +412,23 @@ void loop() {
 
 // =============================== CRIAÇÃO DAS FUNÇÔES ============================================= //
 
-// Função para média móvel - 3 filtros em uma função
 #if Barometro
-#if altitude
-float filtroMediaMovel(float AltitudeSensor, int linhaFiltro) {
+// Funções que servem para qualquer dado que o sensor barométrico estiver habilitado a fornecer
+
+//============================ Média Móvel - 1 filtro apenas ======================================= //
+float MediaMovel(float ValorElemento, int linhaFiltro) {
   float MediaMov = 0;                                       // Média móvel principal
   float SomaMov = 0;                                        // Soma dos últimos 10 valores para o filtro principal de média móvel
-  MediaMov = AltitudeSensor;
-  for (int j = 0; j < linhaFiltro + 1; j++) {
-    for (int i = 8; i >= 0; i--) {                          // Laço apenas para a movimentação
-      Vetor[j][i + 1] = Vetor[j][i];
-    }
-    Vetor[j][0] = MediaMov;
-    SomaMov = 0;
-    for (int i = 0; i < 10; i++) {                         // Laço para a somatória dos valores
-      SomaMov = SomaMov + Vetor[j][i];
-    }
-    MediaMov = SomaMov / 10;
+  MediaMov = ValorElemento;
+  for (int i = 8; i >= 0; i--) {                            // Laço apenas para a movimentação
+    Vetor[linhaFiltro][i + 1] = Vetor[linhaFiltro][i];
   }
+  Vetor[linhaFiltro][0] = MediaMov;
+  SomaMov = 0;
+  for (int i = 0; i < 10; i++) {                             // Laço para a somatória dos valores
+    SomaMov = SomaMov + Vetor[linhaFiltro][i];
+  }
+  MediaMov = SomaMov / 10;
   return MediaMov;
 }
-#endif
 #endif
