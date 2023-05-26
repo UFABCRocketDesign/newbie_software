@@ -36,7 +36,7 @@
 #define Magx (0 && Magnetometro)          //Definindo a presença de dados do campo magnético no eixo X
 #define Magy (1 && Magnetometro)          //Definindo a presença de dados do campo magnético no eixo Y
 #define Magz (1 && Magnetometro)          //Definindo a presença de dados do campo magnético no eixo Z
-#define GravacaoSD 0                      //Definindo se irá gravar os dados no cartão SD
+#define GravacaoSD 1                      //Definindo se irá gravar os dados no cartão SD
 
 // ======================================================================================================================= //
 #if Barometro
