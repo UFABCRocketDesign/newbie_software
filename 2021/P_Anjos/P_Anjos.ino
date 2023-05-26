@@ -22,17 +22,17 @@
 #define dfaltura 2                        //Define o delta de altura de ref. que serve de critério para a determinação do apogeu
 #define Barometro 1                       //Definindo a presença ou não de um sensor barométrico no sistema
 #define altitude    (1 && Barometro)      //Definindo a presença de dados de altitude
-#define temperatura (1&& Barometro)       //Definindo a presença de dados de temperatura
+#define temperatura (0&& Barometro)       //Definindo a presença de dados de temperatura
 #define pressao     (0 && Barometro)      //Definindo a presença de dados de pressão
-#define giroscopio 1                      //Definindo a presença ou não de um sensor giroscópio no sistema
+#define giroscopio 0                      //Definindo a presença ou não de um sensor giroscópio no sistema
 #define gyrox (1 && giroscopio)           //Definindo a presença de dados do giroscópio no eixo X
 #define gyroy (0 && giroscopio)           //Definindo a presença de dados do giroscópio no eixo Y
 #define gyroz (0 && giroscopio)           //Definindo a presença de dados do giroscópio no eixo Z
-#define Acelerometro 1                    //Definindo a presença ou não de um sensor acelerômetro no sistema
+#define Acelerometro 0                    //Definindo a presença ou não de um sensor acelerômetro no sistema
 #define Accx (0 && Acelerometro)          //Definindo a presença de dados do acelerômetro no eixo X
 #define Accy (1 && Acelerometro)          //Definindo a presença de dados do acelerômetro no eixo Y
 #define Accz (0 && Acelerometro)          //Definindo a presença de dados do acelerômetro no eixo Z
-#define Magnetometro 1                    //Definindo a presença ou não de um sensor magnetômetro no sistema
+#define Magnetometro 0                    //Definindo a presença ou não de um sensor magnetômetro no sistema
 #define Magx (0 && Magnetometro)          //Definindo a presença de dados do campo magnético no eixo X
 #define Magy (1 && Magnetometro)          //Definindo a presença de dados do campo magnético no eixo Y
 #define Magz (1 && Magnetometro)          //Definindo a presença de dados do campo magnético no eixo Z
@@ -65,14 +65,10 @@ float H1 = 0;                         // Variável GLOBAL - Não é ressetada a 
 float H2 = 0;                         // Variável para armazenar a última medida do sensor
 float Hmax = 0;                       // Variável que armazena a altura máxima detectada
 float Soma = 0;
-float SomaMov = 0;                    // Soma dos últimos 10 valores para o filtro principal de média móvel
-float SomaFA = 0;                     // Soma dos últimos 10 valores para o filtro A de média móvel - 2ª filtragem (Atualmente, em DESUSO)
-float SomaFB = 0;                     // Soma dos últimos 10 valores para o filtro B de média móvel - 3ª filtragem (Atualmente, em DESUSO)
-float MediaMov = 0;                   // Média móvel principal
-float MediaMA = 0;                    // Média móvel do filtro A - 2ª filtragem (Atualmente, em DESUSO)
-float MediaMB = 0;                    // Média móvel do filtro B - 3ª filtragem (Atualmente, em DESUSO)
-float FiltroA[10];                    // Vetor do filtro A - 2ª filtragem (Atualmente, em DESUSO)
-float FiltroB[10];                    // Vetor do filtro B - 3ª filtragem (Atualmente, em DESUSO)
+float AltitudeSensor = 0;             // A variável para dar a altitude medida já desconsiderando a altitude de referência (parâmetro de entrada da função)
+int linhaFiltro = 0;                  // Parâmetro de entrada da minha função para definir qual filtragem quero ver
+float Filtro1 = 0;                    // Média móvel do filtro 1 - 1ª filtragem
+float Filtro2 = 0;                    // Média móvel do filtro 2 - 2ª filtragem
 float Delta;                          // Diferença da altitude anterior com a nova que foi medida
 float Vetor[3][10];                   // Vetor para guardar os últimos 10 valores para a média móvel (Na verdade é uma matriz)
 bool Apogeu = false;                  // Detecção do apogeu em variável booleana
@@ -91,7 +87,6 @@ bool Aceso = false;                   // A variável booleana para verificar se 
 bool Fim = true;                      // A variável booleana para parar a verificação do paraquedas
 bool ResetA2 = true;                  // A variável booleana para parar resetar o timer do A2
 bool ResetB = true;                   // A variável booleana para parar resetar o timer do B
-float AltitudeSensor = 0;
 
 // =========================================== VARIAVEIS LOCAIS DECLARADAS ====================================================== //
 //================================================================================================================== //
@@ -201,7 +196,7 @@ void setup() {
   String dataCabecalho;     // Variável local para armazenar o cabecalho. Não é ressetada todo loop e eu só uso aqui no void setup
   dataCabecalho += "Tempo\t";
 #if altitude
-  dataCabecalho += "Apogeu(Hmax)\tAltura filtrada(H1)\tDelta\tAltura sensor\t";
+  dataCabecalho += "Apogeu(Hmax)\tAltura sensor\tAltura filtro 1\tAltura filtro 2\tAltura filtrada final(H1)\tDelta\t";
 #endif
 #if temperatura
   dataCabecalho += "Temperature(*C)\t";
@@ -263,23 +258,14 @@ void loop() {
   // =========================================== MÉDIA MÓVEL E DETECÇÃO DE APOGEU ===================================================== //
 #if Barometro
 #if altitude
-  SomaMov = 0;
+  //SomaMov = 0;
   //MediaMov = bmp.readAltitude() - AltitudeRef;
   AltitudeSensor = bmp.readAltitude() - AltitudeRef;
-  filtroMediaMovel(AltitudeSensor);
-//  for (int j = 0; j < 3; j++) {
-//    for (int i = 8; i >= 0; i--) {                          // Laço apenas para a movimentação
-//      Vetor[j][i + 1] = Vetor[j][i];
-//    }
-//    Vetor[j][0] = MediaMov;
-//    SomaMov = 0;
-//    for (int i = 0; i < 10; i++) {                         // Laço para a somatória dos valores
-//      SomaMov = SomaMov + Vetor[j][i];
-//    }
-//    MediaMov = SomaMov / 10;
-//  }
+  Filtro1 = filtroMediaMovel(AltitudeSensor, 0);
+  Filtro2 = filtroMediaMovel(AltitudeSensor, 1);
+
   H2 = H1;                                                  // Guardei a altitude de referência (medição anterior)
-  H1 = MediaMov;                                            // Nova leitura filtrada de altitude.
+  H1 = filtroMediaMovel(AltitudeSensor, 2);                 // Nova leitura filtrada de altitude.
 
   if (Hmax < H1) {
     Hmax = H1;                                              // Guardou a nova altitude máxima
@@ -289,12 +275,17 @@ void loop() {
   // ============================================== DADOS QUE VÃO PARA STRING ========================================================== //
   dataString += String(Hmax);                               // Maior altura registrada
   dataString += "\t";
-  dataString += String(H1);                                 // Altura atual já filtrada
+  dataString += String(Vetor[0][0]);                        // Altura atual sem filtro nenhum. A fim de comparação de valores apenas
+  dataString += "\t";
+  dataString += String(Filtro1);                            // Altura com a 1ª filtragem
+  dataString += "\t";
+  dataString += String(Filtro2);                            // Altura com a 2ª filtragem
+  dataString += "\t";
+  dataString += String(H1);                                 // Altura com a filtragem final
   dataString += "\t";
   dataString += String(Delta);                              // Diferença em relação a altura máxima
   dataString += "\t";
-  dataString += String(Vetor[0][0]);                        // Altura atual sem filtro nenhum. A fim de comparação de valores apenas
-  dataString += "\t";
+
 #endif
 #if temperatura
   dataString += String(bmp.readTemperature());              // Valores de temperatura, se for relevante
@@ -420,10 +411,12 @@ void loop() {
 
 // =============================== CRIAÇÃO DAS FUNÇÔES ============================================= //
 
-// Função para média móvel - 3 filtros em uma função 
+// Função para média móvel - 3 filtros em uma função
 #if Barometro
 #if altitude
-float filtroMediaMovel(float AltitudeSensor) {
+float filtroMediaMovel(float AltitudeSensor, int linhaFiltro) {
+  float MediaMov = 0;                                       // Média móvel principal
+  float SomaMov = 0;                                        // Soma dos últimos 10 valores para o filtro principal de média móvel
   MediaMov = AltitudeSensor;
   for (int j = 0; j < 3; j++) {
     for (int i = 8; i >= 0; i--) {                          // Laço apenas para a movimentação
@@ -436,7 +429,13 @@ float filtroMediaMovel(float AltitudeSensor) {
     }
     MediaMov = SomaMov / 10;
   }
-  return MediaMov;
+  // Tendo já os valores endereçados
+  SomaMov = 0;
+  for (int i = 0; i < 10; i++) {                         // Laço para a somatória APENAS da linha desejada
+    SomaMov = SomaMov + Vetor[linhaFiltro][i];
+  }
+  MediaMov = SomaMov / 10;
+return MediaMov;
 }
 #endif
 #endif
