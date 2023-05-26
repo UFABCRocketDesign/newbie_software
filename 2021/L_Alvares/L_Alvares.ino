@@ -11,7 +11,6 @@
 #define IGN_2 61 /*act2*/
 #define IGN_3 46 /*act3*/
 #define IGN_4 55 /*act4*/
-#define inter 1000
 #define AtivarLED2 3000
 #define TL 5000
 #define PLED1 IGN_1
@@ -22,6 +21,7 @@
 #define Nf 2
 #define Vmed 11
 #define VEQ 11
+#define NP 3
 
 #define MagDbg 1
 #define GyrDbg 1
@@ -42,9 +42,7 @@
 #define AclYDbg (AclDbg && 1)
 #define AclZDbg (AclDbg && 1)
 
-#define Led1Dbg (BarDbg && 1)
-#define Led2Dbg (BarDbg && 1)
-#define Led3Dbg (BarDbg && 1)
+#define PqDbg (BarDbg && 1)
 
 #define BarTempDbg (BarDbg && 0)
 #define BarPresDbg (BarDbg && 0)
@@ -69,27 +67,13 @@ int Q1 = 0;
 unsigned long TQ = 0;
 #endif
 
-#if Led1Dbg
-int LED1ST = LOW;
-bool LK1 = false;
-int P1 = LOW;
-unsigned long TDes1 = 0;
-#endif
+#if PqDbg
+int LEDST[NP] = LOW;
+unsigned long TDes[NP];
+int PqD[NP] = LOW;
 
-#if Led2Dbg
-int LED2ST = LOW;
-bool LK2 = false;
 bool LC2 = false;
-int P2 = LOW;
-unsigned long TAL2 = 0;
-unsigned long TDes2 = 0;
-#endif
 
-#if Led3Dbg
-int LED3ST = LOW;
-bool LK3 = false;
-int P3 = LOW;
-unsigned long TDes3 = 0;
 #endif
 
 #if MagDbg
@@ -121,15 +105,9 @@ void setup() {
   }
 #endif
 
-#if Led1Dbg
+#if PqDbg
   pinMode(PLED1, OUTPUT);
-#endif
-
-#if Led2Dbg
   pinMode(PLED2, OUTPUT);
-#endif
-
-#if Led3Dbg
   pinMode(PLED3, OUTPUT);
 #endif
 
@@ -279,17 +257,13 @@ void setup() {
 #endif
 
 
-#if Led1Dbg
+#if PqDbg
   StringC += "Ativação Led1";
   StringC += "\t";
-#endif
 
-#if Led2Dbg
   StringC += "Ativação Led2";
   StringC += "\t";
-#endif
 
-#if Led3Dbg
   StringC += "Ativação Led3";
   StringC += "\t";
 #endif
@@ -412,42 +386,50 @@ void loop() {
 #if ApgDbg
   if (Q1 == 1)  // se detectar a queda
   {
-#if Led1Dbg
-    P1 = Paraquedas(TAtual,LED1ST,TL,LK1,TDes1);
-    digitalWrite(PLED1, P1);
-#endif
-#if Led2Dbg
+#if PqDbg
+
+    P1 = Paraquedas(TAtual, LED1ST, TL, LK1, TDes1);
+
+
     if (LC2 == false) {
       TAL2 = TQ + AtivarLED2;
       LC2 = true;
     }
-    if (TAtual > TAL2)
-    {
-      P2 = Paraquedas(TAtual,LED2ST,TL,LK2,TDes2);
+    if (TAtual > TAL2) {
+      P2 = Paraquedas(TAtual, LED2ST, TL, LK2, TDes2);
     }
-    digitalWrite(PLED2, P2);
-#endif
-#if Led3Dbg
+
+
     if (SF[Nf] <= -0.25)  //se a trava estiver desativada
     {
-      P3 = Paraquedas(TAtual,LED3ST,TL,LK3,TDes3);
+      P3 = Paraquedas(TAtual, LED3ST, TL, LK3, TDes3);
     }
-    digitalWrite(PLED3, P3);
+
+    //for (int P = 1; P <= NP; P++)
+    //{
+    //  PqD[P] = Paraquedas(P,TAtual,LEDST[P],TL,TDes[P]);
+    //  digitalWrite(PLED[P], PqD[P]);
+    //}
+
 #endif
   }
 #endif
 
-#if Led1Dbg
+
+#if PqDbg //for rodando os paraquedas por PqD[P]
+
+    //for (int P = 1; P <= NP; P++)
+    //{
+    //dataString += String(PqD[P]);
+    //dataString += "\t";
+    //}
+
   dataString += String(LED1ST);
   dataString += "\t";
-#endif
 
-#if Led2Dbg
   dataString += String(LED2ST);
   dataString += "\t";
-#endif
 
-#if Led3Dbg
   dataString += String(LED3ST);
   dataString += "\t";
 #endif
@@ -491,19 +473,18 @@ int Apogeu(float AltAtual, int VQueda) {
 }
 
 //Paraquedas
-int Paraquedas(unsigned long TAt, int StPqd, int TAc, bool LK, int TDs) //Tempo atual, Estado do paraquedas, Tempo de acionamento do paraquedas, Trava do paraquedas, Tempo de desligamento do paraquedas
+int Paraquedas(int x, unsigned long TAt, int StPqd, int TAc, int TDs)  //Tempo atual, Estado do paraquedas, Tempo de acionamento do paraquedas, Tempo de desligamento do paraquedas, Numero do paraquedas
 {
-  if(LK == false)
+  if ()  //só roda na primeira vez q chamar a funçao, como fazer isso
   {
-    StPqd = HIGH;
-    LK = HIGH;
-    TDs = TAt + TAc;
+    StPqd[x] = HIGH;
+    TDs[x] = TAt + TAc;
   }
 
-  if(TAt > TDs)
+  if (TAt > TDs[x])  // roda sempre
   {
-    StPqd = LOW;
+    StPqd[x] = LOW;
   }
 
-return StPqd;
+  return StPqd[x];
 }
