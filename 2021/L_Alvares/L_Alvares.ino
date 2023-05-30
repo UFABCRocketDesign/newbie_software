@@ -71,9 +71,10 @@ unsigned long TQ = 0;
 int LEDST[NP] = LOW;
 unsigned long TDes[NP];
 int PqD[NP] = LOW;
-
+bool LK[NP] = false;
 bool LC2 = false;
-
+int TP = 1;
+unsigned long TAL2 = 0;
 #endif
 
 #if MagDbg
@@ -388,27 +389,43 @@ void loop() {
   {
 #if PqDbg
 
-    P1 = Paraquedas(TAtual, LED1ST, TL, LK1, TDes1);
-
-
     if (LC2 == false) {
       TAL2 = TQ + AtivarLED2;
       LC2 = true;
     }
-    if (TAtual > TAL2) {
-      P2 = Paraquedas(TAtual, LED2ST, TL, LK2, TDes2);
+
+    for (int P = 1; P <= NP; P++) {
+      if (Q1 == 1 && TP == 1) {
+        LK[P] = true;
+        PqD[P] = Paraquedas(P, TAtual, LEDST[P], TL, TDes[P], LK[P]);
+        LK[P] = false;
+        TP++;
+      } else if (TAtual > TAL2 && TP == 2) {
+        LK[P] == true;
+        PqD[P] = Paraquedas(P, TAtual, LEDST[P], TL, TDes[P], LK[P]);
+        LK[P] = false;
+        TP++;
+      } else if (SF[Nf] <= -0.25 && 3 == true) {
+        LK[P] = true;
+        PqD[P] = Paraquedas(P, TAtual, LEDST[P], TL, TDes[P], LK[P]);
+        LK[P] = false;
+        TP++;
+      } else {
+        PqD[P] = Paraquedas(P, TAtual, LEDST[P], TL, TDes[P], LK[P]);
+      }
     }
 
+    digitalWrite(PLED1, PqD[1]);
+    digitalWrite(PLED2, PqD[2]);
+    digitalWrite(PLED3, PqD[3]);
 
-    if (SF[Nf] <= -0.25)  //se a trava estiver desativada
-    {
-      P3 = Paraquedas(TAtual, LED3ST, TL, LK3, TDes3);
-    }
-
-    //for (int P = 1; P <= NP; P++)
+    //if (TAtual > TAL2) {
+    // P2 = Paraquedas(TAtual, LED2ST, TL, LK2, TDes2);
+    //LK2 = false;
+    //}
+    //if (SF[Nf] <= -0.25)  //se a trava estiver desativada
     //{
-    //  PqD[P] = Paraquedas(P,TAtual,LEDST[P],TL,TDes[P]);
-    //  digitalWrite(PLED[P], PqD[P]);
+    //  P3 = Paraquedas(TAtual, LED3ST, TL, LK3, TDes3);
     //}
 
 #endif
@@ -416,22 +433,21 @@ void loop() {
 #endif
 
 
-#if PqDbg //for rodando os paraquedas por PqD[P]
+#if PqDbg  //for rodando os paraquedas por PqD[P]
 
-    //for (int P = 1; P <= NP; P++)
-    //{
-    //dataString += String(PqD[P]);
-    //dataString += "\t";
-    //}
+  for (int P = 1; P <= NP; P++) {
+    dataString += String(PqD[P]);
+    dataString += "\t";
+  }
 
-  dataString += String(LED1ST);
-  dataString += "\t";
+  //dataString += String(LED1ST);
+  //dataString += "\t";
 
-  dataString += String(LED2ST);
-  dataString += "\t";
+  //dataString += String(LED2ST);
+  //dataString += "\t";
 
-  dataString += String(LED3ST);
-  dataString += "\t";
+  //dataString += String(LED3ST);
+  //dataString += "\t";
 #endif
 
   Serial.println(dataString);
@@ -473,18 +489,18 @@ int Apogeu(float AltAtual, int VQueda) {
 }
 
 //Paraquedas
-int Paraquedas(int x, unsigned long TAt, int StPqd, int TAc, int TDs)  //Tempo atual, Estado do paraquedas, Tempo de acionamento do paraquedas, Tempo de desligamento do paraquedas, Numero do paraquedas
+int Paraquedas(int X, unsigned long TAt, int StPqd, int TAc, int TDs, bool LK)  //Tempo atual, Estado do paraquedas, Tempo de acionamento do paraquedas, Tempo de desligamento do paraquedas, Numero do paraquedas
 {
-  if ()  //só roda na primeira vez q chamar a funçao, como fazer isso
+  if (LK[X] == true)  //só roda na primeira vez q chamar a funçao, como fazer isso
   {
-    StPqd[x] = HIGH;
+    StPqd[X] = HIGH;
     TDs[x] = TAt + TAc;
   }
 
-  if (TAt > TDs[x])  // roda sempre
+  if (TAt > TDs[X])  // roda sempre
   {
-    StPqd[x] = LOW;
+    StPqd[X] = LOW;
   }
 
-  return StPqd[x];
+  return StPqd[X];
 }
