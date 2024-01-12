@@ -405,7 +405,7 @@ void loop() {
         PqD[P] = Paraquedas(P, TAtual, LEDST[P], TL, TDes[P], LK[P]);
         LK[P] = false;
         TP++;
-      } else if (SF[Nf] <= -0.25 && 3 == true) {
+      } else if (SF[Nf] <= -0.25 && TP == 3) {
         LK[P] = true;
         PqD[P] = Paraquedas(P, TAtual, LEDST[P], TL, TDes[P], LK[P]);
         LK[P] = false;
@@ -489,9 +489,9 @@ int Apogeu(float AltAtual, int VQueda) {
 }
 
 //Paraquedas
-int Paraquedas(int X, unsigned long TAt, int StPqd, int TAc, int TDs, bool LK)  //Tempo atual, Estado do paraquedas, Tempo de acionamento do paraquedas, Tempo de desligamento do paraquedas, Numero do paraquedas
+int Paraquedas(int X, unsigned long TAt, int StPqd, int TAc, int TDs, bool LK)  //Numero do paraquedas, Tempo atual, Estado do paraquedas, Tempo de acionamento do paraquedas, Tempo de desligamento do paraquedas, Trava do paraquedas
 {
-  if (LK[X] == true)  //só roda na primeira vez q chamar a funçao, como fazer isso
+  if (LK[X] == true)  //A trava sempre está em false, menos quando ativamos o paraquedas especifico, e isso registra o tempo que precisa ser desligado
   {
     StPqd[X] = HIGH;
     TDs[x] = TAt + TAc;
