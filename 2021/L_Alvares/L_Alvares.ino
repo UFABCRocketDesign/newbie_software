@@ -68,10 +68,10 @@ unsigned long TQ = 0;
 #endif
 
 #if PqDbg
-int LEDST[NP] = LOW;
+int LEDST[NP] = {LOW};
 unsigned long TDes[NP];
-int PqD[NP] = LOW;
-bool LK[NP] = false;
+int PqD[NP] = {LOW};
+bool LK[NP] = {false};
 bool LC2 = false;
 int TP = 1;
 unsigned long TAL2 = 0;
@@ -397,21 +397,21 @@ void loop() {
     for (int P = 1; P <= NP; P++) {
       if (Q1 == 1 && TP == 1) {
         LK[P] = true;
-        PqD[P] = Paraquedas(P, TAtual, LEDST[P], TL, TDes[P], LK[P]);
+        PqD[P] = Paraquedas(P, TAtual, LEDST[P], TDes[P]);
         LK[P] = false;
         TP++;
       } else if (TAtual > TAL2 && TP == 2) {
         LK[P] == true;
-        PqD[P] = Paraquedas(P, TAtual, LEDST[P], TL, TDes[P], LK[P]);
+        PqD[P] = Paraquedas(P, TAtual, LEDST[P], TDes[P]);
         LK[P] = false;
         TP++;
       } else if (SF[Nf] <= -0.25 && TP == 3) {
         LK[P] = true;
-        PqD[P] = Paraquedas(P, TAtual, LEDST[P], TL, TDes[P], LK[P]);
+        PqD[P] = Paraquedas(P, TAtual, LEDST[P], TDes[P]);
         LK[P] = false;
         TP++;
       } else {
-        PqD[P] = Paraquedas(P, TAtual, LEDST[P], TL, TDes[P], LK[P]);
+        PqD[P] = Paraquedas(P, TAtual, LEDST[P], TDes[P]);
       }
     }
 
@@ -489,18 +489,18 @@ int Apogeu(float AltAtual, int VQueda) {
 }
 
 //Paraquedas
-int Paraquedas(int X, unsigned long TAt, int StPqd, int TAc, int TDs, bool LK)  //Numero do paraquedas, Tempo atual, Estado do paraquedas, Tempo de acionamento do paraquedas, Tempo de desligamento do paraquedas, Trava do paraquedas
+int Paraquedas(int Par, unsigned long TAt, int StPqd_v[], int TDs[])  //Numero do paraquedas, Tempo atual, Estado do paraquedas, Tempo de acionamento do paraquedas, Tempo de desligamento do paraquedas, Trava do paraquedas
 {
-  if (LK[X] == true)  //A trava sempre está em false, menos quando ativamos o paraquedas especifico, e isso registra o tempo que precisa ser desligado
+  if (LK[Par] == true)  //A trava sempre está em false, menos quando ativamos o paraquedas especifico, e isso registra o tempo que precisa ser desligado
   {
-    StPqd[X] = HIGH;
-    TDs[x] = TAt + TAc;
+    StPqd_v[Par] = HIGH;
+    TDs[Par] = TAt + TL;
   }
 
-  if (TAt > TDs[X])  // roda sempre
+  if (TAt > TDs[Par])  // roda sempre
   {
-    StPqd[X] = LOW;
+    StPqd_v[Par] = LOW;
   }
 
-  return StPqd[X];
+  return StPqd_v[Par];
 }
