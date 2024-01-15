@@ -7,11 +7,11 @@ void setup() {
 	  Serial.println("Could not find a valid BMP085 sensor, check wiring!");
 	  while (1) {}
   }
+  Serial.print("Temperature (); Pressure (); Altitude (); Pressure At Sea Level (); Real Altitude ();");
 }
 void loop() {
   digitalWrite(LED_BUILTIN, HIGH);
   delay(1000);
-  Serial.print("Temperature (*C); Pressure (Pa); Altitude (m); Pressure At Sea Level (Pa); Real Altitude (m);");
   Serial.print(bmp.readTemperature());
   Serial.print("; ");
   Serial.print(bmp.readPressure());
