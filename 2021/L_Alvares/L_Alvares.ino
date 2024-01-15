@@ -418,16 +418,6 @@ void loop() {
     digitalWrite(PLED1, PqD[1]);
     digitalWrite(PLED2, PqD[2]);
     digitalWrite(PLED3, PqD[3]);
-
-    //if (TAtual > TAL2) {
-    // P2 = Paraquedas(TAtual, LED2ST, TL, LK2, TDes2);
-    //LK2 = false;
-    //}
-    //if (SF[Nf] <= -0.25)  //se a trava estiver desativada
-    //{
-    //  P3 = Paraquedas(TAtual, LED3ST, TL, LK3, TDes3);
-    //}
-
 #endif
   }
 #endif
@@ -439,15 +429,6 @@ void loop() {
     dataString += String(PqD[P]);
     dataString += "\t";
   }
-
-  //dataString += String(LED1ST);
-  //dataString += "\t";
-
-  //dataString += String(LED2ST);
-  //dataString += "\t";
-
-  //dataString += String(LED3ST);
-  //dataString += "\t";
 #endif
 
   Serial.println(dataString);
