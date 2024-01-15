@@ -16,11 +16,12 @@ void setup() {
 // the loop function runs over and over again forever
 void loop() {
   digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
-  delay(3645);                      // wait for a second
+  delay(1);                      // wait for a second
   digitalWrite(LED_BUILTIN, LOW);   // turn the LED off by making the voltage LOW
-  delay(301); 
+  delay(501); 
   //led acima, bpm085 abaixo deste comment.
-  Serial.print("Temperature = ");
+  Serial.print(bmp.readTemperature() + bmp.readPressure() + bmp.readAltitude() + bmp.readSealevelPressure()+ bmp.readAltitude(101500));
+  /*Serial.print("Temperature = ");
     Serial.print(bmp.readTemperature());
     Serial.println(" *C");
     
@@ -44,7 +45,7 @@ void loop() {
   // that is equal to 101500 Pascals.
     Serial.print("Real altitude = ");
     Serial.print(bmp.readAltitude(101500));
-    Serial.println(" meters");
+    Serial.println(" meters");*/
     
     Serial.println();
     delay(500);                     // wait for a second
