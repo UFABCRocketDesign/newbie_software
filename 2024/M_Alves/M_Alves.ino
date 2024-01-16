@@ -2,6 +2,8 @@
 
 Adafruit_BMP085 bmp;
 float AltInicial = 0;
+int numLeituras = 100;
+float somaAltInicial = 0;
 
 void setup() {
   //BME085
@@ -14,9 +16,15 @@ void setup() {
   //Cabeçalho
   Serial.println("Temperature (*C) \t Pressure (Pa) \t Altitude (m) \t Pressure at sea level (Pa) \t Real Altitude (m)");
 
-  //AltInicial = bmp.readAltitude(101500); //Altitude inicial no nível do mar (?)
-  //AltInicial = bmp.readAltitude(101100); //Altitude inicial em Santo André (?)
-  AltInicial = bmp.readAltitude(); //Altitude do local (?)
+  //Somar diversas "leituras iniciais" e tirar a média
+  for(int i = 0; i < numLeituras; i++) {
+    somaAltInicial += bmp.readAltitude();
+    delay(10); // Aguarde um pouco entre as leituras
+  }
+
+  //Média das alturas
+  AltInicial = somaAltInicial / numLeituras;
+
 }
 
 // the loop function runs over and over again forever
