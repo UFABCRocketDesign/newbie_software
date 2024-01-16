@@ -2,8 +2,12 @@
 
 Adafruit_BMP085 bmp;
 float AltInicial = 0;
-int numLeituras = 100;
+int numLeiturasInicial = 20;
 float somaAltInicial = 0;
+
+float altitudes[5];
+int frente = 0;
+int numLeiturasFila = 5;
 
 void setup() {
   //BME085
@@ -16,13 +20,17 @@ void setup() {
   //Cabeçalho
   Serial.println("Temperature (*C) \t Pressure (Pa) \t Altitude (m) \t Pressure at sea level (Pa) \t Real Altitude (m)");
 
-  //Somar diversas "leituras iniciais" e tirar a média
-  for (int i = 0; i < numLeituras; i++) {
+  //Leituras iniciais
+  for (int i = 0; i < numLeiturasInicial; i++) {
     somaAltInicial += bmp.readAltitude();
   }
 
-  //Média das alturas
-  AltInicial = somaAltInicial / numLeituras;
+  AltInicial = somaAltInicial / numLeiturasInicial; //Médias das leituras iniciais
+
+  //Inicializar o array com as primeiras 10 após a AltInicial
+  for (int i = 0; i < numLeiturasFila; i++) {
+    altitudes[i] = bmp.readAltitude();
+  }
 }
 
 // the loop function runs over and over again forever
@@ -38,13 +46,16 @@ void loop() {
   Serial.print(bmp.readSealevelPressure());
   Serial.print('\t');
 
-  //Mesma ideia do setup - para cada valor, calcular uma média de 10 valores e printar apenas a média
-  int numLeiturasM = 100;
+  //Suavizar as leituras da altura utilizando o conceito de "fila"
+
+  altitudes[frente] = bmp.readAltitude();  // Adicionar a nova leitura na posição da frente do array
+
+  frente = (frente + 1) % numLeiturasFila;  // Atualizar a posição da frente
+
   float somaAltRelativa = 0;
-  // Faça várias leituras e some-as
-  for (int j = 0; j < numLeiturasM; j++) {
-    somaAltRelativa += bmp.readAltitude();
+  for (int i = 0; i < numLeiturasFila; i++) { //
+    somaAltRelativa += altitudes[i];
   }
 
-  Serial.println((somaAltRelativa / numLeiturasM) - AltInicial);  //Altura do sensor
+  Serial.println((somaAltRelativa / numLeiturasFila) - AltInicial);  //Altura do sensor
 }
