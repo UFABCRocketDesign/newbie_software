@@ -47,8 +47,8 @@ void loop() {
   Serial.print(bmp.readSealevelPressure());
   Serial.print('\t');
   
-  rawAltitude = bmp.readAltitude();
-  Serial.print(rawAltitude);
+  rawAltitude = bmp.readAltitude() - AltInicial;
+  Serial.print(rawAltitude); //Altura do sensor sem filtro, rawww
   Serial.print('\t');
 
   //Suavizar as leituras da altura utilizando o conceito de "fila"
@@ -62,5 +62,5 @@ void loop() {
     somaAltRelativa += altitudes[i];
   }
 
-  Serial.println((somaAltRelativa / numLeiturasFila) - AltInicial);  //Altura do sensor
+  Serial.println((somaAltRelativa / numLeiturasFila));  //Altura do sensor real, com filtro
 }
