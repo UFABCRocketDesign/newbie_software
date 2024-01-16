@@ -1,10 +1,10 @@
 #include <Adafruit_BMP085.h>
 
+Adafruit_BMP085 bmp;
+
 void setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);
-
-Adafruit_BMP085 bmp;
 
   Serial.begin(9600);
   if (!bmp.begin()) {
@@ -16,8 +16,6 @@ Adafruit_BMP085 bmp;
 
 void loop() {
 
-Adafruit_BMP085 bmp;
-  
   digitalWrite(LED_BUILTIN, HIGH); 
   delay(3000);                      
   digitalWrite(LED_BUILTIN, LOW);   
