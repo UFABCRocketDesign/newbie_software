@@ -16,17 +16,18 @@
 #define PLED1 IGN_1
 #define PLED2 IGN_2
 #define PLED3 LED_BUILTIN
+#define PLED4 IGN_4
 
 #define Tam 11
 #define Nf 2
 #define Vmed 11
 #define VEQ 11
-#define NP 3
+#define NP 4
 
 #define MagDbg 0
 #define GyrDbg 0
 #define AclDbg 0
-#define sdDbg 1
+#define sdDbg 0
 #define TemDbg 1
 #define BarDbg 1
 
@@ -75,6 +76,7 @@ bool LK[NP] = {false};
 bool LC2 = false;
 int TP = 1;
 unsigned long TAL2 = 0;
+const int LEDS[] = {PLED1,PLED2,PLED3,PLED4};
 #endif
 
 #if MagDbg
@@ -110,6 +112,7 @@ void setup() {
   pinMode(PLED1, OUTPUT);
   pinMode(PLED2, OUTPUT);
   pinMode(PLED3, OUTPUT);
+  pinMode(PLED4, OUTPUT);
 #endif
 
 #if MagDbg
@@ -394,7 +397,7 @@ void loop() {
       LC2 = true;
     }
 
-    for (int P = 1; P <= NP; P++) {
+    for (int P = 0; P <= NP; P++) {
       if (Q1 == 1 && TP == 1) {
         LK[P] = true;
         PqD[P] = Paraquedas(P, TAtual, LEDST[P], TDes[P]);
@@ -413,11 +416,12 @@ void loop() {
       } else {
         PqD[P] = Paraquedas(P, TAtual, LEDST[P], TDes[P]);
       }
+      digitalWrite(LEDS[P], PqD[P]);
     }
 
-    digitalWrite(PLED1, PqD[1]);
-    digitalWrite(PLED2, PqD[2]);
-    digitalWrite(PLED3, PqD[3]);
+    //digitalWrite(LEDS[P], PqD[P]);
+    //digitalWrite(PLED2, PqD[2]);
+    //digitalWrite(PLED3, PqD[3]);
 #endif
   }
 #endif
@@ -425,7 +429,7 @@ void loop() {
 
 #if PqDbg  //for rodando os paraquedas por PqD[P]
 
-  for (int P = 1; P <= NP; P++) {
+  for (int P = 0; P <= NP; P++) {
     dataString += String(PqD[P]);
     dataString += "\t";
   }
