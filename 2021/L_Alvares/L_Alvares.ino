@@ -13,10 +13,6 @@
 #define IGN_4 55 /*act4*/
 #define AtivarLED2 3000
 #define TL 5000
-#define PLED1 IGN_1
-#define PLED2 IGN_2
-#define PLED3 LED_BUILTIN
-#define PLED4 IGN_4
 
 #define Tam 11
 #define Nf 2
@@ -69,14 +65,14 @@ unsigned long TQ = 0;
 #endif
 
 #if PqDbg
-int LEDST[NP] = {LOW};
+int LEDST[NP] = { LOW };
 unsigned long TDes[NP];
-int PqD[NP] = {LOW};
-bool LK[NP] = {false};
+int PqD[NP] = { LOW };
+bool LK[NP] = { false };
 bool LC2 = false;
 int TP = 1;
 unsigned long TAL2 = 0;
-const int LEDS[] = {PLED1,PLED2,PLED3,PLED4};
+const int LEDS[] = { IGN_1, IGN_2, IGN_3, IGN_4 };
 #endif
 
 #if MagDbg
@@ -109,10 +105,10 @@ void setup() {
 #endif
 
 #if PqDbg
-  pinMode(PLED1, OUTPUT);
-  pinMode(PLED2, OUTPUT);
-  pinMode(PLED3, OUTPUT);
-  pinMode(PLED4, OUTPUT);
+  pinMode(IGN_1, OUTPUT);
+  pinMode(IGN_2, OUTPUT);
+  pinMode(IGN_3, OUTPUT);
+  pinMode(IGN_4, OUTPUT);
 #endif
 
 #if MagDbg
@@ -400,28 +396,24 @@ void loop() {
     for (int P = 0; P <= NP; P++) {
       if (Q1 == 1 && TP == 1) {
         LK[P] = true;
-        PqD[P] = Paraquedas(P, TAtual, LEDST[P], TDes[P]);
+        PqD[P] = Paraquedas(P, TAtual);
         LK[P] = false;
         TP++;
       } else if (TAtual > TAL2 && TP == 2) {
         LK[P] == true;
-        PqD[P] = Paraquedas(P, TAtual, LEDST[P], TDes[P]);
+        PqD[P] = Paraquedas(P, TAtual);
         LK[P] = false;
         TP++;
       } else if (SF[Nf] <= -0.25 && TP == 3) {
         LK[P] = true;
-        PqD[P] = Paraquedas(P, TAtual, LEDST[P], TDes[P]);
+        PqD[P] = Paraquedas(P, TAtual);
         LK[P] = false;
         TP++;
       } else {
-        PqD[P] = Paraquedas(P, TAtual, LEDST[P], TDes[P]);
+        PqD[P] = Paraquedas(P, TAtual);
       }
       digitalWrite(LEDS[P], PqD[P]);
     }
-
-    //digitalWrite(LEDS[P], PqD[P]);
-    //digitalWrite(PLED2, PqD[2]);
-    //digitalWrite(PLED3, PqD[3]);
 #endif
   }
 #endif
@@ -429,8 +421,8 @@ void loop() {
 
 #if PqDbg  //for rodando os paraquedas por PqD[P]
 
-  for (int P = 0; P <= NP; P++) {
-    dataString += String(PqD[P]);
+  for (int T = 0; T <= NP; T++) {
+    dataString += String(PqD[T]);
     dataString += "\t";
   }
 #endif
@@ -474,18 +466,18 @@ int Apogeu(float AltAtual, int VQueda) {
 }
 
 //Paraquedas
-int Paraquedas(int Par, unsigned long TAt, int StPqd_v[], int TDs[])  //Numero do paraquedas, Tempo atual, Estado do paraquedas, Tempo de desligamento do paraquedas)
+int Paraquedas(int Par, unsigned long TAt)  //Numero do paraquedas, Tempo atual)
 {
   if (LK[Par] == true)  //A trava sempre está em false, menos quando ativamos o paraquedas especifico, e isso registra o tempo que precisa ser desligado
   {
-    StPqd_v[Par] = HIGH;
-    TDs[Par] = TAt + TL;
+    LEDST[Par] = HIGH;
+    TDes[Par] = TAt + TL;
   }
 
-  if (TAt > TDs[Par])  // roda sempre
+  if (TAt > TDes[Par])  // roda sempre
   {
-    StPqd_v[Par] = LOW;
+    LEDST[Par] = LOW;
   }
 
-  return StPqd_v[Par];
+  return LEDST[Par];
 }
