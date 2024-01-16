@@ -1,6 +1,7 @@
 #include <Adafruit_BMP085.h>
 
 Adafruit_BMP085 bmp;
+float AltInicial = 0;
 
 void setup() {
   //BME085
@@ -11,7 +12,11 @@ void setup() {
   }
 
   //Cabeçalho
-  Serial.println("Temperature (*C); Pressure (Pa); Altitude (m); Pressure at sea level (Pa); Real Altitude (m);");
+  Serial.println("Temperature (*C) \t Pressure (Pa) \t Altitude (m) \t Pressure at sea level (Pa) \t Real Altitude (m)");
+
+  //AltInicial = bmp.readAltitude(101500); //Altitude inicial no nível do mar (?)
+  //AltInicial = bmp.readAltitude(101100); //Altitude inicial em Santo André (?)
+  AltInicial = bmp.readAltitude(); //Altitude do local (?)
 }
 
 // the loop function runs over and over again forever
@@ -26,8 +31,6 @@ void loop() {
   Serial.print('\t');
   Serial.print(bmp.readSealevelPressure());
   Serial.print('\t');
-  Serial.print(bmp.readAltitude(101500));
-  Serial.println('\t');
+  Serial.println(bmp.readAltitude() - AltInicial); //Altura do sensor
 
-  delay(50);
 }
