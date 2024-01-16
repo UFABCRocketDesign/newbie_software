@@ -21,11 +21,14 @@ void loop() {
   delay(500);                      
 
   Serial.print(bmp.readTemperature());
+  Serial.print(" ");
   Serial.print(bmp.readPressure());
+  Serial.print(" ");
   Serial.print(bmp.readAltitude());
+  Serial.print(" ");
   Serial.print(bmp.readSealevelPressure());
+  Serial.print(" ");
   Serial.println(bmp.readAltitude(101500));
     
-  Serial.println();
   delay(500);
 }
