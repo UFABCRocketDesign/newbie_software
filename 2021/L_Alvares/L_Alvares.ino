@@ -23,9 +23,9 @@
 #define VEQ 11
 #define NP 3
 
-#define MagDbg 1
-#define GyrDbg 1
-#define AclDbg 1
+#define MagDbg 0
+#define GyrDbg 0
+#define AclDbg 0
 #define sdDbg 1
 #define TemDbg 1
 #define BarDbg 1
@@ -470,7 +470,7 @@ int Apogeu(float AltAtual, int VQueda) {
 }
 
 //Paraquedas
-int Paraquedas(int Par, unsigned long TAt, int StPqd_v[], int TDs[])  //Numero do paraquedas, Tempo atual, Estado do paraquedas, Tempo de acionamento do paraquedas, Tempo de desligamento do paraquedas, Trava do paraquedas
+int Paraquedas(int Par, unsigned long TAt, int StPqd_v[], int TDs[])  //Numero do paraquedas, Tempo atual, Estado do paraquedas, Tempo de desligamento do paraquedas)
 {
   if (LK[Par] == true)  //A trava sempre está em false, menos quando ativamos o paraquedas especifico, e isso registra o tempo que precisa ser desligado
   {
