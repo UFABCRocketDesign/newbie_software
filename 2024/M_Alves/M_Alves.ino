@@ -8,6 +8,7 @@ float somaAltInicial = 0;
 float altitudes[5];
 int frente = 0;
 int numLeiturasFila = 5;
+float rawAltitude = 0;
 
 void setup() {
   //BME085
@@ -18,7 +19,7 @@ void setup() {
   }
 
   //Cabeçalho
-  Serial.println("Temperature (*C) \t Pressure (Pa) \t Altitude (m) \t Pressure at sea level (Pa) \t Real Altitude (m)");
+  Serial.println("Temperature (*C) \t Pressure (Pa) \t Altitude (m) \t Pressure at sea level (Pa) \t Raw Altitude \t Real Altitude (m)");
 
   //Leituras iniciais
   for (int i = 0; i < numLeiturasInicial; i++) {
@@ -45,10 +46,14 @@ void loop() {
   Serial.print('\t');
   Serial.print(bmp.readSealevelPressure());
   Serial.print('\t');
+  
+  rawAltitude = bmp.readAltitude();
+  Serial.print(rawAltitude);
+  Serial.print('\t');
 
   //Suavizar as leituras da altura utilizando o conceito de "fila"
 
-  altitudes[frente] = bmp.readAltitude();  // Adicionar a nova leitura na posição da frente do array
+  altitudes[frente] = rawAltitude;  // Adicionar a nova leitura na posição da frente do array
 
   frente = (frente + 1) % numLeiturasFila;  // Atualizar a posição da frente
 
