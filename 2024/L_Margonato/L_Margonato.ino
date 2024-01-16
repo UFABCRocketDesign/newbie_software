@@ -15,7 +15,7 @@ void setup() {
   }
 
   i = 0;
-  while(i<=50) {
+  while(i<50) {
   local = bmp.readAltitude();
   sum = sum + local;
   i = i + 1;
