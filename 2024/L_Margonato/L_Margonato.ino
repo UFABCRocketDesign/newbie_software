@@ -2,7 +2,9 @@
 
 Adafruit_BMP085 bmp;
 float local;
-float reallocal;
+int i;
+float sum;
+float base;
 
 void setup() {
 
@@ -12,19 +14,19 @@ void setup() {
 	while (1) {}
   }
 
+  i = 0;
+  while(i<=50) {
   local = bmp.readAltitude();
-  reallocal = bmp.readAltitude(101500);
+  sum = sum + local;
+  i = i + 1;
+} 
+  base = sum/50;
 
   Serial.print("Temperature:");
   Serial.print("\t");
   Serial.print("Pressure:");
   Serial.print("\t");
-  Serial.print("Altitude:");
-  Serial.print("\t");
-  Serial.print("Pressure at sealevel:");
-  Serial.print("\t");
-  Serial.println("Real altitude:");
-
+  Serial.println("Altitude:");
 }
   
 void loop() {
@@ -33,11 +35,6 @@ void loop() {
   Serial.print("\t");
   Serial.print(bmp.readPressure());
   Serial.print("\t");
-  Serial.print(bmp.readAltitude()-local);
-  Serial.print("\t");
-  Serial.print(bmp.readSealevelPressure());
-  Serial.print("\t");
-  Serial.println(bmp.readAltitude(101500)-reallocal);
-    
-  delay(500);
+  Serial.println(bmp.readAltitude()-base);
+
 }
