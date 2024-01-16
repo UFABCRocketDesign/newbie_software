@@ -14,7 +14,7 @@ void setup() {
 void loop() {
   digitalWrite(LED_BUILTIN, HIGH);
   delay(3000);
-
+  
   Serial.println(1);
 
   Serial.print("Temperature = ");
