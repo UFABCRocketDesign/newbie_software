@@ -23,7 +23,6 @@ void loop() {
   Serial.print(bmp.readAltitude(101500));
   Serial.print("\t");
   Serial.println();
-  delay(1000);
   digitalWrite(LED_BUILTIN, LOW);
   delay(1000);
 }
