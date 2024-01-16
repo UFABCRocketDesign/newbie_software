@@ -9,22 +9,20 @@ void setup() {
   //BME085
   Serial.begin(9600);
   if (!bmp.begin()) {
-	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-	while (1) {}
+    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+    while (1) {}
   }
 
   //Cabeçalho
   Serial.println("Temperature (*C) \t Pressure (Pa) \t Altitude (m) \t Pressure at sea level (Pa) \t Real Altitude (m)");
 
   //Somar diversas "leituras iniciais" e tirar a média
-  for(int i = 0; i < numLeituras; i++) {
+  for (int i = 0; i < numLeituras; i++) {
     somaAltInicial += bmp.readAltitude();
-    delay(10); // Aguarde um pouco entre as leituras
   }
 
   //Média das alturas
   AltInicial = somaAltInicial / numLeituras;
-
 }
 
 // the loop function runs over and over again forever
@@ -39,6 +37,14 @@ void loop() {
   Serial.print('\t');
   Serial.print(bmp.readSealevelPressure());
   Serial.print('\t');
-  Serial.println(bmp.readAltitude() - AltInicial); //Altura do sensor
 
+  //Mesma ideia do setup - para cada valor, calcular uma média de 10 valores e printar apenas a média
+  int numLeiturasM = 100;
+  float somaAltRelativa = 0;
+  // Faça várias leituras e some-as
+  for (int j = 0; j < numLeiturasM; j++) {
+    somaAltRelativa += bmp.readAltitude();
+  }
+
+  Serial.println((somaAltRelativa / numLeiturasM) - AltInicial);  //Altura do sensor
 }
