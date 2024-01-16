@@ -13,7 +13,6 @@ void setup() {
   }
 }
   
-
 void loop() {
 
   digitalWrite(LED_BUILTIN, HIGH); 
@@ -21,26 +20,12 @@ void loop() {
   digitalWrite(LED_BUILTIN, LOW);   
   delay(500);                      
 
-    Serial.print("Temperature = ");
-    Serial.print(bmp.readTemperature());
-    Serial.println(" *C");
+  Serial.print(bmp.readTemperature());
+  Serial.print(bmp.readPressure());
+  Serial.print(bmp.readAltitude());
+  Serial.print(bmp.readSealevelPressure());
+  Serial.println(bmp.readAltitude(101500));
     
-    Serial.print("Pressure = ");
-    Serial.print(bmp.readPressure());
-    Serial.println(" Pa");
-    
-    Serial.print("Altitude = ");
-    Serial.print(bmp.readAltitude());
-    Serial.println(" meters");
-
-    Serial.print("Pressure at sealevel (calculated) = ");
-    Serial.print(bmp.readSealevelPressure());
-    Serial.println(" Pa");
-
-    Serial.print("Real altitude = ");
-    Serial.print(bmp.readAltitude(101500));
-    Serial.println(" meters");
-    
-    Serial.println();
-    delay(500);
+  Serial.println();
+  delay(500);
 }
