@@ -1,7 +1,9 @@
+ //Dados de Telemetria
  #include <Adafruit_BMP085.h>
 
 Adafruit_BMP085 bmp;
-
+float data[5][30];
+int row = 0; 
 void setup() {
   // initialize digital 
   pinMode(LED_BUILTIN, OUTPUT);
