@@ -6,10 +6,11 @@ void setup() {
   // initialize digital 
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(9600);
-  if (!bmp.begin()) 
+  if (!bmp.begin()) {
 	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
 	while (1) {}
-   }
+    }
+}
 void loop() {
 digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
   delay(3000);
