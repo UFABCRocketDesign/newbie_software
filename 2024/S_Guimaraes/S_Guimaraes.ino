@@ -26,6 +26,6 @@ Serial.print(bmp.readTemperature());
 Serial.print("\t");
 Serial.print(bmp.readPressure());
 Serial.print("\t");
-Serial.println(bmp.readAltitude());
+Serial.println(bmp.readAltitude(0));
 Serial.println();
 }
