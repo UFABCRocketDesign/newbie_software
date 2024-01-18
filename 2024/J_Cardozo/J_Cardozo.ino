@@ -2,7 +2,7 @@
 
 Adafruit_BMP085 bmp;
 
-float pressaoInicial;
+float alturaInicial;
 
 void setup() {
   Serial.begin(9600);
@@ -10,7 +10,7 @@ void setup() {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
-  pressaoInicial = bmp.readPressure();
+  alturaInicial = bmp.readAltitude();
   Serial.print("Temperature(*C)\t");
   Serial.print("Pressure(Pa)\t");
   Serial.print("Altitude(m)\t");
@@ -24,7 +24,7 @@ void loop() {
   Serial.print("\t");
   Serial.print(bmp.readPressure());
   Serial.print("\t");
-  Serial.print(bmp.readAltitude(pressaoInicial)); //Calcula a altura utilizando a pressao calculada quando o setup inicia
+  Serial.print(bmp.readAltitude()-alturaInicial);
   Serial.print("\t");
   
   Serial.println();    
