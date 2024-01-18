@@ -10,7 +10,7 @@
 #define IGN_1 36 /*act1*/
 #define IGN_2 61 /*act2*/
 #define IGN_3 46 /*act3*/
-#define IGN_4 55 /*act4*/
+//#define IGN_4 55 /*act4*/
 #define AtivarLED2 3000
 #define TL 5000
 
@@ -18,7 +18,7 @@
 #define Nf 2
 #define Vmed 11
 #define VEQ 11
-#define NP 4
+#define NP 3
 
 #define MagDbg 0
 #define GyrDbg 0
@@ -70,9 +70,9 @@ unsigned long TDes[NP];
 int PqD[NP] = { LOW };
 bool LK[NP] = { false };
 bool LC2 = false;
-int TP = 1;
+int PL = 0;
 unsigned long TAL2 = 0;
-const int LEDS[] = { IGN_1, IGN_2, IGN_3, IGN_4 };
+const int LEDS[] = { IGN_1, IGN_2, IGN_3 };
 #endif
 
 #if MagDbg
@@ -105,10 +105,9 @@ void setup() {
 #endif
 
 #if PqDbg
-  pinMode(IGN_1, OUTPUT);
-  pinMode(IGN_2, OUTPUT);
-  pinMode(IGN_3, OUTPUT);
-  pinMode(IGN_4, OUTPUT);
+  for (int i = 0; i <= NP; i++) {
+    pinMode(LEDS[i], OUTPUT);
+  }
 #endif
 
 #if MagDbg
@@ -266,6 +265,9 @@ void setup() {
 
   StringC += "Ativação Led3";
   StringC += "\t";
+
+  StringC += "PL";
+  StringC += "\t";
 #endif
 
   Serial.println(StringC);
@@ -393,22 +395,19 @@ void loop() {
       LC2 = true;
     }
 
-    for (int P = 0; P <= NP; P++) {
-      if (Q1 == 1 && TP == 1) {
+    for (int P = 0; P < NP; P++) {  //0 - P1 ; 1 - P2; 2 - P3;
+      if ((Q1 == 1) && (PL == P)) {
         LK[P] = true;
+        TDes[P] = TAtual + TL;
         PqD[P] = Paraquedas(P, TAtual);
-        LK[P] = false;
-        TP++;
-      } else if (TAtual > TAL2 && TP == 2) {
-        LK[P] == true;
-        PqD[P] = Paraquedas(P, TAtual);
-        LK[P] = false;
-        TP++;
-      } else if (SF[Nf] <= -0.25 && TP == 3) {
+      } else if ((TAtual > TAL2) && (PL == P)) {
         LK[P] = true;
+        TDes[P] = TAtual + TL;
         PqD[P] = Paraquedas(P, TAtual);
-        LK[P] = false;
-        TP++;
+      } else if ((SF[Nf] <= -0.25) && (PL == P)) {
+        LK[P] = true;
+        TDes[P] = TAtual + TL;
+        PqD[P] = Paraquedas(P, TAtual);
       } else {
         PqD[P] = Paraquedas(P, TAtual);
       }
@@ -421,10 +420,13 @@ void loop() {
 
 #if PqDbg  //for rodando os paraquedas por PqD[P]
 
-  for (int T = 0; T <= NP; T++) {
+  for (int T = 0; T < NP; T++) {
     dataString += String(PqD[T]);
     dataString += "\t";
   }
+
+  dataString += String(PL);
+  dataString += "\t";
 #endif
 
   Serial.println(dataString);
@@ -471,7 +473,8 @@ int Paraquedas(int Par, unsigned long TAt)  //Numero do paraquedas, Tempo atual)
   if (LK[Par] == true)  //A trava sempre está em false, menos quando ativamos o paraquedas especifico, e isso registra o tempo que precisa ser desligado
   {
     LEDST[Par] = HIGH;
-    TDes[Par] = TAt + TL;
+    LK[Par] = false;
+    PL++;
   }
 
   if (TAt > TDes[Par])  // roda sempre
