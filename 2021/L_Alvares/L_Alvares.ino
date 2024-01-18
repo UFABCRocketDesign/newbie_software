@@ -389,57 +389,42 @@ void loop() {
   if (Q1 == 1)  // se detectar a queda
   {
 #if PqDbg
-
     if (LC2 == false) {
       TAL2 = TQ + AtivarLED2;
       LC2 = true;
     }
 
-    for (int P = 0; P < NP; P++) {  //0 - P1 ; 1 - P2; 2 - P3;
-      if ((Q1 == 1) && (PL == P)) {
-        LK[P] = true;
-        TDes[P] = TAtual + TL;
-        PqD[P] = Paraquedas(P, TAtual);
-      } else if ((TAtual > TAL2) && (PL == P)) {
-        LK[P] = true;
-        TDes[P] = TAtual + TL;
-        PqD[P] = Paraquedas(P, TAtual);
-      } else if ((SF[Nf] <= -0.25) && (PL == P)) {
-        LK[P] = true;
-        TDes[P] = TAtual + TL;
-        PqD[P] = Paraquedas(P, TAtual);
-      } else {
-        PqD[P] = Paraquedas(P, TAtual);
-      }
+    for (int P = 0; P < NP; P++) {  //primeira vez que ele rodar, Q1 é igual a 1, então podemos ativar o paraquedas 1
+      PqD[P] = Paraquedas(P, TAtual);
       digitalWrite(LEDS[P], PqD[P]);
     }
 #endif
-  }
+}
 #endif
 
 
 #if PqDbg  //for rodando os paraquedas por PqD[P]
 
-  for (int T = 0; T < NP; T++) {
-    dataString += String(PqD[T]);
-    dataString += "\t";
-  }
-
-  dataString += String(PL);
+for (int T = 0; T < NP; T++) {
+  dataString += String(PqD[T]);
   dataString += "\t";
+}
+
+dataString += String(PL);
+dataString += "\t";
 #endif
 
-  Serial.println(dataString);
+Serial.println(dataString);
 
 #if sdDbg
-  //Cartão SD
-  File dataFile = SD.open(NomeArq, FILE_WRITE);
-  if (dataFile) {
-    dataFile.println(dataString);
-    dataFile.close();
-  } else {
-    Serial.println("error opening datalog.txt");
-  }
+//Cartão SD
+File dataFile = SD.open(NomeArq, FILE_WRITE);
+if (dataFile) {
+  dataFile.println(dataString);
+  dataFile.close();
+} else {
+  Serial.println("error opening datalog.txt");
+}
 #endif
 }
 
@@ -470,11 +455,35 @@ int Apogeu(float AltAtual, int VQueda) {
 //Paraquedas
 int Paraquedas(int Par, unsigned long TAt)  //Numero do paraquedas, Tempo atual)
 {
-  if (LK[Par] == true)  //A trava sempre está em false, menos quando ativamos o paraquedas especifico, e isso registra o tempo que precisa ser desligado
+  //if (TAtual > TAL2) -- liga P1
+  //if (SF[Nf] <= -0.25) -- liga P2
+  //TDes[P] = TAtual + TL
+
+  if((Par == 0) && (LK[Par] = false))
   {
     LEDST[Par] = HIGH;
-    LK[Par] = false;
-    PL++;
+    TDes[Par] = TAt + TL;
+    LK[Par] = true;
+  }
+
+  if((Par == 1) && (TAt > TAL2))
+  {
+    if(LK[Par] == false)
+    {
+    LEDST[Par] = HIGH;
+    TDes[Par] = TAt + TL;
+    LK[Par] = true;
+    }
+  }
+
+  if((Par == 2) && (SF[Nf] <= -0.25))
+  {
+    if(LK[Par] == false)
+    {
+    LEDST[Par] = HIGH;
+    TDes[Par] = TAt + TL;
+    LK[Par] = true;
+    }
   }
 
   if (TAt > TDes[Par])  // roda sempre
