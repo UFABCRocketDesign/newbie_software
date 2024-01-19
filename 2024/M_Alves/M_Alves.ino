@@ -2,13 +2,12 @@
 
 Adafruit_BMP085 bmp;
 float AltInicial = 0;
-int numLeiturasInicial = 20;
+int numLeiturasInicial = 25;
 float somaAltInicial = 0;
 
-float altitudes[5];
-int frente = 0;
-int numLeiturasFila = 5;
-float rawAltitude = 0;
+float fatorSuavizacao = 0.7; // fator de suavização, varia de 0 a 1, sendo que 1 da mais peso nas medidas recentes e 0 nas antigas
+float MME = 0; // Média Móvel Exponencial
+float apogeu = 820;
 
 void setup() {
   //BME085
@@ -27,11 +26,6 @@ void setup() {
   }
 
   AltInicial = somaAltInicial / numLeiturasInicial; //Médias das leituras iniciais
-
-  //Inicializar o array com as primeiras 10 após a AltInicial
-  for (int i = 0; i < numLeiturasFila; i++) {
-    altitudes[i] = bmp.readAltitude();
-  }
 }
 
 // the loop function runs over and over again forever
@@ -47,20 +41,15 @@ void loop() {
   Serial.print(bmp.readSealevelPressure());
   Serial.print('\t');
   
-  rawAltitude = bmp.readAltitude() - AltInicial;
+  float rawAltitude = bmp.readAltitude() - AltInicial;
   Serial.print(rawAltitude); //Altura do sensor sem filtro, rawww
   Serial.print('\t');
 
-  //Suavizar as leituras da altura utilizando o conceito de "fila"
+  //Suavizar as leituras da altura usando MME
+  MME = fatorSuavizacao*rawAltitude + (1-fatorSuavizacao)*MME;
+  Serial.println(MME);  //Altura do sensor real, com filtro
 
-  altitudes[frente] = rawAltitude;  // Adicionar a nova leitura na posição da frente do array
-
-  frente = (frente + 1) % numLeiturasFila;  // Atualizar a posição da frente
-
-  float somaAltRelativa = 0;
-  for (int i = 0; i < numLeiturasFila; i++) { //
-    somaAltRelativa += altitudes[i];
-  }
-
-  Serial.println((somaAltRelativa / numLeiturasFila));  //Altura do sensor real, com filtro
+  if (MME >= apogeu) {
+    Serial.println("APOGEU! ative alguma coisa com isso pfvr");
+  } 
 }
