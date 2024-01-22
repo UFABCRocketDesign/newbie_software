@@ -22,6 +22,7 @@ float mediaAltitudeFiltrada = 0;       // a média das leituras filtradas
 //Apogeu
 float altitudeAnterior = -1;
 int contador = 0;
+int contador2 = 0;
 
 void setup() {
   //BME085
@@ -32,7 +33,7 @@ void setup() {
   }
 
   //Cabeçalho
-  Serial.println("Temperature (*C) \t Pressure (Pa) \t Raw Altitude (m) \t First Filter (m) \t Second Filter (m)");
+  Serial.println("Temperature (*C) \t Pressure (Pa) \t Raw Altitude (m) \t First Filter (m) \t Second Filter (m) \t 1desce/0sobe ");
 
   //Leituras iniciais
   for (int i = 0; i < numLeiturasInicial; i++) {
@@ -76,7 +77,8 @@ void loop() {
   leiturasFiltradas[indiceLeitura] = mediaAltitude;  // usa a média do primeiro filtro
   somaLeiturasFiltradas = somaLeiturasFiltradas + leiturasFiltradas[indiceLeitura];
   mediaAltitudeFiltrada = somaLeiturasFiltradas / numLeituras;
-  Serial.println(mediaAltitudeFiltrada);
+  Serial.print(mediaAltitudeFiltrada);
+  Serial.print('\t');
 
   indiceLeitura++;
   if (indiceLeitura >= numLeituras) {  //se for o último vetor, volta para o início
@@ -86,13 +88,17 @@ void loop() {
   // Apogeu
   if (altitudeAnterior != -1 && mediaAltitudeFiltrada < altitudeAnterior) {
     contador++;
-    if (contador > 10) {
-      Serial.println("Apogeu! O foguete está caindo.");
-      contador = 0;  // resetar o contador
+    if (contador > 5) {
+      Serial.println(1); //ta descendo
+      contador2 = 0; //reseta o contador que verifica a subida
     }
   } else {
-    contador = 0;  // resetar o contador se a altitude não estiver diminuindo
+    contador2++;
+    if (contador2 > 5) {
+      Serial.println(0); //ta subindo
+      contador = 0;  // resetar o contador que verifica a descida
+    }
   }
 
-  altitudeAnterior = mediaAltitudeFiltrada; // Atualize a altitude anterior para a próxima iteração
+  altitudeAnterior = mediaAltitudeFiltrada;  // Atualize a altitude anterior para a próxima iteração
 }
