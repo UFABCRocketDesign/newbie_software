@@ -29,6 +29,7 @@ void setup() {
   for (int i = 0; i < nLeitFila; i++) {
     altitudes[i] = bmp.readAltitude();
   }
+
 }
 void loop() {
 
@@ -45,13 +46,16 @@ void loop() {
   Serial.print(rawAltitude);
   Serial.print('\t');
 
-  altitudes[frente] = rawAltitude;
-  frente = (frente + 1) % nLeitFila;
+  //altitudes[frente] = rawAltitude;
+  //frente = (frente + 1) % nLeitFila;
 
-  float somaAltRelativa = 0;
+  //float somaAltRelativa = 0;
 
-  for (int i = 0; i < nLeitFila; i++) {
-    somaAltRelativa += altitudes[i];
-  }
+  //for (int i = 0; i < nLeitFila; i++) {
+  //  somaAltRelativa += altitudes[i];
+//}
+
+// rever essa parte de altitude...
+
   Serial.println();
 }
