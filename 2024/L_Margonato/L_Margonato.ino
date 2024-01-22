@@ -3,6 +3,7 @@
 Adafruit_BMP085 bmp;
 float local;
 int i;
+float c;
 float med;
 float sum;
 float base;
@@ -33,8 +34,10 @@ void setup() {
 void loop() {
 
   for (int j = 0; j<10; j++) {
-  med = med + bmp.readAltitude();
+  c = c + bmp.readAltitude();
   }
+  med = c/10;
+  c = 0;
                  
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
