@@ -13,7 +13,6 @@ int index = 0;
 int indi = 0;
 float total = 0;
 float acum = 0;
-float last_altitude = 0;
 
 float apogeu[3];
 int ap = 0;
@@ -92,7 +91,7 @@ void loop() {
 apogeu[ap] = altura_sRuido2;
 ap = (ap + 1)%3;
 
-if (apogeu[0] - apogeu[1] & apogeu[1]-apogeu[2] & apogeu[2]-apogeu[3]){
+if (apogeu[0] > apogeu[1] && apogeu[1]> apogeu[2] && apogeu[2] > apogeu[3]){
   queda = 1;
 }
 else{
@@ -106,3 +105,4 @@ else{
 
   Serial.println();
   delay(5);
+}
