@@ -5,9 +5,16 @@ float AltInicial = 0;
 int numLeiturasInicial = 25;
 float somaAltInicial = 0;
 
-float fatorSuavizacao = 0.7; // fator de suavização, varia de 0 a 1, sendo que 1 da mais peso nas medidas recentes e 0 nas antigas
-float MME = 0; // Média Móvel Exponencial
-float apogeu = 820;
+// Variáveis para a média simples
+const int numLeituras = 25; // número de leituras para a média
+float leituras[numLeituras]; // as leituras do sensor de altitude
+int indiceLeitura = 0; // o índice da leitura atual
+float somaLeituras = 0; // a soma das leituras
+float mediaAltitude = 0; // a média das leituras
+
+//apogeu
+float apogeu = 10;
+int contador = 0;
 
 void setup() {
   //BME085
@@ -26,6 +33,12 @@ void setup() {
   }
 
   AltInicial = somaAltInicial / numLeiturasInicial; //Médias das leituras iniciais
+
+  //Armazena 25 leituras para realizar a média
+  for (int i = 0; i < numLeituras; i++) {
+    leituras[i] = bmp.readAltitude() - AltInicial;
+    somaLeituras += leituras[i];
+  }
 }
 
 // the loop function runs over and over again forever
@@ -45,11 +58,24 @@ void loop() {
   Serial.print(rawAltitude); //Altura do sensor sem filtro, rawww
   Serial.print('\t');
 
-  //Suavizar as leituras da altura usando MME
-  MME = fatorSuavizacao*rawAltitude + (1-fatorSuavizacao)*MME;
-  Serial.println(MME);  //Altura do sensor real, com filtro
+  // Filtro
+  somaLeituras = somaLeituras - leituras[indiceLeitura];
+  leituras[indiceLeitura] = rawAltitude;
+  somaLeituras = somaLeituras + leituras[indiceLeitura];
+  indiceLeitura++;
+ 
+  if (indiceLeitura >= numLeituras) { //se for o último vetor, volta para o início
+    indiceLeitura = 0;
+  }
 
-  if (MME >= apogeu) {
-    Serial.println("APOGEU! ative alguma coisa com isso pfvr");
+  //Média
+  mediaAltitude = somaLeituras / numLeituras;
+  Serial.println(mediaAltitude);
+
+  if (mediaAltitude >= apogeu) {
+    contador++;
+    if (contador > 20) {
+      Serial.println("APOGEU! ative alguma coisa com isso pfvr");
+    }
   } 
 }
