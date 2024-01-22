@@ -18,7 +18,7 @@ float somaLeiturasFiltradas = 0;       // a soma das leituras filtradas
 float mediaAltitudeFiltrada = 0;       // a média das leituras filtradas
 
 //apogeu
-float apogeu = 10;
+float apogeu = 5;
 int contador = 0;
 
 void setup() {
@@ -30,7 +30,7 @@ void setup() {
   }
 
   //Cabeçalho
-  Serial.println("Temperature (*C) \t Pressure (Pa) \t Altitude (m) \t Pressure at sea level (Pa) \t Raw Altitude \t Real Altitude (m)");
+  Serial.println("Temperature (*C) \t Pressure (Pa) \t Raw Altitude \t First Filter (m) \t Second Filter");
 
   //Leituras iniciais
   for (int i = 0; i < numLeiturasInicial; i++) {
@@ -56,10 +56,6 @@ void loop() {
   Serial.print('\t');
   Serial.print(bmp.readPressure());
   Serial.print('\t');
-  Serial.print(bmp.readAltitude());
-  Serial.print('\t');
-  Serial.print(bmp.readSealevelPressure());
-  Serial.print('\t');
 
   float rawAltitude = bmp.readAltitude() - AltInicial;
   Serial.print(rawAltitude);  //Altura do sensor sem filtro, rawww
@@ -70,20 +66,21 @@ void loop() {
   leituras[indiceLeitura] = rawAltitude;
   somaLeituras = somaLeituras + leituras[indiceLeitura];
   mediaAltitude = somaLeituras / numLeituras;
+  Serial.print(mediaAltitude);
 
   // Segundo Filtro
   somaLeiturasFiltradas = somaLeiturasFiltradas - leiturasFiltradas[indiceLeitura];
   leiturasFiltradas[indiceLeitura] = mediaAltitude;  // usa a média do primeiro filtro
   somaLeiturasFiltradas = somaLeiturasFiltradas + leiturasFiltradas[indiceLeitura];
   mediaAltitudeFiltrada = somaLeiturasFiltradas / numLeituras;
+  Serial.println(mediaAltitudeFiltrada);
 
   indiceLeitura++;
   if (indiceLeitura >= numLeituras) {  //se for o último vetor, volta para o início
     indiceLeitura = 0;
   }
 
-  Serial.println(mediaAltitudeFiltrada);
-
+  //Apogeu
   if (mediaAltitudeFiltrada >= apogeu) {
     contador++;
     if (contador > 20) {
