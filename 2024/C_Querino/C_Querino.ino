@@ -13,27 +13,24 @@ void setup() {
 	while (1) {}
   
   }
-  alturainicial = bmp.readAltitude();
-
+ for (l=1;l<=20;l++)
+  
+  {
+    alturainicial = alturainicial + bmp.readAltitude();
+  }
+    altura = (alturainicial/20);
   Serial.print("Temperatura\tpressão\tAltitude\tpressão em relação ao mar\taltitude real");
 }
 
-
 void loop(){
- /* for (l=1;l<=10;l++)
-  
-  {
-    altura = altura + bmp.readAltitude();
-  }
-    altura = (altura/10)-alturainicial*/
-    
+   
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
 
     Serial.print(bmp.readPressure());
     Serial.print("\t");
 
-    Serial.print(bmp.readAltitude()-alturainicial);
+    Serial.print(bmp.readAltitude()-altura);
     Serial.print("\t");
 
     Serial.print(bmp.readSealevelPressure());
