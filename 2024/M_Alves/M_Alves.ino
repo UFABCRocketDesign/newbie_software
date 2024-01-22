@@ -67,6 +67,7 @@ void loop() {
   somaLeituras = somaLeituras + leituras[indiceLeitura];
   mediaAltitude = somaLeituras / numLeituras;
   Serial.print(mediaAltitude);
+  Serial.print('\t');
 
   // Segundo Filtro
   somaLeiturasFiltradas = somaLeiturasFiltradas - leiturasFiltradas[indiceLeitura];
