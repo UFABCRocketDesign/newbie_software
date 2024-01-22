@@ -88,8 +88,10 @@ void loop() {
   Serial.print("\t");
 
      
-apogeu[ap] = altura_sRuido2;
-ap = (ap + 1)%3;
+for (i=0; i<3; i++)
+{
+  apogeu[i] = altura_sRuido2;
+}
 
 if (apogeu[0] > apogeu[1] && apogeu[1]> apogeu[2] && apogeu[2] > apogeu[3]){
   queda = 1;
