@@ -1,6 +1,8 @@
 #include <Adafruit_BMP085.h>
 
 Adafruit_BMP085 bmp;
+
+// Altitude Inicial
 float AltInicial = 0;
 int numLeiturasInicial = 25;
 float somaAltInicial = 0;
@@ -17,8 +19,8 @@ float leiturasFiltradas[numLeituras];  // as leituras filtradas
 float somaLeiturasFiltradas = 0;       // a soma das leituras filtradas
 float mediaAltitudeFiltrada = 0;       // a média das leituras filtradas
 
-//apogeu
-float apogeu = 5;
+//Apogeu
+float altitudeAnterior = -1;
 int contador = 0;
 
 void setup() {
@@ -30,7 +32,7 @@ void setup() {
   }
 
   //Cabeçalho
-  Serial.println("Temperature (*C) \t Pressure (Pa) \t Raw Altitude \t First Filter (m) \t Second Filter");
+  Serial.println("Temperature (*C) \t Pressure (Pa) \t Raw Altitude (m) \t First Filter (m) \t Second Filter (m)");
 
   //Leituras iniciais
   for (int i = 0; i < numLeiturasInicial; i++) {
@@ -81,11 +83,16 @@ void loop() {
     indiceLeitura = 0;
   }
 
-  //Apogeu
-  if (mediaAltitudeFiltrada >= apogeu) {
+  // Apogeu
+  if (altitudeAnterior != -1 && mediaAltitudeFiltrada < altitudeAnterior) {
     contador++;
-    if (contador > 20) {
-      Serial.println("APOGEU! ative alguma coisa com isso pfvr");
+    if (contador > 10) {
+      Serial.println("Apogeu! O foguete está caindo.");
+      contador = 0;  // resetar o contador
     }
+  } else {
+    contador = 0;  // resetar o contador se a altitude não estiver diminuindo
   }
+
+  altitudeAnterior = mediaAltitudeFiltrada; // Atualize a altitude anterior para a próxima iteração
 }
