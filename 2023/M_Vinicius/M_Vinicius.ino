@@ -15,6 +15,10 @@ float total = 0;
 float acum = 0;
 float last_altitude = 0;
 
+float apogeu[3];
+int ap = 0;
+
+
 void setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);
@@ -59,7 +63,7 @@ void loop() {
   indi = (indi + 1) % 10;
   acum = 0;
   for (int i = 0; i< 10; i++)
-  {
+  {   
     acum += filtro2[i];
   }
 
@@ -85,16 +89,15 @@ void loop() {
   Serial.print("\t");
 
      
-  float delta = altura_sRuido2 - last_altitude;  
-  last_altitude = altura_sRuido2; 
+apogeu[ap] = altura_sRuido2;
+ap = (ap + 1)%3;
 
-    if (delta < 0)
-    {
-      queda = 1;
-    }
-    else{
-      queda = 0;
-    }
+if (apogeu[0] - apogeu[1] & apogeu[1]-apogeu[2] & apogeu[2]-apogeu[3]){
+  queda = 1;
+}
+else{
+  queda = 0;
+}
 
     Serial.print(queda);
     Serial.print("\t");
@@ -103,20 +106,3 @@ void loop() {
 
   Serial.println();
   delay(5);
-                               ////test
-}
-
-/*for (i = 0; i<10; i++)
-    {
-      vetor[i] = altura_sRuido2;
-      for (w=0; w<9; w++)
-      {
-        if (vetor[w+1]>vetor[w])
-        {
-          queda = 0;
-        }
-        else {
-          queda = 1;
-        }        
-      }
-    }*/
