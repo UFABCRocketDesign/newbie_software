@@ -1,6 +1,8 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 
+float AltitudeInicial;
+
 void setup() {
   Serial.begin(9600);
   if (!bmp.begin()) {
@@ -8,12 +10,10 @@ void setup() {
 	while (1) {}
   }
   Serial.print("Temperature(C)\t Pressure(Pa)\t High(meters)\t Pressure at sealevel (calculated, Pa)\t Real altitude(meters)");
+  AltitudeInicial= bmp.readAltitude();
 }
-  float AltitudeInicial= bmp.readAltitude();
-
 
 void loop() {
-
     float Altura= bmp.readAltitude()- AltitudeInicial;
 
     Serial.print(bmp.readTemperature());
