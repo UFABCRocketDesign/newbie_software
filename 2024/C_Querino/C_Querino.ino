@@ -1,9 +1,10 @@
 #include <Adafruit_BMP085.h>
 
 Adafruit_BMP085 bmp;
-
 float alturainicial;
-float altura;
+float altura=0;
+int l;
+float altufinal;
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(9600);
@@ -12,28 +13,34 @@ void setup() {
 	while (1) {}
   
   }
-  alturainicial = bmp.readRawTemperature();
+  alturainicial = bmp.readAltitude(101500);
+
   Serial.print("Temperatura\tpressão\tAltitude\tpressão em relação ao mar\taltitude real");
 }
 
 
 void loop() {
-  digitalWrite(LED_BUILTIN, HIGH);
-  delay(1000);                      
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(501); 
+  for (l=1;l<=5;l++)
   
-    altura = (bmp.readTemperature() + alturainicial)/2;
+  {
+    altura = altura+bmp.readAltitude(101500);
+  }
+    altura = altura/5;
+
+    altufinal=altura-alturainicial;
+
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
     Serial.print(bmp.readPressure());
     Serial.print("\t");
-    Serial.print(altura);
+    Serial.print(altufinal);
     Serial.print("\t");
     Serial.print(bmp.readSealevelPressure());
     Serial.print("\t");
     Serial.print(bmp.readAltitude(101500));
     
     Serial.println();
-    delay(500);                     
-}
+    }
+
+
+
