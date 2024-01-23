@@ -21,8 +21,9 @@ float mediaAltitudeFiltrada = 0;       // a média das leituras filtradas
 
 //Apogeu
 float altitudeAnterior = -1;
+int contador = 0;
+int contador2 = 0;
 int estado = 0;
-int contadorEstado = 0;
 
 void setup() {
   //BME085
@@ -87,29 +88,20 @@ void loop() {
 
   // Apogeu
   if (altitudeAnterior != -1 && mediaAltitudeFiltrada < altitudeAnterior) {
-    // O foguete está descendo
-    if (estado == 1) {
-      contadorEstado++;
-    } else {
-      contadorEstado = 1;
-    }
-    if (contadorEstado > 5) {
+    contador++;
+    if (contador > 5) {
       estado = 1;
+      contador2 = 0; //reseta o contador que verifica a subida
     }
   } else {
-    // O foguete está subindo
-    if (estado == 0) {
-      contadorEstado++;
-    } else {
-      contadorEstado = 1;
-    }
-    if (contadorEstado > 5) {
+    contador2++;
+    if (contador2 > 5) {
       estado = 0;
+      contador = 0;  // resetar o contador que verifica a descida
     }
   }
 
-  Serial.print(estado);
-
+  Serial.println(estado); //ta subindo
   altitudeAnterior = mediaAltitudeFiltrada;  // Atualize a altitude anterior para a próxima iteração
-  Serial.println();
+
 }
