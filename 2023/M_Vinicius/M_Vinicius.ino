@@ -87,7 +87,7 @@ void loop() {
   Serial.print(altura_sRuido2);
   Serial.print("\t");
      
-     // detecção de apogeu
+     // detecção de apogeu //
   for (i=0; i<3; i++)
   {
     apogeu[i] = apogeu[i+1];
