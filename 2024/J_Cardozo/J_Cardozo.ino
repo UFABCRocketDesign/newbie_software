@@ -32,7 +32,8 @@ void setup() {
 
   Serial.print("Temperature(*C)\t");
   Serial.print("Pressure(Pa)\t");
-  Serial.print("Altitude(m)\t");
+  Serial.print("Altitude com filtro(m)\t");
+  Serial.print("Altitude sem filtro(m)\t");
 
   Serial.println("");
 }
@@ -60,6 +61,8 @@ void loop() {
   Serial.print(bmp.readPressure());
   Serial.print("\t");
   Serial.print(media);
+  Serial.print("\t");
+  Serial.print(bmp.readPressure()-alturaInicial);
   Serial.print("\t");
 
   Serial.println();
