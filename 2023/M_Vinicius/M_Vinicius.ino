@@ -86,19 +86,22 @@ void loop() {
 
   Serial.print(altura_sRuido2);
   Serial.print("\t");
-
      
-for (i=0; i<3; i++)
-{
-  apogeu[i] = altura_sRuido2;
-}
+     // detecção de apogeu
+  for (i=0; i<3; i++)
+  {
+    apogeu[i] = apogeu[i+1];
+  }
+  apogeu[3] = altura_sRuido2; 
 
-if (apogeu[0] > apogeu[1] && apogeu[1]> apogeu[2] && apogeu[2] > apogeu[3]){
+if (apogeu[3] > apogeu[2] && apogeu[2]> apogeu[1] && apogeu[1] > apogeu[0]){
   queda = 1;
 }
 else{
   queda = 0;
 }
+
+
 
     Serial.print(queda);
     Serial.print("\t");
