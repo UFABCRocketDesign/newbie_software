@@ -1,4 +1,8 @@
 #include <Adafruit_BMP085.h>
+#include <SPI.h>
+#include <SD.h>
+
+const int chipSelect = 53;
 
 Adafruit_BMP085 bmp;
 
@@ -22,7 +26,7 @@ float mediaAltitudeFiltrada = 0;       // a média das leituras filtradas
 //Apogeu
 float altitudeAnterior = -1;
 int contador = 0;
-int estado = 0; // estado 0 -> subindo; estado 1 -> descendo
+int estado = 0;  // estado 0 -> subindo; estado 1 -> descendo
 
 void setup() {
   //BME085
@@ -32,8 +36,10 @@ void setup() {
     while (1) {}
   }
 
-  //Cabeçalho
-  Serial.println("Temperature (*C) \t Pressure (Pa) \t Raw Altitude (m) \t First Filter (m) \t Second Filter (m) \t Estado (0 ou 1) ");
+  //SDCard
+  if (!SD.begin(chipSelect)) {  // see if the card is present and can be initialized:
+    Serial.println("Card failed, or not present");
+  }
 
   //Leituras iniciais
   for (int i = 0; i < numLeiturasInicial; i++) {
@@ -49,36 +55,42 @@ void setup() {
     leiturasFiltradas[i] = leituras[i];
     somaLeiturasFiltradas += leiturasFiltradas[i];
   }
+
+  //Cabeçalho
+  //String dadosString = "";
+  //dadosString += "Temperature (*C) \t Pressure (Pa) \t Raw Altitude (m) \t First Filter (m) \t Second Filter (m) \t Estado (0 ou 1) ";
+  Serial.println("Temperature (*C) \t Pressure (Pa) \t Raw Altitude (m) \t First Filter (m) \t Second Filter (m) \t Estado (0 ou 1) ");
 }
 
 // the loop function runs over and over again forever
 void loop() {
+  String dadosString = "";
 
   //BME085
-  Serial.print(bmp.readTemperature());
-  Serial.print('\t');
-  Serial.print(bmp.readPressure());
-  Serial.print('\t');
+  dadosString += String(bmp.readTemperature());
+  dadosString += "\t";
+  dadosString += String(bmp.readPressure());
+  dadosString += "\t";
 
   float rawAltitude = bmp.readAltitude() - AltInicial;
-  Serial.print(rawAltitude);  //Altura do sensor sem filtro, rawww
-  Serial.print('\t');
+  dadosString += String(rawAltitude);  //Altura do sensor sem filtro, rawww
+  dadosString += "\t";
 
   // Primeiro Filtro
   somaLeituras = somaLeituras - leituras[indiceLeitura];
   leituras[indiceLeitura] = rawAltitude;
   somaLeituras = somaLeituras + leituras[indiceLeitura];
   mediaAltitude = somaLeituras / numLeituras;
-  Serial.print(mediaAltitude);
-  Serial.print('\t');
+  dadosString += String(mediaAltitude);
+  dadosString += "\t";
 
   // Segundo Filtro
   somaLeiturasFiltradas = somaLeiturasFiltradas - leiturasFiltradas[indiceLeitura];
   leiturasFiltradas[indiceLeitura] = mediaAltitude;  // usa a média do primeiro filtro
   somaLeiturasFiltradas = somaLeiturasFiltradas + leiturasFiltradas[indiceLeitura];
   mediaAltitudeFiltrada = somaLeiturasFiltradas / numLeituras;
-  Serial.print(mediaAltitudeFiltrada);
-  Serial.print('\t');
+  dadosString += String(mediaAltitudeFiltrada);
+  dadosString += "\t";
 
   indiceLeitura++;
   if (indiceLeitura >= numLeituras) {  //se for o último vetor, volta para o início
@@ -96,6 +108,21 @@ void loop() {
     estado = 0;
   }
 
-  Serial.println(estado);
+  dadosString += String(estado);
   altitudeAnterior = mediaAltitudeFiltrada;  // Atualize a altitude anterior para a próxima iteração
+
+  File dadosFile = SD.open("M_Alves.txt", FILE_WRITE);
+
+  // if the file is available, write to it:
+  if (dadosFile) {
+    dadosFile.println(dadosString);
+    dadosFile.close();
+    // print to the serial port too:
+    Serial.println(dadosString);
+  }
+  // if the file isn't open, pop up an error:
+  else {
+    Serial.println("error opening datalog.txt");
+    Serial.println(dadosString);
+  }
 }
