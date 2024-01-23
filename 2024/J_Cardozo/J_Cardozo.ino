@@ -3,35 +3,64 @@
 Adafruit_BMP085 bmp;
 
 float alturaInicial;
+const int numLeituras = 10;
+float leituras[numLeituras];
+int indiceLeitura = 0;
+float soma = 0;
+float media = 0;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
 
-  float somaAltura = 0;
-  for (int i = 0; i < 10; i++) {
-    somaAltura += bmp.readAltitude();
+  // Calcula a altura inicial
+  for (int i = 0; i < numLeituras; i++) {
+    soma += bmp.readAltitude();
   }
-  alturaInicial = somaAltura / 10;
-  
+
+  alturaInicial = soma / numLeituras;
+  soma = 0; // Reseta a variavel soma para reutilizala
+
+  // Inicializa o array de leituras com os valores do sensor
+ for (int i = 0; i < numLeituras; i++) {
+    leituras[i] = bmp.readAltitude() - alturaInicial;
+    soma += leituras[i];
+  }
+
   Serial.print("Temperature(*C)\t");
   Serial.print("Pressure(Pa)\t");
   Serial.print("Altitude(m)\t");
-  
 
   Serial.println("");
 }
 
 void loop() {
+  // Subtrai a última leitura
+  soma -= leituras[indiceLeitura];
+  // Lê a altitude atual e subtrai a altura inicial
+  leituras[indiceLeitura] = bmp.readAltitude() - alturaInicial;
+  // Adiciona a leitura atual à soma
+  soma += leituras[indiceLeitura];
+  // Avança para a próxima posição no array
+  indiceLeitura++;
+
+  // Se chegamos ao fim do array, volta para o inicio
+  if (indiceLeitura >= numLeituras) {
+    indiceLeitura = 0;
+  }
+
+  // Calcula a média
+  media = soma / numLeituras;
+
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
   Serial.print(bmp.readPressure());
   Serial.print("\t");
-  Serial.print(bmp.readAltitude()-alturaInicial);
+  Serial.print(media);
   Serial.print("\t");
-  
-  Serial.println();    
+
+  Serial.println();
 }
