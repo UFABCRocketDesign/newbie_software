@@ -88,12 +88,12 @@ void loop() {
   // Apogeu
   if (altitudeAnterior != -1 && mediaAltitudeFiltrada < altitudeAnterior) {
     contador++;
-    if (contador >= 5) {
+    if (contador >= 15) {
       estado = 1;
     }
   } else {
     contador = 0;
-    //estado = 0;
+    estado = 0;
   }
 
   Serial.println(estado);
