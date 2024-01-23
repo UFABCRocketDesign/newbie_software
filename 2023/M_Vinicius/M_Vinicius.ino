@@ -14,7 +14,7 @@ int indi = 0;
 float total = 0;
 float acum = 0;
 
-float apogeu[3];
+float apogeu[4];
 int ap = 0;
 
 
@@ -88,18 +88,17 @@ void loop() {
   Serial.print("\t");
      
      // detecção de apogeu //
-  for (i=0; i<3; i++)
-  {
-    apogeu[i] = apogeu[i+1];
+  for(i = 3; i>0; i--){
+    apogeu[i] = apogeu[i-1];
   }
-  apogeu[3] = altura_sRuido2; 
-
-if (apogeu[0] > apogeu[1] && apogeu[1]> apogeu[2] && apogeu[2] > apogeu[3]){
-  queda = 1;
-}
-else{
-  queda = 0;
-}
+  apogeu[0] = altura_sRuido2;
+  
+if (apogeu[0]<apogeu[1] && apogeu[1]<apogeu[2] && apogeu[2]<apogeu[3]){
+    queda = 1;
+  }
+  else{
+    queda = 0;
+  }
 
 
 
