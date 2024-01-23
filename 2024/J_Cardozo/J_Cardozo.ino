@@ -2,6 +2,7 @@
 
 Adafruit_BMP085 bmp;
 
+float var;
 float alturaInicial;
 const int numLeituras = 10;
 float leituras[numLeituras];
@@ -42,7 +43,8 @@ void loop() {
   // Subtrai a última leitura
   soma -= leituras[indiceLeitura];
   // Lê a altitude atual e subtrai a altura inicial
-  leituras[indiceLeitura] = bmp.readAltitude() - alturaInicial;
+  var = bmp.readAltitude() - alturaInicial;
+  leituras[indiceLeitura] = var;
   // Adiciona a leitura atual à soma
   soma += leituras[indiceLeitura];
   // Avança para a próxima posição no array
@@ -62,7 +64,7 @@ void loop() {
   Serial.print("\t");
   Serial.print(media);
   Serial.print("\t");
-  Serial.print(bmp.readPressure()-alturaInicial);
+  Serial.print(var);
   Serial.print("\t");
 
   Serial.println();
