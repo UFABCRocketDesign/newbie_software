@@ -21,36 +21,36 @@ Adafruit_BMP085 bmp;
 
  //cabeçalho
     Serial.print("Temp");
-    Serial.print("/t");
+    Serial.print("\t");
 
     Serial.print("Pressão");
-    Serial.print("/t");
+    Serial.print("\t");
 
     Serial.print("Altitude");
-    Serial.print("/t");
+    Serial.print("\t");
   
     Serial.print("P. Nível do Mar");
-    Serial.print("/t");
+    Serial.print("\t");
 
     Serial.print("Alt. Nível do mar");
-    Serial.print("/t");
+    Serial.print("\t");
 
  //Leitura de dados
 
     Serial.print(bmp.readTemperature());
-    Serial.print("/t")
+    Serial.print("\t");
   
     Serial.print(bmp.readPressure());
-    Serial.print("/t");
+    Serial.print("\t");
   
     Serial.print(bmp.readAltitude());
-    Serial.print("/t");
+    Serial.print("\t");
     
     Serial.print(bmp.readSealevelPressure());
-    Serial.print("/t");
+    Serial.print("\t");
   
     Serial.print(bmp.readAltitude(101500));
-    Serial.print("/t");
+    Serial.print("\t");
    
     Serial.println();
     delay(500);
