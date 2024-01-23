@@ -33,7 +33,6 @@ void setup() {
   Serial.begin(115200);
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-    while (1) {}
   }
 
   //SDCard
@@ -57,8 +56,8 @@ void setup() {
   }
 
   //Cabeçalho
-  //String dadosString = "";
-  //dadosString += "Temperature (*C) \t Pressure (Pa) \t Raw Altitude (m) \t First Filter (m) \t Second Filter (m) \t Estado (0 ou 1) ";
+  String dadosString = "";
+  dadosString += "Temperature (*C) \t Pressure (Pa) \t Raw Altitude (m) \t First Filter (m) \t Second Filter (m) \t Estado (0 ou 1) ";
   Serial.println("Temperature (*C) \t Pressure (Pa) \t Raw Altitude (m) \t First Filter (m) \t Second Filter (m) \t Estado (0 ou 1) ");
 }
 
@@ -67,30 +66,25 @@ void loop() {
   String dadosString = "";
 
   //BME085
-  dadosString += String(bmp.readTemperature());
-  dadosString += "\t";
-  dadosString += String(bmp.readPressure());
-  dadosString += "\t";
+  dadosString += String(bmp.readTemperature()) + "\t";
+  dadosString += String(bmp.readPressure()) + "\t";
 
   float rawAltitude = bmp.readAltitude() - AltInicial;
-  dadosString += String(rawAltitude);  //Altura do sensor sem filtro, rawww
-  dadosString += "\t";
+  dadosString += String(rawAltitude) + "\t";  //Altura do sensor sem filtro, rawww
 
   // Primeiro Filtro
   somaLeituras = somaLeituras - leituras[indiceLeitura];
   leituras[indiceLeitura] = rawAltitude;
   somaLeituras = somaLeituras + leituras[indiceLeitura];
   mediaAltitude = somaLeituras / numLeituras;
-  dadosString += String(mediaAltitude);
-  dadosString += "\t";
+  dadosString += String(mediaAltitude) + "\t";
 
   // Segundo Filtro
   somaLeiturasFiltradas = somaLeiturasFiltradas - leiturasFiltradas[indiceLeitura];
   leiturasFiltradas[indiceLeitura] = mediaAltitude;  // usa a média do primeiro filtro
   somaLeiturasFiltradas = somaLeiturasFiltradas + leiturasFiltradas[indiceLeitura];
   mediaAltitudeFiltrada = somaLeiturasFiltradas / numLeituras;
-  dadosString += String(mediaAltitudeFiltrada);
-  dadosString += "\t";
+  dadosString += String(mediaAltitudeFiltrada) + "\t";
 
   indiceLeitura++;
   if (indiceLeitura >= numLeituras) {  //se for o último vetor, volta para o início
@@ -123,6 +117,5 @@ void loop() {
   // if the file isn't open, pop up an error:
   else {
     Serial.println("error opening datalog.txt");
-    Serial.println(dadosString);
   }
 }
