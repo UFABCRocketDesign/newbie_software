@@ -10,16 +10,7 @@ Adafruit_BMP085 bmp;
 	  Serial.println("Could not find a valid BMP085 sensor, check wiring!");
 	  while (1) {}
     }
-}
-
- // the loop function runs over and over again forever
-  void loop() {
-    digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
-    delay(2000);                      // wait for a second
-    digitalWrite(LED_BUILTIN, LOW);   // turn the LED off by making the voltage LOW
-    delay(8000);                      // wait for a second
-
- //cabeçalho
+  //cabeçalho
     Serial.print("Temp");
     Serial.print("\t");
 
@@ -29,11 +20,19 @@ Adafruit_BMP085 bmp;
     Serial.print("Altitude");
     Serial.print("\t");
   
-    Serial.print("P. Nível do Mar");
+    Serial.print("P.Nível do Mar");
     Serial.print("\t");
 
-    Serial.print("Alt. Nível do mar");
-    Serial.print("\t");
+    Serial.print("Alt.Nível do mar");
+    Serial.println();
+}
+
+ // the loop function runs over and over again forever
+  void loop() {
+    digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
+    delay(2000);                      // wait for a second
+    digitalWrite(LED_BUILTIN, LOW);   // turn the LED off by making the voltage LOW
+    delay(8000);                      // wait for a second
 
  //Leitura de dados
 
