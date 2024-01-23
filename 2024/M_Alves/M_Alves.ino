@@ -26,7 +26,7 @@ int estado = 0; // estado 0 -> subindo; estado 1 -> descendo
 
 void setup() {
   //BME085
-  Serial.begin(9600);
+  Serial.begin(115200);
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
