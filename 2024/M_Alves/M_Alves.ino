@@ -22,8 +22,7 @@ float mediaAltitudeFiltrada = 0;       // a média das leituras filtradas
 //Apogeu
 float altitudeAnterior = -1;
 int contador = 0;
-int contador2 = 0;
-int estado = 0;
+int estado = 0; // estado 0 -> subindo; estado 1 -> descendo
 
 void setup() {
   //BME085
@@ -34,7 +33,7 @@ void setup() {
   }
 
   //Cabeçalho
-  Serial.println("Temperature (*C) \t Pressure (Pa) \t Raw Altitude (m) \t First Filter (m) \t Second Filter (m) \t 1desce/0sobe ");
+  Serial.println("Temperature (*C) \t Pressure (Pa) \t Raw Altitude (m) \t First Filter (m) \t Second Filter (m) \t Estado (0 ou 1) ");
 
   //Leituras iniciais
   for (int i = 0; i < numLeiturasInicial; i++) {
@@ -89,19 +88,14 @@ void loop() {
   // Apogeu
   if (altitudeAnterior != -1 && mediaAltitudeFiltrada < altitudeAnterior) {
     contador++;
-    if (contador > 5) {
+    if (contador >= 5) {
       estado = 1;
-      contador2 = 0; //reseta o contador que verifica a subida
     }
   } else {
-    contador2++;
-    if (contador2 > 5) {
-      estado = 0;
-      contador = 0;  // resetar o contador que verifica a descida
-    }
+    contador = 0;
+    //estado = 0;
   }
 
-  Serial.println(estado); //ta subindo
+  Serial.println(estado);
   altitudeAnterior = mediaAltitudeFiltrada;  // Atualize a altitude anterior para a próxima iteração
-
 }
