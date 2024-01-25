@@ -2,6 +2,9 @@
 
 Adafruit_BMP085 bmp;
 
+  float Alt = 0
+  int x = 0
+
   void setup() {
 // initialize digital pin LED_BUILTIN as an output.
     pinMode(LED_BUILTIN, OUTPUT);
@@ -25,6 +28,11 @@ Adafruit_BMP085 bmp;
 
     Serial.print("Alt.Nível do mar");
     Serial.println();
+
+  //variaveis
+   for ( int x = 0; i <= 4 ; i++ ){
+   Alt += Serial(bmp.readAltitude());
+   }
 }
 
  // the loop function runs over and over again forever
@@ -38,7 +46,7 @@ Adafruit_BMP085 bmp;
     Serial.print(bmp.readPressure());
     Serial.print("\t");
   
-    Serial.print(bmp.readAltitude());
+    Serial(bmp.readAltitude());
     Serial.print("\t");
     
     Serial.print(bmp.readSealevelPressure());
