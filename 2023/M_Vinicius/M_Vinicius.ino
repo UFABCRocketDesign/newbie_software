@@ -1,5 +1,9 @@
 // BPM085 SENSOR ( PRESSÃO / TEMPERATURA / ALTITUDE)
 #include <Adafruit_BMP085.h>
+#include <SPI.h>
+#include <SD.h>
+
+
 Adafruit_BMP085 bmp;
 int i;
 float altura, alt_in = 0;                       // fazer o sensor pro foguete cair, 1 --> ta caindo
@@ -17,12 +21,24 @@ float acum = 0;
 float apogeu[4];
 int ap = 0;
 
+const int chipSelect = 53;
+
 
 void setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);
 
   Serial.begin(115200);
+
+   Serial.print("Initializing SD card...");
+
+  // see if the card is present and can be initialized:
+  if (!SD.begin(chipSelect)) {
+    Serial.println("Card failed, or not present");
+    // don't do anything more:
+    while (1);
+  }
+  Serial.println("card initialized.");
 
   Serial.print("Temperature (*C) \t");
   Serial.print("Pressure (Pa) \t");
@@ -37,6 +53,7 @@ void setup() {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
+
 
   for (i = 0; i < 5; i++) {
     alt_in = alt_in + bmp.readAltitude();
@@ -67,6 +84,45 @@ void loop() {
   }
 
   altura_sRuido2 = acum/10;
+
+
+  String dataString = "";
+
+  // read three sensors and append to the string:
+  for (int ler = 0; ler < 3; ler++) {
+    if(ler == 0)
+    {
+      int sensor =  altura_sRuido2;
+      dataString += String(sensor);
+    }
+    else if (ler==1)
+    {
+      int sensor = bmp.readTemperature();
+      dataString += String(sensor);
+    }
+    else{
+      int sensor = bmp.readTemperature();
+      dataString += String(sensor);
+    }
+        
+    if (ler < 2) {
+      dataString += ",";
+    }
+  }
+
+   File dataFile = SD.open("marquito.txt", FILE_WRITE);
+   
+    // if the file is available, write to it:
+  if (dataFile) {
+    dataFile.println(dataString);
+    dataFile.close();
+    // print to the serial port too:
+    Serial.println(dataString);
+  }
+  // if the file isn't open, pop up an error:
+  else {
+    Serial.println("error opening datalog.txt");
+  }
 
 
   Serial.print(bmp.readTemperature());
@@ -109,4 +165,5 @@ if (apogeu[0]<apogeu[1] && apogeu[1]<apogeu[2] && apogeu[2]<apogeu[3]){
 
   Serial.println();
   delay(5);
+  
 }
