@@ -18,8 +18,7 @@ void setup() {
   
   SomaAltitude=0; //para dar partida inicial a soma
   for(int posicaoListaAltitude=0; posicaoListaAltitude<10; posicaoListaAltitude++){
-    ListaAltitude[posicaoListaAltitude]= bmp.readAltitude();
-    SomaAltitude += ListaAltitude[posicaoListaAltitude]; //soma das 10 primeiras leituras
+    SomaAltitude += bmp.readAltitude(); //soma das 10 primeiras leituras
   }
 
   MediaAltitudes= SomaAltitude/10; //media das 10 primeiras leituras
