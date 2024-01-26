@@ -1,14 +1,14 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 
-float AltitudeInicial;
-float ListaAltitude[10];
 int SomaAltitude;
-int MediaAltitudes;
+int AltitudeInicial;
+int ListaAltitudeInicial[10];
+int FiltroAltitude_1;
 
 void setup() {
 
-  Serial.begin(9600);
+  Serial.begin(115200);
   if (!bmp.begin()) {
 	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
 	while (1) {}
@@ -21,13 +21,18 @@ void setup() {
     SomaAltitude += bmp.readAltitude(); //soma das 10 primeiras leituras
   }
 
-  MediaAltitudes= SomaAltitude/10; //media das 10 primeiras leituras
+  AltitudeInicial= SomaAltitude/10; //media das 10 primeiras leituras
 
 }
 
 void loop() {
 
-  float Altura= bmp.readAltitude()- MediaAltitudes; 
+  for(int i=0; i<10; i++){ //nao soube definir um fim que não inteferisse nos dados ent usei um -0, neutro.
+    ListaAltitudeInicial[i]= bmp.readAltitude();
+    FiltroAltitude_1 += (ListaAltitudeInicial[i-1]+ListaAltitudeInicial[i+1])/2; //interpreta o prox valor como media do valor anterior + o valor seguinte.
+  }
+
+  float Altura= FiltroAltitude_1 - AltitudeInicial;
 
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
