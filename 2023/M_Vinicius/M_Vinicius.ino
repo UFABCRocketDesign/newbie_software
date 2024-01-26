@@ -105,6 +105,25 @@ void loop() {
       dataString += String(altura_sRuido2);
       dataString += "\t";
 
+            
+            // DETECTAR APOGEU //
+
+              for(i = 3; i>0; i--){
+              apogeu[i] = apogeu[i-1];
+              }
+              apogeu[0] = altura_sRuido2;
+
+              if (apogeu[0]<apogeu[1] && apogeu[1]<apogeu[2] && apogeu[2]<apogeu[3]){
+              queda = 1;
+              }
+              else{
+              queda = 0;
+              }
+
+            dataString += String(queda);
+            dataString += "\t";
+
+
 
                // SD CARD //
         
@@ -121,29 +140,9 @@ void loop() {
           else {
               Serial.println("error opening marquito.txt");
           }
-          
-        
-     
-     // DETECTAR APOGEU //
+         
 
-        for(i = 3; i>0; i--){
-        apogeu[i] = apogeu[i-1];
-        }
-        apogeu[0] = altura_sRuido2;
-
-        if (apogeu[0]<apogeu[1] && apogeu[1]<apogeu[2] && apogeu[2]<apogeu[3]){
-        queda = 1;
-        }
-        else{
-        queda = 0;
-        }
-
-      dataString += String(queda);
-      dataString += "\t";
-
-
-
-    Serial.println(dataString);
+   //Serial.println(dataString);
   
   
   
