@@ -83,53 +83,22 @@ void loop() {
     acum += filtro2[i];
   }
 
-  altura_sRuido2 = acum/10;
-
-
+  altura_sRuido2 = acum/10;        
+    
+        
   String dataString = "";
 
-  // read three sensors and append to the string:
-  for (int ler = 0; ler < 3; ler++) {
-    if(ler == 0)
-    {
-      int sensor =  altura_sRuido2;
-      dataString += String(sensor);
-    }
-    else if (ler==1)
-    {
-      int sensor = bmp.readTemperature();
-      dataString += String(sensor);
-    }
-    else{
-      int sensor = bmp.readTemperature();
-      dataString += String(sensor);
-    }
-        
-    if (ler < 2) {
-      dataString += ",";
-    }
-  }
-
-   File dataFile = SD.open("marquito.txt", FILE_WRITE);
-   
-    // if the file is available, write to it:
-  if (dataFile) {
-    dataFile.println(dataString);
-    dataFile.close();
-    // print to the serial port too:
-    Serial.println(dataString);
-  }
-  // if the file isn't open, pop up an error:
-  else {
-    Serial.println("error opening datalog.txt");
-  }
-
-
   Serial.print(bmp.readTemperature());
+   int sensor = bmp.readTemperature();
+      dataString += String(sensor);
+      dataString += ",";
   Serial.print("\t");
 
   //
   Serial.print(bmp.readPressure());
+   sensor = bmp.readPressure();
+      dataString += String(sensor);
+      dataString += ",";
   Serial.print("\t");
 
   Serial.print(altura);
@@ -138,10 +107,20 @@ void loop() {
 
 
   Serial.print(altura_semRuido);
+  
   Serial.print("\t");
 
   Serial.print(altura_sRuido2);
+   sensor = bmp.readTemperature();
+      dataString += String(sensor);
   Serial.print("\t");
+
+
+  // SD CARD //
+
+  
+   File dataFile = SD.open("marquito.txt", FILE_WRITE);
+        
      
      // detecção de apogeu //
   for(i = 3; i>0; i--){
@@ -156,14 +135,9 @@ if (apogeu[0]<apogeu[1] && apogeu[1]<apogeu[2] && apogeu[2]<apogeu[3]){
     queda = 0;
   }
 
-
-
     Serial.print(queda);
     Serial.print("\t");
-    
-
-
-  Serial.println();
-  delay(5);
+    Serial.println();
+  
   
 }
