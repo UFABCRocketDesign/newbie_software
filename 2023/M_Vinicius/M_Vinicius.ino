@@ -2,9 +2,8 @@
 #include <Adafruit_BMP085.h>
 #include <SPI.h>
 #include <SD.h>
-
-
 Adafruit_BMP085 bmp;
+
 int i;
 float altura, alt_in = 0;                       // fazer o sensor pro foguete cair, 1 --> ta caindo
 float altura_semRuido = 0;
@@ -17,7 +16,6 @@ int index = 0;
 int indi = 0;
 float total = 0;
 float acum = 0;
-
 float apogeu[4];
 int ap = 0;
 
@@ -67,6 +65,8 @@ void loop() {
 
   altura = bmp.readAltitude() - alt_in;
 
+// filtro 1 // 
+
   filtro[index] = altura;
   index = (index + 1) % 10;
   total = 0;
@@ -74,6 +74,8 @@ void loop() {
     total += filtro[i];
   }
   altura_semRuido = total / 10;
+
+// filtro 2 //
 
   filtro2[indi] =  altura_semRuido;
   indi = (indi + 1) % 10;
@@ -85,59 +87,64 @@ void loop() {
 
   altura_sRuido2 = acum/10;        
     
-        
+  // Criação do dataString para armazenar as variaveis // 
   String dataString = "";
 
-  Serial.print(bmp.readTemperature());
-   int sensor = bmp.readTemperature();
-      dataString += String(sensor);
-      dataString += ",";
-  Serial.print("\t");
+      dataString += bmp.readTemperature();
+      dataString += "\t";
 
-  //
-  Serial.print(bmp.readPressure());
-   sensor = bmp.readPressure();
-      dataString += String(sensor);
-      dataString += ",";
-  Serial.print("\t");
+      dataString += bmp.readPressure();
+      dataString += "\t";
+ 
+      dataString += String(altura);
+      dataString += "\t";
 
-  Serial.print(altura);
-  Serial.print("\t");
+      dataString += String(altura_semRuido);
+      dataString += "\t";
 
+      dataString += String(altura_sRuido2);
+      dataString += "\t";
 
 
-  Serial.print(altura_semRuido);
-  
-  Serial.print("\t");
+               // SD CARD //
+        
+        File dataFile = SD.open("marquito.txt", FILE_WRITE);
 
-  Serial.print(altura_sRuido2);
-   sensor = bmp.readTemperature();
-      dataString += String(sensor);
-  Serial.print("\t");
-
-
-  // SD CARD //
-
-  
-   File dataFile = SD.open("marquito.txt", FILE_WRITE);
+                      // if the file is available, write to it:
+          if (dataFile) {
+              dataFile.println(dataString);
+              dataFile.close();
+                      // print to the serial port too:
+            Serial.println(dataString);
+          }
+                      // if the file isn't open, pop up an error:
+          else {
+              Serial.println("error opening marquito.txt");
+          }
+          
         
      
-     // detecção de apogeu //
-  for(i = 3; i>0; i--){
-    apogeu[i] = apogeu[i-1];
-  }
-  apogeu[0] = altura_sRuido2;
-  
-if (apogeu[0]<apogeu[1] && apogeu[1]<apogeu[2] && apogeu[2]<apogeu[3]){
-    queda = 1;
-  }
-  else{
-    queda = 0;
-  }
+     // DETECTAR APOGEU //
 
-    Serial.print(queda);
-    Serial.print("\t");
-    Serial.println();
+        for(i = 3; i>0; i--){
+        apogeu[i] = apogeu[i-1];
+        }
+        apogeu[0] = altura_sRuido2;
+
+        if (apogeu[0]<apogeu[1] && apogeu[1]<apogeu[2] && apogeu[2]<apogeu[3]){
+        queda = 1;
+        }
+        else{
+        queda = 0;
+        }
+
+      dataString += String(queda);
+      dataString += "\t";
+
+
+
+    Serial.println(dataString);
+  
   
   
 }
