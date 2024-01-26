@@ -3,9 +3,12 @@
 #include <SD.h>
 
 const int chipSelect = 53;
-int fileNumber = 0;
-String Math;
-char fileName[12];
+
+int fileNum = 0;
+int qtdSaves = 9999;
+String qtdZeros;
+String sdName = "Math";
+String fileName;
 
 Adafruit_BMP085 bmp;
 
@@ -64,14 +67,20 @@ void setup() {
   Serial.println("Temperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1) ");
 
   // Verifica se o arquivo existe e cria um novo se necessário
-  int fileNum = 0;
-  Math = "Math";
-  fileName[12];  // Array para armazenar o nome do arquivo
-
-  sprintf(fileName, "%s%04d.txt", Math.c_str(), fileNum);  // Formata o número com zeros à esquerda
-  while (SD.exists(fileName)) {
-    fileNum++;
-    sprintf(fileName, "%s%04d.txt", Math.c_str(), fileNum);  // Atualiza o nome do arquivo
+  for (int fileNum = 0; fileNum <= qtdSaves; fileNum++) {
+    if (fileNum < 10) {
+      qtdZeros = "000";
+    } else if (fileNum < 100) {
+      qtdZeros = "00";
+    } else if (fileNum < 1000) {
+      qtdZeros = "0";
+    } else {
+      qtdZeros = "";
+    }
+    fileName = sdName + qtdZeros + String(fileNum) + ".txt";
+    if (!SD.exists(fileName)) {
+      break;
+    }
   }
 
   Serial.println(fileName);
