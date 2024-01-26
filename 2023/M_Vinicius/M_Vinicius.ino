@@ -140,10 +140,7 @@ void loop() {
           else {
               Serial.println("error opening marquito.txt");
           }
-         
-
-   Serial.println(dataString);
-  
+        
   
   
 }
