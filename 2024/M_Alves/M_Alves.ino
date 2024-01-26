@@ -6,8 +6,8 @@ const int chipSelect = 53;
 
 int fileNum = 0;
 int qtdSaves = 9999;
-String qtdZeros;
 String sdName = "Math";
+int numDigits = 4;  // Altere este valor conforme necessário
 String fileName;
 
 Adafruit_BMP085 bmp;
@@ -67,21 +67,14 @@ void setup() {
   Serial.println("Temperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1) ");
 
   // Verifica se o arquivo existe e cria um novo se necessário
-  for (int fileNum = 0; fileNum <= qtdSaves; fileNum++) {
-    if (fileNum < 10) {
-      qtdZeros = "000";
-    } else if (fileNum < 100) {
-      qtdZeros = "00";
-    } else if (fileNum < 1000) {
-      qtdZeros = "0";
-    } else {
-      qtdZeros = "";
+  do {
+    fileName = sdName + String(fileNum);
+    while (fileName.length() < sdName.length() + numDigits) {
+      fileName = sdName + "0" + String(fileNum);
     }
-    fileName = sdName + qtdZeros + String(fileNum) + ".txt";
-    if (!SD.exists(fileName)) {
-      break;
-    }
-  }
+    fileName += ".txt";
+    fileNum++;
+  } while (SD.exists(fileName) && fileNum <= qtdSaves);
 
   Serial.println(fileName);
 
