@@ -57,8 +57,18 @@ void setup() {
 
   //Cabeçalho
   String dadosString = "";
-  dadosString += "Temperature (*C) \t Pressure (Pa) \t Raw Altitude (m) \t First Filter (m) \t Second Filter (m) \t Estado (0 ou 1) \n ";
+  dadosString += "Temperature (*C) \t Pressure (Pa) \t Raw Altitude (m) \t First Filter (m) \t Second Filter (m) \t Estado (0 ou 1)";
   Serial.println("Temperature (*C) \t Pressure (Pa) \t Raw Altitude (m) \t First Filter (m) \t Second Filter (m) \t Estado (0 ou 1) ");
+
+  File dadosFile = SD.open("M_Alves.txt", FILE_WRITE);
+  if (dadosFile) {
+    dadosFile.println(dadosString);
+    dadosFile.close();
+  }
+  // if the file isn't open, pop up an error:
+  else {
+    Serial.println("error opening datalog.txt");
+  }
 }
 
 // the loop function runs over and over again forever
