@@ -3,6 +3,8 @@
 #include <SD.h>
 
 const int chipSelect = 53;
+int fileNumber = 0;
+String fileName;
 
 Adafruit_BMP085 bmp;
 
@@ -60,7 +62,15 @@ void setup() {
   dadosString += "Temperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1)";
   Serial.println("Temperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1) ");
 
-  File dadosFile = SD.open("M_Alves.txt", FILE_WRITE);
+  // Verifica se o arquivo existe e cria um novo se necessário
+  int fileNum = 0;
+  String fileName = "M_Alves" + String(fileNum) + ".txt";
+  while (SD.exists(fileName)) {
+    fileNum++;
+    fileName = "M_Alves" + String(fileNum) + ".txt";
+  }
+
+  File dadosFile = SD.open(fileName, FILE_WRITE);
   if (dadosFile) {
     dadosFile.println(dadosString);
     dadosFile.close();
@@ -115,7 +125,7 @@ void loop() {
   dadosString += String(estado);
   altitudeAnterior = mediaAltitudeFiltrada;  // Atualize a altitude anterior para a próxima iteração
 
-  File dadosFile = SD.open("M_Alves.txt", FILE_WRITE);
+  File dadosFile = SD.open(fileName, FILE_WRITE);
 
   // if the file is available, write to it:
   if (dadosFile) {
@@ -126,6 +136,6 @@ void loop() {
   }
   // if the file isn't open, pop up an error:
   else {
-    Serial.println("error opening datalog.txt");
+    Serial.println("error opening" + fileName);
   }
 }
