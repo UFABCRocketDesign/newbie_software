@@ -64,11 +64,13 @@ void setup() {
 
   // Verifica se o arquivo existe e cria um novo se necessário
   int fileNum = 0;
-  String fileName = "M_Alves" + String(fileNum) + ".txt";
+  fileName = "Math" + String(fileNum) + ".txt";
   while (SD.exists(fileName)) {
     fileNum++;
-    fileName = "M_Alves" + String(fileNum) + ".txt";
+    fileName = "Math" + String(fileNum) + ".txt";
   }
+
+  Serial.println(fileName);
 
   File dadosFile = SD.open(fileName, FILE_WRITE);
   if (dadosFile) {
