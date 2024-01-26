@@ -36,17 +36,46 @@ void setup() {
     // don't do anything more:
     while (1);
   }
-  Serial.println("card initialized.");
+    Serial.println("card initialized.");
 
-  Serial.print("Temperature (*C) \t");
-  Serial.print("Pressure (Pa) \t");
-  Serial.print("Altitude (meters) \t");
-  Serial.print("Altitude sem ruido (meters) \t");
-  Serial.print("Altitude s. ruido 2 (meters) \t");
-  Serial.print("Detector de queda \t");
+      // ADICIONAR O CABEÇALHO //
+  
+    String cabString = "";
 
+    cabString += ("Temperature (*C)");
+    cabString += "\t";
 
+    cabString += ("Pressure (Pa)");
+    cabString += "\t";
 
+    cabString += ("Altitude (meters)");
+    cabString += "\t";
+
+    cabString += ("Altitude sem ruido (meters)");
+    cabString += "\t";
+
+    cabString += ("Altitude s. ruido 2 (meters)");
+    cabString += "\t";
+
+    cabString += ("Detector de queda");
+    cabString += "\t";
+    
+    File cabFile = SD.open("marquito.txt", FILE_WRITE);
+
+                      // if the file is available, write to it:
+          if (cabFile) {
+              cabFile.println(cabString);
+              cabFile.close();
+                      // print to the serial port too:
+            Serial.println(cabString);
+          }
+                      // if the file isn't open, pop up an error:
+          else {
+              Serial.println("error opening marquito.txt");
+          }
+        
+
+  
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
@@ -88,7 +117,7 @@ void loop() {
   altura_sRuido2 = acum/10;        
     
   // Criação do dataString para armazenar as variaveis // 
-  String dataString = "";
+      String dataString = "";
 
       dataString += bmp.readTemperature();
       dataString += "\t";
