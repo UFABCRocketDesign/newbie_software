@@ -4,7 +4,8 @@
 
 const int chipSelect = 53;
 int fileNumber = 0;
-String fileName;
+String Math;
+char fileName[12];
 
 Adafruit_BMP085 bmp;
 
@@ -64,10 +65,13 @@ void setup() {
 
   // Verifica se o arquivo existe e cria um novo se necessário
   int fileNum = 0;
-  fileName = "Math" + String(fileNum) + ".txt";
+  Math = "Math";
+  fileName[12];  // Array para armazenar o nome do arquivo
+
+  sprintf(fileName, "%s%04d.txt", Math.c_str(), fileNum);  // Formata o número com zeros à esquerda
   while (SD.exists(fileName)) {
     fileNum++;
-    fileName = "Math" + String(fileNum) + ".txt";
+    sprintf(fileName, "%s%04d.txt", Math.c_str(), fileNum);  // Atualiza o nome do arquivo
   }
 
   Serial.println(fileName);
@@ -79,7 +83,7 @@ void setup() {
   }
   // if the file isn't open, pop up an error:
   else {
-    Serial.println("error opening datalog.txt");
+    Serial.println("error opening");
   }
 }
 
@@ -138,6 +142,6 @@ void loop() {
   }
   // if the file isn't open, pop up an error:
   else {
-    Serial.println("error opening" + fileName);
+    Serial.println("error opening");
   }
 }
