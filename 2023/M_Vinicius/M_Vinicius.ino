@@ -142,7 +142,7 @@ void loop() {
           }
          
 
-   //Serial.println(dataString);
+   Serial.println(dataString);
   
   
   
