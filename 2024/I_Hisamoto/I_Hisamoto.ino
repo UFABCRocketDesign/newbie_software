@@ -3,21 +3,36 @@ Adafruit_BMP085 bmp;
 
 float SomaAltitude;
 float AltitudeInicial;
-float ListaAltitude_0[10];
 float SomaListaAltitude_0;
-float FiltroAltitude_0[10];
-float SomaFiltroAltitude_0;
 float MediaFiltroAltitude_0;
-
+float ListaAltitude[10];
 
 float filtro_0(){
-  SomaListaAltitude_0=0;
-  for(int i=0;i<10;i++){
-    SomaListaAltitude_0 += bmp.readAltitude()- AltitudeInicial;
+
+  for(int i = 9; i > 0; i--){
+    ListaAltitude[i] = ListaAltitude[i-1];
   }
+
+  ListaAltitude[0] = bmp.readAltitude()- AltitudeInicial;
+  
+  SomaListaAltitude_0=0;
+  for(int i = 0; i < 10; i++){
+    SomaListaAltitude_0 += ListaAltitude[i];
+  }
+
   MediaFiltroAltitude_0 = SomaListaAltitude_0/10;
   return MediaFiltroAltitude_0;
+
 }
+
+//float filtro_0(){
+  //SomaListaAltitude_0=0;
+  //for(int i=0;i<10;i++){
+    //SomaListaAltitude_0 += bmp.readAltitude()- AltitudeInicial;
+  //}
+ // MediaFiltroAltitude_0 = SomaListaAltitude_0/10;
+  //return MediaFiltroAltitude_0;
+//}
 
 
 void setup() {
