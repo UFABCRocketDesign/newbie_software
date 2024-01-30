@@ -4,6 +4,8 @@
 
 //Pinos do paraquedas
 #define IGN_1 36 /*act1*/
+bool ativacao1 = false; //variável para garantir que só vai ativar 1 vez o pino
+
 #define IGN_2 61 /*act2*/
 #define IGN_3 46 /*act3*/
 #define IGN_4 55 /*act4*/
@@ -56,6 +58,7 @@ void setup() {
 
   //Paraquedas
   pinMode(IGN_1, OUTPUT);
+  digitalWrite(IGN_1, LOW);
 
   //Leituras iniciais
   for (int i = 0; i < numLeiturasInicial; i++) {
@@ -139,18 +142,20 @@ void loop() {
     contador++;
     if (contador >= 25) {
       estado = 1;
-      digitalWrite(IGN_1, HIGH);
-      previousMillis = currentMillis;
     }
   } else {
     contador = 0;
     estado = 0;
   }
 
-  if (estado == 1 && currentMillis - previousMillis >= interval) {
+  if (estado == 1 && ativacao1 == false) {
     previousMillis = currentMillis;
+    digitalWrite(IGN_1, HIGH);
+    ativacao1 = true;
+  }
+
+  if (currentMillis - previousMillis >= interval) {
     digitalWrite(IGN_1, LOW);
-    estado = 0;
   }
 
   dadosString += String(estado);
