@@ -4,15 +4,19 @@
 
 //Pinos do paraquedas
 #define IGN_1 36         /*act1*/
-bool ativacao1 = false;  //variável para garantir que só vai ativar 1 vez o pino
+bool ativacao1 = false;  //variável para garantir que só vai ativar 1 vez o pino do paraquedas 1
 
 #define IGN_2 61 /*act2*/
+bool ativacao2 = false; //variável para garantir que só vai ativar 1 vez o pino do paraquedas 2
+
 #define IGN_3 46 /*act3*/
 #define IGN_4 55 /*act4*/
 
-//Relógio interno do arduino
-unsigned long futureMillis = 0;  // will store last time LED was updated
-const long interval = 10000;     // interval at which to blink (milliseconds)
+//Relógio interno do arduino p/ o paraquedas 1 e paraquedas 2
+unsigned long futureMillis = 0;  
+const long interval = 10000;     
+unsigned long futureMillis2 = 0;
+const long interval2 = 5000;
 
 const int chipSelect = 53;
 
@@ -56,9 +60,11 @@ void setup() {
     Serial.println("Card failed, or not present");
   }
 
-  //Paraquedas
+  //Paraquedas 1 e 2
   pinMode(IGN_1, OUTPUT);
   digitalWrite(IGN_1, LOW);
+  pinMode(IGN_2, OUTPUT);
+  digitalWrite(IGN_2, LOW);
 
   //Leituras iniciais
   for (int i = 0; i < numLeiturasInicial; i++) {
@@ -77,8 +83,8 @@ void setup() {
 
   //Cabeçalho
   String dadosString = "";
-  dadosString += "Temperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1)\tParaquedas1 (bool)\n";
-  Serial.println("Temperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1)\tParaquedas1 (bool)");
+  dadosString += "Temperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1)\tParaquedas1 (bool)\tParaquedas2 (bool)\n";
+  Serial.println("Temperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1)\tParaquedas1 (bool)\tParaquedas2 (bool)");
 
   // Verifica se o arquivo existe e cria um novo se necessário
   do {
@@ -150,16 +156,30 @@ void loop() {
 
   if (estado == 1 && ativacao1 == false) {
     futureMillis = currentMillis + interval;
+    futureMillis2 = currentMillis + interval2;
     digitalWrite(IGN_1, HIGH);
     ativacao1 = true;
+    ativacao2 = true;
+  }
+
+  if(ativacao2 = true && currentMillis >= futureMillis2) {
+    digitalWrite(IGN_2, HIGH);
+    ativacao2 = false;
+    futureMillis2 = currentMillis + interval;
   }
 
   if (currentMillis >= futureMillis) {
     digitalWrite(IGN_1, LOW);
   }
 
+  if (currentMillis >= futureMillis2) {
+    digitalWrite(IGN_2, LOW);
+  }
+
   dadosString += String(estado) + "\t";
-  dadosString += String(digitalRead(IGN_1));
+  dadosString += String(digitalRead(IGN_1)) + "\t";
+  dadosString += String(digitalRead(IGN_2));
+
   altitudeAnterior = mediaAltitudeFiltrada;  // Atualize a altitude anterior para a próxima iteração
 
   File dadosFile = SD.open(fileName, FILE_WRITE);
