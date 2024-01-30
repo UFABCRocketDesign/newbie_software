@@ -20,7 +20,7 @@ float apogeu[4];
 int ap = 0;
 int indicador =0;
 
-String marcos, qnt_zero; 
+String marcos; 
 String marcs = "marcs";
 
 const int chipSelect = 53;
@@ -44,7 +44,7 @@ void setup() {
 
     // CRIAR UM NOVO ARQUIVO DE TEXTO CADA VEZ QUE O CARTÃO SD É INSERIDO //
 
-        do{
+        do{ String qnt_zero;
           for (i = String(indicador).length() + String(marcs).length() ; i<8; i++)
           {
             qnt_zero += "0";
