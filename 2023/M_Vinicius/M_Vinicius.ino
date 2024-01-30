@@ -18,9 +18,9 @@ float total = 0;
 float acum = 0;
 float apogeu[4];
 int ap = 0;
-int nulo;
+int indicador =0;
 
-String marcos, marcs; 
+String marcos, qnt_zero; 
 
 const int chipSelect = 53;
 
@@ -44,17 +44,19 @@ void setup() {
     // CRIAR UM NOVO ARQUIVO DE TEXTO CADA VEZ QUE O CARTÃO SD É INSERIDO //
 
         do{
-          for (i = String(nulo).length() + 5 ; i<8; i++)
+          for (i = indicador + 5 ; i<8; i++)
           {
-            nulo += "0";
+            qnt_zero += "0";
           }
 
-          marcos = marcs + nulo + ".txt";
+          marcos = "marcs" + qnt_zero + String(indicador) + ".txt";
 
-          nulo++;
+          indicador++;
                 
 
         } while(SD.exists(marcos));
+
+        Serial.println(marcos);
          
 
 
@@ -91,7 +93,7 @@ void setup() {
           }
                       // if the file isn't open, pop up an error:
           else {
-              Serial.println("error opening marquito.txt");
+              Serial.println("error opening" + marcos);
           }
           Serial.println(cabString);
         
