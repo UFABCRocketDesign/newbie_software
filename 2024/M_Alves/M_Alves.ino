@@ -3,16 +3,16 @@
 #include <SD.h>
 
 //Pinos do paraquedas
-#define IGN_1 36 /*act1*/
-bool ativacao1 = false; //variável para garantir que só vai ativar 1 vez o pino
+#define IGN_1 36         /*act1*/
+bool ativacao1 = false;  //variável para garantir que só vai ativar 1 vez o pino
 
 #define IGN_2 61 /*act2*/
 #define IGN_3 46 /*act3*/
 #define IGN_4 55 /*act4*/
 
 //Relógio interno do arduino
-unsigned long previousMillis = 0;  // will store last time LED was updated
-const long interval = 10000;       // interval at which to blink (milliseconds)
+unsigned long futureMillis = 0;  // will store last time LED was updated
+const long interval = 10000;     // interval at which to blink (milliseconds)
 
 const int chipSelect = 53;
 
@@ -78,7 +78,7 @@ void setup() {
   //Cabeçalho
   String dadosString = "";
   dadosString += "Temperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1)";
-  Serial.println("Temperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1) ");
+  Serial.println("Temperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1)\tParaquedas1 (bool)");
 
   // Verifica se o arquivo existe e cria um novo se necessário
   do {
@@ -149,16 +149,17 @@ void loop() {
   }
 
   if (estado == 1 && ativacao1 == false) {
-    previousMillis = currentMillis;
+    futureMillis = currentMillis + interval;
     digitalWrite(IGN_1, HIGH);
     ativacao1 = true;
   }
 
-  if (currentMillis - previousMillis >= interval) {
+  if (currentMillis >= futureMillis) {
     digitalWrite(IGN_1, LOW);
   }
 
   dadosString += String(estado);
+  dadosString += String(digitalRead(IGN_1));
   altitudeAnterior = mediaAltitudeFiltrada;  // Atualize a altitude anterior para a próxima iteração
 
   File dadosFile = SD.open(fileName, FILE_WRITE);
