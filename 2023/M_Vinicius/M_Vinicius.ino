@@ -21,6 +21,7 @@ int ap = 0;
 int indicador =0;
 
 String marcos, qnt_zero; 
+String marcs = "marcs";
 
 const int chipSelect = 53;
 
@@ -44,12 +45,12 @@ void setup() {
     // CRIAR UM NOVO ARQUIVO DE TEXTO CADA VEZ QUE O CARTÃO SD É INSERIDO //
 
         do{
-          for (i = indicador + 5 ; i<8; i++)
+          for (i = String(indicador).length() + String(marcs).length() ; i<8; i++)
           {
             qnt_zero += "0";
           }
 
-          marcos = "marcs" + qnt_zero + String(indicador) + ".txt";
+          marcos = marcs + qnt_zero + String(indicador) + ".txt";
 
           indicador++;
                 
