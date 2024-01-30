@@ -1,6 +1,9 @@
 // BPM085 SENSOR ( PRESSÃO / TEMPERATURA / ALTITUDE)
 #include <Adafruit_BMP085.h>
+#include <SPI.h>
+#include <SD.h>
 Adafruit_BMP085 bmp;
+
 int i;
 float altura, alt_in = 0;                       // fazer o sensor pro foguete cair, 1 --> ta caindo
 float altura_semRuido = 0;
@@ -13,7 +16,11 @@ int index = 0;
 int indi = 0;
 float total = 0;
 float acum = 0;
-float last_altitude = 0;
+float apogeu[4];
+int ap = 0;
+
+const int chipSelect = 53;
+
 
 void setup() {
 
@@ -21,19 +28,59 @@ void setup() {
 
   Serial.begin(115200);
 
-  Serial.print("Temperature (*C) \t");
-  Serial.print("Pressure (Pa) \t");
-  Serial.print("Altitude (meters) \t");
-  Serial.print("Altitude sem ruido (meters) \t");
-  Serial.print("Altitude s. ruido 2 (meters) \t");
-  Serial.print("Detector de queda \t");
+   Serial.print("Initializing SD card...");
 
+  // see if the card is present and can be initialized:
+  if (!SD.begin(chipSelect)) {
+    Serial.println("Card failed, or not present");
+    // don't do anything more:
+    while (1);
+  }
+    Serial.println("card initialized.");
 
+      // ADICIONAR O CABEÇALHO //
+  
+    String cabString = "";
 
+    cabString += ("Temperature (*C)");
+    cabString += "\t";
+
+    cabString += ("Pressure (Pa)");
+    cabString += "\t";
+
+    cabString += ("Altitude (meters)");
+    cabString += "\t";
+
+    cabString += ("Altitude sem ruido (meters)");
+    cabString += "\t";
+
+    cabString += ("Altitude s. ruido 2 (meters)");
+    cabString += "\t";
+
+    cabString += ("Detector de queda");
+    cabString += "\t";
+    
+    File cabFile = SD.open("marquito.txt", FILE_WRITE);
+
+                      // if the file is available, write to it:
+          if (cabFile) {
+              cabFile.println(cabString);
+              cabFile.close();
+                      // print to the serial port too:
+            Serial.println(cabString);
+          }
+                      // if the file isn't open, pop up an error:
+          else {
+              Serial.println("error opening marquito.txt");
+          }
+        
+
+  
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
+
 
   for (i = 0; i < 5; i++) {
     alt_in = alt_in + bmp.readAltitude();
@@ -47,6 +94,8 @@ void loop() {
 
   altura = bmp.readAltitude() - alt_in;
 
+// filtro 1 // 
+
   filtro[index] = altura;
   index = (index + 1) % 10;
   total = 0;
@@ -55,68 +104,72 @@ void loop() {
   }
   altura_semRuido = total / 10;
 
+// filtro 2 //
+
   filtro2[indi] =  altura_semRuido;
   indi = (indi + 1) % 10;
   acum = 0;
   for (int i = 0; i< 10; i++)
-  {
+  {   
     acum += filtro2[i];
   }
 
-  altura_sRuido2 = acum/10;
-
-
-  Serial.print(bmp.readTemperature());
-  Serial.print("\t");
-
-  //
-  Serial.print(bmp.readPressure());
-  Serial.print("\t");
-
-  Serial.print(altura);
-  Serial.print("\t");
-
-
-
-  Serial.print(altura_semRuido);
-  Serial.print("\t");
-
-  Serial.print(altura_sRuido2);
-  Serial.print("\t");
-
-     
-  float delta = altura_sRuido2 - last_altitude;  
-  last_altitude = altura_sRuido2; 
-
-    if (delta < 0)
-    {
-      queda = 1;
-    }
-    else{
-      queda = 0;
-    }
-
-    Serial.print(queda);
-    Serial.print("\t");
+  altura_sRuido2 = acum/10;        
     
+  // Criação do dataString para armazenar as variaveis // 
+      String dataString = "";
+
+      dataString += bmp.readTemperature();
+      dataString += "\t";
+
+      dataString += bmp.readPressure();
+      dataString += "\t";
+ 
+      dataString += String(altura);
+      dataString += "\t";
+
+      dataString += String(altura_semRuido);
+      dataString += "\t";
+
+      dataString += String(altura_sRuido2);
+      dataString += "\t";
+
+            
+            // DETECTAR APOGEU //
+
+              for(i = 3; i>0; i--){
+              apogeu[i] = apogeu[i-1];
+              }
+              apogeu[0] = altura_sRuido2;
+
+              if (apogeu[0]<apogeu[1] && apogeu[1]<apogeu[2] && apogeu[2]<apogeu[3]){
+              queda = 1;
+              }
+              else{
+              queda = 0;
+              }
+
+            dataString += String(queda);
+            dataString += "\t";
 
 
-  Serial.println();
-  delay(5);
 
+               // SD CARD //
+        
+        File dataFile = SD.open("marquito.txt", FILE_WRITE);
+
+                      // if the file is available, write to it:
+          if (dataFile) {
+              dataFile.println(dataString);
+              dataFile.close();
+                      // print to the serial port too:
+            Serial.println(dataString);
+          }
+                      // if the file isn't open, pop up an error:
+          else {
+              Serial.println("error opening marquito.txt");
+          }
+        
+  
+  
 }
-
-/*for (i = 0; i<10; i++)
-    {
-      vetor[i] = altura_sRuido2;
-      for (w=0; w<9; w++)
-      {
-        if (vetor[w+1]>vetor[w])
-        {
-          queda = 0;
-        }
-        else {
-          queda = 1;
-        }        
-      }
-    }*/
