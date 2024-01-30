@@ -77,7 +77,7 @@ void setup() {
 
   //Cabeçalho
   String dadosString = "";
-  dadosString += "Temperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1)";
+  dadosString += "Temperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1)\tParaquedas1 (bool)\n";
   Serial.println("Temperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1)\tParaquedas1 (bool)");
 
   // Verifica se o arquivo existe e cria um novo se necessário
@@ -158,7 +158,7 @@ void loop() {
     digitalWrite(IGN_1, LOW);
   }
 
-  dadosString += String(estado);
+  dadosString += String(estado) + "\t";
   dadosString += String(digitalRead(IGN_1));
   altitudeAnterior = mediaAltitudeFiltrada;  // Atualize a altitude anterior para a próxima iteração
 
