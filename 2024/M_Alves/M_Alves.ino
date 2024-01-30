@@ -2,6 +2,16 @@
 #include <SPI.h>
 #include <SD.h>
 
+//Pinos do paraquedas
+#define IGN_1 36 /*act1*/
+#define IGN_2 61 /*act2*/
+#define IGN_3 46 /*act3*/
+#define IGN_4 55 /*act4*/
+
+//Relógio interno do arduino
+unsigned long previousMillis = 0;  // will store last time LED was updated
+const long interval = 10000;       // interval at which to blink (milliseconds)
+
 const int chipSelect = 53;
 
 int fileNum = 0;
@@ -43,6 +53,9 @@ void setup() {
   if (!SD.begin(chipSelect)) {  // see if the card is present and can be initialized:
     Serial.println("Card failed, or not present");
   }
+
+  //Paraquedas
+  pinMode(IGN_1, OUTPUT);
 
   //Leituras iniciais
   for (int i = 0; i < numLeiturasInicial; i++) {
@@ -119,14 +132,24 @@ void loop() {
     indiceLeitura = 0;
   }
 
-  // Apogeu
+  // Apogeu + millis
+  unsigned long currentMillis = millis();
+
   if (altitudeAnterior != -1 && mediaAltitudeFiltrada < altitudeAnterior) {
     contador++;
-    if (contador >= 15) {
+    if (contador >= 25) {
       estado = 1;
+      digitalWrite(IGN_1, HIGH);
+      previousMillis = currentMillis;
     }
   } else {
     contador = 0;
+    estado = 0;
+  }
+
+  if (estado == 1 && currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;
+    digitalWrite(IGN_1, LOW);
     estado = 0;
   }
 
