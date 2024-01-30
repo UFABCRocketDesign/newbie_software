@@ -18,6 +18,9 @@ float total = 0;
 float acum = 0;
 float apogeu[4];
 int ap = 0;
+int nulo;
+
+String marcos, marcs; 
 
 const int chipSelect = 53;
 
@@ -37,6 +40,24 @@ void setup() {
     while (1);
   }
     Serial.println("card initialized.");
+
+    // CRIAR UM NOVO ARQUIVO DE TEXTO CADA VEZ QUE O CARTÃO SD É INSERIDO //
+
+        do{
+          for (i = String(nulo).length() + 5 ; i<8; i++)
+          {
+            nulo += "0";
+          }
+
+          marcos = marcs + nulo + ".txt";
+
+          nulo++;
+                
+
+        } while(SD.exists(marcos));
+         
+
+
 
       // ADICIONAR O CABEÇALHO //
   
@@ -60,19 +81,19 @@ void setup() {
     cabString += ("Detector de queda");
     cabString += "\t";
     
-    File cabFile = SD.open("marquito.txt", FILE_WRITE);
+    File cabFile = SD.open(marcos, FILE_WRITE);
 
                       // if the file is available, write to it:
           if (cabFile) {
               cabFile.println(cabString);
               cabFile.close();
                       // print to the serial port too:
-            Serial.println(cabString);
           }
                       // if the file isn't open, pop up an error:
           else {
               Serial.println("error opening marquito.txt");
           }
+          Serial.println(cabString);
         
 
   
@@ -156,20 +177,20 @@ void loop() {
 
                // SD CARD //
         
-        File dataFile = SD.open("marquito.txt", FILE_WRITE);
+        File dataFile = SD.open(marcos, FILE_WRITE);
 
                       // if the file is available, write to it:
           if (dataFile) {
               dataFile.println(dataString);
               dataFile.close();
                       // print to the serial port too:
-            Serial.println(dataString);
+            
           }
                       // if the file isn't open, pop up an error:
           else {
-              Serial.println("error opening marquito.txt");
+              Serial.println("error opening" + marcos);
           }
-        
+        Serial.println(dataString);
   
   
 }
