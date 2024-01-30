@@ -70,7 +70,6 @@ unsigned long TDes[NP];
 int PqD[NP] = { LOW };
 bool LK[NP] = { false };
 bool LC2 = false;
-int PL = 0;
 unsigned long TAL2 = 0;
 const int LEDS[] = { IGN_1, IGN_2, IGN_3 };
 #endif
@@ -399,32 +398,29 @@ void loop() {
       digitalWrite(LEDS[P], PqD[P]);
     }
 #endif
-}
+  }
 #endif
 
 
 #if PqDbg  //for rodando os paraquedas por PqD[P]
 
-for (int T = 0; T < NP; T++) {
-  dataString += String(PqD[T]);
-  dataString += "\t";
-}
-
-dataString += String(PL);
-dataString += "\t";
+  for (int T = 0; T < NP; T++) {
+    dataString += String(PqD[T]);
+    dataString += "\t";
+  }
 #endif
 
-Serial.println(dataString);
+  Serial.println(dataString);
 
 #if sdDbg
-//Cartão SD
-File dataFile = SD.open(NomeArq, FILE_WRITE);
-if (dataFile) {
-  dataFile.println(dataString);
-  dataFile.close();
-} else {
-  Serial.println("error opening datalog.txt");
-}
+  //Cartão SD
+  File dataFile = SD.open(NomeArq, FILE_WRITE);
+  if (dataFile) {
+    dataFile.println(dataString);
+    dataFile.close();
+  } else {
+    Serial.println("error opening datalog.txt");
+  }
 #endif
 }
 
@@ -453,40 +449,40 @@ int Apogeu(float AltAtual, int VQueda) {
 }
 
 //Paraquedas
-int Paraquedas(int Par, unsigned long TAt)  //Numero do paraquedas, Tempo atual)
+int Paraquedas(int Par, unsigned long TA)  //Numero do paraquedas, Tempo atual utilizar sistema de acionamento sem e com atraso (1 e 3 são sem atraso, 2 é atrasado de 1 e 4 é atrasado de 3)
 {
-  //if (TAtual > TAL2) -- liga P1
+  //if (Q1 == 1) -- liga P0
+  //if (TAtual > TAL2) -- liga P1 3 seg apos ligar P0
   //if (SF[Nf] <= -0.25) -- liga P2
-  //TDes[P] = TAtual + TL
+  //TDes[Par] = TAtual + TL
+  // Paraquedas ficam ligados por 5 seg
 
-  if((Par == 0) && (LK[Par] = false))
-  {
-    LEDST[Par] = HIGH;
-    TDes[Par] = TAt + TL;
-    LK[Par] = true;
-  }
+  if (LK[Par] == false) {
 
-  if((Par == 1) && (TAt > TAL2))
-  {
-    if(LK[Par] == false)
-    {
-    LEDST[Par] = HIGH;
-    TDes[Par] = TAt + TL;
-    LK[Par] = true;
+    if (LK[0] == false) {
+      LEDST[Par] = HIGH;
+      TDes[Par] = TA + TL;
+      LK[0] = true;
+    }
+
+    if (LK[1] == false) {
+      if (TA > TAL2) {
+        LEDST[Par] = HIGH;
+        TDes[Par] = TA + TL;
+        LK[1] = true;
+      }
+    }
+
+    if (LK[2] == false) {
+      if (SF[Nf] <= -0.25) {
+        LEDST[Par] = HIGH;
+        TDes[Par] = TA + TL;
+        LK[2] = true;
+      }
     }
   }
 
-  if((Par == 2) && (SF[Nf] <= -0.25))
-  {
-    if(LK[Par] == false)
-    {
-    LEDST[Par] = HIGH;
-    TDes[Par] = TAt + TL;
-    LK[Par] = true;
-    }
-  }
-
-  if (TAt > TDes[Par])  // roda sempre
+  if (TA > TDes[Par])  // roda sempre
   {
     LEDST[Par] = LOW;
   }
