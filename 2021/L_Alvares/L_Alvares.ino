@@ -14,6 +14,7 @@
 
 //#define AtivarLED2 3000
 #define TL 5000
+#define Hplt 400
 
 #define Tam 11
 #define Nf 2
@@ -71,11 +72,11 @@ const int LEDS[] = { IGN_1, IGN_2, IGN_3, IGN_4 };
 int PqD[NP] = { LOW };
 int LEDST[NP] = { LOW };
 
-bool LK = false;
-const int Atraso[] = { 500, 3000, 500, 3000 };
-
-int hMin = 0;
-const int Lock[NP] = { 0 };
+int at = 0;
+const int Atraso[] = { 100, 3000, 100, 3000 };
+float hMin[NP];
+float HQ = 0.0;
+int Lock[NP] = { 0 };
 unsigned long TA[NP];
 unsigned long TDes[NP];
 #endif
@@ -332,6 +333,7 @@ void loop() {
   if (Q1 == 0 && DQueda == 1) {
     Q1 = 1;
     TQ = TAtual;
+    HQ = SF[Nf];
   }
   dataString += String(DQueda);
   dataString += "\t";
@@ -394,20 +396,31 @@ void loop() {
 
     //O atraso de acionamento para os leds pode ser feito a partir de TQ mais um atraso, porém o tempo de acionamento do Led3 precisa ser registrado para saber quando acionar o Led4
 
-    //if (LK == false) {
-    //  for (int P = 0; P < NP; P++) {
-    //    TA[P] = TQ + Atraso[P];
-    //  }
-    //  LK = true;
-    //}
+    //0,2 sem atraso. 1 e 3 com atraso de 3000.
+    //2 e 3 só podem receber o tempo após SF[Nf] < 0.25
+    //É possivel determinar o tempo utilizando Lock e SF[Nf] < -0.25?
+
+  if(at < NP) // como fazer isso parar de rodar após 4 paraquedas?
+    for (int P = 0; P < NP; P++) {
+      if (Lock[P] == 0) {
+        if (P < NP / 2)  // para 0,1
+        {
+          TA[P] = TQ + Atraso[P];
+          hMin[P] = HQ;
+          at++;
+        }
+        if (P >= NP / 2 && SF[Nf] < -0.25)  // para 2,3
+        {
+          TA[P] = TAtual + Atraso[P];
+          hMin[P] = Hplt;
+          at++;
+        }
+      }
+    }
 
     for (int P = 0; P < NP; P++) {
-      PqD[P] = Paraquedas(P,TAtual);  //Passar os parâmetros necessários
+      PqD[P] = Paraquedas(P, TAtual);  //Passar os parâmetros necessários
       digitalWrite(LEDS[P], PqD[P]);
-      //if (LEDS[P] == HIGH)
-      //{
-      //  Lock[P] = 1;  Erro de Read only Lock[P]????
-      //}
     }
 #endif
   }
@@ -460,19 +473,19 @@ int Apogeu(float AltAtual, int VQueda) {
 }
 
 //Paraquedas
-int Paraquedas(int Pq , unsigned long TAt) {  //Numero do paraquedas (Pq, int), Tempo atual (TAt, Unsigned Long)
+int Paraquedas(int Pq, unsigned long TAt) {  //Numero do paraquedas (Pq, int), Tempo atual (TAt, Unsigned Long)
 
   if (Lock[Pq] == 0)  //Trava para evitar que o paraquedas entre nesse loop de novo após ser ativado
   {
     if (((SF[Nf] <= -0.25) && (SF[Nf])) || !(SF[Nf] <= -0.25))  //Essa condicional está certa?
     {
-      if (TAt > TA[Pq])  // Tempo atual > Tempo de acionamento do Paraquedas? (if 1) (Acionar 1 e 2 é simples utilizando TQ, mas como acionar 3 e 4?)
+      if (TAt > TA[Pq])  // Tempo atual > Tempo de acionamento do Paraquedas? (if 1) 
       {
-        if (hMin > SF[Nf])  // A altura minima necessária para acionamento foi atingida? (como fazer a altura de 1 e 2 ser a altura de apogeu? -- registrar a altura de apogeu e uma altura em define como altura minima para o outro paraquedas)  (if 2) -- ligaria 1 e 2, depois 3 e 4
+        if (hMin[Pq] > SF[Nf])  // A altura minima necessária para acionamento foi atingida? (if 2) -- ligaria 1 e 2, depois 3 e 4
         {
           LEDST[Pq] = HIGH;     //Acionar Paraquedas,
           TDes[Pq] = TAt + TL;  //Registrar o tempo para desligar o paraquedas,
-          //Lock[Pq] = 1;         //Faz com que cada paraquedas entre nesse loop apenas uma vez (não deu certo, talvez declarar na função ou verificar o estado do led fora e ai sim adicionar)
+          Lock[Pq] = 1;         //Faz com que cada paraquedas entre nesse loop apenas uma vez
         }
       }
     }
@@ -485,10 +498,3 @@ int Paraquedas(int Pq , unsigned long TAt) {  //Numero do paraquedas (Pq, int), 
 
   return LEDST[Pq];
 }
-
-
-//if (Q1 == 1) -- liga P0
-//if (TAtual > TAL2) -- liga P1 3 seg apos ligar P0
-//if (SF[Nf] <= -0.25) -- liga P2
-//TDes[Par] = TAtual + TL
-// Paraquedas ficam ligados por 5 seg
