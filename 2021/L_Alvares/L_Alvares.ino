@@ -271,6 +271,9 @@ void setup() {
 
   StringC += "Ativação Led3";
   StringC += "\t";
+
+  StringC += "Ativação Led4";
+  StringC += "\t";
 #endif
 
   Serial.println(StringC);
