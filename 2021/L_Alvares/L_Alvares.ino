@@ -14,7 +14,7 @@
 
 //#define AtivarLED2 3000
 #define TL 5000
-#define Hplt 400
+#define Hplt -5
 
 #define Tam 11
 #define Nf 2
@@ -73,7 +73,7 @@ int PqD[NP] = { LOW };
 int LEDST[NP] = { LOW };
 
 int at = 0;
-const int Atraso[] = { 100, 3000, 100, 3000 };
+const int Atraso[] = { 0, 3000, 0, 3000 };
 float hMin[NP];
 float HQ = 0.0;
 int Lock[NP] = { 0 };
@@ -406,18 +406,21 @@ void loop() {
   if(at < NP) // como fazer isso parar de rodar após 4 paraquedas?
     for (int P = 0; P < NP; P++) {
       if (Lock[P] == 0) {
-        if (P < NP / 2)  // para 0,1
+
+        if (P < (NP / 2))  // para 0,1
         {
           TA[P] = TQ + Atraso[P];
-          hMin[P] = HQ;
+          hMin[P] = HQ;  //HQ é a altura registrada quando detecta a queda
           at++;
         }
-        if (P >= NP / 2 && SF[Nf] < -0.25)  // para 2,3
+
+        if ((P >= (NP / 2)) && (SF[Nf] < -0.25))  // para 2,3 
         {
-          TA[P] = TAtual + Atraso[P];
-          hMin[P] = Hplt;
+          TA[P] = TAtual + Atraso[P]; // Como representar o tempo no qual ele precisa acionar
+          hMin[P] = Hplt;  //Hplt é uma altura pré definida para abrir o segundo paraquedas (nesse caso um define de 400, talvez seja muito alto visto que a altura é minima)
           at++;
         }
+
       }
     }
 
@@ -432,6 +435,12 @@ void loop() {
 
 #if PqDbg  //for rodando os paraquedas por PqD[P]
   for (int P = 0; P < NP; P++) {
+    dataString += String(TA[P]);
+    dataString += "\t";
+    dataString += String(hMin[P]);
+    dataString += "\t";
+    dataString += String(at);
+    dataString += "\t";
     dataString += String(PqD[P]);
     dataString += "\t";
   }
@@ -480,19 +489,16 @@ int Paraquedas(int Pq, unsigned long TAt) {  //Numero do paraquedas (Pq, int), T
 
   if (Lock[Pq] == 0)  //Trava para evitar que o paraquedas entre nesse loop de novo após ser ativado
   {
-    if (((SF[Nf] <= -0.25) && (SF[Nf])) || !(SF[Nf] <= -0.25))  //Essa condicional está certa?
-    {
-      if (TAt > TA[Pq])  // Tempo atual > Tempo de acionamento do Paraquedas? (if 1) 
+    if (Q1 == 1 && ((SF[Nf] <= -0.25) && (hMin[Pq] > SF[Nf])) || !(SF[Nf] <= -0.25))  //apg && (h && <altura certa> || !h) onde h é a condicional geral de usar a altura
+    {                                                                                 //apg && ((SF[Nf] <= -0.25) && (hMin[Pq] > SF[Nf]) || !(SF[Nf] <= 0.25))
+      if (TAt > TA[Pq] && TA[Pq] != 0)  // Tempo atual > Tempo de acionamento do Paraquedas? (if 1) -- Dessa forma TAt sempre é maior que os tempos dos paraquedas (começam em 0) (isso foi antes da adição de &&)
       {
-        if (hMin[Pq] > SF[Nf])  // A altura minima necessária para acionamento foi atingida? (if 2) -- ligaria 1 e 2, depois 3 e 4
-        {
           LEDST[Pq] = HIGH;     //Acionar Paraquedas,
           TDes[Pq] = TAt + TL;  //Registrar o tempo para desligar o paraquedas,
           Lock[Pq] = 1;         //Faz com que cada paraquedas entre nesse loop apenas uma vez
-        }
       }
-    }
-  }
+    } // é necessário colocar um else aqui para manter LEDST[Pq] = LOW quando não entra nos ifs?
+  } 
 
   if (TAt > TDes[Pq])  // Tempo atual > Tempo de desligar? (if 3) -- desliga os paraquedas conforme necessário
   {
