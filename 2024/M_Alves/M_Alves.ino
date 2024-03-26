@@ -53,7 +53,6 @@ float mediaAltitudeFiltrada = 0;       // a média das leituras filtradas
 
 //Apogeu
 float altitudeAnterior = -1;
-float altApogeu = 0;
 int contador = 0;
 int estado = 0;  // estado 0 -> subindo; estado 1 -> descendo
 
@@ -173,8 +172,6 @@ void loop() {
     ativacao2 = true;
     futureMillis = currentMillis + interval;
     futureMillis2 = currentMillis + interval2;
-
-    altApogeu = mediaAltitudeFiltrada;
   }
 
   if (ativacao2 == true && currentMillis >= futureMillis2) {
@@ -183,7 +180,7 @@ void loop() {
     futureMillis2 = currentMillis + interval;
   }
 
-  if (ativacao3 == false && mediaAltitudeFiltrada - altApogeu < -5) {
+  if (ativacao3 == false && mediaAltitudeFiltrada < -5) {
     digitalWrite(IGN_3, HIGH);
     ativacao3 = true;
     ativacao4 = true;
