@@ -104,6 +104,9 @@ void setup() {
   cabString += ("Detector de queda");
   cabString += "\t";
 
+  cabString += ("Estado paraquedas");
+  cabString += "\t";
+
   File cabFile = SD.open(nome_do_arquivo, FILE_WRITE);
 
   // if the file is available, write to it:
@@ -198,18 +201,23 @@ void loop() {
 
   // LIBERAR O PRIMEIRO PARAQUEDAS //
    unsigned long currentMillis = millis();
-
+    int estado = 2;
   if (currentMillis - previousMillis >= interval && apogeu[0] > apogeu[1] && queda == 0) {
      
     if (previousMillis == 0 && paraquedas == LOW) {
       paraquedas = HIGH;
+      estado = 1;   // ligado
     } else if (previousMillis != 0) {
       paraquedas = LOW;
+      estado = 0;     //desligado
     }
     previousMillis = currentMillis;
     
     digitalWrite(paraquedasPin, paraquedas);
   }
+
+  dataString += String(estado);
+  dataString += "\t";
 
 
 
