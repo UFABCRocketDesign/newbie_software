@@ -229,4 +229,5 @@ void loop() {
   else {
     Serial.println("error opening");
   }
+  Serial.println(dadosString);
 }
