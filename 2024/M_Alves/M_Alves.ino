@@ -55,6 +55,7 @@ float mediaAltitudeFiltrada = 0;       // a média das leituras filtradas
 float altitudeAnterior = -1;
 int contador = 0;
 int estado = 0;  // estado 0 -> subindo; estado 1 -> descendo
+bool apogeu = false;
 
 void setup() {
   //BME085
@@ -160,13 +161,16 @@ void loop() {
     contador++;
     if (contador >= 25) {
       estado = 1;
+      if (estado == 1) {
+        apogeu = true;
+      }
     }
   } else {
     contador = 0;
     estado = 0;
   }
 
-  if (estado == 1 && ativacao1 == false) {
+  if (apogeu == true && ativacao1 == false) {
     digitalWrite(IGN_1, HIGH);
     ativacao1 = true;
     ativacao2 = true;
@@ -180,7 +184,7 @@ void loop() {
     futureMillis2 = currentMillis + interval;
   }
 
-  if (ativacao3 == false && mediaAltitudeFiltrada < -5) {
+  if (apogeu == true && ativacao3 == false && mediaAltitudeFiltrada < -5) {
     digitalWrite(IGN_3, HIGH);
     ativacao3 = true;
     ativacao4 = true;
