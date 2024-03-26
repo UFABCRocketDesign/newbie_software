@@ -12,7 +12,10 @@ int indiceMedia = 0;
 float soma = 0;
 float somaMedias = 0; 
 float media = 0;
-float mediaDasMedias = 0; 
+float mediaDasMedias = 0;
+const int historicoTamanho = 5;
+float historico[historicoTamanho];
+int indiceHistorico = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -21,19 +24,21 @@ void setup() {
     while (1) {}
   }
 
-  // Calcula a altura inicial
   for (int i = 0; i < numLeituras; i++) {
     soma += bmp.readAltitude();
   }
 
   alturaInicial = soma / numLeituras;
-  soma = 0; // Reseta a variavel soma para reutilizala
+  soma = 0;
 
-  // Inicializa o array de leituras com os valores do sensor
- for (int i = 0; i < numLeituras; i++) {
+  for (int i = 0; i < numLeituras; i++) {
     leituras[i] = bmp.readAltitude() - alturaInicial;
     soma += leituras[i];
-    medias[i] = 0; // Inicializa o array de medias
+    medias[i] = 0;
+  }
+
+  for (int i = 0; i < historicoTamanho; i++) {
+    historico[i] = 0;
   }
 
   Serial.print("Temperature(*C)\t");
@@ -41,42 +46,43 @@ void setup() {
   Serial.print("Altitude com primeiro filtro(m)\t");
   Serial.print("Altitude com segundo filtro(m)\t");
   Serial.print("Altitude sem filtro(m)\t");
+  Serial.print("Status\t");
 
   Serial.println("");
 }
 
 void loop() {
-  // Subtrai a última leitura
   soma -= leituras[indiceLeitura];
-  // Lê a altitude atual e subtrai a altura inicial
   var = bmp.readAltitude() - alturaInicial;
   leituras[indiceLeitura] = var;
-  // Adiciona a leitura atual à soma
   soma += leituras[indiceLeitura];
-  // Avança para a próxima posição no array
-  indiceLeitura++;
-
-  // Se chegamos ao fim do array, volta para o inicio
-  if (indiceLeitura >= numLeituras) {
+  if (++indiceLeitura >= numLeituras) {
     indiceLeitura = 0;
   }
 
-  // Calcula a média
   media = soma / numLeituras;
 
-  // Armazena a média no array de medias e atualiza a soma de medias
   somaMedias -= medias[indiceMedia];
   medias[indiceMedia] = media;
   somaMedias += medias[indiceMedia];
-
-  // Atualiza o índice para o array de medias
-  indiceMedia++;
-  if (indiceMedia >= numLeituras) {
+  if (++indiceMedia >= numLeituras) {
     indiceMedia = 0;
   }
 
-  // Calcula a média das médias
   mediaDasMedias = somaMedias / numLeituras;
+
+  historico[indiceHistorico] = mediaDasMedias;
+  if (++indiceHistorico >= historicoTamanho) {
+    indiceHistorico = 0;
+  }
+
+  bool estaDescendo = true;
+  for (int i = 0; i < historicoTamanho; i++) {
+    if (mediaDasMedias >= historico[i]) {
+      estaDescendo = false;
+      break;
+    }
+  }
 
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
@@ -89,5 +95,11 @@ void loop() {
   Serial.print(var);
   Serial.print("\t");
 
+  if (estaDescendo) {
+    Serial.print("Descendo");
+  } else {
+    Serial.print("Estável ou Subindo");
+  }
   Serial.println();
+
 }
