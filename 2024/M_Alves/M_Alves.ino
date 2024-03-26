@@ -20,6 +20,7 @@ const long interval2 = 5000;
 
 const int chipSelect = 53;
 
+//SDCard
 int fileNum = 0;
 String sdName = "Math";
 String fileName;
@@ -162,7 +163,7 @@ void loop() {
     ativacao2 = true;
   }
 
-  if(ativacao2 = true && currentMillis >= futureMillis2) {
+  if(ativacao2 == true && currentMillis >= futureMillis2) {
     digitalWrite(IGN_2, HIGH);
     ativacao2 = false;
     futureMillis2 = currentMillis + interval;
