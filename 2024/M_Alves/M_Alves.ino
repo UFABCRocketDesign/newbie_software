@@ -6,17 +6,24 @@
 #define IGN_1 36         /*act1*/
 bool ativacao1 = false;  //variável para garantir que só vai ativar 1 vez o pino do paraquedas 1
 
-#define IGN_2 61 /*act2*/
-bool ativacao2 = false; //variável para garantir que só vai ativar 1 vez o pino do paraquedas 2
+#define IGN_2 61         /*act2*/
+bool ativacao2 = false;  //variável para garantir que só vai ativar 1 vez o pino do paraquedas 2
 
 #define IGN_3 46 /*act3*/
+bool ativacao3 = false;
+
 #define IGN_4 55 /*act4*/
+bool ativacao4 = false;
 
 //Relógio interno do arduino p/ o paraquedas 1 e paraquedas 2
-unsigned long futureMillis = 0;  
-const long interval = 10000;     
+unsigned long futureMillis = 0;
+const long interval = 10000;
 unsigned long futureMillis2 = 0;
 const long interval2 = 5000;
+unsigned long futureMillis3 = 0;
+const long interval3 = 10000;
+unsigned long futureMillis4 = 0;
+const long interval4 = 5000;
 
 const int chipSelect = 53;
 
@@ -46,6 +53,7 @@ float mediaAltitudeFiltrada = 0;       // a média das leituras filtradas
 
 //Apogeu
 float altitudeAnterior = -1;
+float altApogeu = 0;
 int contador = 0;
 int estado = 0;  // estado 0 -> subindo; estado 1 -> descendo
 
@@ -84,8 +92,8 @@ void setup() {
 
   //Cabeçalho
   String dadosString = "";
-  dadosString += "Temperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1)\tParaquedas1 (bool)\tParaquedas2 (bool)\n";
-  Serial.println("Temperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1)\tParaquedas1 (bool)\tParaquedas2 (bool)");
+  dadosString += "Temperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1)\tParaquedas1 (bool)\tParaquedas2 (bool)\tParaquedas3 (bool)\tParaquedas4 (bool)\n";
+  Serial.println("Temperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1)\tParaquedas1 (bool)\tParaquedas2 (bool)\tParaquedas3 (bool)\tParaquedas4 (bool)");
 
   // Verifica se o arquivo existe e cria um novo se necessário
   do {
@@ -156,17 +164,33 @@ void loop() {
   }
 
   if (estado == 1 && ativacao1 == false) {
-    futureMillis = currentMillis + interval;
-    futureMillis2 = currentMillis + interval2;
     digitalWrite(IGN_1, HIGH);
     ativacao1 = true;
     ativacao2 = true;
+    futureMillis = currentMillis + interval;
+    futureMillis2 = currentMillis + interval2;
+
+    altApogeu = mediaAltitudeFiltrada;
   }
 
-  if(ativacao2 == true && currentMillis >= futureMillis2) {
+  if (ativacao2 == true && currentMillis >= futureMillis2) {
     digitalWrite(IGN_2, HIGH);
     ativacao2 = false;
     futureMillis2 = currentMillis + interval;
+  }
+
+  if (ativacao3 == false && mediaAltitudeFiltrada - altApogeu < -5) {
+    digitalWrite(IGN_3, HIGH);
+    ativacao3 = true;
+    ativacao4 = true;
+    futureMillis3 = currentMillis + interval3;
+    futureMillis4 = currentMillis + interval4;
+  }
+
+  if (ativacao4 == true && currentMillis >= futureMillis4) {
+    digitalWrite(IGN_3, HIGH);
+    ativacao4 = false;
+    futureMillis4 = currentMillis + interval4;
   }
 
   if (currentMillis >= futureMillis) {
@@ -177,9 +201,19 @@ void loop() {
     digitalWrite(IGN_2, LOW);
   }
 
+  if (currentMillis >= futureMillis3) {
+    digitalWrite(IGN_3, LOW);
+  }
+
+  if (currentMillis >= futureMillis4) {
+    digitalWrite(IGN_4, LOW);
+  }
+
   dadosString += String(estado) + "\t";
   dadosString += String(digitalRead(IGN_1)) + "\t";
-  dadosString += String(digitalRead(IGN_2));
+  dadosString += String(digitalRead(IGN_2)) + "\t";
+  dadosString += String(digitalRead(IGN_3)) + "\t";
+  dadosString += String(digitalRead(IGN_4));
 
   altitudeAnterior = mediaAltitudeFiltrada;  // Atualize a altitude anterior para a próxima iteração
 
