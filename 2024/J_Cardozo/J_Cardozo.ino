@@ -13,9 +13,11 @@ float soma = 0;
 float somaMedias = 0; 
 float media = 0;
 float mediaDasMedias = 0;
-const int historicoTamanho = 5;
+const int historicoTamanho = 20;
 float historico[historicoTamanho];
 int indiceHistorico = 0;
+int contadorHistorico = 0;
+
 
 void setup() {
   Serial.begin(115200);
@@ -76,13 +78,18 @@ void loop() {
     indiceHistorico = 0;
   }
 
-  bool estaDescendo = true;
-  for (int i = 0; i < historicoTamanho; i++) {
-    if (mediaDasMedias >= historico[i]) {
-      estaDescendo = false;
-      break;
+for (int i = 1; i <= historicoTamanho; i++) {
+    if (historico[i-1] >= historico[i]) {
+      contadorHistorico++;
     }
   }
+
+bool estaDescendo = false;
+
+if(contadorHistorico >= 0.7*historicoTamanho) {
+  estaDescendo = true;
+}
+contadorHistorico = 0;
 
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
@@ -96,9 +103,9 @@ void loop() {
   Serial.print("\t");
 
   if (estaDescendo) {
-    Serial.print("Descendo");
+    Serial.print(0);
   } else {
-    Serial.print("Estável ou Subindo");
+    Serial.print(1);
   }
   Serial.println();
 
