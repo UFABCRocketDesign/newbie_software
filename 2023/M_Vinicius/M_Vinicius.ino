@@ -202,7 +202,7 @@ void loop() {
   // LIBERAR O PRIMEIRO PARAQUEDAS //
    unsigned long currentMillis = millis();
 
-  if (currentMillis - previousMillis >= interval && apogeu[0] > apogeu[1] && queda == 0) {
+  if ( apogeu[0] > apogeu[1] && apogeu[1] > apogeu[2] && queda == 0) {
      
     if (previousMillis == 0 && paraquedas == LOW) {
       paraquedas = HIGH; // ligado
