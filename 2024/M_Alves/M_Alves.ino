@@ -69,11 +69,15 @@ void setup() {
     Serial.println("Card failed, or not present");
   }
 
-  //Paraquedas 1 e 2
+  //Paraquedas 1 e 2 e 3 e 4
   pinMode(IGN_1, OUTPUT);
   digitalWrite(IGN_1, LOW);
   pinMode(IGN_2, OUTPUT);
   digitalWrite(IGN_2, LOW);
+  pinMode(IGN_3, OUTPUT);
+  digitalWrite(IGN_3, LOW);
+  pinMode(IGN_4, OUTPUT);
+  digitalWrite(IGN_4, LOW);
 
   //Leituras iniciais
   for (int i = 0; i < numLeiturasInicial; i++) {
