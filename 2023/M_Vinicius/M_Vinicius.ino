@@ -4,6 +4,21 @@
 #include <SD.h>
 Adafruit_BMP085 bmp;
 
+#ifdef ARDUINO_AVR_MEGA2560
+#define SD_CS_PIN 53
+#else
+#define SD_CS_PIN 10
+#endif // ARDUINO_AVR_MEGA2560
+
+#define IGN_1 36	/*act1*/
+#define IGN_2 61	/*act2*/
+#define IGN_3 46	/*act3*/
+#define IGN_4 55	/*act4*/
+
+const int paraquedasPin = IGN_1;
+int paraquedas = LOW;
+
+
 int i;
 float altura, alt_in = 0;                       // fazer o sensor pro foguete cair, 1 --> ta caindo
 float altura_semRuido = 0;
@@ -30,6 +45,8 @@ const int chipSelect = 53;
 void setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);
+
+  pinMode(paraquedasPin, OUTPUT);
 
   Serial.begin(115200);
 
@@ -176,6 +193,21 @@ void loop() {
 
             dataString += String(queda);
             dataString += "\t";
+
+
+
+                    // LIBERAR O PRIMEIRO PARAQUEDAS //
+                          if (queda == 0) {
+                            
+                            if (paraquedas == LOW) {
+                            paraquedas = HIGH;
+                            } else {
+                            paraquedas = LOW;
+                            }
+
+                            // set the LED with the ledState of the variable:
+                            digitalWrite(paraquedasPin, paraquedas);
+                            }
 
 
 
