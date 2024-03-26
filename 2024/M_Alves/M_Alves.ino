@@ -189,9 +189,9 @@ void loop() {
   }
 
   if (ativacao4 == true && currentMillis >= futureMillis4) {
-    digitalWrite(IGN_3, HIGH);
+    digitalWrite(IGN_4, HIGH);
     ativacao4 = false;
-    futureMillis4 = currentMillis + interval4;
+    futureMillis4 = currentMillis + interval3;
   }
 
   if (currentMillis >= futureMillis) {
@@ -224,8 +224,6 @@ void loop() {
   if (dadosFile) {
     dadosFile.println(dadosString);
     dadosFile.close();
-    // print to the serial port too:
-    Serial.println(dadosString);
   }
   // if the file isn't open, pop up an error:
   else {
