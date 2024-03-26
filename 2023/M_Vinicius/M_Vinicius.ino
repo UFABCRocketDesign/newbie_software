@@ -22,6 +22,7 @@ int indicador =0;
 
 String marcos; 
 String marcs = "marcs";
+String nome_do_arquivo;
 
 const int chipSelect = 53;
 
@@ -50,14 +51,14 @@ void setup() {
             qnt_zero += "0";
           }
 
-          marcos = marcs + qnt_zero + String(indicador) + ".txt";
+          nome_do_arquivo = marcs + qnt_zero + String(indicador) + ".txt";
 
           indicador++;
                 
 
-        } while(SD.exists(marcos));
+        } while(SD.exists(nome_do_arquivo));
 
-        Serial.println(marcos);
+        Serial.println(nome_do_arquivo);
          
 
 
@@ -84,7 +85,7 @@ void setup() {
     cabString += ("Detector de queda");
     cabString += "\t";
     
-    File cabFile = SD.open(marcos, FILE_WRITE);
+    File cabFile = SD.open(nome_do_arquivo, FILE_WRITE);
 
                       // if the file is available, write to it:
           if (cabFile) {
@@ -94,7 +95,7 @@ void setup() {
           }
                       // if the file isn't open, pop up an error:
           else {
-              Serial.println("error opening" + marcos);
+              Serial.println("error opening" + nome_do_arquivo);
           }
           Serial.println(cabString);
         
@@ -180,7 +181,7 @@ void loop() {
 
                // SD CARD //
         
-        File dataFile = SD.open(marcos, FILE_WRITE);
+        File dataFile = SD.open(nome_do_arquivo, FILE_WRITE);
 
                       // if the file is available, write to it:
           if (dataFile) {
@@ -191,7 +192,7 @@ void loop() {
           }
                       // if the file isn't open, pop up an error:
           else {
-              Serial.println("error opening" + marcos);
+              Serial.println("error opening" + nome_do_arquivo);
           }
         Serial.println(dataString);
   
