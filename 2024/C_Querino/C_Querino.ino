@@ -7,25 +7,35 @@ float height[19];
 float altufinal;
 float somaH;
 float filtroA;
+int j=0;
 void setup() {
   Serial.begin(115200);
-  if (!bmp.begin()){
+  if (!bmp.begin())
+  {
 	Serial.println("Could not find a valid BMP085 sensor, check wiring!");}
-  for (int i=0;i<20;i++){ 
-    height[i] = bmp.readAltitude();
-    somaH = height[i]+somaH;
+  
+  for (int i=0; i<20; i++){ 
+    
     alturainicial = alturainicial + bmp.readAltitude();
+  
   }
-  filtroA = somaH/20;
+
   altura = (alturainicial/20);
   Serial.print("Temperatura\tpressão\tAltitude\tpressão em relação ao mar\taltitude real");
 }
 void loop(){
-    for (int j=0;j<20;j++){ 
-      height[j] = bmp.readAltitude();
-      somaH = height[j]+somaH;
-      filtroA = somaH/20;}
+    height[j] = bmp.readAltitude()-altura;
     
+    if (j>=19){
+      j=0;}
+      
+    else{
+      
+      for(int k; k<20; k++){
+      somaH = somaH + height[k];
+      }}
+      
+    filtroA = somaH/20;  
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
 
@@ -43,6 +53,5 @@ void loop(){
     
     Serial.print(filtroA);
     Serial.println("filtro");
-    
-    somaH=0;
+    j++;
     }
