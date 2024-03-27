@@ -10,11 +10,11 @@ float var;
 float alturaInicial;
 const int numLeituras = 20;
 float leituras[numLeituras];
-float medias[numLeituras]; 
+float medias[numLeituras];
 int indiceLeitura = 0;
-int indiceMedia = 0; 
+int indiceMedia = 0;
 float soma = 0;
-float somaMedias = 0; 
+float somaMedias = 0;
 float media = 0;
 float mediaDasMedias = 0;
 
@@ -35,7 +35,8 @@ void setup() {
 
   if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present");
-    while (1);
+    while (1)
+      ;
   }
 
   for (int i = 0; i < numLeituras; i++) {
@@ -58,12 +59,24 @@ void setup() {
   String dataStringInicial = "Temperature(*C)\tPressure(Pa)\tAltitude com primeiro filtro(m)\tAltitude com segundo filtro(m)\tAltitude sem filtro(m)\tStatus\n";
   Serial.println(dataStringInicial);
 
-  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  String nomeSD = "datalog";
+  int iSD = 0;
+  while (true) {
+    nomeSD += iSD;
+    if (SD.exists(nomeSD)) {
+      Serial.println("ja existe um arquivo com esse nome.");
+      nomeSD -= iSD;
+    } else {
+      File dataFile = SD.open(nomeSD, FILE_WRITE);
+      break;
+    }
+    i++;
+  }
+
   if (dataFile) {
     dataFile.println(dataStringInicial);
     dataFile.close();
-  }
-  else {
+  } else {
     Serial.println("Error opening datalog.txt");
   }
 }
@@ -95,18 +108,18 @@ void loop() {
     indiceHistorico = 0;
   }
 
-for (int i = 1; i < historicoTamanho; i++) {
-    if (historico[(indiceHistorico+i-1)%historicoTamanho] >= historico[(indiceHistorico+i)%historicoTamanho]) {
+  for (int i = 1; i < historicoTamanho; i++) {
+    if (historico[(indiceHistorico + i - 1) % historicoTamanho] >= historico[(indiceHistorico + i) % historicoTamanho]) {
       contadorHistorico++;
     }
   }
 
-bool estaDescendo = false;
+  bool estaDescendo = false;
 
-if(contadorHistorico >= 0.7*historicoTamanho) {
-  estaDescendo = true;
-}
-contadorHistorico = 0;
+  if (contadorHistorico >= 0.7 * historicoTamanho) {
+    estaDescendo = true;
+  }
+  contadorHistorico = 0;
 
   dataString += bmp.readTemperature();
   dataString += "\t";
@@ -128,12 +141,11 @@ contadorHistorico = 0;
   }
   Serial.println(dataString);
 
-  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  File dataFile = SD.open(nomeSD, FILE_WRITE);
   if (dataFile) {
     dataFile.println(dataString);
     dataFile.close();
-  }
-  else {
+  } else {
     Serial.println("Error opening datalog.txt");
   }
 }
