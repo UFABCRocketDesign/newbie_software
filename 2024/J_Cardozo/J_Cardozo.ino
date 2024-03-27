@@ -62,6 +62,13 @@ void setup() {
   int iSD = 0;
   while (true) {
     nomeSD = "data" + String(iSD) + ".txt";
+    if(nomeSD.length() == 5) {
+      nomeSD = "data00" + String(iSD) + ".txt";
+    } else if (nomeSD.length() == 6) {
+      nomeSD = "data0" + String(iSD) + ".txt";
+    } else {
+      nomeSD = "data" + String(iSD) + ".txt";
+    }
     if (SD.exists(nomeSD)) {
       Serial.print("ja existe um arquivo com o nome: ");
       Serial.println(nomeSD);
