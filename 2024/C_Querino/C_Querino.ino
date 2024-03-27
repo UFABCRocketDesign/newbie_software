@@ -3,7 +3,7 @@
 Adafruit_BMP085 bmp;
 float alturainicial;
 float altura=0;
-float height[19];
+float height[20];
 float altufinal;
 float somaH;
 float filtroA;
@@ -31,13 +31,14 @@ void loop(){
     
     if (j>=20){
       j=0;}
-      
-    for(int k; k<20; k++){
+    
+    somaH=0;  
+    
+    for(int k=0; k<20; k++){
       somaH = somaH + height[k];
     }
     filtroA = somaH/20;
-    somaH=0;  
-    
+      
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
 
