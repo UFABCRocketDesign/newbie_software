@@ -26,32 +26,32 @@ void setup() {
 void loop(){
     height[j] = bmp.readAltitude()-altura;
     
-    if (j>=19){
+    if (j>=20){
       j=0;}
       
     else{
       
       for(int k; k<20; k++){
       somaH = somaH + height[k];
-      }}
       
-    filtroA = somaH/20;  
+      }}
+    filtroA = somaH/20;
+    j++;  
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
 
     Serial.print(bmp.readPressure());
     Serial.print("\t");
 
-    Serial.print(bmp.readAltitude()-altura);
+    Serial.print(height[j-1]);
     Serial.print("\t");
 
     Serial.print(bmp.readSealevelPressure());
     Serial.print("\t");
 
     Serial.print(bmp.readAltitude(101500));
-    Serial.println();
+    Serial.print("\t");
     
     Serial.print(filtroA);
-    Serial.println("filtro");
-    j++;
+    Serial.println();
     }
