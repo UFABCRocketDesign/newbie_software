@@ -33,12 +33,10 @@ void setup() {
     while (1) {}
   }
 
-  Serial.print("Inicializando SD card...");
   if (!SD.begin(chipSelect)) {
-    Serial.println("Card falhou, ou nao esta presente");
+    Serial.println("Card failed, or not present");
     while (1);
   }
-  Serial.println("Card inicializado.");
 
   for (int i = 0; i < numLeituras; i++) {
     soma += bmp.readAltitude();
@@ -57,22 +55,16 @@ void setup() {
     historico[i] = 0;
   }
 
-  Serial.print("Temperature(*C)\t");
-  Serial.print("Pressure(Pa)\t");
-  Serial.print("Altitude com primeiro filtro(m)\t");
-  Serial.print("Altitude com segundo filtro(m)\t");
-  Serial.print("Altitude sem filtro(m)\t");
-  Serial.print("Status\t");
-  Serial.println("");
-
   String dataStringInicial = "Temperature(*C)\tPressure(Pa)\tAltitude com primeiro filtro(m)\tAltitude com segundo filtro(m)\tAltitude sem filtro(m)\tStatus\n";
+  Serial.println(dataStringInicial);
+
   File dataFile = SD.open("datalog.txt", FILE_WRITE);
   if (dataFile) {
     dataFile.println(dataStringInicial);
     dataFile.close();
   }
   else {
-    Serial.println("Erro ao abrir o datalog.txt");
+    Serial.println("Error opening datalog.txt");
   }
 }
 
@@ -116,44 +108,32 @@ if(contadorHistorico >= 0.7*historicoTamanho) {
 }
 contadorHistorico = 0;
 
-  Serial.print(bmp.readTemperature());
   dataString += bmp.readTemperature();
   dataString += "\t";
-  Serial.print("\t");
-  Serial.print(bmp.readPressure());
   dataString += bmp.readPressure();
   dataString += "\t";
-  Serial.print("\t");
-  Serial.print(media);
   dataString += media;
   dataString += "\t";
-  Serial.print("\t");
-  Serial.print(mediaDasMedias); 
   dataString += mediaDasMedias;
   dataString += "\t";
-  Serial.print("\t");
-  Serial.print(var);
   dataString += var;
   dataString += "\t";
-  Serial.print("\t");
 
   if (estaDescendo) {
-    Serial.print(1);
     dataString += "1";
     dataString += "\t";
   } else {
-    Serial.print(0);
     dataString += "0";
     dataString += "\t";
   }
-  Serial.println();
-  
+  Serial.println(dataString);
+
   File dataFile = SD.open("datalog.txt", FILE_WRITE);
   if (dataFile) {
     dataFile.println(dataString);
     dataFile.close();
   }
   else {
-    Serial.println("Erro ao abrir o datalog.txt");
+    Serial.println("Error opening datalog.txt");
   }
 }
