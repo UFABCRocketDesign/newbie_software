@@ -7,6 +7,7 @@ float height[19];
 float altufinal;
 float somaH;
 float filtroA;
+float altitude;
 int j=0;
 void setup() {
   Serial.begin(115200);
@@ -24,26 +25,26 @@ void setup() {
   Serial.print("Temperatura\tpressão\tAltitude\tpressão em relação ao mar\taltitude real");
 }
 void loop(){
-    height[j] = bmp.readAltitude()-altura;
+    altitude = bmp.readAltitude()-altura;
+    height[j] = altitude;
+    j++;
     
     if (j>=20){
       j=0;}
       
-    else{
-      
-      for(int k; k<20; k++){
+    for(int k; k<20; k++){
       somaH = somaH + height[k];
-      
-      }}
+    }
     filtroA = somaH/20;
-    j++;  
+    somaH=0;  
+    
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
 
     Serial.print(bmp.readPressure());
     Serial.print("\t");
 
-    Serial.print(height[j-1]);
+    Serial.print(altitude);
     Serial.print("\t");
 
     Serial.print(bmp.readSealevelPressure());
