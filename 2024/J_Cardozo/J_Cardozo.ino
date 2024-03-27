@@ -78,8 +78,8 @@ void loop() {
     indiceHistorico = 0;
   }
 
-for (int i = 1; i <= historicoTamanho; i++) {
-    if (historico[i-1] >= historico[i]) {
+for (int i = 1; i < historicoTamanho; i++) {
+    if (historico[(indiceHistorico+i-1)%historicoTamanho] >= historico[(indiceHistorico+i)%historicoTamanho]) {
       contadorHistorico++;
     }
   }
