@@ -61,17 +61,20 @@ void setup() {
 
   int iSD = 0;
   while (true) {
-    nomeSD = "datalog" + String(iSD);
+    nomeSD = "data" + String(iSD) + ".txt";
     if (SD.exists(nomeSD)) {
-      Serial.println("ja existe um arquivo com esse nome.");
+      Serial.print("ja existe um arquivo com o nome: ");
+      Serial.println(nomeSD);
     } else {
       File dataFile = SD.open(nomeSD, FILE_WRITE);
       if (dataFile) {
         dataFile.println(dataStringInicial);
         dataFile.close();
       } else {
-        Serial.println("Error opening datalog.txt");
+        Serial.println("Erro ao abrir o arquivo");
       }
+      Serial.print("Arquivo criado: ");
+      Serial.println(nomeSD);
       break;
     }
     iSD++;
