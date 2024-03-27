@@ -5,6 +5,7 @@
 Adafruit_BMP085 bmp;
 
 const int chipSelect = 53;
+String nomeSD;
 
 float var;
 float alturaInicial;
@@ -22,7 +23,6 @@ const int historicoTamanho = 20;
 float historico[historicoTamanho];
 int indiceHistorico = 0;
 int contadorHistorico = 0;
-
 
 void setup() {
   Serial.begin(115200);
@@ -59,25 +59,22 @@ void setup() {
   String dataStringInicial = "Temperature(*C)\tPressure(Pa)\tAltitude com primeiro filtro(m)\tAltitude com segundo filtro(m)\tAltitude sem filtro(m)\tStatus\n";
   Serial.println(dataStringInicial);
 
-  String nomeSD = "datalog";
   int iSD = 0;
   while (true) {
-    nomeSD += iSD;
+    nomeSD = "datalog" + String(iSD);
     if (SD.exists(nomeSD)) {
       Serial.println("ja existe um arquivo com esse nome.");
-      nomeSD -= iSD;
     } else {
       File dataFile = SD.open(nomeSD, FILE_WRITE);
+      if (dataFile) {
+        dataFile.println(dataStringInicial);
+        dataFile.close();
+      } else {
+        Serial.println("Error opening datalog.txt");
+      }
       break;
     }
-    i++;
-  }
-
-  if (dataFile) {
-    dataFile.println(dataStringInicial);
-    dataFile.close();
-  } else {
-    Serial.println("Error opening datalog.txt");
+    iSD++;
   }
 }
 
