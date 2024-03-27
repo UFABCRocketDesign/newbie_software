@@ -5,6 +5,7 @@
 Adafruit_BMP085 bmp;
 
 const int chipSelect = 53;
+String nomeBaseSD = "data";
 String nomeSD;
 
 float var;
@@ -27,7 +28,6 @@ int contadorHistorico = 0;
 void setup() {
   Serial.begin(115200);
 
-  Serial.print("Inicializando BMP...");
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
@@ -61,27 +61,28 @@ void setup() {
 
   int iSD = 0;
   while (true) {
-    nomeSD = "data" + String(iSD) + ".txt";
-    if(nomeSD.length() == 5) {
-      nomeSD = "data00" + String(iSD) + ".txt";
-    } else if (nomeSD.length() == 6) {
-      nomeSD = "data0" + String(iSD) + ".txt";
-    } else {
-      nomeSD = "data" + String(iSD) + ".txt";
+    int numZeros = 8 - nomeBaseSD.length() - String(iSD).length();
+    String zeros = "";
+    for (int i = 0; i < numZeros; i++) {
+      zeros += "0";
     }
+
+    nomeSD = nomeBaseSD + zeros + String(iSD) + ".txt";
+
+    Serial.println("Verificando: " + nomeSD);
+
     if (SD.exists(nomeSD)) {
-      Serial.print("ja existe um arquivo com o nome: ");
-      Serial.println(nomeSD);
+      Serial.println(nomeSD + " já existe.");
     } else {
+      Serial.println(nomeSD + " não existe, criando...");
       File dataFile = SD.open(nomeSD, FILE_WRITE);
       if (dataFile) {
+        Serial.println(nomeSD + " criado.");
         dataFile.println(dataStringInicial);
         dataFile.close();
       } else {
-        Serial.println("Erro ao abrir o arquivo");
+        Serial.println("Erro ao abrir " + nomeSD);
       }
-      Serial.print("Arquivo criado: ");
-      Serial.println(nomeSD);
       break;
     }
     iSD++;
@@ -153,6 +154,8 @@ void loop() {
     dataFile.println(dataString);
     dataFile.close();
   } else {
-    Serial.println("Error opening datalog.txt");
+    Serial.print("Error opening ");
+    Serial.print(nomeSD);
+    Serial.println();
   }
 }
