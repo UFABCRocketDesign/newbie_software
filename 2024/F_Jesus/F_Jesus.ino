@@ -23,17 +23,10 @@ void setup() {
   Serial.println(" meters");
 }
 void loop() {
-  digitalWrite(LED_BUILTIN, HIGH);
-  delay(666);
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(666);
     
-  Serial.print(bmp.readTemperature());
-  Serial.print(bmp.readPressure());
-  Serial.print(bmp.readAltitude());
-  Serial.print(bmp.readSealevelPressure());
+  Serial.print(bmp.readTemperature( ));
+  Serial.print(bmp.readPressure( ));
+  Serial.print(bmp.readAltitude( ));
+  Serial.print(bmp.readSealevelPressure( ));
   Serial.println(bmp.readAltitude(101500));
-
-  Serial.println();
-  delay(500);
 }
