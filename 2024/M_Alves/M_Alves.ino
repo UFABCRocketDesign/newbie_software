@@ -155,7 +155,7 @@ void setup() {
 void loop() {
   String dadosString = "";
   unsigned long currentMillis = millis();
-  dadosString += String(currentMillis/1000) + "\t";
+  dadosString += String(currentMillis/1000.0) + "\t";
 
   //BME085
   dadosString += String(bmp.readTemperature()) + "\t";
