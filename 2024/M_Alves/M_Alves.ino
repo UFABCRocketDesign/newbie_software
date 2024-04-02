@@ -123,8 +123,8 @@ void setup() {
 
   //Cabeçalho
   String dadosString = "";
-  dadosString += "Tempo (ms)\tTemperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1)\tParaquedas1 (bool)\tParaquedas2 (bool)\tParaquedas3 (bool)\tParaquedas4 (bool)\tGyroX (dps)\tGyroY (dps)\tGyroZ (dps)\tMagX (uT)\t MagY (uT)\t MagZ(uT)\tAccelX (m/s^2)\tAccelY (m/s^2)\tAccelZ (m/s^2)\n";
-  Serial.println("Tempo (ms)\tTemperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1)\tParaquedas1 (bool)\tParaquedas2 (bool)\tParaquedas3 (bool)\tParaquedas4 (bool)\tGyroX (dps)\tGyroY (dps)\tGyroZ (dps)\tMagX (uT)\t MagY (uT)\t MagZ(uT)\tAccelX (m/s^2)\tAccelY (m/s^2)\tAccelZ (m/s^2)");
+  dadosString += "Tempo (s)\tTemperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1)\tParaquedas1 (bool)\tParaquedas2 (bool)\tParaquedas3 (bool)\tParaquedas4 (bool)\tGyroX (dps)\tGyroY (dps)\tGyroZ (dps)\tMagX (uT)\t MagY (uT)\t MagZ(uT)\tAccelX (m/s^2)\tAccelY (m/s^2)\tAccelZ (m/s^2)\n";
+  Serial.println("Tempo (s)\tTemperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1)\tParaquedas1 (bool)\tParaquedas2 (bool)\tParaquedas3 (bool)\tParaquedas4 (bool)\tGyroX (dps)\tGyroY (dps)\tGyroZ (dps)\tMagX (uT)\t MagY (uT)\t MagZ(uT)\tAccelX (m/s^2)\tAccelY (m/s^2)\tAccelZ (m/s^2)");
 
   // Verifica se o arquivo existe e cria um novo se necessário
   do {
@@ -155,7 +155,7 @@ void setup() {
 void loop() {
   String dadosString = "";
   unsigned long currentMillis = millis();
-  dadosString += String(currentMillis) + "\t";
+  dadosString += String(currentMillis/1000) + "\t";
 
   //BME085
   dadosString += String(bmp.readTemperature()) + "\t";
@@ -184,7 +184,6 @@ void loop() {
   }
 
   // Apogeu
-
   if (altitudeAnterior != -1 && mediaAltitudeFiltrada < altitudeAnterior) {
     contador++;
     if (contador >= 25) {
