@@ -36,12 +36,6 @@ void setup() {
   }
 
   AltIni = somaAltIni / nLeitIni; //média leituras
-
-  for (int i = 0; i < numLeituras; i++) {
-  altitudes[i] = bmp.readAltitude() - AltIni;
-  somaLeituras += altitudes[i];
- }
-
 }
 void loop() {
 
@@ -72,6 +66,5 @@ void loop() {
   Serial.println(mediaAltitude);
 
   Serial.println();
-
 
 }
