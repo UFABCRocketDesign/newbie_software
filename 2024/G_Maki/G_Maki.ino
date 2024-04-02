@@ -45,6 +45,6 @@ void loop() {
   rawAltitude = bmp.readAltitude() - AltIni;
   Serial.print(rawAltitude);
   Serial.print('\t');
-
+  
   Serial.println();
 }
