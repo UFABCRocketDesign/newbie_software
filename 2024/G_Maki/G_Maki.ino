@@ -46,16 +46,5 @@ void loop() {
   Serial.print(rawAltitude);
   Serial.print('\t');
 
-  //altitudes[frente] = rawAltitude;
-  //frente = (frente + 1) % nLeitFila;
-
-  //float somaAltRelativa = 0;
-
-  //for (int i = 0; i < nLeitFila; i++) {
-  //  somaAltRelativa += altitudes[i];
-//}
-
-// rever essa parte de altitude...
-
   Serial.println();
 }
