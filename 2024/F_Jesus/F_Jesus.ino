@@ -13,12 +13,16 @@ void setup() {
   }
   Serial.print("Temperature");
   Serial.print(" *C");
+  Serial.print("\t");
   Serial.print("Pressure");
   Serial.print(" Pa");
+  Serial.print("\t");
   Serial.print("Altitude");
   Serial.print(" meters");
+  Serial.print("\t");
   Serial.print("Pressure at sealevel (calculated)");
   Serial.print(" Pa");
+  Serial.print("\t");
   Serial.print("Real altitude = ");
   Serial.println(" meters");
 }
