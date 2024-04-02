@@ -11,7 +11,7 @@ int nLeitFila = 10;
 float rawAltitude = 0;
 
 //variáveis para a média simples:
-const int numLeituras = 25; //leituras para a média
+#define numLeituras 15 //leituras para a média
 float leituras[numLeituras]; //leituras do sensor de altitude
 int indiceLeitura = 0; //leitura atual
 float somaLeituras = 0; //soma das leituras
@@ -64,7 +64,5 @@ void loop() {
   //Média
   mediaAltitude = somaLeituras / numLeituras;
   Serial.println(mediaAltitude);
-
-  Serial.println();
 
 }
