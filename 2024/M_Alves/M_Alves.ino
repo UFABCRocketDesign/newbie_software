@@ -1,17 +1,19 @@
 #include <Adafruit_BMP085.h>
 #include <SPI.h>
 #include <SD.h>
+#include <Wire.h>
+#include <L3G.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_HMC5883_U.h>
+#include <Adafruit_ADXL345_U.h>
 
 //Pinos do paraquedas
-#define IGN_1 36         /*act1*/
+#define IGN_1 36 /*act1*/
 bool ativacao1 = false;  //variável para garantir que só vai ativar 1 vez o pino do paraquedas 1
-
-#define IGN_2 61         /*act2*/
+#define IGN_2 61 /*act2*/
 bool ativacao2 = false;  //variável para garantir que só vai ativar 1 vez o pino do paraquedas 2
-
 #define IGN_3 46 /*act3*/
 bool ativacao3 = false;
-
 #define IGN_4 55 /*act4*/
 bool ativacao4 = false;
 
@@ -25,28 +27,26 @@ const long interval3 = 10000;
 unsigned long futureMillis4 = 0;
 const long interval4 = 5000;
 
-const int chipSelect = 53;
-
 //SDCard
+const int chipSelect = 53;
 int fileNum = 0;
 String sdName = "Math";
 String fileName;
 
-Adafruit_BMP085 bmp;
-
 // Altitude Inicial
+Adafruit_BMP085 bmp;
 float AltInicial = 0;
 int numLeiturasInicial = 25;
 float somaAltInicial = 0;
 
-// Variáveis para a média simples
+// Filtro 1 - Variáveis para a média simples
 const int numLeituras = 15;   // número de leituras para a média
 float leituras[numLeituras];  // as leituras do sensor de altitude
 int indiceLeitura = 0;        // o índice da leitura atual
 float somaLeituras = 0;       // a soma das leituras
 float mediaAltitude = 0;      // a média das leituras
 
-// Variáveis para o segundo filtro
+// Filtro 2 -Variáveis para o segundo filtro
 float leiturasFiltradas[numLeituras];  // as leituras filtradas
 float somaLeiturasFiltradas = 0;       // a soma das leituras filtradas
 float mediaAltitudeFiltrada = 0;       // a média das leituras filtradas
@@ -57,16 +57,21 @@ int contador = 0;
 int estado = 0;  // estado 0 -> subindo; estado 1 -> descendo
 bool apogeu = false;
 
-void setup() {
-  //BME085
-  Serial.begin(115200);
-  if (!bmp.begin()) {
-    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-  }
+//Giroscópio
+L3G gyro;
 
-  //SDCard
-  if (!SD.begin(chipSelect)) {  // see if the card is present and can be initialized:
-    Serial.println("Card failed, or not present");
+//Magnetômetro
+Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(1337);
+
+//Acelerômetro
+Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(1338);
+
+void setup() {
+  Serial.begin(115200);
+
+  //BME085
+  if (!bmp.begin()) {
+    Serial.println("No BMP085 detected");
   }
 
   //Paraquedas 1 e 2 e 3 e 4
@@ -78,6 +83,28 @@ void setup() {
   digitalWrite(IGN_3, LOW);
   pinMode(IGN_4, OUTPUT);
   digitalWrite(IGN_4, LOW);
+
+  //Giroscópio
+  Wire.begin();
+  if (!gyro.init()) {
+    Serial.println("No Gyro detected");
+  }
+  gyro.enableDefault();
+
+  //Magnetômetro
+  if(!mag.begin()) {
+    Serial.println("No HMC5883 detected");
+  }
+
+  //Acelerômetro
+  if(!accel.begin()) {
+    Serial.println("No ADXL345 detected");
+  }
+
+  //SDCard
+  if (!SD.begin(chipSelect)) {  // see if the card is present and can be initialized:
+    Serial.println("Card failed, or not present");
+  }
 
   //Leituras iniciais
   for (int i = 0; i < numLeiturasInicial; i++) {
@@ -96,8 +123,8 @@ void setup() {
 
   //Cabeçalho
   String dadosString = "";
-  dadosString += "Temperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1)\tParaquedas1 (bool)\tParaquedas2 (bool)\tParaquedas3 (bool)\tParaquedas4 (bool)\n";
-  Serial.println("Temperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1)\tParaquedas1 (bool)\tParaquedas2 (bool)\tParaquedas3 (bool)\tParaquedas4 (bool)");
+  dadosString += "Temperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1)\tParaquedas1 (bool)\tParaquedas2 (bool)\tParaquedas3 (bool)\tParaquedas4 (bool)\tGyroX (dps)\tGyroY (dps)\tGyroZ (dps)\tMagX (uT)\t MagY (uT)\t MagZ(uT)\tAccelX (m/s^2)\tAccelY (m/s^2)\tAccelZ (m/s^2)\n";
+  Serial.println("Temperature (*C)\tPressure (Pa)\tRaw Altitude (m)\tFirst Filter (m)\tSecond Filter (m)\tEstado (0 ou 1)\tParaquedas1 (bool)\tParaquedas2 (bool)\tParaquedas3 (bool)\tParaquedas4 (bool)\tGyroX (dps)\tGyroY (dps)\tGyroZ (dps)\tMagX (uT)\t MagY (uT)\t MagZ(uT)\tAccelX (m/s^2)\tAccelY (m/s^2)\tAccelZ (m/s^2)");
 
   // Verifica se o arquivo existe e cria um novo se necessário
   do {
@@ -218,7 +245,27 @@ void loop() {
   dadosString += String(digitalRead(IGN_1)) + "\t";
   dadosString += String(digitalRead(IGN_2)) + "\t";
   dadosString += String(digitalRead(IGN_3)) + "\t";
-  dadosString += String(digitalRead(IGN_4));
+  dadosString += String(digitalRead(IGN_4)) + "\t";
+
+  //Giroscópio
+  gyro.read();
+  dadosString += String(gyro.g.x) + "\t";
+  dadosString += String(gyro.g.y) + "\t";
+  dadosString += String(gyro.g.z) + "\t";
+
+  //Magnetômetro
+  sensors_event_t magEvent; 
+  mag.getEvent(&magEvent);
+  dadosString += String(magEvent.magnetic.x) + "\t";
+  dadosString += String(magEvent.magnetic.y) + "\t";
+  dadosString += String(magEvent.magnetic.z) + "\t";
+
+  //Acelerômetro
+  sensors_event_t accelEvent; 
+  accel.getEvent(&accelEvent);
+  dadosString += String(accelEvent.acceleration.x) + "\t";
+  dadosString += String(accelEvent.acceleration.y) + "\t";
+  dadosString += String(accelEvent.acceleration.z);
 
   altitudeAnterior = mediaAltitudeFiltrada;  // Atualize a altitude anterior para a próxima iteração
 
