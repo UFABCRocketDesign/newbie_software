@@ -53,9 +53,9 @@ void loop() {
   Serial.print('\t');
 
   //filtro:
-  somaLeituras = somaLeituras - altitudes[indiceLeitura];
-  altitudes[indiceLeitura] = rawAltitude;
-  somaLeituras = somaLeituras + altitudes[indiceLeitura];
+  somaLeituras = somaLeituras - leituras[indiceLeitura];
+  leituras[indiceLeitura] = rawAltitude;
+  somaLeituras = somaLeituras + leituras[indiceLeitura];
   indiceLeitura++;
   if (indiceLeitura >= numLeituras) { //quando chegar no último vetor - loop
     indiceLeitura = 0;
