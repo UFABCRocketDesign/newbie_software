@@ -2,6 +2,12 @@
 #include <SPI.h>
 #include <SD.h>
 
+#define IGN_1 36 /*act1*/
+#define IGN_2 61 /*act2*/
+#define IGN_3 46 /*act3*/
+#define IGN_4 55 /*act4*/
+
+
 Adafruit_BMP085 bmp;
 
 const int chipSelect = 53;
@@ -24,6 +30,10 @@ const int historicoTamanho = 20;
 float historico[historicoTamanho];
 int indiceHistorico = 0;
 int contadorHistorico = 0;
+
+bool paraquedas1 = false;
+bool paraquedas1data = false;
+unsigned long tempoP1 = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -56,7 +66,7 @@ void setup() {
     historico[i] = 0;
   }
 
-  String dataStringInicial = "Temperature(*C)\tPressure(Pa)\tAltitude com primeiro filtro(m)\tAltitude com segundo filtro(m)\tAltitude sem filtro(m)\tStatus\n";
+  String dataStringInicial = "Temperature(*C)\tPressure(Pa)\tAltitude com primeiro filtro(m)\tAltitude com segundo filtro(m)\tAltitude sem filtro(m)\tStatus\tParaquedas 1\n";
   Serial.println(dataStringInicial);
 
   int iSD = 0;
@@ -129,6 +139,17 @@ void loop() {
   }
   contadorHistorico = 0;
 
+  unsigned long currentTime = millis();
+  if (estaDescendo && !paraquedas1) {
+    paraquedas1 = true;
+    tempoP1 = millis();
+    paraquedas1data = true;
+  }
+
+  if (paraquedas1 && currentTime >= tempoP1 + 10000) {
+    paraquedas1data = false;
+  }
+
   dataString += bmp.readTemperature();
   dataString += "\t";
   dataString += bmp.readPressure();
@@ -141,6 +162,14 @@ void loop() {
   dataString += "\t";
 
   if (estaDescendo) {
+    dataString += "1";
+    dataString += "\t";
+  } else {
+    dataString += "0";
+    dataString += "\t";
+  }
+
+  if (paraquedas1data) {
     dataString += "1";
     dataString += "\t";
   } else {
