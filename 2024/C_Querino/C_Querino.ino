@@ -67,7 +67,7 @@ void loop() {
     n = 0;
   }
 
-  if (n>= 20) {
+  if (n >= 20) {
     apogeu = 1;
   }
 
@@ -81,12 +81,6 @@ void loop() {
   Serial.print("\t");
 
   Serial.print(altitude);
-  Serial.print("\t");
-
-  Serial.print(bmp.readSealevelPressure());
-  Serial.print("\t");
-
-  Serial.print(bmp.readAltitude(101500));
   Serial.print("\t");
 
   Serial.print(filtroA);
