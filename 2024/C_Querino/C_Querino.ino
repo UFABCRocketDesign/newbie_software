@@ -11,7 +11,7 @@ float filtroA;
 float filtroB[20];
 float altitude;
 float apojas = 0;
-int n = 0;
+float n = 0;
 int j = 0;
 int r = 0;
 int y = 1;
@@ -62,7 +62,7 @@ void loop() {
 
 
   if (apojas > filtro) {
-    n++;
+    n=n+0.1;
   } else {
     n = 0;
   }
