@@ -49,6 +49,8 @@ void setup() {
       ;
   }
 
+  pinMode(IGN_1, OUTPUT);
+
   for (int i = 0; i < numLeituras; i++) {
     soma += bmp.readAltitude();
   }
@@ -127,7 +129,7 @@ void loop() {
   }
 
   for (int i = 1; i < historicoTamanho; i++) {
-    if (historico[(indiceHistorico + i - 1) % historicoTamanho] >= historico[(indiceHistorico + i) % historicoTamanho]) {
+    if (historico[(indiceHistorico + i - 1) % historicoTamanho] > historico[(indiceHistorico + i) % historicoTamanho]) {
       contadorHistorico++;
     }
   }
@@ -144,10 +146,12 @@ void loop() {
     paraquedas1 = true;
     tempoP1 = millis();
     paraquedas1data = true;
+    digitalWrite(IGN_1, HIGH);
   }
 
   if (paraquedas1 && currentTime >= tempoP1 + 10000) {
     paraquedas1data = false;
+    digitalWrite(IGN_1, LOW);
   }
 
   dataString += bmp.readTemperature();
