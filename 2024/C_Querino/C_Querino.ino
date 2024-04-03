@@ -93,5 +93,9 @@ void loop(){
     Serial.print("\t");
     
     Serial.print(filtro);
+    Serial.print("\t");
+    
+    Serial.print(apogeu);
     Serial.println();
+    
     }
