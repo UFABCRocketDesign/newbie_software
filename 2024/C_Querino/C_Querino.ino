@@ -11,7 +11,7 @@ float filtroA;
 float filtroB[20];
 float altitude;
 float apojas[20];
-float maximo = 0;
+int maximo = 0;
 int j = 0;
 int r = 0;
 int y = 1;
@@ -61,23 +61,17 @@ void loop() {
   }
   float filtro = somaB / 20;
 
-  apojas[r]=filtro;
+  apojas[r] = filtro;
 
   if (apojas[y] < filtro) {
     apogeu++;
-  }
-  else; {
+  } else {
     apogeu == 0;
   }
   y++;
 
-  if (apogeu == 10) {
-    for (int c = 0; c < 20; c++) {
-      if (apojas[c] > maximo)
-      {
-        maximo = apojas[c];
-      }
-    }
+  if (apogeu >= 10) {
+    maximo = 1;
   }
 
 
