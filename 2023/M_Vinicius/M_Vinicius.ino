@@ -219,33 +219,30 @@ void loop() {
     else if (currentMillis - previousMillis > 4000) {
       paraquedas = LOW;  //desligado      
   }  
-    digitalWrite(paraquedasPin, paraquedas);    
+      
+      // LIBERAR O SEGUNDO PARAQUEDAS //
+    
+    if ( queda == 1 && previousMillis2 == 0) {
+      previousMillis2 = currentMillis;
+    }
+
+    if ( currentMillis - previousMillis2 >= 10000 && paraquedas2 == LOW) {
+    paraquedas2 = HIGH; // ligado
+    previousMillis2 = currentMillis;
+    }  
+    else if (currentMillis - previousMillis2 > 11000) {
+    paraquedas2 = LOW;  //desligado      
+    }  
+
+    digitalWrite(paraquedasPin, paraquedas);   
+    digitalWrite(paraquedasPin2, paraquedas2); 
   } 
 
   dataString += String(paraquedas);
-  dataString += "\t";
-
-  // LIBERAR O SEGUNDO PARAQUEDAS //
-
-  if (queda == 1) {
-    previousMillis2 = currentMillis;
-
-    if ( currentMillis - previousMillis2 == 10000 && paraquedas2 == LOW) {
-      paraquedas2 = HIGH; // ligado
-      previousMillis2 = currentMillis;
-    }  
-    else if (currentMillis - previousMillis2 > 11000) {
-      paraquedas2 = LOW;  //desligado      
-  }  
-    digitalWrite(paraquedasPin2, paraquedas2);
-  } 
+  dataString += "\t"; 
 
   dataString += String(paraquedas2);
   dataString += "\t";
-
-
-
-
 
 
   // SD CARD //
