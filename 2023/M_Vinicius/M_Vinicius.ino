@@ -202,17 +202,20 @@ void loop() {
   // LIBERAR O PRIMEIRO PARAQUEDAS //
    unsigned long currentMillis = millis();
 
-  if ( apogeu[0] > apogeu[1] && apogeu[1] > apogeu[2] && queda == 0) {
-     
+  if (queda == 0) {
+
     if (previousMillis == 0 && paraquedas == LOW) {
       paraquedas = HIGH; // ligado
-    } else if (previousMillis != 0) {
+    }  
+    else if (currentMillis - previousMillis > 4000) {
       paraquedas = LOW;  //desligado
-    }
+      
+  }  
     previousMillis = currentMillis;
-    
+
     digitalWrite(paraquedasPin, paraquedas);
-  }
+    
+  } 
 
   dataString += String(paraquedas);
   dataString += "\t";
