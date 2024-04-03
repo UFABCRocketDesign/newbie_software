@@ -46,11 +46,14 @@ void setup() {
 
 void loop() {
   
-  float Altura_Filtrada = filtro_0(bmp.readAltitude() - AltitudeInicial);
+  float Altura = bmp.readAltitude() - AltitudeInicial;
+  float Altura_Filtrada = filtro_0(Altura);
 
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
   Serial.print(bmp.readPressure());
+  Serial.print("\t");
+  Serial.print(Altura);
   Serial.print("\t");
   Serial.print(Altura_Filtrada);
   Serial.print("\t");
