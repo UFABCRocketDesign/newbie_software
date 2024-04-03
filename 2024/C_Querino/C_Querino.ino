@@ -61,13 +61,13 @@ void loop() {
   float filtro = somaB / 20;
 
 
-  if (apojas < filtro) {
+  if (apojas > filtro) {
     n++;
   } else {
     n = 0;
   }
 
-  if (n>= 10) {
+  if (n>= 20) {
     apogeu = 1;
   }
 
@@ -93,6 +93,9 @@ void loop() {
   Serial.print("\t");
 
   Serial.print(filtro);
+  Serial.print("\t");
+
+  Serial.print(n);
   Serial.print("\t");
 
   Serial.print(apogeu);
