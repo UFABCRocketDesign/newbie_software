@@ -34,6 +34,10 @@ int contadorHistorico = 0;
 bool paraquedas1 = false;
 bool paraquedas1data = false;
 unsigned long tempoP1 = 0;
+bool paraquedas2 = false;
+bool paraquedas2data = false;
+unsigned long tempoP2 = 0;
+
 
 void setup() {
   Serial.begin(115200);
@@ -50,6 +54,7 @@ void setup() {
   }
 
   pinMode(IGN_1, OUTPUT);
+  pinMode(IGN_2, OUTPUT);
 
   for (int i = 0; i < numLeituras; i++) {
     soma += bmp.readAltitude();
@@ -68,7 +73,7 @@ void setup() {
     historico[i] = 0;
   }
 
-  String dataStringInicial = "Temperature(*C)\tPressure(Pa)\tAltitude com primeiro filtro(m)\tAltitude com segundo filtro(m)\tAltitude sem filtro(m)\tStatus\tParaquedas 1\n";
+  String dataStringInicial = "Temperature(*C)\tPressure(Pa)\tAltitude com primeiro filtro(m)\tAltitude com segundo filtro(m)\tAltitude sem filtro(m)\tStatus\tParaquedas 1\tParaquedas 2\n";
   Serial.println(dataStringInicial);
 
   int iSD = 0;
@@ -148,11 +153,23 @@ void loop() {
     paraquedas1data = true;
     digitalWrite(IGN_1, HIGH);
   }
-
   if (paraquedas1 && currentTime >= tempoP1 + 10000) {
     paraquedas1data = false;
     digitalWrite(IGN_1, LOW);
   }
+
+  if (estaDescendo && !paraquedas2) {
+    paraquedas2 = true;
+    tempoP2 = millis();
+  }
+  if (paraquedas2 && currentTime >= tempoP2 + 10000 && currentTime < tempoP2 + 20000) {
+    paraquedas2data = true;
+    digitalWrite(IGN_2, HIGH);
+  } else {
+    paraquedas2data = false;
+    digitalWrite(IGN_2, LOW);
+  }
+
 
   dataString += bmp.readTemperature();
   dataString += "\t";
@@ -174,6 +191,14 @@ void loop() {
   }
 
   if (paraquedas1data) {
+    dataString += "1";
+    dataString += "\t";
+  } else {
+    dataString += "0";
+    dataString += "\t";
+  }
+
+  if (paraquedas2data) {
     dataString += "1";
     dataString += "\t";
   } else {
