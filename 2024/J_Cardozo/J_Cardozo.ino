@@ -31,12 +31,16 @@ float historico[historicoTamanho];
 int indiceHistorico = 0;
 int contadorHistorico = 0;
 
+int intervaloTempo = 10000;
 bool paraquedas1 = false;
 bool paraquedas1data = false;
 unsigned long tempoP1 = 0;
 bool paraquedas2 = false;
 bool paraquedas2data = false;
 unsigned long tempoP2 = 0;
+bool paraquedas3 = false;
+bool paraquedas3data = false;
+unsigned long tempoP3 = 0;
 
 
 void setup() {
@@ -55,6 +59,8 @@ void setup() {
 
   pinMode(IGN_1, OUTPUT);
   pinMode(IGN_2, OUTPUT);
+  pinMode(IGN_3, OUTPUT);
+
 
   for (int i = 0; i < numLeituras; i++) {
     soma += bmp.readAltitude();
@@ -73,7 +79,7 @@ void setup() {
     historico[i] = 0;
   }
 
-  String dataStringInicial = "Temperature(*C)\tPressure(Pa)\tAltitude com primeiro filtro(m)\tAltitude com segundo filtro(m)\tAltitude sem filtro(m)\tStatus\tParaquedas 1\tParaquedas 2\n";
+  String dataStringInicial = "Temperature(*C)\tPressure(Pa)\tAltitude com primeiro filtro(m)\tAltitude com segundo filtro(m)\tAltitude sem filtro(m)\tStatus\tParaquedas 1\tParaquedas 2\tParaquedas 3\n";
   Serial.println(dataStringInicial);
 
   int iSD = 0;
@@ -153,7 +159,7 @@ void loop() {
     paraquedas1data = true;
     digitalWrite(IGN_1, HIGH);
   }
-  if (paraquedas1 && currentTime >= tempoP1 + 10000) {
+  if (paraquedas1 && currentTime >= tempoP1 + intervaloTempo) {
     paraquedas1data = false;
     digitalWrite(IGN_1, LOW);
   }
@@ -162,14 +168,26 @@ void loop() {
     paraquedas2 = true;
     tempoP2 = millis();
   }
-  if (paraquedas2 && currentTime >= tempoP2 + 10000 && currentTime < tempoP2 + 20000) {
+  if (paraquedas2 && currentTime >= tempoP2 + intervaloTempo && currentTime < tempoP2 + 2*intervaloTempo) {
     paraquedas2data = true;
     digitalWrite(IGN_2, HIGH);
-  } else if (paraquedas2 && currentTime >= tempoP2 + 20000) {
+  } else if (paraquedas2 && currentTime >= tempoP2 + 2*intervaloTempo) {
     paraquedas2data = false;
     digitalWrite(IGN_2, LOW);
   }
 
+  if (estaDescendo && !paraquedas3) {
+    paraquedas3 = true;
+  }
+  if (paraquedas3 && mediaDasMedias <= -5 && tempoP3 == 0) {
+    tempoP3 = millis();
+    paraquedas3data = true;
+    digitalWrite(IGN_3, HIGH);
+  } 
+  if (paraquedas3 && tempoP3 != 0 && currentTime >= tempoP3 + intervaloTempo) {
+    paraquedas3data = false;
+    digitalWrite(IGN_3, LOW);
+  }
 
   dataString += bmp.readTemperature();
   dataString += "\t";
@@ -199,6 +217,14 @@ void loop() {
   }
 
   if (paraquedas2data) {
+    dataString += "1";
+    dataString += "\t";
+  } else {
+    dataString += "0";
+    dataString += "\t";
+  }
+
+  if (paraquedas3data) {
     dataString += "1";
     dataString += "\t";
   } else {
