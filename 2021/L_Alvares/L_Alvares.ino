@@ -14,7 +14,6 @@
 
 //#define AtivarLED2 3000
 #define TL 5000
-#define Hplt -5
 
 #define Tam 11
 #define Nf 2
@@ -71,11 +70,8 @@ unsigned long TQ = 0;
 const int LEDS[] = { IGN_1, IGN_2, IGN_3, IGN_4 };
 int PqD[NP] = { LOW };
 int LEDST[NP] = { LOW };
-
-int at = 0;
-const int Atraso[] = { 0, 3000, 0, 3000 };
-float hMin[NP];
-float HQ = 0.0;
+const int Atraso[NP] = { 0, 3000, 0, 3000 };
+float hMin[NP] = { 0, 0, -5, -5 };
 int Lock[NP] = { 0 };
 unsigned long TA[NP];
 unsigned long TDes[NP];
@@ -336,7 +332,6 @@ void loop() {
   if (Q1 == 0 && DQueda == 1) {
     Q1 = 1;
     TQ = TAtual;
-    HQ = SF[Nf];
   }
   dataString += String(DQueda);
   dataString += "\t";
@@ -396,35 +391,16 @@ void loop() {
   if (Q1 == 1)  // se detectar a queda
   {
 #if PqDbg
-
-    //O atraso de acionamento para os leds pode ser feito a partir de TQ mais um atraso, porém o tempo de acionamento do Led3 precisa ser registrado para saber quando acionar o Led4
-
-    //0,2 sem atraso. 1 e 3 com atraso de 3000.
-    //2 e 3 só podem receber o tempo após SF[Nf] < 0.25
-    //É possivel determinar o tempo utilizando Lock e SF[Nf] < -0.25?
-
-  if(at < NP) // como fazer isso parar de rodar após 4 paraquedas?
     for (int P = 0; P < NP; P++) {
-      if (Lock[P] == 0) {
 
-        if (P < (NP / 2))  // para 0,1
-        {
-          TA[P] = TQ + Atraso[P];
-          hMin[P] = HQ;  //HQ é a altura registrada quando detecta a queda
-          at++;
-        }
 
-        if ((P >= (NP / 2)) && (SF[Nf] < -0.25))  // para 2,3 
-        {
-          TA[P] = TAtual + Atraso[P]; // Como representar o tempo no qual ele precisa acionar
-          hMin[P] = Hplt;  //Hplt é uma altura pré definida para abrir o segundo paraquedas (nesse caso um define de 400, talvez seja muito alto visto que a altura é minima)
-          at++;
-        }
-
+      if ((P < NP / 2) && Lock[P] == 0) {
+        TA[P] = TQ + Atraso[P];
+      } else if (SF[Nf] <= -10 && Lock[P] == 0) {
+        TA[P] = TAtual + Atraso[P];
       }
-    }
 
-    for (int P = 0; P < NP; P++) {
+
       PqD[P] = Paraquedas(P, TAtual);  //Passar os parâmetros necessários
       digitalWrite(LEDS[P], PqD[P]);
     }
@@ -435,12 +411,6 @@ void loop() {
 
 #if PqDbg  //for rodando os paraquedas por PqD[P]
   for (int P = 0; P < NP; P++) {
-    dataString += String(TA[P]);
-    dataString += "\t";
-    dataString += String(hMin[P]);
-    dataString += "\t";
-    dataString += String(at);
-    dataString += "\t";
     dataString += String(PqD[P]);
     dataString += "\t";
   }
@@ -489,18 +459,22 @@ int Paraquedas(int Pq, unsigned long TAt) {  //Numero do paraquedas (Pq, int), T
 
   if (Lock[Pq] == 0)  //Trava para evitar que o paraquedas entre nesse loop de novo após ser ativado
   {
-    if (Q1 == 1 && ((SF[Nf] <= -0.25) && (hMin[Pq] > SF[Nf])) || !(SF[Nf] <= -0.25))  //apg && (h && <altura certa> || !h) onde h é a condicional geral de usar a altura
+    if (Q1 == 1 && ((SF[Nf] <= -10) && (SF[Nf] < hMin[Pq])) || !(SF[Nf] <= -10))  //apg && (h && <altura certa> || !h) onde h é a condicional geral de usar a altura
     {                                                                                 //apg && ((SF[Nf] <= -0.25) && (hMin[Pq] > SF[Nf]) || !(SF[Nf] <= 0.25))
-      if (TAt > TA[Pq] && TA[Pq] != 0)  // Tempo atual > Tempo de acionamento do Paraquedas? (if 1) -- Dessa forma TAt sempre é maior que os tempos dos paraquedas (começam em 0) (isso foi antes da adição de &&)
-      {
-          LEDST[Pq] = HIGH;     //Acionar Paraquedas,
-          TDes[Pq] = TAt + TL;  //Registrar o tempo para desligar o paraquedas,
-          Lock[Pq] = 1;         //Faz com que cada paraquedas entre nesse loop apenas uma vez
+      if (TAt > TA[Pq] && TA[Pq] != 0)  // Dessa forma TAt sempre é maior que os tempos dos paraquedas (começam em 0) (isso foi antes da adição de &&)
+      {                                 // Condicional de tempo está bem ajustada pra 3/4 mas ainda não pra 1/2
+        LEDST[Pq] = HIGH;  //Acionar Paraquedas,
+        TDes[Pq] = TAt + TL; //Registrar o tempo para desligar o paraquedas,
+        Lock[Pq] = 1; //Faz com que cada paraquedas entre nesse loop apenas uma vez
       }
-    } // é necessário colocar um else aqui para manter LEDST[Pq] = LOW quando não entra nos ifs?
-  } 
+      //else // é necessário colocar um else aqui para manter LEDST[Pq] = LOW quando não entra nos ifs?
+      //{
+      //  LEDST[Pq] = LOW
+      //}
+    }
+  }
 
-  if (TAt > TDes[Pq])  // Tempo atual > Tempo de desligar? (if 3) -- desliga os paraquedas conforme necessário
+  if (TAt > TDes[Pq])  // Tempo atual > Tempo de desligar?  -- desliga os paraquedas conforme necessário
   {
     LEDST[Pq] = LOW;  //  Desligar o paraquedas
   }
