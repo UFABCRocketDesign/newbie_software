@@ -61,7 +61,7 @@ void loop() {
   }
   float filtro = somaB / 20;
 
-  apojas[r]==filtro;
+  apojas[r]=filtro;
 
   if (apojas[y] < filtro) {
     apogeu++;
@@ -74,7 +74,6 @@ void loop() {
   if (apogeu == 10) {
     for (int c = 0; c < 20; c++) {
       if (apojas[c] > maximo)
-        ;
       {
         maximo = apojas[c];
       }
