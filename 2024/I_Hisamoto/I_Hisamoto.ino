@@ -25,15 +25,6 @@ float filtro_0(){
 
 }
 
-//float filtro_0(){
-  //SomaListaAltitude_0=0;
-  //for(int i=0;i<10;i++){
-    //SomaListaAltitude_0 += bmp.readAltitude()- AltitudeInicial;
-  //}
- // MediaFiltroAltitude_0 = SomaListaAltitude_0/10;
-  //return MediaFiltroAltitude_0;
-//}
-
 
 void setup() {
 
@@ -56,7 +47,7 @@ void setup() {
 
 void loop() {
 
-  float Altura= bmp.readAltitude()/filtro_0();
+  float Altura= (bmp.readAltitude()- AltitudeInicial;)/filtro_0();
 
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
