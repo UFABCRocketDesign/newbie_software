@@ -3,27 +3,26 @@ Adafruit_BMP085 bmp;
 
 float SomaAltitude;
 float AltitudeInicial;
-float SomaListaAltura_0;
-float MediaFiltroAltitude_0;
-float ListaAltura[10];
+float SomaLista_0;
+float MediaFiltro_0;
+float Lista[10];
 
-float filtro_0() {
+float filtro_0(float var) {
 
   for (int i = 9; i > 0; i--) {
-    ListaAltura[i] = ListaAltura[i - 1];
+    Lista[i] = Lista[i - 1];
   }
 
-  ListaAltura[0] = bmp.readAltitude() - AltitudeInicial;
+  Lista[0] = var;
+  SomaLista_0 = 0;
 
-  SomaListaAltura_0 = 0;
   for (int i = 0; i < 10; i++) {
-    SomaListaAltura_0 += ListaAltura[i];
+    SomaLista_0 += Lista[i];
   }
 
-  MediaFiltroAltura_0 = SomaListaAltura_0 / 10;
+  MediaFiltro_0 = SomaLista_0 / 10;
 
-
-  return MediaFiltroAltitude_0;
+  return MediaFiltro_0;
 }
 
 
@@ -47,13 +46,13 @@ void setup() {
 
 void loop() {
   
-  float Altura = filtro_0();
+  float Altura_Filtrada = filtro_0(bmp.readAltitude() - AltitudeInicial);
 
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
   Serial.print(bmp.readPressure());
   Serial.print("\t");
-  Serial.print(Altura);
+  Serial.print(Altura_Filtrada);
   Serial.print("\t");
   Serial.print(bmp.readSealevelPressure());
   Serial.print("\t");
