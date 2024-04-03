@@ -10,8 +10,13 @@ float somaB;
 float filtroA;
 float filtroB[20];
 float altitude;
+float apojas[20];
+float maximo=0;
 int j=0;
 int r=0;
+int y=1;
+int apogeu = 0;
+
 void setup() {
   Serial.begin(115200);
   if (!bmp.begin())
@@ -43,18 +48,32 @@ void loop(){
     filtroA = somaH/20;
      
     filtroB[r] = filtroA;
+    apojas[y] = filtroB[r];  
       r++;
-      if(r>=20){
-      r=0;}
+      y++;
+      if(r>=20 and y>=20){
+      r=0;
+      y=0;}
     
     somaB = 0;
     for (int v=0;v<20;v++){
       somaB = somaB + filtroB[v];
       }
-      float filtro = somaB/20;
+    float filtro = somaB/20;
 
+    if (apojas[r]<filtroB[r]){
+      apogeu++;}
+    
+    else{apogeu==0;}
+
+    if (apogeu==10){
+      for(int c=0;c<20;c++){
+        if (apojas[c]>maximo);{
+          maximo=apojas[c];}
+      }}
       
       
+    
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
 
@@ -74,5 +93,9 @@ void loop(){
     Serial.print("\t");
     
     Serial.print(filtro);
+    Serial.print("\t");
+    
+    Serial.print(apogeu);
     Serial.println();
+    
     }
