@@ -18,7 +18,12 @@ Adafruit_BMP085 bmp;
 const int paraquedasPin = IGN_1;
 int paraquedas = LOW;
 unsigned long previousMillis = 0;
-const long interval = 3000;
+
+
+const int paraquedasPin2 = IGN_2;
+int paraquedas2 = LOW;
+unsigned long previousMillis2 = 0;
+
 
 int i;
 float altura, alt_in = 0;  // fazer o sensor pro foguete cair, 1 --> ta caindo
@@ -105,6 +110,9 @@ void setup() {
   cabString += "\t";
 
   cabString += ("Estado paraquedas");
+  cabString += "\t";
+
+  cabString += ("Estado paraquedas 2");
   cabString += "\t";
 
   File cabFile = SD.open(nome_do_arquivo, FILE_WRITE);
@@ -211,14 +219,32 @@ void loop() {
     else if (currentMillis - previousMillis > 4000) {
       paraquedas = LOW;  //desligado      
   }  
-    
-
-    digitalWrite(paraquedasPin, paraquedas);
-    
+    digitalWrite(paraquedasPin, paraquedas);    
   } 
 
   dataString += String(paraquedas);
   dataString += "\t";
+
+  // LIBERAR O SEGUNDO PARAQUEDAS //
+
+  if (queda == 1) {
+    previousMillis2 = currentMillis;
+
+    if ( currentMillis - previousMillis2 == 10000 && paraquedas2 == LOW) {
+      paraquedas2 = HIGH; // ligado
+      previousMillis2 = currentMillis;
+    }  
+    else if (currentMillis - previousMillis2 > 11000) {
+      paraquedas2 = LOW;  //desligado      
+  }  
+    digitalWrite(paraquedasPin2, paraquedas2);
+  } 
+
+  dataString += String(paraquedas2);
+  dataString += "\t";
+
+
+
 
 
 
