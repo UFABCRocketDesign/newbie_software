@@ -189,7 +189,7 @@ void loop() {
   apogeu[0] = altura_sRuido2;
 
   if (apogeu[0] < apogeu[1] && apogeu[1] < apogeu[2] && apogeu[2] < apogeu[3]) {
-    queda = 1;
+    queda = 1;  //caindo
   } else {
     queda = 0;
   }
@@ -202,16 +202,16 @@ void loop() {
   // LIBERAR O PRIMEIRO PARAQUEDAS //
    unsigned long currentMillis = millis();
 
-  if (queda == 0) {
+  if (queda == 1) {
 
     if (previousMillis == 0 && paraquedas == LOW) {
       paraquedas = HIGH; // ligado
+      previousMillis = currentMillis;
     }  
     else if (currentMillis - previousMillis > 4000) {
-      paraquedas = LOW;  //desligado
-      
+      paraquedas = LOW;  //desligado      
   }  
-    previousMillis = currentMillis;
+    
 
     digitalWrite(paraquedasPin, paraquedas);
     
