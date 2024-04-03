@@ -165,7 +165,7 @@ void loop() {
   if (paraquedas2 && currentTime >= tempoP2 + 10000 && currentTime < tempoP2 + 20000) {
     paraquedas2data = true;
     digitalWrite(IGN_2, HIGH);
-  } else {
+  } else if (paraquedas2 && currentTime >= tempoP2 + 20000) {
     paraquedas2data = false;
     digitalWrite(IGN_2, LOW);
   }
