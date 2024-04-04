@@ -12,86 +12,82 @@
 #define IGN_3 46 /*act3*/
 #define IGN_4 55 /*act4*/
 
-//#define AtivarLED2 3000
 #define TL 5000
 
-#define Tam 11
-#define Nf 2
-#define Vmed 11
-#define VEQ 11
-#define NP 4
+#define TAM 11  // Quantidade de dados a serem avaliados
+#define NF 2    // N° de filtros
+#define VEQ 11  // Comparativo para detectar queda
+#define NP 4    // N° de paraquedas
 
-#define MagDbg 0
-#define GyrDbg 0
-#define AclDbg 0
-#define sdDbg 0
-#define TemDbg 1
-#define BarDbg 1
+#define MAG_DBG 0
+#define GYR_DBG 0
+#define ACL_DBG 0
+#define SD_DBG 0
+#define TEM_DBG 1
+#define BAR_DBG 1
 
-#define MagXDbg (MagDbg && 1)
-#define MagYDbg (MagDbg && 1)
-#define MagZDbg (MagDbg && 1)
+#define USE_MAG_X (MAG_DBG && 1)
+#define USE_MAG_Y (MAG_DBG && 1)
+#define USE_MAG_Z (MAG_DBG && 1)
 
-#define GyrXDbg (GyrDbg && 1)
-#define GyrYDbg (GyrDbg && 1)
-#define GyrZDbg (GyrDbg && 1)
+#define USE_GYR_X (GYR_DBG && 1)
+#define USE_GYR_Y (GYR_DBG && 1)
+#define USE_GYR_Z (GYR_DBG && 1)
 
-#define AclXDbg (AclDbg && 1)
-#define AclYDbg (AclDbg && 1)
-#define AclZDbg (AclDbg && 1)
+#define USE_ACL_X (ACL_DBG && 1)
+#define USE_ACL_Y (ACL_DBG && 1)
+#define USE_ACL_Z (ACL_DBG && 1)
 
-#define PqDbg (BarDbg && 1)
+#define PQ_DBG (BAR_DBG && 1)
 
-#define BarTempDbg (BarDbg && 0)
-#define BarPresDbg (BarDbg && 0)
+#define USE_BAR_TEMP (BAR_DBG && 0)
+#define USE_BAR_PRES (BAR_DBG && 0)
 
-#define ApgDbg (BarDbg && 1)
+#define APG_DBG (BAR_DBG && 1)
 
-#if BarDbg
+#if BAR_DBG
 Adafruit_BMP085 bmp;
-int pos[Tam];
-float Mfiltro[Nf][Tam];
-float AF[Nf];
-float SF[Nf + 1];
-float M = 0.0;
-float Ap1 = 0.0;
+int pos[TAM];
+float mFiltro[NF][TAM]; //
+float af[NF];      // Valor de entrada no filtro
+float sf[NF + 1];  // Valor de saida do filtro
+float m = 0.0;     // Valor da média final
 #endif
 
-#if ApgDbg
-float AltApg = 0.0;
-int CQueda = 0;
-int DQueda = 0;
-int Q1 = 0;
-unsigned long TQ = 0;
+#if APG_DBG
+float altApg = 0.0;   // Altura do Apogeu do foguete
+int cQueda = 0;       // Contador para verificar se o foguete está em queda
+int dQueda = 0;       // Variável registradora de queda (ou não)
+int q1 = 0;           // Trava de queda para outras funções
+unsigned long tq = 0; // Tempo onde detectou a queda
 #endif
 
-#if PqDbg
+#if PQ_DBG
 
-const int LEDS[] = { IGN_1, IGN_2, IGN_3, IGN_4 };
-int PqD[NP] = { LOW };
-int LEDST[NP] = { LOW };
-const int Atraso[NP] = { 0, 3000, 0, 3000 };
-float hMin[NP] = { 0, 0, -5, -5 };
-int Lock[NP] = { 0 };
-unsigned long TA[NP];
-unsigned long TDes[NP];
+const int leds[] = { IGN_1, IGN_2, IGN_3, IGN_4 };  // Vetor que relaciona os paraquedas
+int pqd[NP] = { LOW };                              // Vetor de estado dos paraquedas
+const int atraso[NP] = { 0, 3000, 0, 3000 };        // Tempo de delay para acionar os paraquedas
+float hMin[NP] = { 0, 0, -5, -5 };                  // Altura minima para acionar os paraquedas 
+int lock[NP] = { 0 };                               // Trava "anti-reacionamento" dos paraquedas
+unsigned long ta[NP];                               // Instante de tempo em que o paraquedas deve ser ativado
+unsigned long tDes[NP];                             // Instante de tempo em que o paraquedas deve ser desativado
 #endif
 
-#if MagDbg
+#if MAG_DBG
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 #endif
 
-#if GyrDbg
+#if GYR_DBG
 L3G gyro;
 #endif
 
-#if AclDbg
+#if ACL_DBG
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(1234);
 #endif
 
-#if sdDbg
+#if SD_DBG
 const int chipSelect = 53;  //pino SD
-String NomeArq = "";
+String nomeArq = "";
 #endif
 
 void setup() {
@@ -99,20 +95,20 @@ void setup() {
   Wire.begin();
 
   // Ligando os Sensores
-#if BarDbg
+#if BAR_DBG
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
 #endif
 
-#if PqDbg
+#if PQ_DBG
   for (int i = 0; i <= NP; i++) {
-    pinMode(LEDS[i], OUTPUT);
+    pinMode(leds[i], OUTPUT);
   }
 #endif
 
-#if MagDbg
+#if MAG_DBG
   if (!mag.begin()) {
     Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
     while (1)
@@ -120,7 +116,7 @@ void setup() {
   }
 #endif
 
-#if GyrDbg
+#if GYR_DBG
   if (!gyro.init()) {
     Serial.println("Failed to autodetect gyro type!");
     while (1)
@@ -129,7 +125,7 @@ void setup() {
   gyro.enableDefault();
 #endif
 
-#if AclDbg
+#if ACL_DBG
   if (!accel.begin()) {
     Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
     while (1)
@@ -138,9 +134,9 @@ void setup() {
   accel.setRange(ADXL345_RANGE_16_G);
 #endif
 
-#if sdDbg
-  int ValorA = 0;
-  int NC = 0;
+#if SD_DBG
+  int valorA = 0;
+  int nc = 0;
   //Ligando o cartão SD
   while (!Serial) {
     ;
@@ -153,16 +149,16 @@ void setup() {
   Serial.println("Card initialized.");
 
   //Formatação do nome do arquivo
-  while (NomeArq.length() == 0) {
+  while (nomeArq.length() == 0) {
     String Arq = "";
     String Nome = "LAQ";
     String Zeros = "";
     String VA = "";
 
-    VA = String(ValorA);
-    NC = Nome.length() + VA.length();
+    VA = String(valorA);
+    nc = Nome.length() + VA.length();
 
-    for (int a = 0; a < 8 - NC; a++) {
+    for (int a = 0; a < 8 - nc; a++) {
       Zeros += "0";
     }
 
@@ -173,10 +169,10 @@ void setup() {
 
     if (SD.exists(Arq)) {
       Serial.println(Arq + " existe, fornecer outro nome.");
-      ValorA++;
+      valorA++;
     } else {
       Serial.println(Arq + " esta disponível.");
-      NomeArq = Arq;
+      nomeArq = Arq;
       break;
     }
   }
@@ -185,80 +181,80 @@ void setup() {
   //Cabeçalho
   String StringC = "";
 
-#if TemDbg
+#if TEM_DBG
   StringC += "Tempo(s)";
   StringC += "\t";
 #endif
 
-#if BarTempDbg
+#if USE_BAR_TEMP
   StringC += "Temperatura(°C)";
   StringC += "\t";
 #endif
 
-#if BarPresDbg
+#if USE_BAR_PRES
   StringC += "Pressão(Pa)";
   StringC += "\t";
 #endif
 
-#if BarDbg
+#if BAR_DBG
   StringC += "Altitude(m)";
   StringC += "\t";
 #endif
 
-#if BarDbg
-  for (int F = 0; F < Nf; F++) {
+#if BAR_DBG
+  for (int F = 0; F < NF; F++) {
     StringC += "Filtro ";
     StringC += String(F + 1);
     StringC += "\t";
   }
 #endif
 
-#if ApgDbg
+#if APG_DBG
   StringC += "Detecção de Apogeu";
   StringC += "\t";
 #endif
 
-#if MagXDbg
+#if USE_MAG_X
   StringC += "Magnetômetro X(uT)";
   StringC += "\t";
 #endif
-#if MagYDbg
+#if USE_MAG_Y
   StringC += "Magnetômetro Y(uT)";
   StringC += "\t";
 #endif
-#if MagZDbg
+#if USE_MAG_Z
   StringC += "Magnetômetro Z(uT)";
   StringC += "\t";
 #endif
 
-#if GyrXDbg
+#if USE_GYR_X
   StringC += "Giroscópio X(rad/s)";
   StringC += "\t";
 #endif
-#if GyrYDbg
+#if USE_GYR_Y
   StringC += "Giroscópio Y(rad/s)";
   StringC += "\t";
 #endif
-#if GyrZDbg
+#if USE_GYR_Z
   StringC += "Giroscópio Z(rad/s)";
   StringC += "\t";
 #endif
 
-#if AclXDbg
+#if USE_ACL_X
   StringC += "Acelerômetro X(m/s^2)";
   StringC += "\t";
 #endif
-#if AclYDbg
+#if USE_ACL_Y
   StringC += "Acelerômetro Y(m/s^2)";
   StringC += "\t";
 #endif
-#if AclZDbg
+#if USE_ACL_Z
   StringC += "Acelerômetro Z(m/s^2)";
   StringC += "\t";
 #endif
 
 
-#if PqDbg
+#if PQ_DBG
   StringC += "Ativação Led1";
   StringC += "\t";
 
@@ -274,153 +270,153 @@ void setup() {
 
   Serial.println(StringC);
 
-#if sdDbg
-  File TesteC = SD.open(NomeArq, FILE_WRITE);
+#if SD_DBG
+  File TesteC = SD.open(nomeArq, FILE_WRITE);
   if (TesteC) {
     TesteC.println(StringC);
     TesteC.close();
   }
 #endif
 
-#if BarDbg
+#if BAR_DBG
   //Cálculo da Média
-  float Med = 0.0;
-  for (int i = 0; i < Vmed; i++) {
-    Med = Med + bmp.readAltitude();
+  float med = 0.0;
+  for (int i = 0; i < TAM; i++) {
+    med = med + bmp.readAltitude();
   }
-  M = (Med / Vmed);
+  m = (med / TAM);
 #endif
 }
 
 void loop() {
   String dataString = "";
-  unsigned long TAtual = millis();
+  unsigned long tAtual = millis();
   sensors_event_t event;
 
   //Calculo do tempo
-#if TemDbg
-  dataString += String(TAtual / 1000.0);
+#if TEM_DBG
+  dataString += String(tAtual / 1000.0);
   dataString += "\t";
 #endif
 
   // Temperatura e pressão
-#if BarTempDbg
+#if USE_BAR_TEMP
   dataString += String(bmp.readTemperature());
   dataString += "\t";
 #endif
 
-#if BarPresDbg
+#if USE_BAR_PRES
   dataString += String(bmp.readPressure());
   dataString += "\t";
 #endif
 
   //Impressão dos filtros
-#if BarDbg
-  SF[0] = (bmp.readAltitude() - M);  //ALT = (bmp.readAltitude() - M);
-  dataString += String(SF[0]);       //dataString += String(ALT);
+#if BAR_DBG
+  sf[0] = (bmp.readAltitude() - m);  //ALT = (bmp.readAltitude() - m);
+  dataString += String(sf[0]);       //dataString += String(ALT);
   dataString += "\t";
 
-  for (int IF = 0; IF < Nf; IF++) {
-    SF[IF + 1] = Filtragem(IF, SF[IF]);
-    dataString += String(SF[IF + 1]);
+  for (int IF = 0; IF < NF; IF++) {
+    sf[IF + 1] = Filtragem(IF, sf[IF]);
+    dataString += String(sf[IF + 1]);
     dataString += "\t";
   }
 #endif
 
-#if ApgDbg
-  DQueda = Apogeu(SF[Nf], VEQ);
-  if (Q1 == 0 && DQueda == 1) {
-    Q1 = 1;
-    TQ = TAtual;
+#if APG_DBG
+  dQueda = Apogeu(sf[NF], VEQ);
+  if (q1 == 0 && dQueda == 1) {
+    q1 = 1;
+    tq = tAtual;
   }
-  dataString += String(DQueda);
+  dataString += String(dQueda);
   dataString += "\t";
 #endif
 
   //Captação dos sensores
-#if MagDbg
+#if MAG_DBG
   mag.getEvent(&event);
-#if MagXDbg
+#if USE_MAG_X
   dataString += String(event.magnetic.x);
   dataString += "\t";
 #endif
-#if MagYDbg
+#if USE_MAG_Y
   dataString += String(event.magnetic.y);
   dataString += "\t";
 #endif
-#if MagZDbg
+#if USE_MAG_Z
   dataString += String(event.magnetic.z);
   dataString += "\t";
 #endif
 #endif
 
-#if GyrDbg
+#if GYR_DBG
   gyro.read();
-#if GyrXDbg
+#if USE_GYR_X
   dataString += String((int)gyro.g.x);
   dataString += "\t";
 #endif
-#if GyrYDbg
+#if USE_GYR_Y
   dataString += String((int)gyro.g.y);
   dataString += "\t";
 #endif
-#if GyrZDbg
+#if USE_GYR_Z
   dataString += String((int)gyro.g.z);
   dataString += "\t";
 #endif
 #endif
 
-#if AclDbg
+#if ACL_DBG
   accel.getEvent(&event);
-#if AclXDbg
+#if USE_ACL_X
   dataString += String(event.acceleration.x);
   dataString += "\t";
 #endif
-#if AclYDbg
+#if USE_ACL_Y
   dataString += String(event.acceleration.y);
   dataString += "\t";
 #endif
-#if AclZDbg
+#if USE_ACL_Z
   dataString += String(event.acceleration.z);
   dataString += "\t";
 #endif
 #endif
 
   //Timer e ativação de Parquedas
-#if ApgDbg
-  if (Q1 == 1)  // se detectar a queda
+#if APG_DBG
+  if (q1 == 1)  // se detectar a queda
   {
-#if PqDbg
+#if PQ_DBG
     for (int P = 0; P < NP; P++) {
 
 
-      if ((P < NP / 2) && Lock[P] == 0) {
-        TA[P] = TQ + Atraso[P];
-      } else if (SF[Nf] <= -10 && Lock[P] == 0) {
-        TA[P] = TAtual + Atraso[P];
+      if ((P < NP / 2) && lock[P] == 0) {
+        ta[P] = tq + atraso[P];
+      } else if (sf[NF] <= -10 && lock[P] == 0) {
+        ta[P] = tAtual + atraso[P];
       }
 
 
-      PqD[P] = Paraquedas(P, TAtual);  //Passar os parâmetros necessários
-      digitalWrite(LEDS[P], PqD[P]);
+      pqd[P] = Paraquedas(P, tAtual);  //Passar os parâmetros necessários
+      digitalWrite(leds[P], pqd[P]);
     }
 #endif
   }
 #endif
 
 
-#if PqDbg  //for rodando os paraquedas por PqD[P]
+#if PQ_DBG  //for rodando os paraquedas por pqd[P]
   for (int P = 0; P < NP; P++) {
-    dataString += String(PqD[P]);
+    dataString += String(pqd[P]);
     dataString += "\t";
   }
 #endif
 
   Serial.println(dataString);
 
-#if sdDbg
+#if SD_DBG
   //Cartão SD
-  File dataFile = SD.open(NomeArq, FILE_WRITE);
+  File dataFile = SD.open(nomeArq, FILE_WRITE);
   if (dataFile) {
     dataFile.println(dataString);
     dataFile.close();
@@ -432,52 +428,50 @@ void loop() {
 
 //Calculo dos filtros
 float Filtragem(int a, float vmd) {
-  AF[a] = AF[a] - Mfiltro[a][pos[a]];  //F2 = F2 - Vfiltro2[B];
-  Mfiltro[a][pos[a]] = vmd;            //Vfiltro2[B] = SF1;
-  AF[a] = AF[a] + Mfiltro[a][pos[a]];  //F2 = F2 + Vfiltro2[B];
+  af[a] = af[a] - mFiltro[a][pos[a]];  //F2 = F2 - Vfiltro2[B];
+  mFiltro[a][pos[a]] = vmd;            //Vfiltro2[B] = SF1;
+  af[a] = af[a] + mFiltro[a][pos[a]];  //F2 = F2 + Vfiltro2[B];
   pos[a]++;                            //B++;
-  if (pos[a] == Tam)                   //if (B >= 10)
+  if (pos[a] == TAM)                   //if (B >= 10)
   {                                    //{
     pos[a] = 0;                        //B = 0;
   }                                    //}
-  return AF[a] / Tam;                  //SF2 = F2 / 11;
+  return af[a] / TAM;                  //SF2 = F2 / 11;
 }
 
 //Detecção de Apogeu
 int Apogeu(float AltAtual, int VQueda) {
-  if (AltApg > AltAtual) {
-    CQueda++;
+  if (altApg > AltAtual) {
+    cQueda++;
   } else {
-    CQueda = 0;
+    cQueda = 0;
   }
-  AltApg = AltAtual;
-  return CQueda >= VQueda;
+  altApg = AltAtual;
+  return cQueda >= VQueda;
 }
 
 //Paraquedas
 int Paraquedas(int Pq, unsigned long TAt) {  //Numero do paraquedas (Pq, int), Tempo atual (TAt, Unsigned Long)
 
-  if (Lock[Pq] == 0)  //Trava para evitar que o paraquedas entre nesse loop de novo após ser ativado
+int ledst[Pq] = { LOW };
+
+  if (lock[Pq] == 0)  //Trava para evitar que o paraquedas entre nesse loop de novo após ser ativado
   {
-    if (Q1 == 1 && ((SF[Nf] <= -10) && (SF[Nf] < hMin[Pq])) || !(SF[Nf] <= -10))  //apg && (h && <altura certa> || !h) onde h é a condicional geral de usar a altura
-    {                                                                                 //apg && ((SF[Nf] <= -0.25) && (hMin[Pq] > SF[Nf]) || !(SF[Nf] <= 0.25))
-      if (TAt > TA[Pq] && TA[Pq] != 0)  // Dessa forma TAt sempre é maior que os tempos dos paraquedas (começam em 0) (isso foi antes da adição de &&)
+    if (q1 == 1 && ((sf[NF] <= -10) && (sf[NF] < hMin[Pq])) || !(sf[NF] <= -10))  //apg && (h && <altura certa> || !h) onde h é a condicional geral de usar a altura
+    {                                                                                 //apg && ((sf[NF] <= -0.25) && (hMin[Pq] > sf[NF]) || !(sf[NF] <= 0.25))
+      if (TAt > ta[Pq] && ta[Pq] != 0)  // Dessa forma TAt sempre é maior que os tempos dos paraquedas (começam em 0) (isso foi antes da adição de &&)
       {                                 // Condicional de tempo está bem ajustada pra 3/4 mas ainda não pra 1/2
-        LEDST[Pq] = HIGH;  //Acionar Paraquedas,
-        TDes[Pq] = TAt + TL; //Registrar o tempo para desligar o paraquedas,
-        Lock[Pq] = 1; //Faz com que cada paraquedas entre nesse loop apenas uma vez
+        ledst[Pq] = HIGH;  //Acionar Paraquedas,
+        tDes[Pq] = TAt + TL; //Registrar o tempo para desligar o paraquedas,
+        lock[Pq] = 1; //Faz com que cada paraquedas entre nesse loop apenas uma vez
       }
-      //else // é necessário colocar um else aqui para manter LEDST[Pq] = LOW quando não entra nos ifs?
-      //{
-      //  LEDST[Pq] = LOW
-      //}
     }
   }
 
-  if (TAt > TDes[Pq])  // Tempo atual > Tempo de desligar?  -- desliga os paraquedas conforme necessário
+  if (TAt > tDes[Pq])  // Tempo atual > Tempo de desligar?  -- desliga os paraquedas conforme necessário
   {
-    LEDST[Pq] = LOW;  //  Desligar o paraquedas
+    ledst[Pq] = LOW;  //  Desligar o paraquedas
   }
 
-  return LEDST[Pq];
+  return ledst[Pq];
 }
