@@ -1,14 +1,22 @@
 #include <Adafruit_BMP085.h>
 #include <SPI.h>
 #include <SD.h>
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_ADXL345_U.h>
+#include <Adafruit_HMC5883_U.h>
+#include <L3G.h>
+
 
 #define IGN_1 36 /*act1*/
 #define IGN_2 61 /*act2*/
 #define IGN_3 46 /*act3*/
 #define IGN_4 55 /*act4*/
 
-
+Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
+Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(123456);
 Adafruit_BMP085 bmp;
+L3G gyro;
 
 //Definindo SD
 #define chipSelect 53
@@ -50,11 +58,22 @@ bool paraquedas4 = false;
 bool paraquedas4data = false;
 unsigned long tempoP4 = 0;
 
+//Definindo variaveis acelerometro, giroscopio e magnetometro
+float acelX;
+float acelY;
+float acelZ;
+float gyroX;
+float gyroY;
+float gyroZ;
+float magX;
+float magY;
+float magZ;
 
 void setup() {
   Serial.begin(115200);
+  Wire.begin();
 
-  //Inicializando BMP e SD
+  //Inicializando BMP, SD, Acelerometro, Giroscopio e Magnetometro
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
@@ -64,6 +83,26 @@ void setup() {
     Serial.println("Card failed, or not present");
     while (1)
       ;
+  }
+
+  if (!accel.begin()) {
+    Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
+    while (1)
+      ;
+  }
+  accel.setRange(ADXL345_RANGE_16_G);
+
+  if (!gyro.init())
+  {
+    Serial.println("Failed to autodetect gyro type!");
+    while (1);
+  }
+  gyro.enableDefault();
+
+  if(!mag.begin())
+  {
+    Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
+    while(1);
   }
 
   //Definindo pinos dos paraquedas
@@ -93,7 +132,7 @@ void setup() {
   }
 
   //Definindo cabecalho
-  String dataStringInicial = "Temperature(*C)\tPressure(Pa)\tAltitude com primeiro filtro(m)\tAltitude com segundo filtro(m)\tAltitude sem filtro(m)\tStatus\tParaquedas 1\tParaquedas 2\tParaquedas 3\tParaquedas 4\n";
+  String dataStringInicial = "Temperature(*C)\tPressure(Pa)\tAltitude com primeiro filtro(m)\tAltitude com segundo filtro(m)\tAltitude sem filtro(m)\tStatus\tParaquedas 1\tParaquedas 2\tParaquedas 3\tParaquedas 4\tAcel X\tAcel Y\tAcel Z\tGyro X\tGyro Y\tGyro Z\tMag X\tMag Y\tMag Z\n";
   Serial.println(dataStringInicial);
 
   //Logica para nome do arquivo SD
@@ -128,6 +167,22 @@ void setup() {
 }
 
 void loop() {
+  sensors_event_t event;
+  accel.getEvent(&event);
+  acelX = event.acceleration.x;
+  acelY = event.acceleration.y;
+  acelZ = event.acceleration.z;
+
+  gyro.read();
+  gyroX = gyro.g.x;
+  gyroY = gyro.g.y;
+  gyroZ = gyro.g.z;
+
+  mag.getEvent(&event);
+  magX = event.magnetic.x;
+  magY = event.magnetic.y;
+  magZ = event.magnetic.z;
+
   //Inicializando a string
   String dataString = "";
 
@@ -205,7 +260,7 @@ void loop() {
     tempoP3 = millis();
     paraquedas3data = true;
     digitalWrite(IGN_3, HIGH);
-  } 
+  }
   if (paraquedas3 && tempoP3 != 0 && currentTime >= tempoP3 + intervaloTempo) {
     paraquedas3data = false;
     digitalWrite(IGN_3, LOW);
@@ -217,7 +272,7 @@ void loop() {
   }
   if (paraquedas4 && mediaDasMedias <= -3 && tempoP4 == 0) {
     tempoP4 = millis();
-  } 
+  }
   if (paraquedas4 && tempoP4 != 0 && currentTime >= tempoP4 + intervaloDelay && currentTime < tempoP4 + intervaloDelay + intervaloTempo) {
     paraquedas4data = true;
     digitalWrite(IGN_4, HIGH);
@@ -227,28 +282,30 @@ void loop() {
   }
 
   //String de dados
-  dataString += String(bmp.readTemperature());
-  dataString += "\t";
-  dataString += String(bmp.readPressure());
-  dataString += "\t";
-  dataString += String(media);
-  dataString += "\t";
-  dataString += String(mediaDasMedias);
-  dataString += "\t";
-  dataString += String(var);
-  dataString += "\t";
+  dataString += String(bmp.readTemperature()) + "\t";
+  dataString += String(bmp.readPressure()) + "\t";
+  dataString += String(media) + "\t";
+  dataString += String(mediaDasMedias) + "\t";
+  dataString += String(var) + "\t";
 
-  dataString += String(estaDescendo);
-  dataString += "\t";
-  dataString += String(paraquedas1data);
-  dataString += "\t";
-  dataString += String(paraquedas2data);
-  dataString += "\t";
-  dataString += String(paraquedas3data);
-  dataString += "\t";
-  dataString += String(paraquedas4data);
-  dataString += "\t";
-  
+  dataString += String(estaDescendo) + "\t";
+  dataString += String(paraquedas1data) + "\t";
+  dataString += String(paraquedas2data) + "\t";
+  dataString += String(paraquedas3data) + "\t";
+  dataString += String(paraquedas4data) + "\t";
+
+  dataString += String(acelX) + "\t";
+  dataString += String(acelY) + "\t";
+  dataString += String(acelZ) + "\t";
+
+  dataString += String(gyroX) + "\t";
+  dataString += String(gyroY) + "\t";
+  dataString += String(gyroZ) + "\t";
+
+  dataString += String(magX) + "\t";
+  dataString += String(magY) + "\t";
+  dataString += String(magZ) + "\t";
+
   Serial.println(dataString);
 
   File dataFile = SD.open(nomeSD, FILE_WRITE);
