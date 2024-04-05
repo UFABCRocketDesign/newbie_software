@@ -7,6 +7,12 @@
 #include <Adafruit_HMC5883_U.h>
 #include <Adafruit_ADXL345_U.h>
 
+#define SDCARD (0)
+#define BMP085 (0)
+#define GIRO (0)
+#define MAGNETO (0)
+#define ACELERO (0)
+
 // ********** PARAQUEDAS ********** //
 #define IGN_1 36 /*act1*/
 bool ativacao1 = false;
@@ -27,7 +33,6 @@ unsigned long futureMillis4 = 0;
 const long interval4 = 5000;
 
 // ********** SD Card ********** //
-#define SDCard (1)
 const int chipSelect = 53;
 int fileNum = 0;
 String sdName = "Math";
@@ -35,7 +40,6 @@ String fileName;
 
 // ********** Altitude, Filtros e Apogeu ********** //
 Adafruit_BMP085 bmp;
-#define bmp085 (1)
 float AltInicial = 0;
 int numLeiturasInicial = 25;
 float somaAltInicial = 0;
@@ -60,26 +64,21 @@ bool apogeu = false;
 
 // ********** Gyro + Mag + Accel ********** //
 L3G gyro;
-#define giro (1)
-
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(1337);
-#define magneto (1)
-
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(1338);
-#define acelero (1)
 
 void setup() {
   Serial.begin(115200);
 
   // ********** Iniciando os Sensores ********** //
   //BME085
-  #if bmp085
+  #if BMP085
   if (!bmp.begin()) {
     Serial.println("No BMP085 detected");
   }
   #endif
   //Giroscópio
-  #if giro
+  #if GIRO
   Wire.begin();
   if (!gyro.init()) {
     Serial.println("No Gyro detected");
@@ -87,19 +86,19 @@ void setup() {
   gyro.enableDefault();
   #endif
   //Magnetômetro
-  #if magneto
+  #if MAGNETO
   if (!mag.begin()) {
     Serial.println("No HMC5883 detected");
   }
   #endif
   //Acelerômetro
-  #if acelero
+  #if ACELERO
   if (!accel.begin()) {
     Serial.println("No ADXL345 detected");
   }
   #endif
   //SDCard
-  #if SDCard
+  #if SDCARD
   if (!SD.begin(chipSelect)) {  // see if the card is present and can be initialized:
     Serial.println("Card failed, or not present");
   }
@@ -137,7 +136,7 @@ void setup() {
   Serial.println("Time (s)\tTemperature (*C)\tPressure (Pa)\tAltitude (m)\tAltitude + Filter1 (m)\tAltitude + Filter2 (m)\tApogee (0 ou 1)\tParachute1 (bool)\tParachute2 (bool)\tParachute3 (bool)\tParachute4 (bool)\tGyroX (dps)\tGyroY (dps)\tGyroZ (dps)\tMagX (uT)\t MagY (uT)\t MagZ(uT)\tAccelX (m/s^2)\tAccelY (m/s^2)\tAccelZ (m/s^2)");
 
   // ********** Criando .txt no SD Card ********** //
-  #if SDCard
+  #if SDCARD
   do {
     String fileNumString = String(fileNum);
     int numZeros = 8 - sdName.length() - fileNumString.length();
@@ -284,7 +283,7 @@ void loop() {
   dadosString += String(accelEvent.acceleration.z);         //Aceleração ao longo dos eixos x
 
   // ********** Salvamento no SD Card dos dados ********** //
-  #if SDCard
+  #if SDCARD
   File dadosFile = SD.open(fileName, FILE_WRITE);
 
   if (dadosFile) {
