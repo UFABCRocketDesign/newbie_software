@@ -33,7 +33,7 @@ unsigned long futureMillis4 = 0;
 const long interval4 = 5000;
 
 // ********** SD Card ********** //
-const int chipSelect = 53;
+#define chipSelect 53
 int fileNum = 0;
 String sdName = "Math";
 String fileName;
@@ -41,11 +41,11 @@ String fileName;
 // ********** Altitude, Filtros e Apogeu ********** //
 Adafruit_BMP085 bmp;
 float AltInicial = 0;
-int numLeiturasInicial = 25;
+#define numLeiturasInicial 25
 float somaAltInicial = 0;
 
 // *** Filtro 1 **** //
-const int numLeituras = 15;   // número de leituras para a média
+#define numLeituras 15   // número de leituras para a média
 float leituras[numLeituras];  // as leituras do sensor de altitude
 int indiceLeitura = 0;        // o índice da leitura atual
 float somaLeituras = 0;       // a soma das leituras
