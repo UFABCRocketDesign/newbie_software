@@ -32,6 +32,7 @@ int indiceHistorico = 0;
 int contadorHistorico = 0;
 
 int intervaloTempo = 10000;
+int intervaloDelay = 5000;
 bool paraquedas1 = false;
 bool paraquedas1data = false;
 unsigned long tempoP1 = 0;
@@ -49,6 +50,7 @@ unsigned long tempoP4 = 0;
 void setup() {
   Serial.begin(115200);
 
+  //Inicializando BMP e SD
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
@@ -60,13 +62,14 @@ void setup() {
       ;
   }
 
+  //Definindo pinos dos paraquedas
   pinMode(IGN_1, OUTPUT);
   pinMode(IGN_2, OUTPUT);
   pinMode(IGN_3, OUTPUT);
   pinMode(IGN_4, OUTPUT);
 
 
-
+  
   for (int i = 0; i < numLeituras; i++) {
     soma += bmp.readAltitude();
   }
@@ -118,8 +121,10 @@ void setup() {
 }
 
 void loop() {
+  //Inicializando a string
   String dataString = "";
 
+  //Filtro 1
   soma -= leituras[indiceLeitura];
   var = bmp.readAltitude() - alturaInicial;
   leituras[indiceLeitura] = var;
@@ -130,6 +135,7 @@ void loop() {
 
   media = soma / numLeituras;
 
+  //Filtro 2
   somaMedias -= medias[indiceMedia];
   medias[indiceMedia] = media;
   somaMedias += medias[indiceMedia];
@@ -139,6 +145,7 @@ void loop() {
 
   mediaDasMedias = somaMedias / numLeituras;
 
+  //Apogeu
   historico[indiceHistorico] = mediaDasMedias;
   if (++indiceHistorico >= historicoTamanho) {
     indiceHistorico = 0;
@@ -157,6 +164,7 @@ void loop() {
   }
   contadorHistorico = 0;
 
+  //Paraquedas 1
   unsigned long currentTime = millis();
   if (estaDescendo && !paraquedas1) {
     paraquedas1 = true;
@@ -169,6 +177,7 @@ void loop() {
     digitalWrite(IGN_1, LOW);
   }
 
+  //Paraquedas 2
   if (estaDescendo && !paraquedas2) {
     paraquedas2 = true;
     tempoP2 = millis();
@@ -181,6 +190,7 @@ void loop() {
     digitalWrite(IGN_2, LOW);
   }
 
+  //Paraquedas 3
   if (estaDescendo && !paraquedas3) {
     paraquedas3 = true;
   }
@@ -194,6 +204,7 @@ void loop() {
     digitalWrite(IGN_3, LOW);
   }
 
+  //Paraquedas 4
   if (estaDescendo && !paraquedas4) {
     paraquedas4 = true;
   }
@@ -208,56 +219,29 @@ void loop() {
     digitalWrite(IGN_4, LOW);
   }
 
-  dataString += bmp.readTemperature();
+  //String de dados
+  dataString += String(bmp.readTemperature());
   dataString += "\t";
-  dataString += bmp.readPressure();
+  dataString += String(bmp.readPressure());
   dataString += "\t";
-  dataString += media;
+  dataString += String(media);
   dataString += "\t";
-  dataString += mediaDasMedias;
+  dataString += String(mediaDasMedias);
   dataString += "\t";
-  dataString += var;
+  dataString += String(var);
   dataString += "\t";
 
-  if (estaDescendo) {
-    dataString += "1";
-    dataString += "\t";
-  } else {
-    dataString += "0";
-    dataString += "\t";
-  }
-
-  if (paraquedas1data) {
-    dataString += "1";
-    dataString += "\t";
-  } else {
-    dataString += "0";
-    dataString += "\t";
-  }
-
-  if (paraquedas2data) {
-    dataString += "1";
-    dataString += "\t";
-  } else {
-    dataString += "0";
-    dataString += "\t";
-  }
-
-  if (paraquedas3data) {
-    dataString += "1";
-    dataString += "\t";
-  } else {
-    dataString += "0";
-    dataString += "\t";
-  }
-
-  if (paraquedas4data) {
-    dataString += "1";
-    dataString += "\t";
-  } else {
-    dataString += "0";
-    dataString += "\t";
-  }
+  dataString += String(estaDescendo);
+  dataString += "\t";
+  dataString += String(paraquedas1data);
+  dataString += "\t";
+  dataString += String(paraquedas2data);
+  dataString += "\t";
+  dataString += String(paraquedas3data);
+  dataString += "\t";
+  dataString += String(paraquedas4data);
+  dataString += "\t";
+  
   Serial.println(dataString);
 
   File dataFile = SD.open(nomeSD, FILE_WRITE);
