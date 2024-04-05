@@ -31,13 +31,13 @@ float filtro_1(float var_1) {
   }
 
   Lista_1[0] = var_1;
-  SomaLista = 0;
+  float SomaLista = 0;
 
   for (int i = 0; i < 5; i++) {
     SomaLista += Lista_1[i];
   }
 
-  MediaFiltro = SomaLista / 5;
+  float MediaFiltro = SomaLista / 5;
 
   return MediaFiltro;
 }
