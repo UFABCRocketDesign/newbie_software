@@ -67,7 +67,7 @@ int ledst[NP] = { LOW };
 const int leds[] = { IGN_1, IGN_2, IGN_3, IGN_4 };  // Vetor que relaciona os paraquedas
 int pqd[NP] = { LOW };                              // Vetor de estado dos paraquedas
 const int atraso[NP] = { 0, 3000, 0, 3000 };        // Tempo de delay para acionar os paraquedas
-float hMin[NP] = { 0, 0, 10, 10 };                  // Altura minima para acionar os paraquedas
+float hMin[NP] = { 0, 0, -5, -5 };                  // Altura minima para acionar os paraquedas
 int lock[NP] = { 0 };                               // Trava "anti-reacionamento" dos paraquedas
 unsigned long ta[NP];                               // Instante de tempo em que o paraquedas deve ser ativado
 unsigned long tDes[NP];                             // Instante de tempo em que o paraquedas deve ser desativado
@@ -388,15 +388,6 @@ void loop() {
   {
 #if PQ_DBG
     for (int P = 0; P < NP; P++) {
-
-
-      if ((P < NP / 2) && (lock[P] == 0)) {
-        ta[P] = tq + atraso[P];
-      } else if ((sf[NF] < hMin[NF])  && (lock[P] == 0)) {
-        ta[P] = tAtual + atraso[P];
-      }
-
-
       pqd[P] = Paraquedas(P, tAtual);  //Passar os parâmetros necessários
       digitalWrite(leds[P], pqd[P]);
     }
@@ -408,6 +399,10 @@ void loop() {
 #if PQ_DBG  //for rodando os paraquedas por pqd[P]
   for (int P = 0; P < NP; P++) {
     dataString += String(pqd[P]);
+    dataString += "\t";
+    dataString += String(lock[P]);
+    dataString += "\t";
+    dataString += String(ta[P]);
     dataString += "\t";
   }
 #endif
@@ -455,13 +450,19 @@ int Paraquedas(int Pq, unsigned long TAt) {  //Numero do paraquedas (Pq, int), T
 
   if (lock[Pq] == 0)  //Trava para evitar que o paraquedas entre nesse loop de novo após ser ativado
   {
-    if (q1 == 1 && ((hMin[Pq] != 0) && (sf[NF] < hMin[Pq])) || (hMin[Pq] == 0))  //apg && (h && <altura certa> || !h) onde h é a condicional geral de usar a altura
-    {                                                                            //apg && ((sf[NF] <= -0.25) && (hMin[Pq] > sf[NF]) || !(sf[NF] <= 0.25))
-      if (TAt > ta[Pq] && ta[Pq] != 0)                                           // Dessa forma TAt sempre é maior que os tempos dos paraquedas (começam em 0) (isso foi antes da adição de &&)
-      {                                                                          // Condicional de tempo está bem ajustada pra 3/4 mas ainda não pra 1/2
-        ledst[Pq] = HIGH;                                                        //Acionar Paraquedas,
-        tDes[Pq] = TAt + TL;                                                     //Registrar o tempo para desligar o paraquedas,
-        lock[Pq] = 1;                                                            //Faz com que cada paraquedas entre nesse loop apenas uma vez
+    if (q1 == 1 && (((hMin[Pq] != 0) && (hMin[Pq] > sf[NF])) || (hMin[Pq] == 0)))  //apg && (h && <altura certa> || !h) onde h é a condicional geral de usar a altura
+    {
+      if (Pq < NP / 2) {
+        ta[Pq] = tq + atraso[Pq];
+      } else if (hMin[NF] > sf[NF]) {
+        ta[Pq] = TAt + atraso[Pq];
+      }
+                                        
+      if ((TAt > ta[Pq]) && (ta[Pq] > 0))  // Dessa forma TAt sempre é maior que os tempos dos paraquedas (começam em 0) (isso foi antes da adição de &&)
+      {                                 // Condicional de tempo está bem ajustada pra 3/4 mas ainda não pra 1/2
+        ledst[Pq] = HIGH;               //Acionar Paraquedas,
+        tDes[Pq] = TAt + TL;            //Registrar o tempo para desligar o paraquedas,
+        lock[Pq] = 1;                   //Faz com que cada paraquedas entre nesse loop apenas uma vez
       }
     }
   }
