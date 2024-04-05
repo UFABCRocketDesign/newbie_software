@@ -26,9 +26,12 @@ unsigned long previousMillis2 = 0;
 bool verificar = false;
 
 int paraquedas3 = LOW;
-float alturaBase = 0;
 unsigned long previousMillis3 = 0;
 bool verificar2 = false;
+
+int paraquedas4 = LOW;
+unsigned long previousMillis4 = 0;
+bool verificar3 = false;
 
 
 int i;
@@ -61,6 +64,7 @@ void setup() {
   pinMode(paraquedasPin, OUTPUT);
   pinMode(paraquedasPin2, OUTPUT);
   pinMode(IGN_3, OUTPUT);
+  pinMode(IGN_4, OUTPUT);
 
   Serial.begin(115200);
 
@@ -224,6 +228,7 @@ void loop() {
     if (previousMillis == 0 && paraquedas == LOW) {
       paraquedas = HIGH; // ligado
       previousMillis = currentMillis;
+      previousMillis3 = currentMillis;
       
     }  
     else if (currentMillis - previousMillis > 4000) {
@@ -253,14 +258,25 @@ void loop() {
     previousMillis3 = currentMillis;                               
     }  
     else if (currentMillis - previousMillis3 > 3000) {
-    paraquedas2 = LOW;  //desligado  
+    paraquedas3 = LOW;  //desligado  
     verificar2 = true;
     }  
 
+    // LIBERAR O QUARTO PARAQUEDAS //
+
+    /*if ( currentMillis - previousMillis3 >= 10000 && paraquedas2 == LOW && verificar == false ) {
+    paraquedas3 = HIGH; // ligado
+    previousMillis3 = currentMillis;                               
+    }  
+    else if (currentMillis - previousMillis2 > 11000) {
+    paraquedas3 = LOW;  //desligado  
+    verificar = true;    
+    }*/
 
     digitalWrite(paraquedasPin, paraquedas);   
     digitalWrite(paraquedasPin2, paraquedas2); 
     digitalWrite(IGN_3, paraquedas3);
+    digitalWrite(IGN_4,paraquedas4);
   } 
 
   dataString += String(paraquedas);
