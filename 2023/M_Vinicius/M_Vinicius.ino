@@ -23,6 +23,7 @@ unsigned long previousMillis = 0;
 const int paraquedasPin2 = IGN_2;
 int paraquedas2 = LOW;
 unsigned long previousMillis2 = 0;
+bool verificar = false;
 
 
 int i;
@@ -53,6 +54,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
 
   pinMode(paraquedasPin, OUTPUT);
+  pinMode(paraquedasPin2, OUTPUT);
 
   Serial.begin(115200);
 
@@ -221,17 +223,18 @@ void loop() {
   }  
       
       // LIBERAR O SEGUNDO PARAQUEDAS //
-    
+
     if ( queda == 1 && previousMillis2 == 0) {
       previousMillis2 = currentMillis;
     }
 
-    if ( currentMillis - previousMillis2 >= 10000 && paraquedas2 == LOW) {
+    if ( currentMillis - previousMillis2 >= 10000 && paraquedas2 == LOW && verificar == false ) {
     paraquedas2 = HIGH; // ligado
-    previousMillis2 = currentMillis;
+    previousMillis2 = currentMillis;                               
     }  
     else if (currentMillis - previousMillis2 > 11000) {
-    paraquedas2 = LOW;  //desligado      
+    paraquedas2 = LOW;  //desligado  
+    verificar = true;    
     }  
 
     digitalWrite(paraquedasPin, paraquedas);   
