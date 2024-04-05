@@ -1,12 +1,8 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 
-float SomaAltitude;
+
 float AltitudeInicial;
-float SomaLista_0;
-float SomaLista_1;
-float MediaFiltro_0;
-float MediaFiltro_1;
 float Lista_0[10];
 float Lista_1[5]
 
@@ -17,15 +13,15 @@ float filtro_0(float var_0) {
   }
 
   Lista_0[0] = var;
-  SomaLista_0 = 0;
+  float SomaLista = 0;
 
   for (int i = 0; i < 10; i++) {
-    SomaLista_0 += Lista_0[i];
+    SomaLista += Lista_0[i];
   }
 
-  MediaFiltro_0 = SomaLista_0 / 10;
+  float MediaFiltro = SomaLista / 10;
 
-  return MediaFiltro_0;
+  return MediaFiltro;
 }
 
 float filtro_1(float var_1) {
@@ -35,15 +31,15 @@ float filtro_1(float var_1) {
   }
 
   Lista_1[0] = var_1;
-  SomaLista_0 = 0;
+  SomaLista = 0;
 
   for (int i = 0; i < 5; i++) {
-    SomaLista_0 += Lista_1[i];
+    SomaLista += Lista_1[i];
   }
 
-  MediaFiltro_1 = SomaLista_1 / 5;
+  MediaFiltro = SomaLista / 5;
 
-  return MediaFiltro_1;
+  return MediaFiltro;
 }
 
 void setup() {
@@ -56,12 +52,12 @@ void setup() {
 
   Serial.print("Temperature(C)\t Pressure(Pa)\t High(meters)\t Pressure at sealevel (calculated, Pa)\t Real altitude(meters)");
 
-  SomaAltitude = 0;
+  float SomaAltitude = 0;
   for (int posicaoListaAltitude = 0; posicaoListaAltitude < 10; posicaoListaAltitude++) {
-    SomaAltitude += bmp.readAltitude();
+    float SomaAltitude += bmp.readAltitude();
   }
 
-  AltitudeInicial = SomaAltitude / 10;
+  float AltitudeInicial = SomaAltitude / 10;
 }
 
 void loop() {
@@ -75,6 +71,8 @@ void loop() {
   Serial.print(bmp.readPressure());
   Serial.print("\t");
   Serial.print(Altura);
+  Serial.print("\t");
+  Serial.print(Altura_Filtrada_0);
   Serial.print("\t");
   Serial.print(Altura_Filtrada_1);
   Serial.print("\t");
