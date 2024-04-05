@@ -10,13 +10,15 @@
 
 Adafruit_BMP085 bmp;
 
-const int chipSelect = 53;
+//Definindo SD
+#define chipSelect 53
 String nomeBaseSD = "data";
 String nomeSD;
 
+//Definindo variaveis filtros
 float var;
 float alturaInicial;
-const int numLeituras = 20;
+#define numLeituras 20
 float leituras[numLeituras];
 float medias[numLeituras];
 int indiceLeitura = 0;
@@ -26,11 +28,13 @@ float somaMedias = 0;
 float media = 0;
 float mediaDasMedias = 0;
 
-const int historicoTamanho = 20;
+//Definindo variaveis apogeu
+#define historicoTamanho 20
 float historico[historicoTamanho];
 int indiceHistorico = 0;
 int contadorHistorico = 0;
 
+//Definindo variaveis paraquedas
 int intervaloTempo = 10000;
 int intervaloDelay = 5000;
 bool paraquedas1 = false;
@@ -69,7 +73,7 @@ void setup() {
   pinMode(IGN_4, OUTPUT);
 
 
-  
+  //Primeiras leituras BMP
   for (int i = 0; i < numLeituras; i++) {
     soma += bmp.readAltitude();
   }
@@ -83,13 +87,16 @@ void setup() {
     medias[i] = 0;
   }
 
+  //Inicializando vetor de historico
   for (int i = 0; i < historicoTamanho; i++) {
     historico[i] = 0;
   }
 
+  //Definindo cabecalho
   String dataStringInicial = "Temperature(*C)\tPressure(Pa)\tAltitude com primeiro filtro(m)\tAltitude com segundo filtro(m)\tAltitude sem filtro(m)\tStatus\tParaquedas 1\tParaquedas 2\tParaquedas 3\tParaquedas 4\n";
   Serial.println(dataStringInicial);
 
+  //Logica para nome do arquivo SD
   int iSD = 0;
   while (true) {
     int numZeros = 8 - nomeBaseSD.length() - String(iSD).length();
@@ -182,10 +189,10 @@ void loop() {
     paraquedas2 = true;
     tempoP2 = millis();
   }
-  if (paraquedas2 && currentTime >= tempoP2 + intervaloTempo && currentTime < tempoP2 + 2*intervaloTempo) {
+  if (paraquedas2 && currentTime >= tempoP2 + intervaloDelay && currentTime < tempoP2 + intervaloDelay + intervaloTempo) {
     paraquedas2data = true;
     digitalWrite(IGN_2, HIGH);
-  } else if (paraquedas2 && currentTime >= tempoP2 + 2*intervaloTempo) {
+  } else if (paraquedas2 && currentTime >= tempoP2 + intervaloDelay + intervaloTempo) {
     paraquedas2data = false;
     digitalWrite(IGN_2, LOW);
   }
@@ -211,10 +218,10 @@ void loop() {
   if (paraquedas4 && mediaDasMedias <= -3 && tempoP4 == 0) {
     tempoP4 = millis();
   } 
-  if (paraquedas4 && tempoP4 != 0 && currentTime >= tempoP4 + intervaloTempo && currentTime < tempoP4 + 2*intervaloTempo) {
+  if (paraquedas4 && tempoP4 != 0 && currentTime >= tempoP4 + intervaloDelay && currentTime < tempoP4 + intervaloDelay + intervaloTempo) {
     paraquedas4data = true;
     digitalWrite(IGN_4, HIGH);
-  } else if (paraquedas4 && currentTime >= tempoP4 + 2*intervaloTempo) {
+  } else if (paraquedas4 && currentTime >= tempoP4 + intervaloDelay + intervaloTempo) {
     paraquedas4data = false;
     digitalWrite(IGN_4, LOW);
   }
