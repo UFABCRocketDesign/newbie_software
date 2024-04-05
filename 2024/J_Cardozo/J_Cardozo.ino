@@ -132,7 +132,7 @@ void setup() {
   }
 
   //Definindo cabecalho
-  String dataStringInicial = "Temperature(*C)\tPressure(Pa)\tAltitude com primeiro filtro(m)\tAltitude com segundo filtro(m)\tAltitude sem filtro(m)\tStatus\tParaquedas 1\tParaquedas 2\tParaquedas 3\tParaquedas 4\tAcel X\tAcel Y\tAcel Z\tGyro X\tGyro Y\tGyro Z\tMag X\tMag Y\tMag Z\n";
+  String dataStringInicial = "Tempo(s)\tTemperature(*C)\tPressure(Pa)\tAltitude com primeiro filtro(m)\tAltitude com segundo filtro(m)\tAltitude sem filtro(m)\tStatus\tParaquedas 1\tParaquedas 2\tParaquedas 3\tParaquedas 4\tAcel X\tAcel Y\tAcel Z\tGyro X\tGyro Y\tGyro Z\tMag X\tMag Y\tMag Z\n";
   Serial.println(dataStringInicial);
 
   //Logica para nome do arquivo SD
@@ -167,6 +167,7 @@ void setup() {
 }
 
 void loop() {
+  unsigned long currentTime = millis();
   sensors_event_t event;
   accel.getEvent(&event);
   acelX = event.acceleration.x;
@@ -227,7 +228,6 @@ void loop() {
   contadorHistorico = 0;
 
   //Paraquedas 1
-  unsigned long currentTime = millis();
   if (estaDescendo && !paraquedas1) {
     paraquedas1 = true;
     tempoP1 = millis();
@@ -282,6 +282,7 @@ void loop() {
   }
 
   //String de dados
+  dataString += String(currentTime/1000) + "\t";
   dataString += String(bmp.readTemperature()) + "\t";
   dataString += String(bmp.readPressure()) + "\t";
   dataString += String(media) + "\t";
