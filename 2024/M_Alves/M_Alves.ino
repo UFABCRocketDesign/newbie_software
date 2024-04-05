@@ -147,6 +147,7 @@ void setup() {
   }
 #endif
   // ********** Cabeçalho ********** //
+  dadosString += "\n";
   Serial.println(dadosString);
 // ********** Criando .txt no SD Card ********** //
 #if SDCARD
