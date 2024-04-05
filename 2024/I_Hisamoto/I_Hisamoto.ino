@@ -1,10 +1,10 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 
-
 float AltitudeInicial;
+float SomaAltitude;
 float Lista_0[10];
-float Lista_1[5]
+float Lista_1[5];
 
 float filtro_0(float var_0) {
 
@@ -52,12 +52,12 @@ void setup() {
 
   Serial.print("Temperature(C)\t Pressure(Pa)\t High(meters)\t Pressure at sealevel (calculated, Pa)\t Real altitude(meters)");
 
-  float SomaAltitude = 0;
+  SomaAltitude = 0;
   for (int posicaoListaAltitude = 0; posicaoListaAltitude < 10; posicaoListaAltitude++) {
-    float SomaAltitude += bmp.readAltitude();
+    SomaAltitude += bmp.readAltitude();
   }
 
-  float AltitudeInicial = SomaAltitude / 10;
+  AltitudeInicial = SomaAltitude / 10;
 }
 
 void loop() {
