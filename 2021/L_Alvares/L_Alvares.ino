@@ -48,26 +48,26 @@
 #if BAR_DBG
 Adafruit_BMP085 bmp;
 int pos[TAM];
-float mFiltro[NF][TAM]; //
-float af[NF];      // Valor de entrada no filtro
-float sf[NF + 1];  // Valor de saida do filtro
-float m = 0.0;     // Valor da média final
+float mFiltro[NF][TAM];  //
+float af[NF];            // Valor de entrada no filtro
+float sf[NF + 1];        // Valor de saida do filtro
+float m = 0.0;           // Valor da média final
 #endif
 
 #if APG_DBG
-float altApg = 0.0;   // Altura do Apogeu do foguete
-int cQueda = 0;       // Contador para verificar se o foguete está em queda
-int dQueda = 0;       // Variável registradora de queda (ou não)
-int q1 = 0;           // Trava de queda para outras funções
-unsigned long tq = 0; // Tempo onde detectou a queda
+float altApg = 0.0;    // Altura do Apogeu do foguete
+int cQueda = 0;        // Contador para verificar se o foguete está em queda
+int dQueda = 0;        // Variável registradora de queda (ou não)
+int q1 = 0;            // Trava de queda para outras funções
+unsigned long tq = 0;  // Tempo onde detectou a queda
 #endif
 
 #if PQ_DBG
-
+int ledst[NP] = { LOW };
 const int leds[] = { IGN_1, IGN_2, IGN_3, IGN_4 };  // Vetor que relaciona os paraquedas
 int pqd[NP] = { LOW };                              // Vetor de estado dos paraquedas
 const int atraso[NP] = { 0, 3000, 0, 3000 };        // Tempo de delay para acionar os paraquedas
-float hMin[NP] = { 0, 0, -5, -5 };                  // Altura minima para acionar os paraquedas 
+float hMin[NP] = { 0, 0, 10, 10 };                  // Altura minima para acionar os paraquedas
 int lock[NP] = { 0 };                               // Trava "anti-reacionamento" dos paraquedas
 unsigned long ta[NP];                               // Instante de tempo em que o paraquedas deve ser ativado
 unsigned long tDes[NP];                             // Instante de tempo em que o paraquedas deve ser desativado
@@ -390,9 +390,9 @@ void loop() {
     for (int P = 0; P < NP; P++) {
 
 
-      if ((P < NP / 2) && lock[P] == 0) {
+      if ((P < NP / 2) && (lock[P] == 0)) {
         ta[P] = tq + atraso[P];
-      } else if (sf[NF] <= -10 && lock[P] == 0) {
+      } else if ((sf[NF] < hMin[NF])  && (lock[P] == 0)) {
         ta[P] = tAtual + atraso[P];
       }
 
@@ -453,17 +453,15 @@ int Apogeu(float AltAtual, int VQueda) {
 //Paraquedas
 int Paraquedas(int Pq, unsigned long TAt) {  //Numero do paraquedas (Pq, int), Tempo atual (TAt, Unsigned Long)
 
-int ledst[Pq] = { LOW };
-
   if (lock[Pq] == 0)  //Trava para evitar que o paraquedas entre nesse loop de novo após ser ativado
   {
-    if (q1 == 1 && ((sf[NF] <= -10) && (sf[NF] < hMin[Pq])) || !(sf[NF] <= -10))  //apg && (h && <altura certa> || !h) onde h é a condicional geral de usar a altura
-    {                                                                                 //apg && ((sf[NF] <= -0.25) && (hMin[Pq] > sf[NF]) || !(sf[NF] <= 0.25))
-      if (TAt > ta[Pq] && ta[Pq] != 0)  // Dessa forma TAt sempre é maior que os tempos dos paraquedas (começam em 0) (isso foi antes da adição de &&)
-      {                                 // Condicional de tempo está bem ajustada pra 3/4 mas ainda não pra 1/2
-        ledst[Pq] = HIGH;  //Acionar Paraquedas,
-        tDes[Pq] = TAt + TL; //Registrar o tempo para desligar o paraquedas,
-        lock[Pq] = 1; //Faz com que cada paraquedas entre nesse loop apenas uma vez
+    if (q1 == 1 && ((hMin[Pq] != 0) && (sf[NF] < hMin[Pq])) || (hMin[Pq] == 0))  //apg && (h && <altura certa> || !h) onde h é a condicional geral de usar a altura
+    {                                                                            //apg && ((sf[NF] <= -0.25) && (hMin[Pq] > sf[NF]) || !(sf[NF] <= 0.25))
+      if (TAt > ta[Pq] && ta[Pq] != 0)                                           // Dessa forma TAt sempre é maior que os tempos dos paraquedas (começam em 0) (isso foi antes da adição de &&)
+      {                                                                          // Condicional de tempo está bem ajustada pra 3/4 mas ainda não pra 1/2
+        ledst[Pq] = HIGH;                                                        //Acionar Paraquedas,
+        tDes[Pq] = TAt + TL;                                                     //Registrar o tempo para desligar o paraquedas,
+        lock[Pq] = 1;                                                            //Faz com que cada paraquedas entre nesse loop apenas uma vez
       }
     }
   }
