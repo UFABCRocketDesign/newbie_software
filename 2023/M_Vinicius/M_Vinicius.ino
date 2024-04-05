@@ -15,12 +15,12 @@ Adafruit_BMP085 bmp;
 #define IGN_3 46 /*act3*/
 #define IGN_4 55 /*act4*/
 
-const int paraquedasPin = IGN_1;
+
 int paraquedas = LOW;
 unsigned long previousMillis = 0;
 
 
-const int paraquedasPin2 = IGN_2;
+
 int paraquedas2 = LOW;
 unsigned long previousMillis2 = 0;
 bool verificar = false;
@@ -61,8 +61,8 @@ void setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);
 
-  pinMode(paraquedasPin, OUTPUT);
-  pinMode(paraquedasPin2, OUTPUT);
+  pinMode(IGN_1, OUTPUT);
+  pinMode(IGN_2, OUTPUT);
   pinMode(IGN_3, OUTPUT);
   pinMode(IGN_4, OUTPUT);
 
@@ -253,7 +253,7 @@ void loop() {
 
     // LIBERAR O TERCEIRO PARAQUEDAS //
 
-    if (  altura_sRuido2 - 5 && verificar2 == false) {
+    if (  altura_sRuido2 <= - 5 && verificar2 == false) {
     paraquedas3 = HIGH; // ligado
     previousMillis3 = currentMillis;                               
     }  
@@ -264,17 +264,17 @@ void loop() {
 
     // LIBERAR O QUARTO PARAQUEDAS //
 
-    /*if ( currentMillis - previousMillis3 >= 10000 && paraquedas2 == LOW && verificar == false ) {
-    paraquedas3 = HIGH; // ligado
-    previousMillis3 = currentMillis;                               
+    if (  paraquedas4 == LOW && verificar2 == true && verificar3 == false ) {
+    paraquedas4 = HIGH; // ligado
+    previousMillis4 = currentMillis;                               
     }  
-    else if (currentMillis - previousMillis2 > 11000) {
+    else if (currentMillis - previousMillis4> 6000) {
     paraquedas3 = LOW;  //desligado  
-    verificar = true;    
-    }*/
+    verificar3 = true;    
+    }
 
-    digitalWrite(paraquedasPin, paraquedas);   
-    digitalWrite(paraquedasPin2, paraquedas2); 
+    digitalWrite(IGN_1, paraquedas);   
+    digitalWrite(IGN_2, paraquedas2); 
     digitalWrite(IGN_3, paraquedas3);
     digitalWrite(IGN_4,paraquedas4);
   } 
@@ -285,7 +285,10 @@ void loop() {
   dataString += String(paraquedas2);
   dataString += "\t";
 
-   dataString += String(paraquedas3);
+  dataString += String(paraquedas3);
+  dataString += "\t"; 
+
+  dataString += String(paraquedas4);
   dataString += "\t"; 
 
 
