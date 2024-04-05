@@ -224,7 +224,7 @@ void loop() {
     if (previousMillis == 0 && paraquedas == LOW) {
       paraquedas = HIGH; // ligado
       previousMillis = currentMillis;
-      alturaBase = altura_sRuido2;
+      
     }  
     else if (currentMillis - previousMillis > 4000) {
       paraquedas = LOW;  //desligado      
@@ -248,7 +248,7 @@ void loop() {
 
     // LIBERAR O TERCEIRO PARAQUEDAS //
 
-    if (  altura_sRuido2 <= alturaBase - 5 && verificar2 == false) {
+    if (  altura_sRuido2 - 5 && verificar2 == false) {
     paraquedas3 = HIGH; // ligado
     previousMillis3 = currentMillis;                               
     }  
