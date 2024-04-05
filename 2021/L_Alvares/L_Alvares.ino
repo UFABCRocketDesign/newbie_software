@@ -59,7 +59,6 @@ float altApg = 0.0;    // Altura do Apogeu do foguete
 int cQueda = 0;        // Contador para verificar se o foguete está em queda
 int dQueda = 0;        // Variável registradora de queda (ou não)
 int q1 = 0;            // Trava de queda para outras funções
-unsigned long tq = 0;  // Tempo onde detectou a queda
 #endif
 
 #if PQ_DBG
@@ -327,7 +326,6 @@ void loop() {
   dQueda = Apogeu(sf[NF], VEQ);
   if (q1 == 0 && dQueda == 1) {
     q1 = 1;
-    tq = tAtual;
   }
   dataString += String(dQueda);
   dataString += "\t";
@@ -452,15 +450,10 @@ int Paraquedas(int Pq, unsigned long TAt) {  //Numero do paraquedas (Pq, int), T
   {
     if (q1 == 1 && (((hMin[Pq] != 0) && (hMin[Pq] > sf[NF])) || (hMin[Pq] == 0)))  //apg && (h && <altura certa> || !h) onde h é a condicional geral de usar a altura
     {
-
-      //if (Pq < NP / 2) {
-      //  ta[Pq] = tq + atraso[Pq];
-      //} else if (hMin[Pq] > sf[Pq]) {
         if(ta[Pq] == 0)
         {
         ta[Pq] = TAt + atraso[Pq];
         }
-      //}
                                         
       if ((TAt >= ta[Pq]) && (ta[Pq] > 0))  // Dessa forma TAt sempre é maior que os tempos dos paraquedas (começam em 0) (isso foi antes da adição de &&)
       {                                 // Condicional de tempo está bem ajustada pra 3/4 mas ainda não pra 1/2
