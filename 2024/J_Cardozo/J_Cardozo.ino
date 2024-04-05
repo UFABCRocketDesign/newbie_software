@@ -179,7 +179,7 @@ void loop() {
   if (estaDescendo && !paraquedas3) {
     paraquedas3 = true;
   }
-  if (paraquedas3 && mediaDasMedias <= -5 && tempoP3 == 0) {
+  if (paraquedas3 && mediaDasMedias <= -3 && tempoP3 == 0) {
     tempoP3 = millis();
     paraquedas3data = true;
     digitalWrite(IGN_3, HIGH);
