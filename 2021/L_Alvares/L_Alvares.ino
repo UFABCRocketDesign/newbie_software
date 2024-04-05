@@ -452,13 +452,17 @@ int Paraquedas(int Pq, unsigned long TAt) {  //Numero do paraquedas (Pq, int), T
   {
     if (q1 == 1 && (((hMin[Pq] != 0) && (hMin[Pq] > sf[NF])) || (hMin[Pq] == 0)))  //apg && (h && <altura certa> || !h) onde h é a condicional geral de usar a altura
     {
-      if (Pq < NP / 2) {
-        ta[Pq] = tq + atraso[Pq];
-      } else if (hMin[NF] > sf[NF]) {
+
+      //if (Pq < NP / 2) {
+      //  ta[Pq] = tq + atraso[Pq];
+      //} else if (hMin[Pq] > sf[Pq]) {
+        if(ta[Pq] == 0)
+        {
         ta[Pq] = TAt + atraso[Pq];
-      }
+        }
+      //}
                                         
-      if ((TAt > ta[Pq]) && (ta[Pq] > 0))  // Dessa forma TAt sempre é maior que os tempos dos paraquedas (começam em 0) (isso foi antes da adição de &&)
+      if ((TAt >= ta[Pq]) && (ta[Pq] > 0))  // Dessa forma TAt sempre é maior que os tempos dos paraquedas (começam em 0) (isso foi antes da adição de &&)
       {                                 // Condicional de tempo está bem ajustada pra 3/4 mas ainda não pra 1/2
         ledst[Pq] = HIGH;               //Acionar Paraquedas,
         tDes[Pq] = TAt + TL;            //Registrar o tempo para desligar o paraquedas,
