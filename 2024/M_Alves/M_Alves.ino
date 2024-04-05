@@ -24,13 +24,13 @@ bool ativacao3 = false;
 bool ativacao4 = false;
 
 unsigned long futureMillis = 0;
-const long interval = 10000;
+#define interval 10000
 unsigned long futureMillis2 = 0;
-const long interval2 = 5000;
+#define interval2 5000
 unsigned long futureMillis3 = 0;
-const long interval3 = 10000;
+#define interval3 10000
 unsigned long futureMillis4 = 0;
-const long interval4 = 5000;
+#define interval4 5000
 
 // ********** SD Card ********** //
 #define chipSelect 53
