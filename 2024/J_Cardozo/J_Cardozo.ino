@@ -1,29 +1,51 @@
-#include <Adafruit_BMP085.h>
+#define SENSORES 1
+#define GYRO (SENSORES && 1)
+#define MAG (SENSORES && 1)
+#define ACEL (SENSORES && 1)
+#define BAR (SENSORES && 1)
+
+#define PARAQUEDAS (BAR && 1)
+
+#define SD_CARD 1
+
 #include <SPI.h>
-#include <SD.h>
 #include <Wire.h>
+
+#if (SENSORES)
+#include <Adafruit_BMP085.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_ADXL345_U.h>
 #include <Adafruit_HMC5883_U.h>
 #include <L3G.h>
+#endif
 
+#if (SD_CARD)
+#include <SD.h>
+#endif
 
+#if (PARAQUEDAS)
 #define IGN_1 36 /*act1*/
 #define IGN_2 61 /*act2*/
 #define IGN_3 46 /*act3*/
 #define IGN_4 55 /*act4*/
+#endif
 
+#if (SENSORES)
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(123456);
 Adafruit_BMP085 bmp;
 L3G gyro;
+#endif
 
 //Definindo SD
+#if (SD_CARD)
 #define chipSelect 53
 String nomeBaseSD = "data";
 String nomeSD;
+#endif
 
 //Definindo variaveis filtros
+#if (BAR)
 float var;
 float alturaInicial;
 #define numLeituras 20
@@ -35,16 +57,22 @@ float soma = 0;
 float somaMedias = 0;
 float media = 0;
 float mediaDasMedias = 0;
+#endif
 
 //Definindo variaveis apogeu
+#if (BAR)
 #define historicoTamanho 20
 float historico[historicoTamanho];
 int indiceHistorico = 0;
 int contadorHistorico = 0;
+#endif
+
 
 //Definindo variaveis paraquedas
 #define intervaloTempo 10000
 #define intervaloDelay 5000
+
+#if (PARAQUEDAS)
 bool paraquedas1 = false;
 bool paraquedas1data = false;
 unsigned long tempoP1 = 0;
@@ -57,42 +85,54 @@ unsigned long tempoP3 = 0;
 bool paraquedas4 = false;
 bool paraquedas4data = false;
 unsigned long tempoP4 = 0;
+#endif
 
 void setup() {
   Serial.begin(115200);
   Wire.begin();
 
-  //Inicializando BMP, SD, Acelerometro, Giroscopio e Magnetometro
+//Inicializando BMP, SD, Acelerometro, Giroscopio e Magnetometro
+#if (BAR)
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
+#endif
 
+#if (SD_CARD)
   if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present");
     while (1)
       ;
   }
+#endif
 
+#if (ACEL)
   if (!accel.begin()) {
     Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
     while (1)
       ;
   }
   accel.setRange(ADXL345_RANGE_16_G);
+#endif
 
+#if (GYRO)
   if (!gyro.init()) {
     Serial.println("Failed to autodetect gyro type!");
     while (1)
       ;
   }
   gyro.enableDefault();
+#endif
 
+
+#if (MAG)
   if (!mag.begin()) {
     Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
     while (1)
       ;
   }
+#endif
 
   //Definindo pinos dos paraquedas
   pinMode(IGN_1, OUTPUT);
@@ -121,10 +161,42 @@ void setup() {
   }
 
   //Definindo cabecalho
-  String dataStringInicial = "Tempo(s)\tTemperature(*C)\tPressure(Pa)\tAltitude com primeiro filtro(m)\tAltitude com segundo filtro(m)\tAltitude sem filtro(m)\tStatus\tParaquedas 1\tParaquedas 2\tParaquedas 3\tParaquedas 4\tAcel X\tAcel Y\tAcel Z\tGyro X\tGyro Y\tGyro Z\tMag X\tMag Y\tMag Z\n";
+  String dataStringInicial = "";
+  dataStringInicial += "Tempo(s)\t";
+#if (BAR)
+  dataStringInicial += "Temperature(*C)\t";
+  dataStringInicial += "Pressure(Pa)\t";
+  dataStringInicial += "Altitude com primeiro filtro(m)\t";
+  dataStringInicial += "Altitude com segundo filtro(m)\t";
+  dataStringInicial += "Altitude sem filtro(m)\t";
+  dataStringInicial += "Status\t";
+#endif
+#if (PARAQUEDAS)
+  dataStringInicial += "Paraquedas 1\t";
+  dataStringInicial += "Paraquedas 2\t";
+  dataStringInicial += "Paraquedas 3\t";
+  dataStringInicial += "Paraquedas 4\t";
+#endif
+#if (ACEL)
+  dataStringInicial += "Acel X\t";
+  dataStringInicial += "Acel Y\t";
+  dataStringInicial += "Acel Z\t";
+#endif
+#if (GYRO)
+  dataStringInicial += "Gyro X\t";
+  dataStringInicial += "Gyro Y\t";
+  dataStringInicial += "Gyro Z\t";
+#endif
+#if (MAG)
+  dataStringInicial += "Mag X\t";
+  dataStringInicial += "Mag Y\t";
+  dataStringInicial += "Mag Z\n";
+#endif
   Serial.println(dataStringInicial);
 
-  //Logica para nome do arquivo SD
+
+//Logica para nome do arquivo SD
+#if (SD)
   int iSD = 0;
   while (true) {
     int numZeros = 8 - nomeBaseSD.length() - String(iSD).length();
@@ -153,40 +225,49 @@ void setup() {
     }
     iSD++;
   }
+#endif
 }
 
 void loop() {
-  //Definindo variaveis acelerometro, giroscopio e magnetometro
-  float acelX;
-  float acelY;
-  float acelZ;
-  float gyroX;
-  float gyroY;
-  float gyroZ;
-  float magX;
-  float magY;
-  float magZ;
-  unsigned long currentTime = millis();
-  sensors_event_t event;
-  accel.getEvent(&event);
-  acelX = event.acceleration.x;
-  acelY = event.acceleration.y;
-  acelZ = event.acceleration.z;
+//Definindo variaveis acelerometro, giroscopio e magnetometro
+#if (ACEL)
+  float acelX, acelY, acelZ;
+#endif
 
+#if (GYRO)
+  float gyroX, gyroY, gyroZ;
+#endif
+
+#if (MAG)
+  float magX, magY, magZ;
+#endif
+  unsigned long currentTime = millis();
+
+#if (ACEL)
+  sensors_event_t eventACEL;
+  accel.getEvent(&eventACEL);
+  acelX = eventACEL.acceleration.x;
+  acelY = eventACEL.acceleration.y;
+  acelZ = eventACEL.acceleration.z;
+#endif
+
+#if (GYRO)
   gyro.read();
   gyroX = gyro.g.x;
   gyroY = gyro.g.y;
   gyroZ = gyro.g.z;
+#endif
 
-  mag.getEvent(&event);
-  magX = event.magnetic.x;
-  magY = event.magnetic.y;
-  magZ = event.magnetic.z;
+#if (MAG)
+  sensors_event_t eventMAG;
+  mag.getEvent(&eventMAG);
+  magX = eventMAG.magnetic.x;
+  magY = eventMAG.magnetic.y;
+  magZ = eventMAG.magnetic.z;
+#endif
 
-  //Inicializando a string
-  String dataString = "";
-
-  //Filtro 1
+//Filtro 1
+#if (BAR)
   soma -= leituras[indiceLeitura];
   var = bmp.readAltitude() - alturaInicial;
   leituras[indiceLeitura] = var;
@@ -196,8 +277,10 @@ void loop() {
   }
 
   media = soma / numLeituras;
+#endif
 
-  //Filtro 2
+//Filtro 2
+#if (BAR)
   somaMedias -= medias[indiceMedia];
   medias[indiceMedia] = media;
   somaMedias += medias[indiceMedia];
@@ -206,8 +289,10 @@ void loop() {
   }
 
   mediaDasMedias = somaMedias / numLeituras;
+#endif
 
-  //Apogeu
+//Apogeu
+#if (BAR)
   historico[indiceHistorico] = mediaDasMedias;
   if (++indiceHistorico >= historicoTamanho) {
     indiceHistorico = 0;
@@ -225,7 +310,9 @@ void loop() {
     estaDescendo = true;
   }
   contadorHistorico = 0;
+#endif
 
+#if (PARAQUEDAS)
   //Paraquedas 1
   if (estaDescendo && !paraquedas1) {
     paraquedas1 = true;
@@ -279,35 +366,50 @@ void loop() {
     paraquedas4data = false;
     digitalWrite(IGN_4, LOW);
   }
+#endif
 
+  //Inicializando a string
+  String dataString = "";
   //String de dados
   dataString += String(currentTime / 1000.0) + "\t";
+  
+#if (BAR)
   dataString += String(bmp.readTemperature()) + "\t";
   dataString += String(bmp.readPressure()) + "\t";
   dataString += String(media) + "\t";
   dataString += String(mediaDasMedias) + "\t";
   dataString += String(var) + "\t";
-
   dataString += String(estaDescendo) + "\t";
+#endif
+
+#if (PARAQUEDAS)
   dataString += String(paraquedas1data) + "\t";
   dataString += String(paraquedas2data) + "\t";
   dataString += String(paraquedas3data) + "\t";
   dataString += String(paraquedas4data) + "\t";
+#endif
 
+#if (ACEL)
   dataString += String(acelX) + "\t";
   dataString += String(acelY) + "\t";
   dataString += String(acelZ) + "\t";
+#endif
 
+#if (GYRO)
   dataString += String(gyroX) + "\t";
   dataString += String(gyroY) + "\t";
   dataString += String(gyroZ) + "\t";
+#endif
 
+#if (MAG)
   dataString += String(magX) + "\t";
   dataString += String(magY) + "\t";
   dataString += String(magZ) + "\t";
+#endif
 
   Serial.println(dataString);
 
+#if (SD_CARD)
   File dataFile = SD.open(nomeSD, FILE_WRITE);
   if (dataFile) {
     dataFile.println(dataString);
@@ -317,4 +419,5 @@ void loop() {
     Serial.print(nomeSD);
     Serial.println();
   }
+#endif
 }
