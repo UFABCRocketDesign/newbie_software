@@ -213,7 +213,7 @@ void loop() {
 
   if (apogeu[0] < apogeu[1] && apogeu[1] < apogeu[2] && apogeu[2] < apogeu[3]) {
     queda = 1;  //caindo
-    
+
   } else {
     queda = 0;
   }
@@ -224,46 +224,45 @@ void loop() {
 
 
   // LIBERAR O PRIMEIRO PARAQUEDAS //
-   unsigned long currentMillis = millis();
+  unsigned long currentMillis = millis();
 
   if (queda == 1) {
 
     if (previousMillis == 0 && paraquedas == LOW) {
-      paraquedas = HIGH; // ligado
+      paraquedas = HIGH;  // ligado
       previousMillis = currentMillis;
-      previousMillis3 = currentMillis;
-      
-    }  
-    else if (currentMillis - previousMillis > 4000) {
-      paraquedas = LOW;  //desligado      
-  }  
-      
-      // LIBERAR O SEGUNDO PARAQUEDAS //
+      previousMillis2 = currentMillis;        
 
-    if ( queda == 1 && previousMillis2 == 0) {
-      previousMillis2 = currentMillis;
+    } else if (currentMillis - previousMillis > 4000) {
+      paraquedas = LOW;  //desligado
     }
 
-    if ( currentMillis - previousMillis2 >= 10000 && paraquedas2 == LOW && verificar == false ) {
-    paraquedas2 = HIGH; // ligado
-    previousMillis2 = currentMillis;                               
-    }  
-    else if (currentMillis - previousMillis2 > 11000) {
-    paraquedas2 = LOW;  //desligado  
-    verificar = true;    
-    }  
+    // LIBERAR O SEGUNDO PARAQUEDAS //
+
+    /*if (queda == 1 && previousMillis2 == 0) {
+      previousMillis2 = currentMillis;
+    }*/
+
+    if (currentMillis - previousMillis2 >= 10000 && paraquedas2 == LOW && verificar == false) {
+      paraquedas2 = HIGH;  // ligado
+      previousMillis2 = currentMillis;
+    } else if (currentMillis - previousMillis2 > 11000) {
+      paraquedas2 = LOW;  //desligado
+      verificar = true;
+    }
 
 
     // LIBERAR O TERCEIRO PARAQUEDAS //
 
-    if (  altura_sRuido2 <= -5 && verificar2 == false) {
-    paraquedas3 = HIGH; // ligado
-    previousMillis3 = currentMillis;                               
-    }  
-    else if (currentMillis - previousMillis3 > 3000) {
-    paraquedas3 = LOW;  //desligado  
-    verificar2 = true;
-    }  
+    if (altura_sRuido2 <= -5 && verificar2 == false) {
+      paraquedas3 = HIGH;  // ligado
+      previousMillis3 = currentMillis;
+      verificar2 = true;
+
+    } else if (currentMillis - previousMillis3 > 3000) {
+      paraquedas3 = LOW;  //desligado
+      
+    }
 
     // LIBERAR O QUARTO PARAQUEDAS //
 
@@ -276,23 +275,23 @@ void loop() {
     verificar3 = true;    
     }*/
 
-    digitalWrite(IGN_1, paraquedas);   
-    digitalWrite(IGN_2, paraquedas2); 
+    digitalWrite(IGN_1, paraquedas);
+    digitalWrite(IGN_2, paraquedas2);
     digitalWrite(IGN_3, paraquedas3);
-   // digitalWrite(IGN_4,paraquedas4);
-  } 
+    // digitalWrite(IGN_4,paraquedas4);
+  }
 
   dataString += String(paraquedas);
-  dataString += "\t"; 
+  dataString += "\t";
 
   dataString += String(paraquedas2);
   dataString += "\t";
 
   dataString += String(paraquedas3);
-  dataString += "\t"; 
+  dataString += "\t";
 
   //dataString += String(paraquedas4);
-  //dataString += "\t"; 
+  //dataString += "\t";
 
 
   // SD CARD //
