@@ -43,8 +43,8 @@ int indiceHistorico = 0;
 int contadorHistorico = 0;
 
 //Definindo variaveis paraquedas
-int intervaloTempo = 10000;
-int intervaloDelay = 5000;
+#define intervaloTempo 10000
+#define intervaloDelay 5000
 bool paraquedas1 = false;
 bool paraquedas1data = false;
 unsigned long tempoP1 = 0;
@@ -57,17 +57,6 @@ unsigned long tempoP3 = 0;
 bool paraquedas4 = false;
 bool paraquedas4data = false;
 unsigned long tempoP4 = 0;
-
-//Definindo variaveis acelerometro, giroscopio e magnetometro
-float acelX;
-float acelY;
-float acelZ;
-float gyroX;
-float gyroY;
-float gyroZ;
-float magX;
-float magY;
-float magZ;
 
 void setup() {
   Serial.begin(115200);
@@ -92,17 +81,17 @@ void setup() {
   }
   accel.setRange(ADXL345_RANGE_16_G);
 
-  if (!gyro.init())
-  {
+  if (!gyro.init()) {
     Serial.println("Failed to autodetect gyro type!");
-    while (1);
+    while (1)
+      ;
   }
   gyro.enableDefault();
 
-  if(!mag.begin())
-  {
+  if (!mag.begin()) {
     Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
-    while(1);
+    while (1)
+      ;
   }
 
   //Definindo pinos dos paraquedas
@@ -167,6 +156,16 @@ void setup() {
 }
 
 void loop() {
+  //Definindo variaveis acelerometro, giroscopio e magnetometro
+  float acelX;
+  float acelY;
+  float acelZ;
+  float gyroX;
+  float gyroY;
+  float gyroZ;
+  float magX;
+  float magY;
+  float magZ;
   unsigned long currentTime = millis();
   sensors_event_t event;
   accel.getEvent(&event);
@@ -282,7 +281,7 @@ void loop() {
   }
 
   //String de dados
-  dataString += String(currentTime/1000) + "\t";
+  dataString += String(currentTime / 1000.0) + "\t";
   dataString += String(bmp.readTemperature()) + "\t";
   dataString += String(bmp.readPressure()) + "\t";
   dataString += String(media) + "\t";
