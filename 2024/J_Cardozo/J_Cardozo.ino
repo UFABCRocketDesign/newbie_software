@@ -1,10 +1,28 @@
 #define SENSORES 1
+
 #define GYRO (SENSORES && 0)
+#define GX (GYRO && 1)
+#define GY (GYRO && 1)
+#define GZ (GYRO && 1)
+
 #define MAG (SENSORES && 0)
+#define MX (MAG && 1)
+#define MY (MAG && 0)
+#define MZ (MAG && 0)
+
 #define ACEL (SENSORES && 0)
+#define AX (ACEL && 1)
+#define AY (ACEL && 0)
+#define AZ (ACEL && 0)
+
 #define BAR (SENSORES && 1)
 
 #define PARAQUEDAS (BAR && 1)
+#define P1 (PARAQUEDAS && 1)
+#define P2 (PARAQUEDAS && 0)
+#define P3 (PARAQUEDAS && 0)
+#define P4 (PARAQUEDAS && 0)
+
 
 #define SD_CARD 0
 
@@ -12,10 +30,22 @@
 #include <Wire.h>
 
 #if (SENSORES)
-#include <Adafruit_BMP085.h>
 #include <Adafruit_Sensor.h>
+#endif
+
+#if (BAR)
+#include <Adafruit_BMP085.h>
+#endif
+
+#if (ACEL)
 #include <Adafruit_ADXL345_U.h>
+#endif
+
+#if (MAG)
 #include <Adafruit_HMC5883_U.h>
+#endif
+
+#if (GYRO)
 #include <L3G.h>
 #endif
 
@@ -23,17 +53,35 @@
 #include <SD.h>
 #endif
 
-#if (PARAQUEDAS)
+#if (P1)
 #define IGN_1 36 /*act1*/
+#endif
+
+#if (P2)
 #define IGN_2 61 /*act2*/
+#endif
+
+#if (P3)
 #define IGN_3 46 /*act3*/
+#endif
+
+#if (P4)
 #define IGN_4 55 /*act4*/
 #endif
 
-#if (SENSORES)
+#if (ACEL)
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
+#endif
+
+#if (MAG)
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(123456);
+#endif
+
+#if (BAR)
 Adafruit_BMP085 bmp;
+#endif
+
+#if (GYRO)
 L3G gyro;
 #endif
 
@@ -72,16 +120,25 @@ int contadorHistorico = 0;
 #define intervaloTempo 10000
 #define intervaloDelay 5000
 
-#if (PARAQUEDAS)
+#if (P1)
 bool paraquedas1 = false;
 bool paraquedas1data = false;
 unsigned long tempoP1 = 0;
+#endif
+
+#if (P2)
 bool paraquedas2 = false;
 bool paraquedas2data = false;
 unsigned long tempoP2 = 0;
+#endif
+
+#if (P3)
 bool paraquedas3 = false;
 bool paraquedas3data = false;
 unsigned long tempoP3 = 0;
+#endif
+
+#if (P4)
 bool paraquedas4 = false;
 bool paraquedas4data = false;
 unsigned long tempoP4 = 0;
@@ -134,13 +191,24 @@ void setup() {
   }
 #endif
 
-  //Definindo pinos dos paraquedas
+//Definindo pinos dos paraquedas
+#if (P1)
   pinMode(IGN_1, OUTPUT);
+#endif
+
+#if (P2)
   pinMode(IGN_2, OUTPUT);
+#endif
+
+#if (P3)
   pinMode(IGN_3, OUTPUT);
+#endif
+
+#if (P4)
   pinMode(IGN_4, OUTPUT);
+#endif
 
-
+#if (BAR)
   //Primeiras leituras BMP
   for (int i = 0; i < numLeituras; i++) {
     soma += bmp.readAltitude();
@@ -159,6 +227,7 @@ void setup() {
   for (int i = 0; i < historicoTamanho; i++) {
     historico[i] = 0;
   }
+#endif
 
   //Definindo cabecalho
   String dataStringInicial = "";
@@ -171,27 +240,59 @@ void setup() {
   dataStringInicial += "Altitude sem filtro(m)\t";
   dataStringInicial += "Status\t";
 #endif
-#if (PARAQUEDAS)
+
+#if (P1)
   dataStringInicial += "Paraquedas 1\t";
+#endif
+
+#if (P2)
   dataStringInicial += "Paraquedas 2\t";
+#endif
+
+#if (P3)
   dataStringInicial += "Paraquedas 3\t";
+#endif
+
+#if (P4)
   dataStringInicial += "Paraquedas 4\t";
 #endif
-#if (ACEL)
+
+#if (AX)
   dataStringInicial += "Acel X\t";
+#endif
+
+#if (AY)
   dataStringInicial += "Acel Y\t";
+#endif
+
+#if (AZ)
   dataStringInicial += "Acel Z\t";
 #endif
-#if (GYRO)
+
+#if (GX)
   dataStringInicial += "Gyro X\t";
+#endif
+
+#if (GY)
   dataStringInicial += "Gyro Y\t";
+#endif
+
+#if (GZ)
   dataStringInicial += "Gyro Z\t";
 #endif
-#if (MAG)
+
+#if (MX)
   dataStringInicial += "Mag X\t";
+#endif
+
+#if (MY)
   dataStringInicial += "Mag Y\t";
+#endif
+
+#if (MZ)
   dataStringInicial += "Mag Z\n";
 #endif
+
   Serial.println(dataStringInicial);
 
 
@@ -230,39 +331,76 @@ void setup() {
 
 void loop() {
 //Definindo variaveis acelerometro, giroscopio e magnetometro
-#if (ACEL)
-  float acelX, acelY, acelZ;
+#if (AX)
+  float acelX;
+#endif
+#if (AY)
+  float acelY;
+#endif
+#if (AZ)
+  float acelZ;
 #endif
 
-#if (GYRO)
-  float gyroX, gyroY, gyroZ;
+#if (GX)
+  float gyroX;
+#endif
+#if (GY)
+  float gyroY;
+#endif
+#if (GZ)
+  float gyroZ;
 #endif
 
-#if (MAG)
-  float magX, magY, magZ;
+#if (MX)
+  float magX;
 #endif
+#if (MY)
+  float magY;
+#endif
+#if (MZ)
+  float magZ;
+#endif
+
   unsigned long currentTime = millis();
 
 #if (ACEL)
   sensors_event_t eventACEL;
   accel.getEvent(&eventACEL);
+#endif
+#if (AX)
   acelX = eventACEL.acceleration.x;
+#endif
+#if (AY)
   acelY = eventACEL.acceleration.y;
+#endif
+#if (AZ)
   acelZ = eventACEL.acceleration.z;
 #endif
 
 #if (GYRO)
   gyro.read();
+#endif
+#if (GX)
   gyroX = gyro.g.x;
+#endif
+#if (GY)
   gyroY = gyro.g.y;
+#endif
+#if (GZ)
   gyroZ = gyro.g.z;
 #endif
 
 #if (MAG)
   sensors_event_t eventMAG;
   mag.getEvent(&eventMAG);
+#endif
+#if (MX)
   magX = eventMAG.magnetic.x;
+#endif
+#if (MY)
   magY = eventMAG.magnetic.y;
+#endif
+#if (MZ)
   magZ = eventMAG.magnetic.z;
 #endif
 
@@ -312,8 +450,8 @@ void loop() {
   contadorHistorico = 0;
 #endif
 
-#if (PARAQUEDAS)
   //Paraquedas 1
+#if (P1)
   if (estaDescendo && !paraquedas1) {
     paraquedas1 = true;
     tempoP1 = millis();
@@ -324,8 +462,10 @@ void loop() {
     paraquedas1data = false;
     digitalWrite(IGN_1, LOW);
   }
+#endif
 
   //Paraquedas 2
+#if (P2)
   if (estaDescendo && !paraquedas2) {
     paraquedas2 = true;
     tempoP2 = millis();
@@ -337,8 +477,10 @@ void loop() {
     paraquedas2data = false;
     digitalWrite(IGN_2, LOW);
   }
+#endif
 
-  //Paraquedas 3
+//Paraquedas 3
+#if (P3)
   if (estaDescendo && !paraquedas3) {
     paraquedas3 = true;
   }
@@ -351,8 +493,10 @@ void loop() {
     paraquedas3data = false;
     digitalWrite(IGN_3, LOW);
   }
+#endif
 
-  //Paraquedas 4
+//Paraquedas 4
+#if (P4)
   if (estaDescendo && !paraquedas4) {
     paraquedas4 = true;
   }
@@ -382,28 +526,49 @@ void loop() {
   dataString += String(estaDescendo) + "\t";
 #endif
 
-#if (PARAQUEDAS)
+#if (P1)
   dataString += String(paraquedas1data) + "\t";
+#endif
+
+#if (P2)
   dataString += String(paraquedas2data) + "\t";
+#endif
+
+#if (P3)
   dataString += String(paraquedas3data) + "\t";
+#endif
+
+#if (P4)
   dataString += String(paraquedas4data) + "\t";
 #endif
 
-#if (ACEL)
+#if (AX)
   dataString += String(acelX) + "\t";
+#endif
+#if (AY)
   dataString += String(acelY) + "\t";
+#endif
+#if (AZ)
   dataString += String(acelZ) + "\t";
 #endif
 
-#if (GYRO)
+#if (GX)
   dataString += String(gyroX) + "\t";
+#endif
+#if (GY)
   dataString += String(gyroY) + "\t";
+#endif
+#if (GZ)
   dataString += String(gyroZ) + "\t";
 #endif
 
-#if (MAG)
+#if (MX)
   dataString += String(magX) + "\t";
+#endif
+#if (MY)
   dataString += String(magY) + "\t";
+#endif
+#if (MZ)
   dataString += String(magZ) + "\t";
 #endif
 
