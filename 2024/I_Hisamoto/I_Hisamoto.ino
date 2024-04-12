@@ -5,6 +5,7 @@ float AltitudeInicial;
 float SomaAltitude;
 float Lista_0[10];
 float Lista_1[5];
+float Lista_2[5];
 
 float filtro_0(float var_0) {
 
@@ -42,6 +43,31 @@ float filtro_1(float var_1) {
   return MediaFiltro;
 }
 
+float Fall(float var){
+
+  int contador = 0;
+  int FallenCondition = 0;
+
+  for (int i = 5; i > 0; i--) {
+    Lista_2[i] = Lista_2[i - 1];
+    Lista_2[0] = var;
+
+    if (Lista_2[i-1]<Lista_2[i]){
+      contador++;
+      
+      if (contador==5){
+        FallenCondition = 1;
+      }
+      else{
+        FallenCondition = 0;
+      }
+    }
+  }
+
+  return FallenCondition;
+
+}
+
 void setup() {
 
   Serial.begin(115200);
@@ -50,7 +76,7 @@ void setup() {
     while (1) {}
   }
 
-  Serial.print("Temperature(C)\t Pressure(Pa)\t High(meters)\t Pressure at sealevel (calculated, Pa)\t Real altitude(meters)");
+  Serial.print("Temperature(C)\t Pressure(Pa)\t High(meters)\t Pressure at sealevel (calculated, Pa)\t Real altitude(meters)\t Fallen(1)/ Not fallen (0)");
 
   SomaAltitude = 0;
   for (int posicaoListaAltitude = 0; posicaoListaAltitude < 10; posicaoListaAltitude++) {
@@ -79,6 +105,9 @@ void loop() {
   Serial.print(bmp.readSealevelPressure());
   Serial.print("\t");
   Serial.print(bmp.readAltitude(101500));
+  Serial.print("\t");
+  Serial.print(Fall(Altura_Filtrada_1));
+
 
   Serial.println();
 }
