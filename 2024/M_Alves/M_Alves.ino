@@ -8,10 +8,34 @@
 #include <Adafruit_ADXL345_U.h>
 
 #define SDCARD (0)
-#define BMP085 (0)
+//Paraquedas
+#define state (1)
+#define PARA1 (0)
+#define PARA2 (0)
+#define PARA3 (0)
+#define PARA4 (0)
+//BMP085
+#define BMP085 (1)
+#define BMP085temp (0)
+#define BMP085press (1)
+#define altRAW (1)
+#define altFilter1 (0)
+#define altFilte2 (1)
+//Giroscopio
 #define GIRO (1)
+#define GIROX (1)
+#define GIROY (0)
+#define GIROZ (0)
+//Magnetometro
 #define MAGNETO (1)
-#define ACELERO (0)
+#define MAGNETOX (1)
+#define MAGNETOY (0)
+#define MAGNETOZ (0)
+//Acelerometro
+#define ACELERO (1)
+#define ACELEROX (1)
+#define ACELEROY (0)
+#define ACELEROZ (0)
 
 // ********** PARAQUEDAS ********** //
 #define IGN_1 36 /*act1*/
@@ -130,8 +154,8 @@ void setup() {
   pinMode(IGN_4, OUTPUT);
   digitalWrite(IGN_4, LOW);
 
-// ********** Filtros ********** //
-//Leituras iniciais
+  // ********** Filtros ********** //
+  //Leituras iniciais
   for (int i = 0; i < numLeiturasInicial; i++) {
     somaAltInicial += bmp.readAltitude();
   }
@@ -285,31 +309,69 @@ void loop() {
   // ********** Leitura dos dados ********** //
   dadosString += String(currentMillis / 1000.0) + "\t";  //Tempo atual
 #if BMP085
+#if BMP085temp
   dadosString += String(temperature) + "\t";  //Temperatura *C
-  dadosString += String(pressure) + "\t";     //Pressão Pa
-  dadosString += String(rawAltitude) + "\t";  //Altura com 0 filtro
+#endif
+#if BMP085press
+  dadosString += String(pressure) + "\t";  //Pressão Pa
+#endif
+#if altRAW
+  dadosString += String(rawAltitude) + "\t";            //Altura com 0 filtro
+  #endif
+  #if altFilter1
   dadosString += String(mediaAltitude) + "\t";          //Altura com 1 filtro
-  dadosString += String(mediaAltitudeFiltrada) + "\t";  //Altura com 2 filtros
+  #endif
+  #if altFilter2
+  dadosString += String(mediaAltitudeFiltrada) + "\t";  //Altura com 2 filtro
+  #endif
+  #if state
   dadosString += String(estado) + "\t";                 //Bool indicando se o apogeu foi atingido (0 = não; 1 = sim)
+  #endif
+  #if PARA1
   dadosString += String(digitalRead(IGN_1)) + "\t";     //Estado do Paraquedas 1 (0 = desativado; 1 = ativado)
+  #endif
+  #if PARA2
   dadosString += String(digitalRead(IGN_2)) + "\t";     //Estado do Paraquedas 2 (0 = desativado; 1 = ativado)
+  #endif
+  #if PARA3
   dadosString += String(digitalRead(IGN_3)) + "\t";     //Estado do Paraquedas 3 (0 = desativado; 1 = ativado)
+  #endif
+  #if PARA4
   dadosString += String(digitalRead(IGN_4)) + "\t";     //Estado do Paraquedas 4 (0 = desativado; 1 = ativado)
+  #endif
 #endif
 #if GIRO
+#if GIROX
   dadosString += String(gyro.g.x) + "\t";  //Rotação angular do Giroscópio no eixo x
+#endif
+#if GIROY
   dadosString += String(gyro.g.y) + "\t";  //Rotação angular do Giroscópio no eixo y
+#endif
+#if GIROZ
   dadosString += String(gyro.g.z) + "\t";  //Rotação angular do Giroscópio no eixo z
 #endif
+#endif
 #if MAGNETO
+#if MAGNETOX
   dadosString += String(magEvent.magnetic.x) + "\t";  //Intensidade do campo magnético no eixo x
+#endif
+#if MAGNETOY
   dadosString += String(magEvent.magnetic.y) + "\t";  //Intensidade do campo magnético no eixo y
+#endif
+#if MAGNETOZ
   dadosString += String(magEvent.magnetic.z) + "\t";  //Intensidade do campo magnético no eixo z
 #endif
+#endif
 #if ACELERO
+#if ACELEROX
   dadosString += String(accelEvent.acceleration.x) + "\t";  //Aceleração ao longo dos eixos x
+#endif
+#if ACELEROY
   dadosString += String(accelEvent.acceleration.y) + "\t";  //Aceleração ao longo dos eixos x
-  dadosString += String(accelEvent.acceleration.z);         //Aceleração ao longo dos eixos x
+#endif
+#if ACELEROZ
+  dadosString += String(accelEvent.acceleration.z);  //Aceleração ao longo dos eixos x
+#endif
 #endif
 
 // ********** Salvamento no SD Card dos dados ********** //
@@ -323,6 +385,5 @@ void loop() {
     Serial.println("error opening");
   }
 #endif
-
   Serial.println(dadosString);
 }
