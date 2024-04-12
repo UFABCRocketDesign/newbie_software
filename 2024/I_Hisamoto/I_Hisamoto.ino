@@ -51,12 +51,13 @@ float DeteccaoQueda(float altura){
   }
 
   ListaDeteccaoQueda[0] = altura;
+  int contador = 0;
+  int FallenCondition = 0;
 
-  for (int contador=0; contador<10; contador++){
+  for (int i=0; i<10; i++){
     
-    int FallenCondition = 0;
-
     if (ListaDeteccaoQueda[i-1]<ListaDeteccaoQueda[i]){
+      
       contador++;
       
       if (contador==9){
