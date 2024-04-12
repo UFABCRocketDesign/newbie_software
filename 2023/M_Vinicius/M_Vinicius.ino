@@ -127,6 +127,9 @@ void setup() {
   cabString += ("Estado paraquedas 2");
   cabString += "\t";
 
+  cabString += ("Estado paraquedas 3");
+  cabString += "\t";
+
   File cabFile = SD.open(nome_do_arquivo, FILE_WRITE);
 
   // if the file is available, write to it:
@@ -253,7 +256,7 @@ void loop() {
 
     // LIBERAR O TERCEIRO PARAQUEDAS //
 
-    if (  altura_sRuido2 <= - 5 && verificar2 == false) {
+    if (  altura_sRuido2 <= -5 && verificar2 == false) {
     paraquedas3 = HIGH; // ligado
     previousMillis3 = currentMillis;                               
     }  
@@ -264,19 +267,19 @@ void loop() {
 
     // LIBERAR O QUARTO PARAQUEDAS //
 
-    if (  paraquedas4 == LOW && verificar2 == true && verificar3 == false ) {
+    /*if (  paraquedas4 == LOW && verificar2 == true && verificar3 == false ) {
     paraquedas4 = HIGH; // ligado
     previousMillis4 = currentMillis;                               
     }  
     else if (currentMillis - previousMillis4> 6000) {
     paraquedas3 = LOW;  //desligado  
     verificar3 = true;    
-    }
+    }*/
 
     digitalWrite(IGN_1, paraquedas);   
     digitalWrite(IGN_2, paraquedas2); 
     digitalWrite(IGN_3, paraquedas3);
-    digitalWrite(IGN_4,paraquedas4);
+   // digitalWrite(IGN_4,paraquedas4);
   } 
 
   dataString += String(paraquedas);
@@ -288,8 +291,8 @@ void loop() {
   dataString += String(paraquedas3);
   dataString += "\t"; 
 
-  dataString += String(paraquedas4);
-  dataString += "\t"; 
+  //dataString += String(paraquedas4);
+  //dataString += "\t"; 
 
 
   // SD CARD //
