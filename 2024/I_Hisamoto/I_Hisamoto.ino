@@ -3,21 +3,22 @@ Adafruit_BMP085 bmp;
 
 float AltitudeInicial;
 float SomaAltitude;
-float Lista_0[10];
-float Lista_1[5];
-float Lista_2[5];
+float ListaSuavizarCurva_0[10];
+float ListaSuavizarCurva_1[5];
+float ListaDeteccaoQueda[10];
 
-float filtro_0(float var_0) {
+
+float FiltroSuavizarCurva_0(float dadosCurva_0) {
 
   for (int i = 9; i > 0; i--) {
-    Lista_0[i] = Lista_0[i - 1];
+    ListaSuavizarCurva_0[i] = ListaSuavizarCurva_0[i - 1];
   }
 
-  Lista_0[0] = var;
+  ListaSuavizarCurva_0[0] = dadosCurva_0;
   float SomaLista = 0;
 
   for (int i = 0; i < 10; i++) {
-    SomaLista += Lista_0[i];
+    SomaLista += ListaSuavizarCurva_0[i];
   }
 
   float MediaFiltro = SomaLista / 10;
@@ -25,17 +26,17 @@ float filtro_0(float var_0) {
   return MediaFiltro;
 }
 
-float filtro_1(float var_1) {
+float FiltroSuavizarCurva_1(float dadosCurva_1) {
 
   for (int i = 4; i > 0; i--) {
-    Lista_1[i] = Lista_1[i - 1];
+    ListaSuavizarCurva_1[i] = ListaSuavizarCurva_1[i - 1];
   }
 
-  Lista_1[0] = var_1;
+  ListaSuavizarCurva_1[0] = dadosCurva_1;
   float SomaLista = 0;
 
   for (int i = 0; i < 5; i++) {
-    SomaLista += Lista_1[i];
+    SomaLista += ListaSuavizarCurva_1[i];
   }
 
   float MediaFiltro = SomaLista / 5;
@@ -43,19 +44,22 @@ float filtro_1(float var_1) {
   return MediaFiltro;
 }
 
-float Fall(float var){
+float DeteccaoQueda(float altura){
 
-  int contador = 0;
-  int FallenCondition = 0;
+  for (int i = 9; i > 0; i--) {
+    ListaDeteccaoQueda[i] = ListaDeteccaoQueda[i - 1];
+  }
 
-  for (int i = 5; i > 0; i--) {
-    Lista_2[i] = Lista_2[i - 1];
-    Lista_2[0] = var;
+  ListaDeteccaoQueda[0] = altura;
 
-    if (Lista_2[i-1]<Lista_2[i]){
+  for (int contador=0; contador<10; contador++){
+    
+    int FallenCondition = 0;
+
+    if (ListaDeteccaoQueda[i-1]<ListaDeteccaoQueda[i]){
       contador++;
       
-      if (contador==5){
+      if (contador==9){
         FallenCondition = 1;
       }
       else{
@@ -63,7 +67,7 @@ float Fall(float var){
       }
     }
   }
-
+    
   return FallenCondition;
 
 }
@@ -89,8 +93,8 @@ void setup() {
 void loop() {
   
   float Altura = bmp.readAltitude() - AltitudeInicial;
-  float Altura_Filtrada_0 = filtro_0(Altura);
-  float Altura_Filtrada_1 = filtro_1(Altura_Filtrada_0);
+  float Altura_Filtrada_0 = FiltroSuavizarCurva_0(Altura);
+  float Altura_Filtrada_1 = FiltroSuavizarCurva_1(Altura_Filtrada_0);
 
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
@@ -106,7 +110,7 @@ void loop() {
   Serial.print("\t");
   Serial.print(bmp.readAltitude(101500));
   Serial.print("\t");
-  Serial.print(Fall(Altura_Filtrada_1));
+  Serial.print(DeteccaoQueda(Altura_Filtrada_1));
 
 
   Serial.println();
