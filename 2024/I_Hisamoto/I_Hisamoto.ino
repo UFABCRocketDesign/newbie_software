@@ -8,7 +8,7 @@ float ListaSuavizarCurva_1[5];
 float ListaDeteccaoQueda[10];
 
 
-float FiltroSuavizarCurva_0(float dadosCurva_0) {
+float filtroSuavizarCurva_0(float dadosCurva_0) {
 
   for (int i = 9; i > 0; i--) {
     ListaSuavizarCurva_0[i] = ListaSuavizarCurva_0[i - 1];
@@ -26,7 +26,7 @@ float FiltroSuavizarCurva_0(float dadosCurva_0) {
   return MediaFiltro;
 }
 
-float FiltroSuavizarCurva_1(float dadosCurva_1) {
+float filtroSuavizarCurva_1(float dadosCurva_1) {
 
   for (int i = 4; i > 0; i--) {
     ListaSuavizarCurva_1[i] = ListaSuavizarCurva_1[i - 1];
@@ -44,7 +44,7 @@ float FiltroSuavizarCurva_1(float dadosCurva_1) {
   return MediaFiltro;
 }
 
-float DeteccaoQueda(float altura){
+float deteccaoQueda(float altura){
 
   for (int i = 9; i > 0; i--) {
     ListaDeteccaoQueda[i] = ListaDeteccaoQueda[i - 1];
@@ -94,8 +94,8 @@ void setup() {
 void loop() {
   
   float Altura = bmp.readAltitude() - AltitudeInicial;
-  float Altura_Filtrada_0 = FiltroSuavizarCurva_0(Altura);
-  float Altura_Filtrada_1 = FiltroSuavizarCurva_1(Altura_Filtrada_0);
+  float Altura_Filtrada_0 = filtroSuavizarCurva_0(Altura);
+  float Altura_Filtrada_1 = filtroSuavizarCurva_1(Altura_Filtrada_0);
 
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
@@ -111,7 +111,7 @@ void loop() {
   Serial.print("\t");
   Serial.print(bmp.readAltitude(101500));
   Serial.print("\t");
-  Serial.print(DeteccaoQueda(Altura_Filtrada_1));
+  Serial.print(deteccaoQueda(Altura_Filtrada_1));
 
 
   Serial.println();
