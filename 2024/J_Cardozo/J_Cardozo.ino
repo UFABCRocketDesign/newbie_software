@@ -1,12 +1,12 @@
 #define SENSORES 1
-#define GYRO (SENSORES && 1)
-#define MAG (SENSORES && 1)
-#define ACEL (SENSORES && 1)
+#define GYRO (SENSORES && 0)
+#define MAG (SENSORES && 0)
+#define ACEL (SENSORES && 0)
 #define BAR (SENSORES && 1)
 
 #define PARAQUEDAS (BAR && 1)
 
-#define SD_CARD 1
+#define SD_CARD 0
 
 #include <SPI.h>
 #include <Wire.h>
@@ -372,7 +372,7 @@ void loop() {
   String dataString = "";
   //String de dados
   dataString += String(currentTime / 1000.0) + "\t";
-  
+
 #if (BAR)
   dataString += String(bmp.readTemperature()) + "\t";
   dataString += String(bmp.readPressure()) + "\t";
