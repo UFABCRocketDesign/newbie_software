@@ -130,6 +130,9 @@ void setup() {
   cabString += ("Estado paraquedas 3");
   cabString += "\t";
 
+   cabString += ("Estado paraquedas 4");
+  cabString += "\t";
+
   File cabFile = SD.open(nome_do_arquivo, FILE_WRITE);
 
   // if the file is available, write to it:
@@ -231,7 +234,7 @@ void loop() {
     if (previousMillis == 0 && paraquedas == LOW) {
       paraquedas = HIGH;  // ligado
       previousMillis = currentMillis;
-      previousMillis2 = currentMillis;        
+        
 
     } else if (currentMillis - previousMillis > 4000) {
       paraquedas = LOW;  //desligado
@@ -239,9 +242,10 @@ void loop() {
 
     // LIBERAR O SEGUNDO PARAQUEDAS //
 
-    /*if (queda == 1 && previousMillis2 == 0) {
+    if (queda == 1 && previousMillis2 == 0) {
       previousMillis2 = currentMillis;
-    }*/
+        
+    }
 
     if (currentMillis - previousMillis2 >= 10000 && paraquedas2 == LOW && verificar == false) {
       paraquedas2 = HIGH;  // ligado
@@ -258,7 +262,7 @@ void loop() {
       paraquedas3 = HIGH;  // ligado
       previousMillis3 = currentMillis;
       verificar2 = true;
-
+      previousMillis4 = currentMillis + 5000;
     } else if (currentMillis - previousMillis3 > 3000) {
       paraquedas3 = LOW;  //desligado
       
@@ -266,19 +270,20 @@ void loop() {
 
     // LIBERAR O QUARTO PARAQUEDAS //
 
-    /*if (  paraquedas4 == LOW && verificar2 == true && verificar3 == false ) {
+    if ( paraquedas4 == LOW && verificar2 == true && verificar3 == false && currentMillis >= previousMillis4 ) {
     paraquedas4 = HIGH; // ligado
-    previousMillis4 = currentMillis;                               
+    previousMillis4 = currentMillis; 
+    verificar3 = true;                              
     }  
-    else if (currentMillis - previousMillis4> 6000) {
-    paraquedas3 = LOW;  //desligado  
-    verificar3 = true;    
-    }*/
+    else if (currentMillis - previousMillis4> 3000) {
+    paraquedas4 = LOW;  //desligado  
+        
+    }
 
     digitalWrite(IGN_1, paraquedas);
     digitalWrite(IGN_2, paraquedas2);
     digitalWrite(IGN_3, paraquedas3);
-    // digitalWrite(IGN_4,paraquedas4);
+    digitalWrite(IGN_4,paraquedas4);
   }
 
   dataString += String(paraquedas);
