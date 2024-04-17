@@ -88,31 +88,27 @@ L3G gyro;
 //Definindo SD
 #if (SD_CARD)
 #define chipSelect 53
-String nomeBaseSD = "data"; //setup
-String nomeSD; //global
+String nomeBaseSD = "data";  //setup
+String nomeSD;               //global
 #endif
 
 //Definindo variaveis filtros
 #if (BAR)
-float altitude; //loop
-float alturaInicial; //global
+float alturaInicial;  //global
 #define numLeituras 20
-float leituras[numLeituras]; //global
-float medias[numLeituras]; //global
-int indiceLeitura = 0; //? apenas dentro do loop
-int indiceMedia = 0; //? apenas dentro do loop
-float soma = 0; //global
-float somaMedias = 0; //global
-float media = 0; //loop
-float mediaDasMedias = 0; //loop
+float leituras[numLeituras];  //global
+float medias[numLeituras];    //global
+int indiceLeitura = 0;        //persistentes
+int indiceMedia = 0;          //persistentes
+float soma = 0;               //global
+float somaMedias = 0;         //global
 #endif
 
 //Definindo variaveis apogeu
 #if (BAR)
 #define historicoTamanho 20
-float historico[historicoTamanho]; //global
-int indiceHistorico = 0; //global
-int contadorHistorico = 0; //loop
+float historico[historicoTamanho];  //global
+int indiceHistorico = 0;            //global
 #endif
 
 
@@ -121,27 +117,27 @@ int contadorHistorico = 0; //loop
 #define intervaloDelay 5000
 
 #if (P1)
-bool paraquedas1 = false; //?
-bool paraquedas1data = false;
-unsigned long tempoP1 = 0;
+bool paraquedas1 = false;  //global
+bool paraquedas1data = false; //global
+unsigned long tempoP1 = 0; //global
 #endif
 
 #if (P2)
-bool paraquedas2 = false;
-bool paraquedas2data = false;
-unsigned long tempoP2 = 0;
+bool paraquedas2 = false; //global
+bool paraquedas2data = false; //global
+unsigned long tempoP2 = 0; //global
 #endif
 
 #if (P3)
-bool paraquedas3 = false;
-bool paraquedas3data = false;
-unsigned long tempoP3 = 0;
+bool paraquedas3 = false; //global
+bool paraquedas3data = false; //global
+unsigned long tempoP3 = 0; //global
 #endif
 
 #if (P4)
-bool paraquedas4 = false;
-bool paraquedas4data = false;
-unsigned long tempoP4 = 0;
+bool paraquedas4 = false; //global
+bool paraquedas4data = false; //global
+unsigned long tempoP4 = 0; //global
 #endif
 
 void setup() {
@@ -406,6 +402,8 @@ void loop() {
 
 //Filtro 1
 #if (BAR)
+  float altitude;
+  float media;
   soma -= leituras[indiceLeitura];
   altitude = bmp.readAltitude() - alturaInicial;
   leituras[indiceLeitura] = altitude;
@@ -419,6 +417,7 @@ void loop() {
 
 //Filtro 2
 #if (BAR)
+  float mediaDasMedias;
   somaMedias -= medias[indiceMedia];
   medias[indiceMedia] = media;
   somaMedias += medias[indiceMedia];
@@ -431,6 +430,7 @@ void loop() {
 
 //Apogeu
 #if (BAR)
+  int contadorHistorico = 0;
   historico[indiceHistorico] = mediaDasMedias;
   if (++indiceHistorico >= historicoTamanho) {
     indiceHistorico = 0;
@@ -447,7 +447,6 @@ void loop() {
   if (contadorHistorico >= 0.7 * historicoTamanho) {
     estaDescendo = true;
   }
-  contadorHistorico = 0;
 #endif
 
   //Paraquedas 1
