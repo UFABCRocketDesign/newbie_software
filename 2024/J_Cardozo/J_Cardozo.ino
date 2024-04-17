@@ -88,31 +88,31 @@ L3G gyro;
 //Definindo SD
 #if (SD_CARD)
 #define chipSelect 53
-String nomeBaseSD = "data";
-String nomeSD;
+String nomeBaseSD = "data"; //setup
+String nomeSD; //global
 #endif
 
 //Definindo variaveis filtros
 #if (BAR)
-float var;
-float alturaInicial;
+float altitude; //loop
+float alturaInicial; //global
 #define numLeituras 20
-float leituras[numLeituras];
-float medias[numLeituras];
-int indiceLeitura = 0;
-int indiceMedia = 0;
-float soma = 0;
-float somaMedias = 0;
-float media = 0;
-float mediaDasMedias = 0;
+float leituras[numLeituras]; //global
+float medias[numLeituras]; //global
+int indiceLeitura = 0; //? apenas dentro do loop
+int indiceMedia = 0; //? apenas dentro do loop
+float soma = 0; //global
+float somaMedias = 0; //global
+float media = 0; //loop
+float mediaDasMedias = 0; //loop
 #endif
 
 //Definindo variaveis apogeu
 #if (BAR)
 #define historicoTamanho 20
-float historico[historicoTamanho];
-int indiceHistorico = 0;
-int contadorHistorico = 0;
+float historico[historicoTamanho]; //global
+int indiceHistorico = 0; //global
+int contadorHistorico = 0; //loop
 #endif
 
 
@@ -121,7 +121,7 @@ int contadorHistorico = 0;
 #define intervaloDelay 5000
 
 #if (P1)
-bool paraquedas1 = false;
+bool paraquedas1 = false; //?
 bool paraquedas1data = false;
 unsigned long tempoP1 = 0;
 #endif
@@ -407,8 +407,8 @@ void loop() {
 //Filtro 1
 #if (BAR)
   soma -= leituras[indiceLeitura];
-  var = bmp.readAltitude() - alturaInicial;
-  leituras[indiceLeitura] = var;
+  altitude = bmp.readAltitude() - alturaInicial;
+  leituras[indiceLeitura] = altitude;
   soma += leituras[indiceLeitura];
   if (++indiceLeitura >= numLeituras) {
     indiceLeitura = 0;
@@ -522,7 +522,7 @@ void loop() {
   dataString += String(bmp.readPressure()) + "\t";
   dataString += String(media) + "\t";
   dataString += String(mediaDasMedias) + "\t";
-  dataString += String(var) + "\t";
+  dataString += String(altitude) + "\t";
   dataString += String(estaDescendo) + "\t";
 #endif
 
