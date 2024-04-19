@@ -17,7 +17,7 @@ float filtroSuavizarCurva_0(float dadosCurva_0) {
   ListaSuavizarCurva_0[0] = dadosCurva_0;
   float SomaLista = 0;
 
-  for (int i = 1; i <= 10; i++) {
+  for (int i = 0; i < 10; i++) {
     SomaLista += ListaSuavizarCurva_0[i];
   }
 
@@ -54,7 +54,7 @@ float deteccaoQueda(float altura){
   int contador = 0;
   int FallenCondition = 0;
 
-  for (int i=0; i<10; i++){
+  for (int i=1; i<=10; i++){
     
     if (ListaDeteccaoQueda[i-1]<ListaDeteccaoQueda[i]){
       
