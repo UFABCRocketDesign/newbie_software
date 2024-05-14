@@ -2,6 +2,17 @@
 #include <Adafruit_BMP085.h>
 #include <SPI.h>
 #include <SD.h>
+//Acelerometro
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_ADXL345_U.h>
+Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
+// Giroscopio
+#include <L3G.h>
+L3G gyro;
+// Magnetometro
+#include <Adafruit_HMC5883_U.h>
+Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 Adafruit_BMP085 bmp;
 
 #ifdef ARDUINO_AVR_MEGA2560
@@ -67,6 +78,7 @@ void setup() {
   pinMode(IGN_4, OUTPUT);
 
   Serial.begin(115200);
+   Wire.begin();
 
   Serial.print("Initializing SD card...");
 
@@ -78,6 +90,29 @@ void setup() {
       ;
   }
   Serial.println("card initialized.");
+
+  // iniciar acelerometro
+  if(!accel.begin())
+    {
+      /* There was a problem detecting the ADXL345 ... check your connections */
+      Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
+   }
+
+  //iniciar giroscopio
+  if (!gyro.init())
+  {
+    Serial.println("Failed to autodetect gyro type!");
+  }
+
+  gyro.enableDefault();
+  // iniciar magnetometro
+  if(!mag.begin())
+  {
+    /* There was a problem detecting the HMC5883 ... check your connections */
+    Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
+  
+  }
+  
 
   // CRIAR UM NOVO ARQUIVO DE TEXTO CADA VEZ QUE O CARTÃO SD É INSERIDO //
 
