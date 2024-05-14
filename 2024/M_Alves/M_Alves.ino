@@ -58,14 +58,10 @@ unsigned long futureMillis4 = 0;
 
 // ********** SD Card ********** //
 #define chipSelect 53
-int fileNum = 0;
-String sdName = "Math";
-String fileName;
 
 // ********** Altitude, Filtros e Apogeu ********** //
 #if BMP085
 Adafruit_BMP085 bmp;
-#endif
 float AltInicial = 0;
 #define numLeiturasInicial 25
 float somaAltInicial = 0;
@@ -87,7 +83,7 @@ float altitudeAnterior = -1;
 int contador = 0;
 int estado = 0;  // estado 0 -> subindo; estado 1 -> descendo
 bool apogeu = false;
-
+#endif
 // ********** Gyro + Mag + Accel ********** //
 #if GIRO
 L3G gyro;
@@ -175,6 +171,9 @@ void setup() {
   Serial.println(dadosString);
 // ********** Criando .txt no SD Card ********** //
 #if SDCARD
+int fileNum = 0;
+String sdName = "Math";
+String fileName;
   do {
     String fileNumString = String(fileNum);
     int numZeros = 8 - sdName.length() - fileNumString.length();
