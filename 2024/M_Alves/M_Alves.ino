@@ -68,15 +68,22 @@ Adafruit_BMP085 bmp;
 float AltInicial = 0;
 #define numLeiturasInicial 25
 
-// *** Filtro 1 **** //
-#define numLeituras 15        // número de leituras para a média
-float leituras[numLeituras];  // as leituras do sensor de altitude
-int indiceLeitura = 0;        // o índice da leitura atual
-float somaLeituras = 0;       // a soma das leituras
+// *** Filtros **** //
 
-// *** Filtro 2 **** //
-float leiturasFiltradas[numLeituras];  // as leituras filtradas
-float somaLeiturasFiltradas = 0;       // a soma das leituras filtradas
+#define NUM_FILTROS 2
+#define NUM_LEITURAS 15
+
+float leituras[NUM_FILTROS][NUM_LEITURAS] = {0};
+float somaLeituras[NUM_FILTROS] = {0};
+int indiceLeitura[NUM_FILTROS] = {0};
+
+float atualizarFiltro(int filtro, float novaLeitura) {
+  somaLeituras[filtro] -= leituras[filtro][indiceLeitura[filtro]];
+  leituras[filtro][indiceLeitura[filtro]] = novaLeitura;
+  somaLeituras[filtro] += leituras[filtro][indiceLeitura[filtro]];
+  indiceLeitura[filtro] = (indiceLeitura[filtro] + 1) % NUM_LEITURAS;
+  return somaLeituras[filtro] / NUM_LEITURAS;
+}
 
 // *** Apogeu **** //
 float altitudeAnterior = -1;
@@ -84,6 +91,7 @@ int contador = 0;
 int estado = 0;  // estado 0 -> subindo; estado 1 -> descendo
 bool apogeu = false;
 #endif
+
 // ********** Gyro + Mag + Accel ********** //
 #if GIRO
 L3G gyro;
@@ -198,24 +206,10 @@ void loop() {
   float rawAltitude = bmp.readAltitude() - AltInicial;
 
   // *** Filtro 1 **** //
-  float mediaAltitude;
-  somaLeituras = somaLeituras - leituras[indiceLeitura];
-  leituras[indiceLeitura] = rawAltitude;
-  somaLeituras = somaLeituras + leituras[indiceLeitura];
-  mediaAltitude = somaLeituras / numLeituras;
-
+  float mediaAltitude = atualizarFiltro(0, rawAltitude);
 
   // *** Filtro 2 **** //
-  float mediaAltitudeFiltrada;
-  somaLeiturasFiltradas = somaLeiturasFiltradas - leiturasFiltradas[indiceLeitura];
-  leiturasFiltradas[indiceLeitura] = mediaAltitude;  // usa a média do primeiro filtro
-  somaLeiturasFiltradas = somaLeiturasFiltradas + leiturasFiltradas[indiceLeitura];
-  mediaAltitudeFiltrada = somaLeiturasFiltradas / numLeituras;
-
-  indiceLeitura++;
-  if (indiceLeitura >= numLeituras) {  //se for o último vetor, volta para o início
-    indiceLeitura = 0;
-  }
+  float mediaAltitudeFiltrada = atualizarFiltro(1, mediaAltitude);
 
   // ********** Apogeu ********** //
   if (altitudeAnterior != -1 && mediaAltitudeFiltrada < altitudeAnterior) {
