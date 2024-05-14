@@ -103,7 +103,7 @@ String nomeSD;               //global
 //Definindo variaveis filtros
 #if (BAR)
 float alturaInicial;  //global
-#define NUM_FILTROS 6
+#define NUM_FILTROS 3
 #define NUM_LEITURAS 20
 float dados[NUM_FILTROS][NUM_LEITURAS];
 int indices[NUM_FILTROS];
@@ -159,6 +159,27 @@ float aplicarFiltro(float entrada, int filtro) {
     indices[filtro] = 0;
   }
   return media;
+}
+
+bool deteccaoApogeu(float entrada) {
+  historico[indiceHistorico] = entrada;
+  int contadorHistorico = 0;
+  if (++indiceHistorico >= historicoTamanho) {
+    indiceHistorico = 0;
+  }
+
+  for (int i = 1; i < historicoTamanho; i++) {
+    if (historico[(indiceHistorico + i - 1) % historicoTamanho] > historico[(indiceHistorico + i) % historicoTamanho]) {
+      contadorHistorico++;
+    }
+  }
+
+  bool estaDescendo = false;
+
+  if (contadorHistorico >= 0.85 * historicoTamanho) {
+    estaDescendo = true;
+  }
+  return estaDescendo;
 }
 #endif
 
@@ -431,35 +452,31 @@ void loop() {
 #if (BAR)
   //Filtros
   float altitude = bmp.readAltitude() - alturaInicial;
-  // float filtro1 = aplicarFiltro(altitude, 0);
-  // float filtro2 = aplicarFiltro(filtro1, 1);
-  // float filtro3 = aplicarFiltro(filtro2, 2);
+  
+  filtros[0] = aplicarFiltro(altitude, 0);
   for (int i = 0; i < NUM_FILTROS; i++) {
-    if (i == 0) {
-      filtros[i] = aplicarFiltro(altitude, i);
-    } else {
-      filtros[i] = aplicarFiltro(filtros[i - 1], i);
-    }
+    filtros[i] = aplicarFiltro(filtros[i - 1], i);
   }
 
   //Apogeu
-  int contadorHistorico = 0;
-  historico[indiceHistorico] = filtros[NUM_FILTROS - 1];
-  if (++indiceHistorico >= historicoTamanho) {
-    indiceHistorico = 0;
-  }
+  bool estaDescendo = deteccaoApogeu(filtros[NUM_FILTROS - 1]);
+  // int contadorHistorico = 0;
+  // historico[indiceHistorico] = filtros[NUM_FILTROS - 1];
+  // if (++indiceHistorico >= historicoTamanho) {
+  //   indiceHistorico = 0;
+  // }
 
-  for (int i = 1; i < historicoTamanho; i++) {
-    if (historico[(indiceHistorico + i - 1) % historicoTamanho] > historico[(indiceHistorico + i) % historicoTamanho]) {
-      contadorHistorico++;
-    }
-  }
+  // for (int i = 1; i < historicoTamanho; i++) {
+  //   if (historico[(indiceHistorico + i - 1) % historicoTamanho] > historico[(indiceHistorico + i) % historicoTamanho]) {
+  //     contadorHistorico++;
+  //   }
+  // }
 
-  bool estaDescendo = false;
+  // bool estaDescendo = false;
 
-  if (contadorHistorico >= 0.85 * historicoTamanho) {
-    estaDescendo = true;
-  }
+  // if (contadorHistorico >= 0.85 * historicoTamanho) {
+  //   estaDescendo = true;
+  // }
 #endif
 
   //Paraquedas 1
@@ -536,9 +553,6 @@ void loop() {
   for (int i = 0; i < NUM_FILTROS; i++) {
     dataString += String(filtros[i]) + "\t";
   }
-  // dataString += String(filtro1) + "\t";
-  // dataString += String(filtro2) + "\t";
-  // dataString += String(filtro3) + "\t";
   dataString += String(estaDescendo) + "\t";
 #endif
 
