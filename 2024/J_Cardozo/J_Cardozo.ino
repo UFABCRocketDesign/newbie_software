@@ -25,7 +25,7 @@
 
 #define SD_CARD 0
 
-#define RFREQ 1
+#define RFREQ 0
 
 #include <SPI.h>
 #include <Wire.h>
