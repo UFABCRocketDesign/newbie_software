@@ -46,7 +46,7 @@ void setup() {
     while (1) {}
   }
 
-  Serial.print("Temperature(C)\t Pressure(Pa)\t High(meters)\t Pressure at sealevel (calculated, Pa)\t Real altitude(meters)\t Fallen(1)/ Not fallen (0)");
+  Serial.print("Temperature(C)\t Pressure(Pa)\t High(meters)\t Fallen(1)/ Not fallen (0)\t Contador de Queda");
 
   SomaAltitude = 0;
   for (int posicaoListaAltitude = 0; posicaoListaAltitude < 10; posicaoListaAltitude++) {
@@ -70,7 +70,7 @@ void loop() {
       contador = 0;
     }
     ListaDeteccaoQueda[0] = Altura_Filtrada_1;
-    if (contador == 5) {
+    if (contador >= 5) {
       fallenCondition = 1;
     } else {
       fallenCondition = 0;
@@ -87,10 +87,6 @@ void loop() {
   Serial.print(Altura_Filtrada_0);
   Serial.print("\t");
   Serial.print(Altura_Filtrada_1);
-  Serial.print("\t");
-  Serial.print(bmp.readSealevelPressure());
-  Serial.print("\t");
-  Serial.print(bmp.readAltitude(101500));
   Serial.print("\t");
   Serial.print(fallenCondition);
   Serial.print("\t");
