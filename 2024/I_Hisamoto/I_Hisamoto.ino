@@ -5,7 +5,8 @@ float AltitudeInicial;
 float SomaAltitude;
 float ListaSuavizarCurva_0[10];
 float ListaSuavizarCurva_1[5];
-float ListaDeteccaoQueda[10];
+float ListaDeteccaoQueda[2];
+int contador; 
 
 
 float filtroSuavizarCurva_0(float dadosCurva_0) {
@@ -44,34 +45,6 @@ float filtroSuavizarCurva_1(float dadosCurva_1) {
   return MediaFiltro;
 }
 
-float deteccaoQueda(float altura){
-
-  for (int i = 9; i > 0; i--) {
-    ListaDeteccaoQueda[i] = ListaDeteccaoQueda[i - 1];
-  }
-
-  ListaDeteccaoQueda[0] = altura;
-  int contador = 0;
-  int FallenCondition = 0;
-
-  for (int i=1; i<=10; i++){
-    
-    if (ListaDeteccaoQueda[i-1]<ListaDeteccaoQueda[i]){
-      
-      contador++;
-      
-      if (contador==9){
-        FallenCondition = 1;
-      }
-      else{
-        FallenCondition = 0;
-      }
-    }
-  }
-    
-  return FallenCondition;
-
-}
 
 void setup() {
 
@@ -92,7 +65,29 @@ void setup() {
 }
 
 void loop() {
-  
+//detecção de queda fora da function 
+
+  for (int i = 2; i > 0; i--) {
+    ListaDeteccaoQueda[i] = ListaDeteccaoQueda[i - 1];
+  }
+
+  ListaDeteccaoQueda[0] = Altura_Filtrada_1;
+  contador = 0;
+
+  if (ListaDeteccaoQueda[i-1]<ListaDeteccaoQueda[i]){
+    contador++;
+    
+    if (contador==5){
+      int fallenCondition = 1;
+    }
+    else {
+      contador = 0;
+      fallenCondition = 0;
+    }
+  }
+
+}
+
   float Altura = bmp.readAltitude() - AltitudeInicial;
   float Altura_Filtrada_0 = filtroSuavizarCurva_0(Altura);
   float Altura_Filtrada_1 = filtroSuavizarCurva_1(Altura_Filtrada_0);
@@ -111,8 +106,9 @@ void loop() {
   Serial.print("\t");
   Serial.print(bmp.readAltitude(101500));
   Serial.print("\t");
-  Serial.print(deteccaoQueda(Altura_Filtrada_1));
-
+  Serial.print(fallen);
+  Serial.print("\t");
+  Serial.print(contador);
 
   Serial.println();
 }
