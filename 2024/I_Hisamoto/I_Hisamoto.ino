@@ -1,6 +1,8 @@
+#include <SD.h>
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 
+int chipSelect = 53;
 float altitudeInicial;
 float somaAltitude;
 float listaSuavizarCurva_0[10];
@@ -40,14 +42,32 @@ float filtroSuavizarCurva_1(float dadosCurva_1) {
 
 
 void setup() {
+//abrindo o SD
+  pinMode(chipSelect,OUTPUT);
 
+  if (!SD.begin(chipSelect)) {
+    Serial.println("Falha ao inicializar o cartão SD");
+    return;
+  }
+  Serial.println("Cartão SD inicializado com sucesso");
+
+  File logFile = SD.open("dadosFoguete.csv", FILE_WRITE);
+  if (logFile) {
+    String header = "Temperature(C), Pressure(Pa), High(meters), Filtered High 0(meters), Filtered High 1(meters), Fallen(1)/ Not fallen (0), Contador de Queda";
+    logFile.println(header);
+    logFile.close();
+    Serial.println(header);
+  } else {
+    Serial.println("Erro ao abrir o arquivo");
+  }
+//end 
   Serial.begin(115200);
   if (!bmp.begin()) {
-    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+    Serial.println("Não foi possível achar um sensor BMP085 válido, verifique os fios!");
     while (1) {}
   }
 
-  Serial.print("Temperature(C)\t Pressure(Pa)\t High(meters)\t Fallen(1)/ Not fallen (0)\t Contador de Queda");
+  Serial.print("Temperature(C)\t Pressure(Pa)\t High(meters)\t Filtered High 0(meters)\t Filtered High 1(meters)\t Fallen(1)/ Not fallen (0)\t Contador de Queda");
 
   somaAltitude = 0;
   for (int posicaoListaAltitude = 0; posicaoListaAltitude < 10; posicaoListaAltitude++) {
@@ -57,8 +77,8 @@ void setup() {
   altitudeInicial = somaAltitude / 10;
 }
 
-void loop() {
 
+void loop() {
 //determinando o apogeu
   float altura = bmp.readAltitude() - altitudeInicial;
   float alturaFiltrada_0 = filtroSuavizarCurva_0(altura);
@@ -88,4 +108,13 @@ void loop() {
   Serial.print(contador);
 
   Serial.println();
+
+//salvando dados no sd
+  String dataString = String(bmp.readTemperature()) + "," + String(bmp.readPressure()) + "," + String(altura) + "," + String(alturaFiltrada_0) + "," + String(alturaFiltrada_1) + "," + String(fallenCondition) + "," + String(contador);
+  File logFile = SD.open("dadosFoguete.csv", FILE_WRITE);
+  if(logFile){
+    logFile.println(dataString);
+    logFile.close();
+    Serial.println(dataString);
+  }
 }
