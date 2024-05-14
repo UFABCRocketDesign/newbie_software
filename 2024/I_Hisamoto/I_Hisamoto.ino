@@ -7,6 +7,7 @@ float listaSuavizarCurva_0[10];
 float listaSuavizarCurva_1[5];
 float listaDeteccaoQueda[2];
 int contador = 0;
+float alturaAnterior;
 
 
 float filtroSuavizarCurva_0(float dadosCurva_0) {
@@ -58,27 +59,19 @@ void setup() {
 
 void loop() {
 
+//determinando o apogeu
   float altura = bmp.readAltitude() - altitudeInicial;
   float alturaFiltrada_0 = filtroSuavizarCurva_0(altura);
   float alturaFiltrada_1 = filtroSuavizarCurva_1(alturaFiltrada_0);
-  float alturaAnterior;
   int fallenCondition = 0;
-
-
-  for (int i = 1; i < 2; i++) {
-    listaDeteccaoQueda[0] = alturaFiltrada_1;
-    listaDeteccaoQueda[1] = alturaAnterior;
-  }
+  
   if (alturaFiltrada_1 < alturaAnterior) {
     contador++;
   } else {
     contador = 0;
   }
-  if (contador >= 5) {
-    fallenCondition = 1;
-  } else {
-    fallenCondition = 0;
-  }
+  alturaAnterior = alturaFiltrada_1;
+  fallenCondition = (contador >= 5) ? 1 : 0;
 
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
