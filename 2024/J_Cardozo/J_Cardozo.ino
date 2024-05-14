@@ -7,24 +7,25 @@
 
 #define MAG (SENSORES && 0)
 #define MX (MAG && 1)
-#define MY (MAG && 0)
-#define MZ (MAG && 0)
+#define MY (MAG && 1)
+#define MZ (MAG && 1)
 
 #define ACEL (SENSORES && 0)
 #define AX (ACEL && 1)
-#define AY (ACEL && 0)
-#define AZ (ACEL && 0)
+#define AY (ACEL && 1)
+#define AZ (ACEL && 1)
 
 #define BAR (SENSORES && 1)
 
-#define PARAQUEDAS (BAR && 1)
+#define PARAQUEDAS (BAR && 0)
 #define P1 (PARAQUEDAS && 1)
-#define P2 (PARAQUEDAS && 0)
-#define P3 (PARAQUEDAS && 0)
-#define P4 (PARAQUEDAS && 0)
-
+#define P2 (PARAQUEDAS && 1)
+#define P3 (PARAQUEDAS && 1)
+#define P4 (PARAQUEDAS && 1)
 
 #define SD_CARD 0
+
+#define RFREQ 0
 
 #include <SPI.h>
 #include <Wire.h>
@@ -85,6 +86,13 @@ Adafruit_BMP085 bmp;
 L3G gyro;
 #endif
 
+#if (RFREQ)
+#include <RH_ASK.h>
+RH_ASK rf_driver;
+unsigned long previousMillis = 0;
+const long interval = 200;
+#endif
+
 //Definindo SD
 #if (SD_CARD)
 #define chipSelect 53
@@ -95,13 +103,11 @@ String nomeSD;               //global
 //Definindo variaveis filtros
 #if (BAR)
 float alturaInicial;  //global
-#define numLeituras 20
-float leituras[numLeituras];  //global
-float medias[numLeituras];    //global
-int indiceLeitura = 0;        //persistentes
-int indiceMedia = 0;          //persistentes
-float soma = 0;               //global
-float somaMedias = 0;         //global
+#define NUM_FILTROS 6
+#define NUM_LEITURAS 20
+float dados[NUM_FILTROS][NUM_LEITURAS];
+int indices[NUM_FILTROS];
+float filtros[NUM_FILTROS];
 #endif
 
 //Definindo variaveis apogeu
@@ -111,33 +117,49 @@ float historico[historicoTamanho];  //global
 int indiceHistorico = 0;            //global
 #endif
 
-
 //Definindo variaveis paraquedas
 #define intervaloTempo 10000
 #define intervaloDelay 5000
 
 #if (P1)
-bool paraquedas1 = false;  //global
-bool paraquedas1data = false; //global
-unsigned long tempoP1 = 0; //global
+bool paraquedas1 = false;      //global
+bool paraquedas1data = false;  //global
+unsigned long tempoP1 = 0;     //global
 #endif
 
 #if (P2)
-bool paraquedas2 = false; //global
-bool paraquedas2data = false; //global
-unsigned long tempoP2 = 0; //global
+bool paraquedas2 = false;      //global
+bool paraquedas2data = false;  //global
+unsigned long tempoP2 = 0;     //global
 #endif
 
 #if (P3)
-bool paraquedas3 = false; //global
-bool paraquedas3data = false; //global
-unsigned long tempoP3 = 0; //global
+bool paraquedas3 = false;      //global
+bool paraquedas3data = false;  //global
+unsigned long tempoP3 = 0;     //global
 #endif
 
 #if (P4)
-bool paraquedas4 = false; //global
-bool paraquedas4data = false; //global
-unsigned long tempoP4 = 0; //global
+bool paraquedas4 = false;      //global
+bool paraquedas4data = false;  //global
+unsigned long tempoP4 = 0;     //global
+#endif
+
+#if (BAR)
+float aplicarFiltro(float entrada, int filtro) {
+  float soma = 0;
+  float media = 0;
+  dados[filtro][indices[filtro]] = entrada;
+  for (int j = 0; j < NUM_LEITURAS; j++) {
+    soma += dados[filtro][j];
+  }
+  media = soma / NUM_LEITURAS;
+  indices[filtro]++;
+  if (indices[filtro] >= NUM_LEITURAS) {
+    indices[filtro] = 0;
+  }
+  return media;
+}
 #endif
 
 void setup() {
@@ -150,6 +172,15 @@ void setup() {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
+#endif
+
+#if (RFREQ)
+  if (!rf_driver.init()) {
+    Serial.println("RF init failed");
+  } else {
+    Serial.println("RF init succeeded");
+  }
+  pinMode(LED_BUILTIN, OUTPUT);
 #endif
 
 #if (SD_CARD)
@@ -206,18 +237,11 @@ void setup() {
 
 #if (BAR)
   //Primeiras leituras BMP
-  for (int i = 0; i < numLeituras; i++) {
+  float soma = 0;
+  for (int i = 0; i < NUM_LEITURAS; i++) {
     soma += bmp.readAltitude();
   }
-
-  alturaInicial = soma / numLeituras;
-  soma = 0;
-
-  for (int i = 0; i < numLeituras; i++) {
-    leituras[i] = bmp.readAltitude() - alturaInicial;
-    soma += leituras[i];
-    medias[i] = 0;
-  }
+  alturaInicial = soma / NUM_LEITURAS;
 
   //Inicializando vetor de historico
   for (int i = 0; i < historicoTamanho; i++) {
@@ -231,9 +255,12 @@ void setup() {
 #if (BAR)
   dataStringInicial += "Temperature(*C)\t";
   dataStringInicial += "Pressure(Pa)\t";
-  dataStringInicial += "Altitude com primeiro filtro(m)\t";
-  dataStringInicial += "Altitude com segundo filtro(m)\t";
   dataStringInicial += "Altitude sem filtro(m)\t";
+  for (int i = 1; i <= NUM_FILTROS; i++) {
+    dataStringInicial += "Altitude com filtro";
+    dataStringInicial += String(i);
+    dataStringInicial += "(m)\t";
+  }
   dataStringInicial += "Status\t";
 #endif
 
@@ -326,6 +353,9 @@ void setup() {
 }
 
 void loop() {
+
+  unsigned long currentTime = millis();
+
 //Definindo variaveis acelerometro, giroscopio e magnetometro
 #if (AX)
   float acelX;
@@ -356,8 +386,6 @@ void loop() {
 #if (MZ)
   float magZ;
 #endif
-
-  unsigned long currentTime = millis();
 
 #if (ACEL)
   sensors_event_t eventACEL;
@@ -400,38 +428,23 @@ void loop() {
   magZ = eventMAG.magnetic.z;
 #endif
 
-//Filtro 1
 #if (BAR)
-  float altitude;
-  float media;
-  soma -= leituras[indiceLeitura];
-  altitude = bmp.readAltitude() - alturaInicial;
-  leituras[indiceLeitura] = altitude;
-  soma += leituras[indiceLeitura];
-  if (++indiceLeitura >= numLeituras) {
-    indiceLeitura = 0;
+  //Filtros
+  float altitude = bmp.readAltitude() - alturaInicial;
+  // float filtro1 = aplicarFiltro(altitude, 0);
+  // float filtro2 = aplicarFiltro(filtro1, 1);
+  // float filtro3 = aplicarFiltro(filtro2, 2);
+  for (int i = 0; i < NUM_FILTROS; i++) {
+    if (i == 0) {
+      filtros[i] = aplicarFiltro(altitude, i);
+    } else {
+      filtros[i] = aplicarFiltro(filtros[i - 1], i);
+    }
   }
 
-  media = soma / numLeituras;
-#endif
-
-//Filtro 2
-#if (BAR)
-  float mediaDasMedias;
-  somaMedias -= medias[indiceMedia];
-  medias[indiceMedia] = media;
-  somaMedias += medias[indiceMedia];
-  if (++indiceMedia >= numLeituras) {
-    indiceMedia = 0;
-  }
-
-  mediaDasMedias = somaMedias / numLeituras;
-#endif
-
-//Apogeu
-#if (BAR)
+  //Apogeu
   int contadorHistorico = 0;
-  historico[indiceHistorico] = mediaDasMedias;
+  historico[indiceHistorico] = filtros[NUM_FILTROS - 1];
   if (++indiceHistorico >= historicoTamanho) {
     indiceHistorico = 0;
   }
@@ -444,7 +457,7 @@ void loop() {
 
   bool estaDescendo = false;
 
-  if (contadorHistorico >= 0.7 * historicoTamanho) {
+  if (contadorHistorico >= 0.85 * historicoTamanho) {
     estaDescendo = true;
   }
 #endif
@@ -519,9 +532,13 @@ void loop() {
 #if (BAR)
   dataString += String(bmp.readTemperature()) + "\t";
   dataString += String(bmp.readPressure()) + "\t";
-  dataString += String(media) + "\t";
-  dataString += String(mediaDasMedias) + "\t";
   dataString += String(altitude) + "\t";
+  for (int i = 0; i < NUM_FILTROS; i++) {
+    dataString += String(filtros[i]) + "\t";
+  }
+  // dataString += String(filtro1) + "\t";
+  // dataString += String(filtro2) + "\t";
+  // dataString += String(filtro3) + "\t";
   dataString += String(estaDescendo) + "\t";
 #endif
 
@@ -572,6 +589,30 @@ void loop() {
 #endif
 
   Serial.println(dataString);
+
+#if (RFREQ)
+  char msg[64];
+  dataString.toCharArray(msg, 64);
+
+  if (currentTime - previousMillis >= interval) {
+    // salva o tempo atual como o último tempo de execução
+    previousMillis = currentTime;
+
+    // Inverte o estado do LED
+    int ledState = digitalRead(LED_BUILTIN);
+    digitalWrite(LED_BUILTIN, !ledState);
+  }
+
+  // Envia os dados
+  if (rf_driver.send((uint8_t *)msg, strlen(msg))) {
+    rf_driver.waitPacketSent();
+  } else {
+    Serial.print("\tFailed to send message.");
+  }
+
+  // Desliga o LED
+  digitalWrite(LED_BUILTIN, LOW);
+#endif
 
 #if (SD_CARD)
   File dataFile = SD.open(nomeSD, FILE_WRITE);
