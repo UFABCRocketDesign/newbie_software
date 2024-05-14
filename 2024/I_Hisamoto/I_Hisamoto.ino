@@ -65,31 +65,28 @@ void setup() {
 }
 
 void loop() {
-  //detecção de queda fora da function
-
-  for (int i = 2; i > 0; i--) {
-    ListaDeteccaoQueda[i] = ListaDeteccaoQueda[i - 1];
-  }
-
-  ListaDeteccaoQueda[0] = Altura_Filtrada_1;
-  contador = 0;
-
-  if (ListaDeteccaoQueda[i - 1] < ListaDeteccaoQueda[i]) {
-    contador++;
-
-    if (contador == 5) {
-      int fallenCondition = 1;
-    } else {
-      contador = 0;
-      fallenCondition = 0;
-    }
-  }
-
-
-
+  
   float Altura = bmp.readAltitude() - AltitudeInicial;
   float Altura_Filtrada_0 = filtroSuavizarCurva_0(Altura);
   float Altura_Filtrada_1 = filtroSuavizarCurva_1(Altura_Filtrada_0);
+  int fallenCondition = 1;
+
+  for (int i = 1; i <= 2; i++){
+    if (ListaDeteccaoQueda[i - 1] < ListaDeteccaoQueda[i]) {
+      contador++;
+
+    ListaDeteccaoQueda[0] = Altura_Filtrada_1;
+    contador = 0;
+    
+    if (contador == 5) {
+      fallenCondition = 1;
+    } 
+    else {
+      contador = 0;
+      fallenCondition = 0;
+    }
+    }
+  }
 
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
