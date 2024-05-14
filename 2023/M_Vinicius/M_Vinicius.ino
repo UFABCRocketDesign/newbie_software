@@ -168,6 +168,7 @@ void setup() {
    cabString += ("Estado paraquedas 4");
   cabString += "\t";
 
+  
   File cabFile = SD.open(nome_do_arquivo, FILE_WRITE);
 
   // if the file is available, write to it:
@@ -241,7 +242,7 @@ void loop() {
   dataString += String(altura_sRuido2);
   dataString += "\t";
 
-
+ 
   // DETECTAR APOGEU //
 
   for (i = 3; i > 0; i--) {
@@ -330,8 +331,32 @@ void loop() {
   dataString += String(paraquedas3);
   dataString += "\t";
 
-  //dataString += String(paraquedas4);
-  //dataString += "\t";
+  dataString += String(paraquedas4);
+  dataString += "\t";
+
+  // Magnetometro & Acelerometro e Giroscopio
+  /* Get a new sensor event */ 
+  sensors_event_t event; 
+  mag.getEvent(&event);
+  accel.getEvent(&event);
+  gyro.read();
+ 
+  //mag
+  Serial.print("X: "); Serial.print(event.magnetic.x); Serial.print("  ");
+  Serial.print("Y: "); Serial.print(event.magnetic.y); Serial.print("  ");
+  Serial.print("Z: "); Serial.print(event.magnetic.z); Serial.print("  ");Serial.println("uT");
+  //acelerometro
+  Serial.print("X: "); Serial.print(event.acceleration.x); Serial.print("  ");
+  Serial.print("Y: "); Serial.print(event.acceleration.y); Serial.print("  ");
+  Serial.print("Z: "); Serial.print(event.acceleration.z); Serial.print("  ");Serial.println("m/s^2 ");
+  //giro
+  Serial.print("G ");
+  Serial.print("X: ");
+  Serial.print((int)gyro.g.x);
+  Serial.print(" Y: ");
+  Serial.print((int)gyro.g.y);
+  Serial.print(" Z: ");
+  Serial.println((int)gyro.g.z);
 
 
   // SD CARD //
