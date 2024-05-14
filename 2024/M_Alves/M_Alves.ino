@@ -20,7 +20,7 @@
 #define BMP085press (1)
 #define altRAW (1)
 #define altFilter1 (1)
-#define altFilte2 (1)
+#define altFilter2 (1)
 //Giroscopio
 #define GIRO (1)
 #define GIROX (1)
@@ -80,7 +80,7 @@ int indiceLeitura[NUM_FILTROS] = {0};
 float atualizarFiltro(int filtro, float novaLeitura) {
   somaLeituras[filtro] -= leituras[filtro][indiceLeitura[filtro]];
   leituras[filtro][indiceLeitura[filtro]] = novaLeitura;
-  somaLeituras[filtro] += leituras[filtro][indiceLeitura[filtro]];
+  somaLeituras[filtro] += novaLeitura;
   indiceLeitura[filtro] = (indiceLeitura[filtro] + 1) % NUM_LEITURAS;
   return somaLeituras[filtro] / NUM_LEITURAS;
 }
