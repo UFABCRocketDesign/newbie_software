@@ -6,7 +6,7 @@ float SomaAltitude;
 float ListaSuavizarCurva_0[10];
 float ListaSuavizarCurva_1[5];
 float ListaDeteccaoQueda[2];
-int contador; 
+int contador;
 
 
 float filtroSuavizarCurva_0(float dadosCurva_0) {
@@ -65,7 +65,7 @@ void setup() {
 }
 
 void loop() {
-//detecção de queda fora da function 
+  //detecção de queda fora da function
 
   for (int i = 2; i > 0; i--) {
     ListaDeteccaoQueda[i] = ListaDeteccaoQueda[i - 1];
@@ -74,19 +74,18 @@ void loop() {
   ListaDeteccaoQueda[0] = Altura_Filtrada_1;
   contador = 0;
 
-  if (ListaDeteccaoQueda[i-1]<ListaDeteccaoQueda[i]){
+  if (ListaDeteccaoQueda[i - 1] < ListaDeteccaoQueda[i]) {
     contador++;
-    
-    if (contador==5){
+
+    if (contador == 5) {
       int fallenCondition = 1;
-    }
-    else {
+    } else {
       contador = 0;
       fallenCondition = 0;
     }
   }
 
-}
+
 
   float Altura = bmp.readAltitude() - AltitudeInicial;
   float Altura_Filtrada_0 = filtroSuavizarCurva_0(Altura);
@@ -106,7 +105,7 @@ void loop() {
   Serial.print("\t");
   Serial.print(bmp.readAltitude(101500));
   Serial.print("\t");
-  Serial.print(fallen);
+  Serial.print(fallenCondition);
   Serial.print("\t");
   Serial.print(contador);
 
