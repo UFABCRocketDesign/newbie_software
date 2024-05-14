@@ -61,6 +61,7 @@ float apogeu[4];
 int ap = 0;
 int indicador = 0;
 
+
 String marcos;
 String marcs = "marcs";
 String nome_do_arquivo;
@@ -137,6 +138,9 @@ void setup() {
   // ADICIONAR O CABEÇALHO //
 
   String cabString = "";
+  
+  cabString += ("Tempo (s)");
+  cabString += "\t";
 
   cabString += ("Temperature (*C)");
   cabString += "\t";
@@ -227,6 +231,13 @@ void setup() {
 
 
 void loop() {
+ // Criação do dataString para armazenar as variaveis //
+  String dataString = "";
+
+unsigned long Tempo_decorrido = millis();
+
+dataString += String(Tempo_decorrido/1000.0);
+dataString += "\t"; 
 
   altura = bmp.readAltitude() - alt_in;
 
@@ -251,8 +262,7 @@ void loop() {
 
   altura_sRuido2 = acum / 10;
 
-  // Criação do dataString para armazenar as variaveis //
-  String dataString = "";
+ 
 
   dataString += bmp.readTemperature();
   dataString += "\t";
