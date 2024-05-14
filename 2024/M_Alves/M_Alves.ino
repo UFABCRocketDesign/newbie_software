@@ -7,35 +7,35 @@
 #include <Adafruit_HMC5883_U.h>
 #include <Adafruit_ADXL345_U.h>
 
-#define SDCARD (0)
+#define SDCARD (1)
 //Paraquedas
 #define state (1)
-#define PARA1 (0)
-#define PARA2 (0)
-#define PARA3 (0)
-#define PARA4 (0)
+#define PARA1 (1)
+#define PARA2 (1)
+#define PARA3 (1)
+#define PARA4 (1)
 //BMP085
 #define BMP085 (1)
-#define BMP085temp (0)
+#define BMP085temp (1)
 #define BMP085press (1)
 #define altRAW (1)
-#define altFilter1 (0)
+#define altFilter1 (1)
 #define altFilte2 (1)
 //Giroscopio
 #define GIRO (1)
 #define GIROX (1)
-#define GIROY (0)
-#define GIROZ (0)
+#define GIROY (1)
+#define GIROZ (1)
 //Magnetometro
 #define MAGNETO (1)
 #define MAGNETOX (1)
-#define MAGNETOY (0)
-#define MAGNETOZ (0)
+#define MAGNETOY (1)
+#define MAGNETOZ (1)
 //Acelerometro
 #define ACELERO (1)
 #define ACELEROX (1)
-#define ACELEROY (0)
-#define ACELEROZ (0)
+#define ACELEROY (1)
+#define ACELEROZ (1)
 
 // ********** PARAQUEDAS ********** //
 #define IGN_1 36 /*act1*/
@@ -58,13 +58,15 @@ unsigned long futureMillis4 = 0;
 
 // ********** SD Card ********** //
 #define chipSelect 53
+int fileNum = 0;
+String sdName = "Math";
+String fileName;
 
 // ********** Altitude, Filtros e Apogeu ********** //
 #if BMP085
 Adafruit_BMP085 bmp;
 float AltInicial = 0;
 #define numLeiturasInicial 25
-float somaAltInicial = 0;
 
 // *** Filtro 1 **** //
 #define numLeituras 15        // número de leituras para a média
@@ -152,6 +154,7 @@ void setup() {
 
   // ********** Filtros ********** //
   //Leituras iniciais
+  float somaAltInicial;
   for (int i = 0; i < numLeiturasInicial; i++) {
     somaAltInicial += bmp.readAltitude();
   }
@@ -171,9 +174,6 @@ void setup() {
   Serial.println(dadosString);
 // ********** Criando .txt no SD Card ********** //
 #if SDCARD
-int fileNum = 0;
-String sdName = "Math";
-String fileName;
   do {
     String fileNumString = String(fileNum);
     int numZeros = 8 - sdName.length() - fileNumString.length();
