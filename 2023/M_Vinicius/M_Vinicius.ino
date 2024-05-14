@@ -168,6 +168,33 @@ void setup() {
    cabString += ("Estado paraquedas 4");
   cabString += "\t";
 
+  cabString += ("Mag_X (uT)");
+  cabString += "\t";
+
+  cabString += ("Mag_Y");
+  cabString += "\t";
+
+  cabString += ("Mag_Z");
+  cabString += "\t";
+
+  cabString += ("Ace_X (m/s^2)");
+  cabString += "\t";
+
+  cabString += ("Ace_Y");
+  cabString += "\t";
+
+  cabString += ("Ace_Z");
+  cabString += "\t";
+
+  cabString += ("Giro_X");
+  cabString += "\t";
+
+  cabString += ("Giro_Y");
+  cabString += "\t";
+
+  cabString += ("Giro_Z");
+  cabString += "\t";
+
   
   File cabFile = SD.open(nome_do_arquivo, FILE_WRITE);
 
@@ -335,29 +362,37 @@ void loop() {
   dataString += "\t";
 
   // Magnetometro & Acelerometro e Giroscopio
-  /* Get a new sensor event */ 
-  sensors_event_t event; 
-  mag.getEvent(&event);
-  accel.getEvent(&event);
-  gyro.read();
- 
-  //mag
-  Serial.print("X: "); Serial.print(event.magnetic.x); Serial.print("  ");
-  Serial.print("Y: "); Serial.print(event.magnetic.y); Serial.print("  ");
-  Serial.print("Z: "); Serial.print(event.magnetic.z); Serial.print("  ");Serial.println("uT");
-  //acelerometro
-  Serial.print("X: "); Serial.print(event.acceleration.x); Serial.print("  ");
-  Serial.print("Y: "); Serial.print(event.acceleration.y); Serial.print("  ");
-  Serial.print("Z: "); Serial.print(event.acceleration.z); Serial.print("  ");Serial.println("m/s^2 ");
-  //giro
-  Serial.print("G ");
-  Serial.print("X: ");
-  Serial.print((int)gyro.g.x);
-  Serial.print(" Y: ");
-  Serial.print((int)gyro.g.y);
-  Serial.print(" Z: ");
-  Serial.println((int)gyro.g.z);
 
+  //mag
+  sensors_event_t Mag_event; 
+  mag.getEvent(&Mag_event);
+   dataString +=(Mag_event.magnetic.x); 
+   dataString += "\t";
+   dataString +=(Mag_event.magnetic.y);  
+   dataString += "\t";
+   dataString +=(Mag_event.magnetic.z);  
+   dataString += "\t";
+  
+
+  //acelerometro
+  sensors_event_t Ace_event; 
+  accel.getEvent(&Ace_event);
+   dataString +=(Ace_event.acceleration.x); 
+   dataString += "\t";
+   dataString +=(Ace_event.acceleration.y);  
+   dataString += "\t";
+   dataString +=(Ace_event.acceleration.z);  
+   dataString += "\t";
+  
+
+  //giro
+  gyro.read();
+  dataString +=((int)gyro.g.x);
+  dataString += "\t";
+  dataString +=((int)gyro.g.y);
+  dataString += "\t";
+  dataString +=((int)gyro.g.z);
+  dataString += "\t";
 
   // SD CARD //
 

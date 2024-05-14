@@ -152,19 +152,12 @@ void setup() {
 
   // ********** Filtros ********** //
   //Leituras iniciais
-  float somaAltInicial;
+  float somaAltInicial = 0;
   for (int i = 0; i < numLeiturasInicial; i++) {
     somaAltInicial += bmp.readAltitude();
   }
 
   AltInicial = somaAltInicial / numLeiturasInicial;  //Médias das leituras iniciais
-
-  //Armazena leituras para realizar a média
-  for (int i = 0; i < numLeituras; i++) {
-    leituras[i] = bmp.readAltitude() - AltInicial;
-    somaLeituras += leituras[i];
-    leiturasFiltradas[i] = leituras[i];
-  }
 #endif
   // ********** Cabeçalho ********** //
   dadosString += "\n";
