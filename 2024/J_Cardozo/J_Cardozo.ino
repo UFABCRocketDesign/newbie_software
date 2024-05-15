@@ -17,7 +17,7 @@
 
 #define BAR (SENSORES && 1)
 
-#define PARAQUEDAS (BAR && 0)
+#define PARAQUEDAS (BAR && 1)
 #define P1 (PARAQUEDAS && 1)
 #define P2 (PARAQUEDAS && 1)
 #define P3 (PARAQUEDAS && 1)
