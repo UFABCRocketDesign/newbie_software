@@ -1,6 +1,10 @@
 #include <Adafruit_BMP085.h>
+#include <SPI.h>
+#include <SD.h>
 
 Adafruit_BMP085 bmp;
+const int chipSelect = 53;
+
 float alturainicial;
 float altura = 0;
 float height[20];
@@ -12,6 +16,8 @@ float filtroB[20];
 float altitude;
 float apojas = 0;
 float n = 0;
+float temperatura;
+float pressao;
 int j = 0;
 int r = 0;
 int y = 1;
@@ -19,10 +25,25 @@ int apogeu = 0;
 
 void setup() {
   Serial.begin(115200);
+  
+  // erro de iniciar os sensores
+
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+
+  // iniciar SD
+
+  while (!Serial) {;}
+  Serial.print("Initializing SD card...");
+
+  if (!SD.begin(chipSelect)) {
+    Serial.println("Card failed, or not present");
+    while (1);
+  }
+  Serial.println("card initialized.");
   }
 
+// sensores
   for (int i = 0; i < 20; i++) {
 
     alturainicial = alturainicial + bmp.readAltitude();
@@ -31,7 +52,10 @@ void setup() {
   altura = (alturainicial / 20);
   Serial.print("Temperatura\tpressão\tAltitude\tpressão em relação ao mar\taltitude real");
 }
+
 void loop() {
+
+
   altitude = bmp.readAltitude() - altura;
   height[j] = altitude;
   j++;
@@ -72,12 +96,13 @@ void loop() {
   }
 
   apojas = filtro;
+  temperatura = bmp.readTemperature();
+  pressao = bmp.readPressure();
 
-
-  Serial.print(bmp.readTemperature());
+  /*Serial.print(temperatura);
   Serial.print("\t");
 
-  Serial.print(bmp.readPressure());
+  Serial.print(pressao);
   Serial.print("\t");
 
   Serial.print(altitude);
@@ -93,5 +118,25 @@ void loop() {
   Serial.print("\t");
 
   Serial.print(apogeu);
-  Serial.println();
+  Serial.println();*/
+
+
+  String dataString = "";
+  dataString = String(temperatura) +"; "+ String(pressao) +"; "+ String(altitude) +"; "+ String(filtroA) +"; "+ String(filtro) +"; "+ String(n) +"; "+ String(apogeu);
+  
+  Serial.println(dataString);
+
+  File dataFile = SD.open("calvo.txt", FILE_WRITE);
+
+  if (dataFile) {
+    dataFile.println(dataString);
+    dataFile.close();
+    Serial.println(dataString);
+  }
+  else {
+    Serial.println("error opening datalog.txt");
+  }
 }
+  
+
+  
