@@ -125,7 +125,7 @@ int indiceHistorico = 0;            //global
 bool paraquedas[] = {false, false, false, false};
 bool paraquedasData[] = {false, false, false, false};
 unsigned long paraquedasTempo[] = {0, 0, 0, 0};
-const char* ign[] = { "IGN_1", "IGN_2", "IGN_3", "IGN_4" };
+const int ign[] = { IGN_1, IGN_2, IGN_3, IGN_4 };
 // for (int i = 0; i < NUM_PARAQUEDAS; i++) {
 //   paraquedas[i] = false;
 //   paraquedasData[i] = false;
@@ -172,51 +172,51 @@ bool deteccaoApogeu(float entrada) {
 #endif
 
 #if (PARAQUEDAS)
-void ativarParaquedas(unsigned long currentTime, bool estaDescendo, float delay, float altura, int paraquedas) {
-  if (estaDescendo && !paraquedas[paraquedas]) {
-    paraquedas[paraquedas] = true;
+void ativarParaquedas(unsigned long currentTime, bool estaDescendo, float delay, float altura, int indiceParaquedas) {
+  if (estaDescendo && !paraquedas[indiceParaquedas]) {
+    paraquedas[indiceParaquedas] = true;
   }
   if (delay == 0) {
     if (altura == 0) {
-      paraquedasTempo[paraquedas] = millis();
-      paraquedasData[paraquedas] = true;
-      digitalWrite(ign[paraquedas], HIGH);
+      paraquedasTempo[indiceParaquedas] = millis();
+      paraquedasData[indiceParaquedas] = true;
+      digitalWrite(ign[indiceParaquedas], HIGH);
 
-      if (paraquedas[paraquedas] && currentTime >= paraquedasTempo[paraquedas] + intervaloTempo) {
-        paraquedasData[paraquedas] = false;
-        digitalWrite(ign[paraquedas], LOW);
+      if (paraquedas[indiceParaquedas] && currentTime >= paraquedasTempo[indiceParaquedas] + intervaloTempo) {
+        paraquedasData[indiceParaquedas] = false;
+        digitalWrite(ign[indiceParaquedas], LOW);
       }
     } else {
-      if (paraquedas[paraquedas] && filtros[NUM_FILTROS - 1] <= altura && paraquedasTempo[paraquedas] == 0) {
-        paraquedasTempo[paraquedas] = millis();
-        paraquedasData[paraquedas] = true;
-        digitalWrite(ign[paraquedas], HIGH);
+      if (paraquedas[indiceParaquedas] && filtros[NUM_FILTROS - 1] <= altura && paraquedasTempo[indiceParaquedas] == 0) {
+        paraquedasTempo[indiceParaquedas] = millis();
+        paraquedasData[indiceParaquedas] = true;
+        digitalWrite(ign[indiceParaquedas], HIGH);
       }
-      if (paraquedas[paraquedas] && paraquedasTempo[paraquedas] != 0 && currentTime >= paraquedasTempo[paraquedas] + intervaloTempo) {
-        paraquedasData[paraquedas] = false;
-        digitalWrite(ign[paraquedas], LOW);
+      if (paraquedas[indiceParaquedas] && paraquedasTempo[indiceParaquedas] != 0 && currentTime >= paraquedasTempo[indiceParaquedas] + intervaloTempo) {
+        paraquedasData[indiceParaquedas] = false;
+        digitalWrite(ign[indiceParaquedas], LOW);
       }
     }
   } else {
     if (altura == 0) {
-      paraquedasTempo[paraquedas] = millis();
-      if (paraquedas[paraquedas] && currentTime >= paraquedasTempo[paraquedas] + delay && currentTime < paraquedasTempo[paraquedas] + delay + intervaloTempo) {
-        paraquedasData[paraquedas] = true;
-        digitalWrite(ign[paraquedas], HIGH);
-      } else if (paraquedas[paraquedas] && currentTime >= paraquedasTempo[paraquedas] + delay + intervaloTempo) {
-        paraquedasData[paraquedas] = false;
-        digitalWrite(ign[paraquedas], LOW);
+      paraquedasTempo[indiceParaquedas] = millis();
+      if (paraquedas[indiceParaquedas] && currentTime >= paraquedasTempo[indiceParaquedas] + delay && currentTime < paraquedasTempo[indiceParaquedas] + delay + intervaloTempo) {
+        paraquedasData[indiceParaquedas] = true;
+        digitalWrite(ign[indiceParaquedas], HIGH);
+      } else if (paraquedas[indiceParaquedas] && currentTime >= paraquedasTempo[indiceParaquedas] + delay + intervaloTempo) {
+        paraquedasData[indiceParaquedas] = false;
+        digitalWrite(ign[indiceParaquedas], LOW);
       }
     } else {
-      if (paraquedas[paraquedas] && filtros[NUM_FILTROS - 1] <= altura && paraquedasTempo[paraquedas] == 0) {
-        paraquedasTempo[paraquedas] = millis();
+      if (paraquedas[indiceParaquedas] && filtros[NUM_FILTROS - 1] <= altura && paraquedasTempo[indiceParaquedas] == 0) {
+        paraquedasTempo[indiceParaquedas] = millis();
       }
-      if (paraquedas[paraquedas] && paraquedasTempo[paraquedas] != 0 && currentTime >= paraquedasTempo[paraquedas] + delay && currentTime < paraquedasTempo[paraquedas] + delay + intervaloTempo) {
-        paraquedasData[paraquedas] = true;
-        digitalWrite(ign[paraquedas], HIGH);
-      } else if (paraquedas[paraquedas] && currentTime >= paraquedasTempo[paraquedas] + delay + intervaloTempo) {
-        paraquedasData[paraquedas] = false;
-        digitalWrite(ign[paraquedas], LOW);
+      if (paraquedas[indiceParaquedas] && paraquedasTempo[indiceParaquedas] != 0 && currentTime >= paraquedasTempo[indiceParaquedas] + delay && currentTime < paraquedasTempo[indiceParaquedas] + delay + intervaloTempo) {
+        paraquedasData[indiceParaquedas] = true;
+        digitalWrite(ign[indiceParaquedas], HIGH);
+      } else if (paraquedas[indiceParaquedas] && currentTime >= paraquedasTempo[indiceParaquedas] + delay + intervaloTempo) {
+        paraquedasData[indiceParaquedas] = false;
+        digitalWrite(ign[indiceParaquedas], LOW);
       }
     }
   }
