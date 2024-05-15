@@ -43,6 +43,10 @@ void setup() {
   Serial.println("card initialized.");
   }
 
+  File dataFile = SD.open("calvo.txt", FILE_WRITE);
+  String dataString = "";
+  dataString += String("Temperatura\tpressão\tAltitude\tpressão em relação ao mar\taltitude real") + "\t";
+  
 // sensores
   for (int i = 0; i < 20; i++) {
 
@@ -50,7 +54,6 @@ void setup() {
   }
 
   altura = (alturainicial / 20);
-  Serial.print("Temperatura\tpressão\tAltitude\tpressão em relação ao mar\taltitude real");
 }
 
 void loop() {
@@ -119,26 +122,22 @@ void loop() {
 
   Serial.print(apogeu);
   Serial.println();*/
-
-
+  File dataFile = SD.open("calvo.txt", FILE_WRITE);
   String dataString = "";
-  
-  dataString += String(temperatura) + "/t";
-  dataString += String(pressao) + "/t";
-  dataString += String(altitude) + "/t";
-  dataString += String(filtroA) + "/t";
-  dataString += String(filtro) + "/t";
-  dataString += String(n) + "/t";
-  dataString += String(apogeu) + "/t";
+
+  dataString += String(temperatura) + "\t";
+  dataString += String(pressao) + "\t";
+  dataString += String(altitude) + "\t";
+  dataString += String(filtroA) + "\t";
+  dataString += String(filtro) + "\t";
+  dataString += String(n) + "\t";
+  dataString += String(apogeu) + "\t";
 
   Serial.println(dataString);
-
-  File dataFile = SD.open("calvo.txt", FILE_WRITE);
 
   if (dataFile) {
     dataFile.println(dataString);
     dataFile.close();
-    Serial.println(dataString);
   }
   else {
     Serial.println("error opening datalog.txt");
