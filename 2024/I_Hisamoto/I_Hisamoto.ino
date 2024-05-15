@@ -10,7 +10,8 @@ float listaSuavizarCurva_1[5];
 float listaDeteccaoQueda[2];
 int contador = 0;
 float alturaAnterior;
-
+int numA = 0;
+File arquivo;
 
 float filtroSuavizarCurva_0(float dadosCurva_0) {
 
@@ -50,15 +51,21 @@ void setup() {
     return;
   }
   Serial.println("Cartão SD inicializado com sucesso");
-
-  File logFile = SD.open("data.txt", FILE_WRITE);
-  if (logFile) {
+//verificando nome de arquivo
+  String nomeArquivo = "data" + String(numA) + ".txt";
+  while (SD.exists(nomeArquivo)) {
+    numA++;
+    nomeArquivo = "data" + String(numA) + ".txt";
+  }
+  arquivo = SD.open(nomeArquivo, FILE_WRITE);
+  if (arquivo) {
     String header = "Temperature(C), Pressure(Pa), High(meters), Filtered High 0(meters), Filtered High 1(meters), Fallen(1)/ Not fallen (0), Contador de Queda";
-    logFile.println(header);
-    logFile.close();
+    arquivo.println(header);
+    arquivo.close();
   } else {
     Serial.println("Erro ao abrir o arquivo");
   }
+
 //end 
   Serial.begin(115200);
   if (!bmp.begin()) {
@@ -101,10 +108,10 @@ void loop() {
   dataString += String(fallenCondition) + "\t";
   dataString += String(contador) + "\t";
   Serial.println(dataString);
-  File logFile = SD.open("data.txt", FILE_WRITE);
-  if(logFile){
-    logFile.println(dataString);
-    logFile.close();
+  arquivo = SD.open("nomeArquivo", FILE_WRITE);
+  if(arquivo){
+    arquivo.println(dataString);
+    arquivo.close();
   }
 
 }
