@@ -51,12 +51,11 @@ void setup() {
   }
   Serial.println("Cartão SD inicializado com sucesso");
 
-  File logFile = SD.open("dadosFoguete.csv", FILE_WRITE);
+  File logFile = SD.open("data.txt", FILE_WRITE);
   if (logFile) {
     String header = "Temperature(C), Pressure(Pa), High(meters), Filtered High 0(meters), Filtered High 1(meters), Fallen(1)/ Not fallen (0), Contador de Queda";
     logFile.println(header);
     logFile.close();
-    Serial.println(header);
   } else {
     Serial.println("Erro ao abrir o arquivo");
   }
@@ -77,7 +76,6 @@ void setup() {
   altitudeInicial = somaAltitude / 10;
 }
 
-
 void loop() {
 //determinando o apogeu
   float altura = bmp.readAltitude() - altitudeInicial;
@@ -93,28 +91,20 @@ void loop() {
   alturaAnterior = alturaFiltrada_1;
   fallenCondition = (contador >= 5) ? 1 : 0;
 
-  Serial.print(bmp.readTemperature());
-  Serial.print("\t");
-  Serial.print(bmp.readPressure());
-  Serial.print("\t");
-  Serial.print(altura);
-  Serial.print("\t");
-  Serial.print(alturaFiltrada_0);
-  Serial.print("\t");
-  Serial.print(alturaFiltrada_1);
-  Serial.print("\t");
-  Serial.print(fallenCondition);
-  Serial.print("\t");
-  Serial.print(contador);
-
-  Serial.println();
-
 //salvando dados no sd
-  String dataString = String(bmp.readTemperature()) + "," + String(bmp.readPressure()) + "," + String(altura) + "," + String(alturaFiltrada_0) + "," + String(alturaFiltrada_1) + "," + String(fallenCondition) + "," + String(contador);
-  File logFile = SD.open("dadosFoguete.csv", FILE_WRITE);
+  String dataString = "";
+  dataString += String(bmp.readTemperature()) + "\t";
+  dataString += String(bmp.readPressure()) + "\t";
+  dataString += String(altura) + "\t";
+  dataString += String(alturaFiltrada_0) + "\t";
+  dataString += String(alturaFiltrada_1) + "\t";
+  dataString += String(fallenCondition) + "\t";
+  dataString += String(contador) + "\t";
+  Serial.println(dataString);
+  File logFile = SD.open("data.txt", FILE_WRITE);
   if(logFile){
     logFile.println(dataString);
     logFile.close();
-    Serial.println(dataString);
   }
+
 }
