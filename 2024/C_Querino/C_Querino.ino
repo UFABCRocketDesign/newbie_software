@@ -43,10 +43,16 @@ void setup() {
   Serial.println("card initialized.");
   }
 
-  File dataFile = SD.open("calvo.txt", FILE_WRITE);
+  
   String dataString = "";
   dataString += String("Temperatura\tpressão\tAltitude\tpressão em relação ao mar\taltitude real") + "\t";
-  
+  File dataFile = SD.open("calvo.txt", FILE_WRITE);
+  if (dataFile) {
+    dataFile.println(dataString);
+    dataFile.close();}
+  else {
+    Serial.println("error opening datalog.txt");
+  }
 // sensores
   for (int i = 0; i < 20; i++) {
 
