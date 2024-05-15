@@ -122,8 +122,15 @@ void loop() {
 
 
   String dataString = "";
-  dataString = String(temperatura) +"; "+ String(pressao) +"; "+ String(altitude) +"; "+ String(filtroA) +"; "+ String(filtro) +"; "+ String(n) +"; "+ String(apogeu);
   
+  dataString += String(temperatura) + "/t";
+  dataString += String(pressao) + "/t";
+  dataString += String(altitude) + "/t";
+  dataString += String(filtroA) + "/t";
+  dataString += String(filtro) + "/t";
+  dataString += String(n) + "/t";
+  dataString += String(apogeu) + "/t";
+
   Serial.println(dataString);
 
   File dataFile = SD.open("calvo.txt", FILE_WRITE);
