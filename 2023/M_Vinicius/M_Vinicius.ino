@@ -1,16 +1,13 @@
-// BPM085 SENSOR ( PRESSÃO / TEMPERATURA / ALTITUDE)
+// BPM085 SENSOR ( PRESSÃO / TEMPERATURA / ALTITUDE) & Acelerometro & Giroscopio & Magnetometro
 #include <Adafruit_BMP085.h>
 #include <SPI.h>
 #include <SD.h>
-//Acelerometro
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_ADXL345_U.h>
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
-// Giroscopio
 #include <L3G.h>
 L3G gyro;
-// Magnetometro
 #include <Adafruit_HMC5883_U.h>
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 Adafruit_BMP085 bmp;
@@ -20,31 +17,26 @@ Adafruit_BMP085 bmp;
 #else
 #define SD_CS_PIN 10
 #endif  // ARDUINO_AVR_MEGA2560
-
+// PINOS PARAQUEDAS
 #define IGN_1 36 /*act1*/
 #define IGN_2 61 /*act2*/
 #define IGN_3 46 /*act3*/
 #define IGN_4 55 /*act4*/
 
-
+// Declaração variaveis paraquedas:
 int paraquedas = LOW;
 unsigned long previousMillis = 0;
-
-
-
 int paraquedas2 = LOW;
 unsigned long previousMillis2 = 0;
 bool verificar = false;
-
 int paraquedas3 = LOW;
 unsigned long previousMillis3 = 0;
 bool verificar2 = false;
-
 int paraquedas4 = LOW;
 unsigned long previousMillis4 = 0;
 bool verificar3 = false;
 
-
+// Declaração De variaveis diversas
 int i;
 float altura, alt_in = 0;  // fazer o sensor pro foguete cair, 1 --> ta caindo
 float altura_semRuido = 0;
@@ -61,7 +53,6 @@ float apogeu[4];
 int ap = 0;
 int indicador = 0;
 
-
 String marcos;
 String marcs = "marcs";
 String nome_do_arquivo;
@@ -72,18 +63,55 @@ const int chipSelect = 53;
 void setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);
-
   pinMode(IGN_1, OUTPUT);
   pinMode(IGN_2, OUTPUT);
   pinMode(IGN_3, OUTPUT);
   pinMode(IGN_4, OUTPUT);
 
   Serial.begin(115200);
-   Wire.begin();
+  Wire.begin();
+
+
+  // ADICIONAR O CABEÇALHO //
+
+  String cabString = "";
+
+  cabString += ("Tempo (s) \t Temperature (*C) \t Pressure (Pa) \t Altitude (meters) \t Altitude sem ruido (meters) \t Altitude s. ruido 2 (meters) \t  Detector de queda \t");
+  cabString += ("Estado paraquedas \t Estado paraquedas 2 \t Estado paraquedas 3 \t Estado paraquedas 4 \t ");
+
+  // INICIAR BPM085 SENSOR ( PRESSÃO / TEMPERATURA / ALTITUDE)
+  if (!bmp.begin()) {
+    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+    while (1) {}
+  }
+
+  // iniciar MAGNETOMETRO
+  if (!mag.begin()) {
+    /* There was a problem detecting the HMC5883 ... check your connections */
+    Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
+  }
+  cabString += ("Mag_X (uT) \t Mag_Y \t Mag_Z \t");
+
+
+  // iniciar ACELEROMETRO
+  if (!accel.begin()) {
+    /* There was a problem detecting the ADXL345 ... check your connections */
+    Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
+  }
+  cabString += ("Ace_X (m/s^2) \t Ace_Y \t Ace_Z \t");
+
+  //iniciar GIROSCOPIO
+  if (!gyro.init()) {
+    Serial.println("Failed to autodetect gyro type!");
+  }
+  gyro.enableDefault();
+  cabString += ("Giro_X \t Giro_Y \t Giro_Z \t");
+
+  // SD
 
   Serial.print("Initializing SD card...");
 
-  // see if the card is present and can be initialized:
+  // VERIFICAR E INICIALIZAR
   if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present");
     // don't do anything more:
@@ -92,117 +120,22 @@ void setup() {
   }
   Serial.println("card initialized.");
 
-  // iniciar acelerometro
-  if(!accel.begin())
-    {
-      /* There was a problem detecting the ADXL345 ... check your connections */
-      Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
-   }
-
-  //iniciar giroscopio
-  if (!gyro.init())
-  {
-    Serial.println("Failed to autodetect gyro type!");
-  }
-
-  gyro.enableDefault();
-  // iniciar magnetometro
-  if(!mag.begin())
-  {
-    /* There was a problem detecting the HMC5883 ... check your connections */
-    Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
-  
-  }
-  
-
   // CRIAR UM NOVO ARQUIVO DE TEXTO CADA VEZ QUE O CARTÃO SD É INSERIDO //
-
   do {
     String qnt_zero;
     for (i = String(indicador).length() + String(marcs).length(); i < 8; i++) {
       qnt_zero += "0";
     }
-
     nome_do_arquivo = marcs + qnt_zero + String(indicador) + ".txt";
-
     indicador++;
-
 
   } while (SD.exists(nome_do_arquivo));
 
   Serial.println(nome_do_arquivo);
 
-
-
-
-  // ADICIONAR O CABEÇALHO //
-
-  String cabString = "";
-  
-  cabString += ("Tempo (s)");
-  cabString += "\t";
-
-  cabString += ("Temperature (*C)");
-  cabString += "\t";
-
-  cabString += ("Pressure (Pa)");
-  cabString += "\t";
-
-  cabString += ("Altitude (meters)");
-  cabString += "\t";
-
-  cabString += ("Altitude sem ruido (meters)");
-  cabString += "\t";
-
-  cabString += ("Altitude s. ruido 2 (meters)");
-  cabString += "\t";
-
-  cabString += ("Detector de queda");
-  cabString += "\t";
-
-  cabString += ("Estado paraquedas");
-  cabString += "\t";
-
-  cabString += ("Estado paraquedas 2");
-  cabString += "\t";
-
-  cabString += ("Estado paraquedas 3");
-  cabString += "\t";
-
-   cabString += ("Estado paraquedas 4");
-  cabString += "\t";
-
-  cabString += ("Mag_X (uT)");
-  cabString += "\t";
-
-  cabString += ("Mag_Y");
-  cabString += "\t";
-
-  cabString += ("Mag_Z");
-  cabString += "\t";
-
-  cabString += ("Ace_X (m/s^2)");
-  cabString += "\t";
-
-  cabString += ("Ace_Y");
-  cabString += "\t";
-
-  cabString += ("Ace_Z");
-  cabString += "\t";
-
-  cabString += ("Giro_X");
-  cabString += "\t";
-
-  cabString += ("Giro_Y");
-  cabString += "\t";
-
-  cabString += ("Giro_Z");
-  cabString += "\t";
-
-  
   File cabFile = SD.open(nome_do_arquivo, FILE_WRITE);
 
-  // if the file is available, write to it:
+  // se o arquivo estiver disponivel, escrever nele:
   if (cabFile) {
     cabFile.println(cabString);
     cabFile.close();
@@ -216,29 +149,22 @@ void setup() {
 
 
 
-  if (!bmp.begin()) {
-    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-    while (1) {}
-  }
-
-
+  // LEITURA ALTITUDE
   for (i = 0; i < 5; i++) {
     alt_in = alt_in + bmp.readAltitude();
   }
-
   alt_in = alt_in / 5;
 }
 
 
 void loop() {
- // Criação do dataString para armazenar as variaveis //
+  
+  // Criação do dataString para armazenar as variaveis que serão impressas //
+  
   String dataString = "";
-
-unsigned long Tempo_decorrido = millis();
-
-dataString += String(Tempo_decorrido/1000.0);
-dataString += "\t"; 
-
+  
+  unsigned long currentMillis = millis();
+  
   altura = bmp.readAltitude() - alt_in;
 
   // filtro 1 //
@@ -262,24 +188,7 @@ dataString += "\t";
 
   altura_sRuido2 = acum / 10;
 
- 
 
-  dataString += bmp.readTemperature();
-  dataString += "\t";
-
-  dataString += bmp.readPressure();
-  dataString += "\t";
-
-  dataString += String(altura);
-  dataString += "\t";
-
-  dataString += String(altura_semRuido);
-  dataString += "\t";
-
-  dataString += String(altura_sRuido2);
-  dataString += "\t";
-
- 
   // DETECTAR APOGEU //
 
   for (i = 3; i > 0; i--) {
@@ -294,20 +203,15 @@ dataString += "\t";
     queda = 0;
   }
 
-  dataString += String(queda);
-  dataString += "\t";
-
-
-
   // LIBERAR O PRIMEIRO PARAQUEDAS //
-  unsigned long currentMillis = millis();
+
 
   if (queda == 1) {
 
     if (previousMillis == 0 && paraquedas == LOW) {
       paraquedas = HIGH;  // ligado
       previousMillis = currentMillis;
-        
+
 
     } else if (currentMillis - previousMillis > 4000) {
       paraquedas = LOW;  //desligado
@@ -317,7 +221,6 @@ dataString += "\t";
 
     if (queda == 1 && previousMillis2 == 0) {
       previousMillis2 = currentMillis;
-        
     }
 
     if (currentMillis - previousMillis2 >= 10000 && paraquedas2 == LOW && verificar == false) {
@@ -338,73 +241,68 @@ dataString += "\t";
       previousMillis4 = currentMillis + 5000;
     } else if (currentMillis - previousMillis3 > 3000) {
       paraquedas3 = LOW;  //desligado
-      
     }
 
     // LIBERAR O QUARTO PARAQUEDAS //
 
-    if ( paraquedas4 == LOW && verificar2 == true && verificar3 == false && currentMillis >= previousMillis4 ) {
-    paraquedas4 = HIGH; // ligado
-    previousMillis4 = currentMillis; 
-    verificar3 = true;                              
-    }  
-    else if (currentMillis - previousMillis4> 3000) {
-    paraquedas4 = LOW;  //desligado  
-        
+    if (paraquedas4 == LOW && verificar2 == true && verificar3 == false && currentMillis >= previousMillis4) {
+      paraquedas4 = HIGH;  // ligado
+      previousMillis4 = currentMillis;
+      verificar3 = true;
+    } else if (currentMillis - previousMillis4 > 3000) {
+      paraquedas4 = LOW;  //desligado
     }
 
     digitalWrite(IGN_1, paraquedas);
     digitalWrite(IGN_2, paraquedas2);
     digitalWrite(IGN_3, paraquedas3);
-    digitalWrite(IGN_4,paraquedas4);
+    digitalWrite(IGN_4, paraquedas4);
   }
-
-  dataString += String(paraquedas);
-  dataString += "\t";
-
-  dataString += String(paraquedas2);
-  dataString += "\t";
-
-  dataString += String(paraquedas3);
-  dataString += "\t";
-
-  dataString += String(paraquedas4);
-  dataString += "\t";
 
   // Magnetometro & Acelerometro e Giroscopio
 
   //mag
-  sensors_event_t Mag_event; 
+  sensors_event_t Mag_event;
   mag.getEvent(&Mag_event);
-   dataString +=(Mag_event.magnetic.x); 
-   dataString += "\t";
-   dataString +=(Mag_event.magnetic.y);  
-   dataString += "\t";
-   dataString +=(Mag_event.magnetic.z);  
-   dataString += "\t";
-  
 
   //acelerometro
-  sensors_event_t Ace_event; 
-  accel.getEvent(&Ace_event);
-   dataString +=(Ace_event.acceleration.x); 
-   dataString += "\t";
-   dataString +=(Ace_event.acceleration.y);  
-   dataString += "\t";
-   dataString +=(Ace_event.acceleration.z);  
-   dataString += "\t";
-  
+  sensors_event_t Ace_event;
+  accel.getEvent(&Ace_event);  
 
   //giro
   gyro.read();
-  dataString +=((int)gyro.g.x);
-  dataString += "\t";
-  dataString +=((int)gyro.g.y);
-  dataString += "\t";
-  dataString +=((int)gyro.g.z);
-  dataString += "\t";
+  
 
-  // SD CARD //
+  // DADOS A SEREM IMPRIMIDOS//
+
+  dataString += String(currentMillis / 1000.0) + "\t";
+  dataString += String(bmp.readTemperature()) + "\t";
+  dataString += bmp.readPressure() + "\t";
+  dataString += String(altura) + "\t";
+  dataString += String(altura_semRuido) + "\t";
+  dataString += String(altura_sRuido2) + "\t";
+  dataString += String(queda) + "\t";
+
+  dataString += String(paraquedas) + "\t";
+  dataString += String(paraquedas2) + "\t";
+  dataString += String(paraquedas3) + "\t";
+  dataString += String(paraquedas4) + "\t";
+
+  dataString += String(Mag_event.magnetic.x) + "\t";
+  dataString += String(Mag_event.magnetic.y) + "\t";
+  dataString += String(Mag_event.magnetic.z) + "\t";
+
+
+  dataString += String(Ace_event.acceleration.x) + "\t";
+  dataString += String(Ace_event.acceleration.y) + "\t";
+  dataString += String(Ace_event.acceleration.z) + "\t";
+
+  dataString += ((int)gyro.g.x) + "\t";
+  dataString += ((int)gyro.g.y) + "\t";
+  dataString += ((int)gyro.g.z) + "\t";
+ 
+
+  // SALVANDO NO SD
 
   File dataFile = SD.open(nome_do_arquivo, FILE_WRITE);
 
