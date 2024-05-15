@@ -277,7 +277,7 @@ void loop() {
 
   dataString += String(currentMillis / 1000.0) + "\t";
   dataString += String(bmp.readTemperature()) + "\t";
-  dataString += bmp.readPressure() + "\t";
+  dataString += String(bmp.readPressure()) + "\t";
   dataString += String(altura) + "\t";
   dataString += String(altura_semRuido) + "\t";
   dataString += String(altura_sRuido2) + "\t";
