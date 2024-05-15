@@ -104,7 +104,7 @@ String nomeSD;               //global
 #if (BAR)
 float alturaInicial;  //global
 #define NUM_FILTROS 3
-#define NUM_LEITURAS 20
+#define NUM_LEITURAS 10
 float dados[NUM_FILTROS][NUM_LEITURAS];
 int indices[NUM_FILTROS];
 float filtros[NUM_FILTROS];
@@ -118,31 +118,19 @@ int indiceHistorico = 0;            //global
 #endif
 
 //Definindo variaveis paraquedas
-#define intervaloTempo 10000
-#define intervaloDelay 5000
 
-#if (P1)
-bool paraquedas1 = false;      //global
-bool paraquedas1data = false;  //global
-unsigned long tempoP1 = 0;     //global
-#endif
-
-#if (P2)
-bool paraquedas2 = false;      //global
-bool paraquedas2data = false;  //global
-unsigned long tempoP2 = 0;     //global
-#endif
-
-#if (P3)
-bool paraquedas3 = false;      //global
-bool paraquedas3data = false;  //global
-unsigned long tempoP3 = 0;     //global
-#endif
-
-#if (P4)
-bool paraquedas4 = false;      //global
-bool paraquedas4data = false;  //global
-unsigned long tempoP4 = 0;     //global
+#if (PARAQUEDAS)
+#define intervaloTempo 10000 //Intervalo de tempo que os skibs ficam ligados
+// #define NUM_PARAQUEDAS 4
+bool paraquedas[] = {false, false, false, false};
+bool paraquedasData[] = {false, false, false, false};
+unsigned long paraquedasTempo[] = {0, 0, 0, 0};
+const char* ign[] = { "IGN_1", "IGN_2", "IGN_3", "IGN_4" };
+// for (int i = 0; i < NUM_PARAQUEDAS; i++) {
+//   paraquedas[i] = false;
+//   paraquedasData[i] = false;
+//   paraquedasTempo[i] = 0;
+// }
 #endif
 
 #if (BAR)
@@ -180,6 +168,58 @@ bool deteccaoApogeu(float entrada) {
     estaDescendo = true;
   }
   return estaDescendo;
+}
+#endif
+
+#if (PARAQUEDAS)
+void ativarParaquedas(unsigned long currentTime, bool estaDescendo, float delay, float altura, int paraquedas) {
+  if (estaDescendo && !paraquedas[paraquedas]) {
+    paraquedas[paraquedas] = true;
+  }
+  if (delay == 0) {
+    if (altura == 0) {
+      paraquedasTempo[paraquedas] = millis();
+      paraquedasData[paraquedas] = true;
+      digitalWrite(ign[paraquedas], HIGH);
+
+      if (paraquedas[paraquedas] && currentTime >= paraquedasTempo[paraquedas] + intervaloTempo) {
+        paraquedasData[paraquedas] = false;
+        digitalWrite(ign[paraquedas], LOW);
+      }
+    } else {
+      if (paraquedas[paraquedas] && filtros[NUM_FILTROS - 1] <= altura && paraquedasTempo[paraquedas] == 0) {
+        paraquedasTempo[paraquedas] = millis();
+        paraquedasData[paraquedas] = true;
+        digitalWrite(ign[paraquedas], HIGH);
+      }
+      if (paraquedas[paraquedas] && paraquedasTempo[paraquedas] != 0 && currentTime >= paraquedasTempo[paraquedas] + intervaloTempo) {
+        paraquedasData[paraquedas] = false;
+        digitalWrite(ign[paraquedas], LOW);
+      }
+    }
+  } else {
+    if (altura == 0) {
+      paraquedasTempo[paraquedas] = millis();
+      if (paraquedas[paraquedas] && currentTime >= paraquedasTempo[paraquedas] + delay && currentTime < paraquedasTempo[paraquedas] + delay + intervaloTempo) {
+        paraquedasData[paraquedas] = true;
+        digitalWrite(ign[paraquedas], HIGH);
+      } else if (paraquedas[paraquedas] && currentTime >= paraquedasTempo[paraquedas] + delay + intervaloTempo) {
+        paraquedasData[paraquedas] = false;
+        digitalWrite(ign[paraquedas], LOW);
+      }
+    } else {
+      if (paraquedas[paraquedas] && filtros[NUM_FILTROS - 1] <= altura && paraquedasTempo[paraquedas] == 0) {
+        paraquedasTempo[paraquedas] = millis();
+      }
+      if (paraquedas[paraquedas] && paraquedasTempo[paraquedas] != 0 && currentTime >= paraquedasTempo[paraquedas] + delay && currentTime < paraquedasTempo[paraquedas] + delay + intervaloTempo) {
+        paraquedasData[paraquedas] = true;
+        digitalWrite(ign[paraquedas], HIGH);
+      } else if (paraquedas[paraquedas] && currentTime >= paraquedasTempo[paraquedas] + delay + intervaloTempo) {
+        paraquedasData[paraquedas] = false;
+        digitalWrite(ign[paraquedas], LOW);
+      }
+    }
+  }
 }
 #endif
 
@@ -452,7 +492,7 @@ void loop() {
 #if (BAR)
   //Filtros
   float altitude = bmp.readAltitude() - alturaInicial;
-  
+
   filtros[0] = aplicarFiltro(altitude, 0);
   for (int i = 0; i < NUM_FILTROS; i++) {
     filtros[i] = aplicarFiltro(filtros[i - 1], i);
@@ -460,85 +500,26 @@ void loop() {
 
   //Apogeu
   bool estaDescendo = deteccaoApogeu(filtros[NUM_FILTROS - 1]);
-  // int contadorHistorico = 0;
-  // historico[indiceHistorico] = filtros[NUM_FILTROS - 1];
-  // if (++indiceHistorico >= historicoTamanho) {
-  //   indiceHistorico = 0;
-  // }
-
-  // for (int i = 1; i < historicoTamanho; i++) {
-  //   if (historico[(indiceHistorico + i - 1) % historicoTamanho] > historico[(indiceHistorico + i) % historicoTamanho]) {
-  //     contadorHistorico++;
-  //   }
-  // }
-
-  // bool estaDescendo = false;
-
-  // if (contadorHistorico >= 0.85 * historicoTamanho) {
-  //   estaDescendo = true;
-  // }
 #endif
 
   //Paraquedas 1
 #if (P1)
-  if (estaDescendo && !paraquedas1) {
-    paraquedas1 = true;
-    tempoP1 = millis();
-    paraquedas1data = true;
-    digitalWrite(IGN_1, HIGH);
-  }
-  if (paraquedas1 && currentTime >= tempoP1 + intervaloTempo) {
-    paraquedas1data = false;
-    digitalWrite(IGN_1, LOW);
-  }
+  ativarParaquedas(currentTime, estaDescendo, 0, 0, 0);
 #endif
 
   //Paraquedas 2
 #if (P2)
-  if (estaDescendo && !paraquedas2) {
-    paraquedas2 = true;
-    tempoP2 = millis();
-  }
-  if (paraquedas2 && currentTime >= tempoP2 + intervaloDelay && currentTime < tempoP2 + intervaloDelay + intervaloTempo) {
-    paraquedas2data = true;
-    digitalWrite(IGN_2, HIGH);
-  } else if (paraquedas2 && currentTime >= tempoP2 + intervaloDelay + intervaloTempo) {
-    paraquedas2data = false;
-    digitalWrite(IGN_2, LOW);
-  }
+  ativarParaquedas(currentTime, estaDescendo, 5000, 0, 1);
 #endif
 
 //Paraquedas 3
 #if (P3)
-  if (estaDescendo && !paraquedas3) {
-    paraquedas3 = true;
-  }
-  if (paraquedas3 && mediaDasMedias <= -3 && tempoP3 == 0) {
-    tempoP3 = millis();
-    paraquedas3data = true;
-    digitalWrite(IGN_3, HIGH);
-  }
-  if (paraquedas3 && tempoP3 != 0 && currentTime >= tempoP3 + intervaloTempo) {
-    paraquedas3data = false;
-    digitalWrite(IGN_3, LOW);
-  }
+  ativarParaquedas(currentTime, estaDescendo, 0, -3, 2);
 #endif
 
 //Paraquedas 4
 #if (P4)
-  if (estaDescendo && !paraquedas4) {
-    paraquedas4 = true;
-  }
-  if (paraquedas4 && mediaDasMedias <= -3 && tempoP4 == 0) {
-    tempoP4 = millis();
-  }
-  if (paraquedas4 && tempoP4 != 0 && currentTime >= tempoP4 + intervaloDelay && currentTime < tempoP4 + intervaloDelay + intervaloTempo) {
-    paraquedas4data = true;
-    digitalWrite(IGN_4, HIGH);
-  } else if (paraquedas4 && currentTime >= tempoP4 + intervaloDelay + intervaloTempo) {
-    paraquedas4data = false;
-    digitalWrite(IGN_4, LOW);
-  }
+  ativarParaquedas(currentTime, estaDescendo, 5000, -3, 3);
 #endif
 
   //Inicializando a string
@@ -557,19 +538,19 @@ void loop() {
 #endif
 
 #if (P1)
-  dataString += String(paraquedas1data) + "\t";
+  dataString += String(paraquedasData[0]) + "\t";
 #endif
 
 #if (P2)
-  dataString += String(paraquedas2data) + "\t";
+  dataString += String(paraquedasData[1]) + "\t";
 #endif
 
 #if (P3)
-  dataString += String(paraquedas3data) + "\t";
+  dataString += String(paraquedasData[2]) + "\t";
 #endif
 
 #if (P4)
-  dataString += String(paraquedas4data) + "\t";
+  dataString += String(paraquedasData[3]) + "\t";
 #endif
 
 #if (AX)
@@ -618,7 +599,7 @@ void loop() {
   }
 
   // Envia os dados
-  if (rf_driver.send((uint8_t *)msg, strlen(msg))) {
+  if (rf_driver.send((uint8_t*)msg, strlen(msg))) {
     rf_driver.waitPacketSent();
   } else {
     Serial.print("\tFailed to send message.");
