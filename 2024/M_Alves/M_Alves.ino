@@ -7,7 +7,7 @@
 #include <Adafruit_HMC5883_U.h>
 #include <Adafruit_ADXL345_U.h>
 
-#define SDCARD (1)
+#define SDCARD (0)
 //Paraquedas
 #define state (1)
 #define PARA1 (1)
