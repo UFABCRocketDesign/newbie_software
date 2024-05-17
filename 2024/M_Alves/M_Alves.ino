@@ -69,7 +69,6 @@ float AltInicial = 0;
 #define numLeiturasInicial 25
 
 // *** Filtros **** //
-
 #define NUM_FILTROS 2
 #define NUM_LEITURAS 15
 
@@ -86,10 +85,29 @@ float atualizarFiltro(int filtro, float novaLeitura) {
 }
 
 // *** Apogeu **** //
-float altitudeAnterior = -1;
-int contador = 0;
-int estado = 0;  // estado 0 -> subindo; estado 1 -> descendo
-bool apogeu = false;
+bool apogeuAtingido = false;  // Variável global para rastrear se o apogeu foi atingido
+bool detectarApogeu(float alturaAtual) {
+  static float altitudeAnterior = -1;
+  static int contador = 0;
+  static int estado = 0;  // estado 0 -> subindo; estado 1 -> descendo
+  static bool apogeu = false;
+
+  if (altitudeAnterior != -1 && alturaAtual < altitudeAnterior) {
+    contador++;
+    if (contador >= 25) {
+      estado = 1;
+      if (estado == 1) {
+        apogeu = true;
+      }
+    }
+  } else {
+    contador = 0;
+    estado = 0;
+  }
+
+  altitudeAnterior = alturaAtual;  // Atualize a altitude anterior para a próxima iteração
+  return apogeu;
+}
 #endif
 
 // ********** Gyro + Mag + Accel ********** //
@@ -212,24 +230,14 @@ void loop() {
   float mediaAltitudeFiltrada = atualizarFiltro(1, mediaAltitude);
 
   // ********** Apogeu ********** //
-  if (altitudeAnterior != -1 && mediaAltitudeFiltrada < altitudeAnterior) {
-    contador++;
-    if (contador >= 25) {
-      estado = 1;
-      if (estado == 1) {
-        apogeu = true;
-      }
-    }
-  } else {
-    contador = 0;
-    estado = 0;
+  if (!apogeuAtingido) {  // Chamar detectarApogeu se o apogeu ainda não foi atingido
+    apogeuAtingido = detectarApogeu(mediaAltitudeFiltrada);
   }
-
-  altitudeAnterior = mediaAltitudeFiltrada;  // Atualize a altitude anterior para a próxima iteração
 #endif
+
   // ********** Ativando os Paraquedas 1/2/3/4 ********** //
   // *** Paraquedas 1 **** //
-  if (apogeu == true && ativacao1 == false) {
+  if (apogeuAtingido == true && ativacao1 == false) {
     digitalWrite(IGN_1, HIGH);
     ativacao1 = true;
     ativacao2 = true;
@@ -245,7 +253,7 @@ void loop() {
   }
 
   // *** Paraquedas 3 **** //
-  if (apogeu == true && ativacao3 == false && mediaAltitudeFiltrada < -5) {
+  if (apogeuAtingido == true && ativacao3 == false && mediaAltitudeFiltrada < -5) {
     digitalWrite(IGN_3, HIGH);
     ativacao3 = true;
     ativacao4 = true;
@@ -310,7 +318,7 @@ void loop() {
   dadosString += String(mediaAltitudeFiltrada) + "\t";  //Altura com 2 filtro
   #endif
   #if state
-  dadosString += String(estado) + "\t";                 //Bool indicando se o apogeu foi atingido (0 = não; 1 = sim)
+  dadosString += String(apogeuAtingido) + "\t";                 //Bool indicando se o apogeu foi atingido (0 = não; 1 = sim)
   #endif
   #if PARA1
   dadosString += String(digitalRead(IGN_1)) + "\t";     //Estado do Paraquedas 1 (0 = desativado; 1 = ativado)
