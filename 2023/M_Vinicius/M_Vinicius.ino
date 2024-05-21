@@ -59,7 +59,7 @@ String nome_do_arquivo;
 
 const int chipSelect = 53;
 
-
+// ATÉ AQUI OK
 void setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);
@@ -71,6 +71,18 @@ void setup() {
   Serial.begin(115200);
   Wire.begin();
 
+  // SD
+
+  Serial.print("Initializing SD card...");
+
+  // VERIFICAR E INICIALIZAR
+  if (!SD.begin(chipSelect)) {
+    Serial.println("Card failed, or not present");
+    // don't do anything more:
+    while (1)
+      ;
+  }
+  Serial.println("card initialized.");
 
   // ADICIONAR O CABEÇALHO //
 
@@ -87,7 +99,6 @@ void setup() {
 
   // iniciar MAGNETOMETRO
   if (!mag.begin()) {
-    /* There was a problem detecting the HMC5883 ... check your connections */
     Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
   }
   cabString += ("Mag_X (uT) \t Mag_Y \t Mag_Z \t");
@@ -95,30 +106,17 @@ void setup() {
 
   // iniciar ACELEROMETRO
   if (!accel.begin()) {
-    /* There was a problem detecting the ADXL345 ... check your connections */
     Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
   }
   cabString += ("Ace_X (m/s^2) \t Ace_Y \t Ace_Z \t");
 
   //iniciar GIROSCOPIO
+  
   if (!gyro.init()) {
     Serial.println("Failed to autodetect gyro type!");
   }
   gyro.enableDefault();
   cabString += ("Giro_X \t Giro_Y \t Giro_Z \t");
-
-  // SD
-
-  Serial.print("Initializing SD card...");
-
-  // VERIFICAR E INICIALIZAR
-  if (!SD.begin(chipSelect)) {
-    Serial.println("Card failed, or not present");
-    // don't do anything more:
-    while (1)
-      ;
-  }
-  Serial.println("card initialized.");
 
   // CRIAR UM NOVO ARQUIVO DE TEXTO CADA VEZ QUE O CARTÃO SD É INSERIDO //
   do {
@@ -158,13 +156,9 @@ void setup() {
 
 
 void loop() {
-  
-  // Criação do dataString para armazenar as variaveis que serão impressas //
-  
-  String dataString = "";
-  
-  unsigned long currentMillis = millis();
-  
+
+    unsigned long currentMillis = millis();
+
   altura = bmp.readAltitude() - alt_in;
 
   // filtro 1 //
@@ -267,13 +261,16 @@ void loop() {
 
   //acelerometro
   sensors_event_t Ace_event;
-  accel.getEvent(&Ace_event);  
+  accel.getEvent(&Ace_event);
 
   //giro
   gyro.read();
-  
+
 
   // DADOS A SEREM IMPRIMIDOS//
+  // Criação do dataString para armazenar as variaveis que serão impressas //
+
+  String dataString = "";
 
   dataString += String(currentMillis / 1000.0) + "\t";
   dataString += String(bmp.readTemperature()) + "\t";
@@ -300,7 +297,7 @@ void loop() {
   dataString += ((int)gyro.g.x) + "\t";
   dataString += ((int)gyro.g.y) + "\t";
   dataString += ((int)gyro.g.z) + "\t";
- 
+
 
   // SALVANDO NO SD
 
