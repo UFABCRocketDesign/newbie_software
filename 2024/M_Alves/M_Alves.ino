@@ -80,7 +80,7 @@ void gerenciarParaquedas(bool apogeuAtingido, float mediaAltitudeFiltrada, unsig
     apogeuMillis = currentMillis;  // Atualize o momento em que o apogeu foi atingido
   }
 
-  if (mediaAltitudeFiltrada < altParaquedas && altParaquedasMillis == 0) {
+  if (apogeuAtingido == true && mediaAltitudeFiltrada < altParaquedas && altParaquedasMillis == 0) {
     altParaquedasMillis = currentMillis;  // Atualize o momento em que a altitude se tornou menor que "altParaquedas"
   }
 
