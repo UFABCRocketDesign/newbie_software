@@ -100,21 +100,41 @@ String nomeBaseSD = "data";  //setup
 String nomeSD;               //global
 #endif
 
-//Definindo variaveis filtros
 #if (BAR)
-float alturaInicial;  //global
-#define NUM_FILTROS 3
-#define NUM_LEITURAS 10
-float dados[NUM_FILTROS][NUM_LEITURAS];
-int indices[NUM_FILTROS];
-float filtros[NUM_FILTROS];
+class FiltroMediaMovel {
+  float dados[10] = {};
+  int indice = 0;
+  const int numLeitura = 10;
+
+public:
+  float aplicarFiltro(float entrada) {
+    float soma = 0;
+    float media = 0;
+    dados[indice] = entrada;
+    for (int i = 0; i < numLeitura; i++) {
+      soma += dados[i];
+    }
+    media = soma / numLeitura;
+    indice++;
+    if (indice >= numLeitura) {
+      indice = 0;
+    }
+    return media;
+  }
+};
 #endif
 
-//Definindo variaveis apogeu
+//Definindo variaveis para o barometro
 #if (BAR)
+float alturaInicial;  //Var global para altura inicial
+#define NUM_LEITURAS 10
+#define NUM_FILTROS 3
+float filtros[NUM_FILTROS];
+
+//Definindo variaveis apogeu
 #define historicoTamanho 20
-float historico[historicoTamanho];  //global
-int indiceHistorico = 0;            //global
+float historico[historicoTamanho];
+int indiceHistorico = 0;
 #endif
 
 //Definindo variaveis paraquedas
@@ -128,20 +148,6 @@ const int ign[] = { IGN_1, IGN_2, IGN_3, IGN_4 };
 #endif
 
 #if (BAR)
-float aplicarFiltro(float entrada, int filtro) {
-  float soma = 0;
-  float media = 0;
-  dados[filtro][indices[filtro]] = entrada;
-  for (int j = 0; j < NUM_LEITURAS; j++) {
-    soma += dados[filtro][j];
-  }
-  media = soma / NUM_LEITURAS;
-  indices[filtro]++;
-  if (indices[filtro] >= NUM_LEITURAS) {
-    indices[filtro] = 0;
-  }
-  return media;
-}
 
 bool deteccaoApogeu(float entrada) {
   historico[indiceHistorico] = entrada;
@@ -491,13 +497,16 @@ void loop() {
 #endif
 
 #if (BAR)
+  FiltroMediaMovel f1;
+  FiltroMediaMovel f2;
+  FiltroMediaMovel f3;
+
   //Filtros
   float altitude = bmp.readAltitude() - alturaInicial;
 
-  filtros[0] = aplicarFiltro(altitude, 0);
-  for (int i = 0; i < NUM_FILTROS; i++) {
-    filtros[i] = aplicarFiltro(filtros[i - 1], i);
-  }
+  filtros[0] = f1.aplicarFiltro(altitude);
+  filtros[1] = f2.aplicarFiltro(filtros[0]);
+  filtros[2] = f3.aplicarFiltro(filtros[1]);
 
   //Apogeu
   bool estaDescendo = deteccaoApogeu(filtros[NUM_FILTROS - 1]);
