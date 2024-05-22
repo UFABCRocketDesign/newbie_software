@@ -105,7 +105,7 @@ String nomeSD;               //global
 #define NUM_FILTROS 3
 
 class FiltroMediaMovel {
-  float* dados;
+  float* dados = new float[numLeitura];
   int indice = 0;
   const int numLeitura;
   float media = 0;
@@ -114,10 +114,6 @@ public:
   //Construtor para inicializar o vetor dados com 0 e com tamanho x
   FiltroMediaMovel(int tamanho)
     : numLeitura(tamanho) {
-    dados = new float[numLeitura];
-    for (int i = 0; i < numLeitura; i++) {
-      dados[i] = 0;
-    }
   }
   // Destrutor para liberar a memória alocada dinamicamente
   ~FiltroMediaMovel() {
@@ -126,7 +122,6 @@ public:
 
   float aplicarFiltro(float entrada) {
     float soma = 0;
-    float media = 0;
     dados[indice] = entrada;
     for (int i = 0; i < numLeitura; i++) {
       soma += dados[i];
