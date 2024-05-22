@@ -101,12 +101,29 @@ String nomeSD;               //global
 #endif
 
 #if (BAR)
+#define NUM_LEITURAS 10
+#define NUM_FILTROS 3
+
 class FiltroMediaMovel {
-  float dados[10] = {};
+  float* dados;
   int indice = 0;
-  const int numLeitura = 10;
+  const int numLeitura;
+  float media = 0;
 
 public:
+  //Construtor para inicializar o vetor dados com 0 e com tamanho x
+  FiltroMediaMovel(int tamanho)
+    : numLeitura(tamanho) {
+    dados = new float[numLeitura];
+    for (int i = 0; i < numLeitura; i++) {
+      dados[i] = 0;
+    }
+  }
+  // Destrutor para liberar a memória alocada dinamicamente
+  ~FiltroMediaMovel() {
+    delete[] dados;
+  }
+
   float aplicarFiltro(float entrada) {
     float soma = 0;
     float media = 0;
@@ -121,15 +138,19 @@ public:
     }
     return media;
   }
+
+  float getMedia() {
+    return media;
+  }
+
 };
-#endif
+//Inicializando os filtros
+FiltroMediaMovel f1(NUM_LEITURAS);
+FiltroMediaMovel f2(NUM_LEITURAS);
+FiltroMediaMovel f3(NUM_LEITURAS);
 
 //Definindo variaveis para o barometro
-#if (BAR)
 float alturaInicial;  //Var global para altura inicial
-#define NUM_LEITURAS 10
-#define NUM_FILTROS 3
-float filtros[NUM_FILTROS];
 
 //Definindo variaveis apogeu
 #define historicoTamanho 20
@@ -172,7 +193,7 @@ bool deteccaoApogeu(float entrada) {
 #endif
 
 #if (PARAQUEDAS)
-void ativarParaquedas(unsigned long currentTime, bool estaDescendo, float delay, float altura, int indiceParaquedas) {
+void ativarParaquedas(float alturaAtual, unsigned long currentTime, bool estaDescendo, float delay, float altura, int indiceParaquedas) {
 
   if (delay == 0) {
     if (altura == 0) {
@@ -189,7 +210,7 @@ void ativarParaquedas(unsigned long currentTime, bool estaDescendo, float delay,
       if (estaDescendo && !paraquedas[indiceParaquedas]) {
         paraquedas[indiceParaquedas] = true;
       }
-      if (paraquedas[indiceParaquedas] && filtros[NUM_FILTROS - 1] <= altura && paraquedasTempo[indiceParaquedas] == 0) {
+      if (paraquedas[indiceParaquedas] && alturaAtual <= altura && paraquedasTempo[indiceParaquedas] == 0) {
         paraquedasTempo[indiceParaquedas] = millis();
         paraquedasData[indiceParaquedas] = true;
       }
@@ -212,7 +233,7 @@ void ativarParaquedas(unsigned long currentTime, bool estaDescendo, float delay,
       if (estaDescendo && !paraquedas[indiceParaquedas]) {
         paraquedas[indiceParaquedas] = true;
       }
-      if (paraquedas[indiceParaquedas] && filtros[NUM_FILTROS - 1] <= altura && paraquedasTempo[indiceParaquedas] == 0) {
+      if (paraquedas[indiceParaquedas] && alturaAtual <= altura && paraquedasTempo[indiceParaquedas] == 0) {
         paraquedasTempo[indiceParaquedas] = millis();
       }
       if (paraquedas[indiceParaquedas] && paraquedasTempo[indiceParaquedas] != 0 && currentTime >= paraquedasTempo[indiceParaquedas] + delay && currentTime < paraquedasTempo[indiceParaquedas] + delay + intervaloTempo) {
@@ -497,39 +518,38 @@ void loop() {
 #endif
 
 #if (BAR)
-  FiltroMediaMovel f1;
-  FiltroMediaMovel f2;
-  FiltroMediaMovel f3;
-
   //Filtros
   float altitude = bmp.readAltitude() - alturaInicial;
 
-  filtros[0] = f1.aplicarFiltro(altitude);
-  filtros[1] = f2.aplicarFiltro(filtros[0]);
-  filtros[2] = f3.aplicarFiltro(filtros[1]);
+  f1.aplicarFiltro(altitude);
+  f2.aplicarFiltro(f1.getMedia());
+  f3.aplicarFiltro(f2.getMedia());
+
+  // Obtendo a média final filtrada
+  float filtroFinal = f3.getMedia();
 
   //Apogeu
-  bool estaDescendo = deteccaoApogeu(filtros[NUM_FILTROS - 1]);
+  bool estaDescendo = deteccaoApogeu(filtroFinal);
 #endif
 
   //Paraquedas 1
 #if (P1)
-  ativarParaquedas(currentTime, estaDescendo, 0, 0, 0);
+  ativarParaquedas(filtroFinal, currentTime, estaDescendo, 0, 0, 0);
 #endif
 
   //Paraquedas 2
 #if (P2)
-  ativarParaquedas(currentTime, estaDescendo, 5000, 0, 1);
+  ativarParaquedas(filtroFinal, currentTime, estaDescendo, 5000, 0, 1);
 #endif
 
 //Paraquedas 3
 #if (P3)
-  ativarParaquedas(currentTime, estaDescendo, 0, -3, 2);
+  ativarParaquedas(filtroFinal, currentTime, estaDescendo, 0, -3, 2);
 #endif
 
 //Paraquedas 4
 #if (P4)
-  ativarParaquedas(currentTime, estaDescendo, 5000, -3, 3);
+  ativarParaquedas(filtroFinal, currentTime, estaDescendo, 5000, -3, 3);
 #endif
 
   //Inicializando a string
@@ -541,9 +561,9 @@ void loop() {
   dataString += String(bmp.readTemperature()) + "\t";
   dataString += String(bmp.readPressure()) + "\t";
   dataString += String(altitude) + "\t";
-  for (int i = 0; i < NUM_FILTROS; i++) {
-    dataString += String(filtros[i]) + "\t";
-  }
+  dataString += String(f1.getMedia()) + "\t";
+  dataString += String(f2.getMedia()) + "\t";
+  dataString += String(f3.getMedia()) + "\t";
   dataString += String(estaDescendo) + "\t";
 #endif
 
