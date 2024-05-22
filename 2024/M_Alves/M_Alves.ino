@@ -40,100 +40,41 @@
 
 // ********** PARAQUEDAS ********** //
 #if PARA
-#if PARA1
-#define IGN_1 36 /*act1*/
-#endif
-#if PARA2
-#define IGN_2 61 /*act2*/
-#endif
-#if PARA3
-#define IGN_3 46 /*act3*/
-#endif
-#if PARA4
-#define IGN_4 55 /*act4*/
-#endif
+#define NUM_PARAQUEDAS 4
+#define ALT_PARAQUEDAS -5
 
-#define interval1 10000
-#define interval2 5000
-#define altParaquedas -5
+int ign[NUM_PARAQUEDAS] = { 36, 61, 46, 55 };  // Número dos pinos para cada paraquedas
+bool ativacao[NUM_PARAQUEDAS] = { false };
+bool paraquedasAtivado[NUM_PARAQUEDAS] = { false };
+unsigned long futureMillis[NUM_PARAQUEDAS] = { 0 };
+
+bool apogeuApenas[NUM_PARAQUEDAS] = { true, true, false, false };  // Paraquedas que ativam com apenas o apogeu = true, paraquedas que precisam de uma altura específica = false
+
+unsigned long intervalosApogeu[NUM_PARAQUEDAS] = { 0, 5000, 0, 0 };    // Intervalo de ativação entre os paraquedas de "apenas apogeu"
+unsigned long intervalosAltitude[NUM_PARAQUEDAS] = { 0, 0, 0, 5000 };  // Intervalo de ativação entre os paraquedas de altura específica
+
+unsigned long tempoAtivacao[NUM_PARAQUEDAS] = { 5000, 5000, 5000, 5000 };  // Tempo de ativação de cada paraquedas
 
 void gerenciarParaquedas(bool apogeuAtingido, float mediaAltitudeFiltrada, unsigned long currentMillis) {
-  static bool ativacao1 = false;
-  static bool ativacao2 = false;
-  static bool ativacao3 = false;
-  static bool ativacao4 = false;
-
-  static bool paraquedas1Ativado = false;
-  static bool paraquedas2Ativado = false;
-  static bool paraquedas3Ativado = false;
-  static bool paraquedas4Ativado = false;
-
-  static unsigned long futureMillis1 = 0;
-  static unsigned long futureMillis2 = 0;
-  static unsigned long futureMillis3 = 0;
-  static unsigned long futureMillis4 = 0;
-
-  static unsigned long apogeuMillis = 0;         // Momento em que o apogeu foi atingido
-  static unsigned long altParaquedasMillis = 0;  // Momento em que a altitude se tornou menor que "altParaquedas"
   static bool altParaquedasBool = false;
 
-  if (apogeuAtingido == true && apogeuMillis == 0) {
-    apogeuMillis = currentMillis;  // Atualize o momento em que o apogeu foi atingido
-  }
-
-  if (apogeuAtingido == true && mediaAltitudeFiltrada < altParaquedas && altParaquedasMillis == 0) {
-    altParaquedasMillis = currentMillis;  // Atualize o momento em que a altitude se tornou menor que "altParaquedas"
+  if (apogeuAtingido == true && mediaAltitudeFiltrada < ALT_PARAQUEDAS) {
     altParaquedasBool = true;
   }
 
-// *** Paraquedas 1 **** //
-#if PARA1
-  if (apogeuAtingido == true && ativacao1 == false && paraquedas1Ativado == false) {
-    digitalWrite(IGN_1, HIGH);
-    ativacao1 = true;
-    futureMillis1 = currentMillis + interval1;
-  } else if (ativacao1 == true && currentMillis >= futureMillis1) {
-    digitalWrite(IGN_1, LOW);
-    ativacao1 = false;
-    paraquedas1Ativado = true;
+  for (int i = 0; i < NUM_PARAQUEDAS; i++) {
+    if (apogeuAtingido == true && ativacao[i] == false && paraquedasAtivado[i] == false && (apogeuApenas[i] || altParaquedasBool)) {
+      if (i == 0 || (i > 0 && currentMillis >= futureMillis[i - 1] + (apogeuApenas[i] ? intervalosApogeu[i] : intervalosAltitude[i]))) {
+        digitalWrite(ign[i], HIGH);
+        ativacao[i] = true;
+        futureMillis[i] = currentMillis + tempoAtivacao[i];
+      }
+    } else if (ativacao[i] == true && currentMillis >= futureMillis[i]) {
+      digitalWrite(ign[i], LOW);
+      ativacao[i] = false;
+      paraquedasAtivado[i] = true;
+    }
   }
-#endif
-// *** Paraquedas 2 **** //
-#if PARA2
-  if (apogeuAtingido == true && ativacao2 == false && paraquedas2Ativado == false && currentMillis >= apogeuMillis + interval2) {
-    digitalWrite(IGN_2, HIGH);
-    ativacao2 = true;
-    futureMillis2 = currentMillis + interval1;
-  } else if (ativacao2 == true && currentMillis >= futureMillis2) {
-    digitalWrite(IGN_2, LOW);
-    ativacao2 = false;
-    paraquedas2Ativado = true;
-  }
-#endif
-// *** Paraquedas 3 **** //
-#if PARA3
-  if (apogeuAtingido == true && ativacao3 == false && paraquedas3Ativado == false && altParaquedasBool == true) {
-    digitalWrite(IGN_3, HIGH);
-    ativacao3 = true;
-    futureMillis3 = currentMillis + interval1;
-  } else if (ativacao3 == true && currentMillis >= futureMillis3) {
-    digitalWrite(IGN_3, LOW);
-    ativacao3 = false;
-    paraquedas3Ativado = true;
-  }
-#endif
-// *** Paraquedas 4 **** //
-#if PARA4
-  if (apogeuAtingido == true && ativacao4 == false && paraquedas4Ativado == false && altParaquedasBool == true && currentMillis >= altParaquedasMillis + interval2) {
-    digitalWrite(IGN_4, HIGH);
-    ativacao4 = true;
-    futureMillis4 = currentMillis + interval1;
-  } else if (ativacao4 == true && currentMillis >= futureMillis4) {
-    digitalWrite(IGN_4, LOW);
-    ativacao4 = false;
-    paraquedas4Ativado = true;
-  }
-#endif
 }
 #endif
 
@@ -221,26 +162,11 @@ void setup() {
 
   // ********** Setando os Paraquedas ********** //
 #if PARA
-#if PARA1
-  pinMode(IGN_1, OUTPUT);
-  digitalWrite(IGN_1, LOW);
-  dadosString += "Parachute1 (bool)\t";
-#endif
-#if PARA2
-  pinMode(IGN_2, OUTPUT);
-  digitalWrite(IGN_2, LOW);
-  dadosString += "Parachute2 (bool)\t";
-#endif
-#if PARA3
-  pinMode(IGN_3, OUTPUT);
-  digitalWrite(IGN_3, LOW);
-  dadosString += "Parachute3 (bool)\t";
-#endif
-#if PARA4
-  pinMode(IGN_4, OUTPUT);
-  digitalWrite(IGN_4, LOW);
-  dadosString += "Parachute4 (bool)\t";
-#endif
+for (int i = 0; i < NUM_PARAQUEDAS; i++) {
+  pinMode(ign[i], OUTPUT);
+  digitalWrite(ign[i], LOW);
+  dadosString += "Parachute" + String(i+1) + " (bool)\t";
+}
 #endif
 
 //Giroscópio
@@ -380,18 +306,9 @@ void loop() {
 #endif
 #endif
 #if PARA
-#if PARA1
-  dadosString += String(digitalRead(IGN_1)) + "\t";  //Estado do Paraquedas 1 (0 = desativado; 1 = ativado)
-#endif
-#if PARA2
-  dadosString += String(digitalRead(IGN_2)) + "\t";  //Estado do Paraquedas 2 (0 = desativado; 1 = ativado)
-#endif
-#if PARA3
-  dadosString += String(digitalRead(IGN_3)) + "\t";  //Estado do Paraquedas 3 (0 = desativado; 1 = ativado)
-#endif
-#if PARA4
-  dadosString += String(digitalRead(IGN_4)) + "\t";  //Estado do Paraquedas 4 (0 = desativado; 1 = ativado)
-#endif
+for (int i = 0; i < NUM_PARAQUEDAS; i++) {
+  dadosString += String(digitalRead(ign[i])) + "\t";  //Estado do Paraquedas i (0 = desativado; 1 = ativado)
+}
 #endif
 #if GIRO
 #if GIROX
