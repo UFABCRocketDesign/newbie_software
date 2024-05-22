@@ -75,6 +75,7 @@ void gerenciarParaquedas(bool apogeuAtingido, float mediaAltitudeFiltrada, unsig
 
   static unsigned long apogeuMillis = 0;         // Momento em que o apogeu foi atingido
   static unsigned long altParaquedasMillis = 0;  // Momento em que a altitude se tornou menor que "altParaquedas"
+  static bool altParaquedasBool = false;
 
   if (apogeuAtingido == true && apogeuMillis == 0) {
     apogeuMillis = currentMillis;  // Atualize o momento em que o apogeu foi atingido
@@ -82,6 +83,7 @@ void gerenciarParaquedas(bool apogeuAtingido, float mediaAltitudeFiltrada, unsig
 
   if (apogeuAtingido == true && mediaAltitudeFiltrada < altParaquedas && altParaquedasMillis == 0) {
     altParaquedasMillis = currentMillis;  // Atualize o momento em que a altitude se tornou menor que "altParaquedas"
+    altParaquedasBool = true;
   }
 
 // *** Paraquedas 1 **** //
@@ -110,7 +112,7 @@ void gerenciarParaquedas(bool apogeuAtingido, float mediaAltitudeFiltrada, unsig
 #endif
 // *** Paraquedas 3 **** //
 #if PARA3
-  if (apogeuAtingido == true && ativacao3 == false && paraquedas3Ativado == false && mediaAltitudeFiltrada < altParaquedas) {
+  if (apogeuAtingido == true && ativacao3 == false && paraquedas3Ativado == false && altParaquedasBool == true) {
     digitalWrite(IGN_3, HIGH);
     ativacao3 = true;
     futureMillis3 = currentMillis + interval1;
@@ -122,7 +124,7 @@ void gerenciarParaquedas(bool apogeuAtingido, float mediaAltitudeFiltrada, unsig
 #endif
 // *** Paraquedas 4 **** //
 #if PARA4
-  if (apogeuAtingido == true && ativacao4 == false && paraquedas4Ativado == false && mediaAltitudeFiltrada < altParaquedas && currentMillis >= altParaquedasMillis + interval2) {
+  if (apogeuAtingido == true && ativacao4 == false && paraquedas4Ativado == false && altParaquedasBool == true && currentMillis >= altParaquedasMillis + interval2) {
     digitalWrite(IGN_4, HIGH);
     ativacao4 = true;
     futureMillis4 = currentMillis + interval1;
