@@ -105,9 +105,9 @@ String nomeSD;               //global
 #define NUM_FILTROS 3
 
 class FiltroMediaMovel {
+  const int numLeitura;
   float* dados = new float[numLeitura];
   int indice = 0;
-  const int numLeitura;
   float media = 0;
 
 public:
