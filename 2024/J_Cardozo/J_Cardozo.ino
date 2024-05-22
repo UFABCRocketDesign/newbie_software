@@ -112,7 +112,7 @@ class FiltroMediaMovel {
 
 public:
   //Construtor para inicializar o vetor dados com 0 e com tamanho x
-  FiltroMediaMovel(int tamanho)
+  FiltroMediaMovel(int tamanho = 10)
     : numLeitura(tamanho) {
   }
   // Destrutor para liberar a memória alocada dinamicamente
