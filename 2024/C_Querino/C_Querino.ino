@@ -30,17 +30,17 @@ void setup() {
 
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+  }
+  while (!Serial) { ; }
+  Serial.print("Initializing SD card...");
 
-    while (!Serial) { ; }
-    Serial.print("Initializing SD card...");
-
-    if (!SD.begin(chipSelect)) {
-      Serial.println("Card failed, or not present");
-      while (1)
-        ;
+  if (!SD.begin(chipSelect)) {
+    Serial.println("Card failed, or not present");
+    while (1)
+      ;
   }
   Serial.println("card initialized.");
-  
+
 
 
   String dataString = "";
@@ -60,7 +60,7 @@ void setup() {
 
   altura = (alturainicial / 20);
 }
-}
+
 void loop() {
 
 
