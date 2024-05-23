@@ -242,7 +242,7 @@ void loop() {
 // ********** BME085 - Altura e Filtros ********** //
 #if BMP085
   float temperature = bmp.readTemperature();
-  float pressure = bmp.readPressure();
+  int pressure = bmp.readPressure();
   float rawAltitude = bmp.readAltitude() - altInicial;
 
   // *** Filtro 1 **** //
