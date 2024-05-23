@@ -12,27 +12,27 @@
 #define PARA (1)
 //BMP085
 #define BMP085 (1)
-#define BMP085temp (1)
-#define BMP085press (1)
-#define altRAW (1)
-#define altFilter1 (1)
-#define altFilter2 (1)
-#define apogee (1)
+#define BMP085_TEMP (1)
+#define BMP085_PRESS (1)
+#define ALT_RAW (1)
+#define ALT_FILTER1 (1)
+#define ALT_FILTER2 (1)
+#define APOGEE (1)
 //Giroscopio
 #define GIRO (1)
-#define GIROX (1)
-#define GIROY (1)
-#define GIROZ (1)
+#define GIRO_X (1)
+#define GIRO_Y (1)
+#define GIRO_Z (1)
 //Magnetometro
 #define MAGNETO (1)
-#define MAGNETOX (1)
-#define MAGNETOY (1)
-#define MAGNETOZ (1)
+#define MAGNETO_X (1)
+#define MAGNETO_Y (1)
+#define MAGNETO_Z (1)
 //Acelerometro
 #define ACELERO (1)
-#define ACELEROX (1)
-#define ACELEROY (1)
-#define ACELEROZ (1)
+#define ACELERO_X (1)
+#define ACELERO_Y (1)
+#define ACELERO_Z (1)
 
 // ********** PARAQUEDAS ********** //
 #if PARA
@@ -73,7 +73,7 @@ void gerenciarParaquedasIndividual(int i, bool apogeuAtingido, float mediaAltitu
 #endif
 
 // ********** SD Card ********** //
-#define chipSelect 53
+#define CHIP_SELECT 53
 int fileNum = 0;
 String sdName = "Math";
 String fileName;
@@ -81,8 +81,8 @@ String fileName;
 // ********** Altitude, Filtros e Apogeu ********** //
 #if BMP085
 Adafruit_BMP085 bmp;
-float AltInicial = 0;
-#define numLeiturasInicial 25
+float altInicial = 0;
+#define NUM_LEITURAS_INICIAL 25
 
 // *** Filtros **** //
 #define NUM_FILTROS 2
@@ -103,12 +103,12 @@ float atualizarFiltro(int filtro, float novaLeitura) {
 // *** Apogeu **** //
 bool apogeuAtingido = false;  // Variável global para rastrear se o apogeu foi atingido
 bool detectarApogeu(float alturaAtual) {
-  static float altitudeAnterior = -1;
+  static float alturaAnterior = -1;
   static int contador = 0;
   static int estado = 0;  // estado 0 -> subindo; estado 1 -> descendo
   static bool apogeu = false;
 
-  if (altitudeAnterior != -1 && alturaAtual < altitudeAnterior) {
+  if (alturaAnterior != -1 && alturaAtual < alturaAnterior) {
     contador++;
     if (contador >= 25) {
       estado = 1;
@@ -121,7 +121,7 @@ bool detectarApogeu(float alturaAtual) {
     estado = 0;
   }
 
-  altitudeAnterior = alturaAtual;  // Atualize a altitude anterior para a próxima iteração
+  alturaAnterior = alturaAtual;  // Atualize a altitude anterior para a próxima iteração
   return apogeu;
 }
 #endif
@@ -200,11 +200,11 @@ void setup() {
 #if BMP085
   //Leituras iniciais
   float somaAltInicial = 0;
-  for (int i = 0; i < numLeiturasInicial; i++) {
+  for (int i = 0; i < NUM_LEITURAS_INICIAL; i++) {
     somaAltInicial += bmp.readAltitude();
   }
 
-  AltInicial = somaAltInicial / numLeiturasInicial;  //Médias das leituras iniciais
+  altInicial = somaAltInicial / NUM_LEITURAS_INICIAL;  //Médias das leituras iniciais
 #endif
 
   // ********** Cabeçalho ********** //
@@ -243,7 +243,7 @@ void loop() {
 #if BMP085
   float temperature = bmp.readTemperature();
   float pressure = bmp.readPressure();
-  float rawAltitude = bmp.readAltitude() - AltInicial;
+  float rawAltitude = bmp.readAltitude() - altInicial;
 
   // *** Filtro 1 **** //
   float mediaAltitude = atualizarFiltro(0, rawAltitude);
@@ -282,22 +282,22 @@ void loop() {
   // ********** Leitura dos dados ********** //
   dadosString += String(currentMillis / 1000.0) + "\t";  //Tempo atual
 #if BMP085
-#if BMP085temp
+#if BMP085_TEMP
   dadosString += String(temperature) + "\t";  //Temperatura *C
 #endif
-#if BMP085press
+#if BMP085_PRESS
   dadosString += String(pressure) + "\t";  //Pressão Pa
 #endif
-#if altRAW
+#if ALT_RAW
   dadosString += String(rawAltitude) + "\t";  //Altura com 0 filtro
 #endif
-#if altFilter1
+#if ALT_FILTER1
   dadosString += String(mediaAltitude) + "\t";  //Altura com 1 filtro
 #endif
-#if altFilter2
+#if ALT_FILTER2
   dadosString += String(mediaAltitudeFiltrada) + "\t";  //Altura com 2 filtro
 #endif
-#if apogee
+#if APOGEE
   dadosString += String(apogeuAtingido) + "\t";  //Bool indicando se o apogeu foi atingido (0 = não; 1 = sim)
 #endif
 #endif
@@ -307,35 +307,35 @@ void loop() {
   }
 #endif
 #if GIRO
-#if GIROX
+#if GIRO_X
   dadosString += String(gyro.g.x) + "\t";  //Rotação angular do Giroscópio no eixo x
 #endif
-#if GIROY
+#if GIRO_Y
   dadosString += String(gyro.g.y) + "\t";  //Rotação angular do Giroscópio no eixo y
 #endif
-#if GIROZ
+#if GIRO_Z
   dadosString += String(gyro.g.z) + "\t";  //Rotação angular do Giroscópio no eixo z
 #endif
 #endif
 #if MAGNETO
-#if MAGNETOX
+#if MAGNETO_X
   dadosString += String(magEvent.magnetic.x) + "\t";  //Intensidade do campo magnético no eixo x
 #endif
-#if MAGNETOY
+#if MAGNETO_Y
   dadosString += String(magEvent.magnetic.y) + "\t";  //Intensidade do campo magnético no eixo y
 #endif
-#if MAGNETOZ
+#if MAGNETO_Z
   dadosString += String(magEvent.magnetic.z) + "\t";  //Intensidade do campo magnético no eixo z
 #endif
 #endif
 #if ACELERO
-#if ACELEROX
+#if ACELERO_X
   dadosString += String(accelEvent.acceleration.x) + "\t";  //Aceleração ao longo dos eixos x
 #endif
-#if ACELEROY
+#if ACELERO_Y
   dadosString += String(accelEvent.acceleration.y) + "\t";  //Aceleração ao longo dos eixos x
 #endif
-#if ACELEROZ
+#if ACELERO_Z
   dadosString += String(accelEvent.acceleration.z);  //Aceleração ao longo dos eixos x
 #endif
 #endif
