@@ -1,16 +1,39 @@
 // BPM085 SENSOR ( PRESSÃO / TEMPERATURA / ALTITUDE) & Acelerometro & Giroscopio & Magnetometro
+#define BMP 1
+#if BMP 
 #include <Adafruit_BMP085.h>
+Adafruit_BMP085 bmp;
+#endif
+
+#define SDD 1
+
+#ifdef SDD
 #include <SPI.h>
 #include <SD.h>
+#endif
+
+#define ACEL 1
+#if ACEL
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_ADXL345_U.h>
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
+#endif
+
+#define GIRO 1
+#if GIRO
 #include <L3G.h>
 L3G gyro;
+#endif
+
+#define MAG 1
+#if MAG
 #include <Adafruit_HMC5883_U.h>
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
-Adafruit_BMP085 bmp;
+#endif
+
+#define PARAQUEDAS 1
+
 
 #ifdef ARDUINO_AVR_MEGA2560
 #define SD_CS_PIN 53
@@ -24,6 +47,7 @@ Adafruit_BMP085 bmp;
 #define IGN_4 55 /*act4*/
 
 // Declaração variaveis paraquedas:
+#ifdef PARAQUEDAS
 int paraquedas = LOW;
 unsigned long previousMillis = 0;
 int paraquedas2 = LOW;
@@ -35,6 +59,7 @@ bool verificar2 = false;
 int paraquedas4 = LOW;
 unsigned long previousMillis4 = 0;
 bool verificar3 = false;
+#endif
 
 // Declaração De variaveis diversas
 int i;
@@ -69,24 +94,31 @@ void setup() {
   Serial.print("Initializing SD card...");
 
 
-
+  #ifdef ACEL
   // iniciar ACELEROMETRO
   if (!accel.begin()) {
     /* There was a problem detecting the ADXL345 ... check your connections */
     Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
   }
+  #endif
+
+  #ifdef GIRO
   //iniciar GIROSCOPIO
   if (!gyro.init()) {
     Serial.println("Failed to autodetect gyro type!");
   }
   gyro.enableDefault();
 
+  #endif 
+
+  #ifdef MAG
   // iniciar MAGNETOMETRO
   if (!mag.begin()) {
     /* There was a problem detecting the HMC5883 ... check your connections */
     Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
   }
 
+  #endif 
 
   // ADICIONAR O CABEÇALHO //
 
@@ -136,6 +168,7 @@ void setup() {
 
   //SD
 
+  #ifdef SDD
   // VERIFICAR E INICIALIZAR
   if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present");
@@ -166,8 +199,11 @@ void setup() {
   else {
     Serial.println("error opening" + nome_do_arquivo);
   }
+   #endif 
+   
   Serial.println(cabString);
 
+  #ifdef BMP
   //INICIAR BMP
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
@@ -179,6 +215,9 @@ void setup() {
     alt_in = alt_in + bmp.readAltitude();
   }
   alt_in = alt_in / 5;
+
+  #endif
+
 }
 
 
@@ -190,15 +229,24 @@ void loop() {
   unsigned long currentMillis = millis();
 
   // altura
+  #ifdef BMP
   altura = bmp.readAltitude() - alt_in;
+  #endif
 
   //mag & acel & giro
+  #ifdef MAG
   sensors_event_t Mag_event;
   mag.getEvent(&Mag_event);
+  #endif 
+
+  #ifdef ACEL
   sensors_event_t Ace_event;
   accel.getEvent(&Ace_event);
-  gyro.read();
+  #endif 
 
+  #ifdef GIRO
+  gyro.read();
+  #endif
 
   // PROCESSAMENTO
 
@@ -234,6 +282,8 @@ void loop() {
   }
 
   // LIBERAR O PRIMEIRO PARAQUEDAS //
+
+  #ifdef PARAQUEDAS
 
   if (queda == 1) {
     if (previousMillis == 0 && paraquedas == LOW) {
@@ -276,7 +326,7 @@ void loop() {
     digitalWrite(IGN_3, paraquedas3);
     digitalWrite(IGN_4, paraquedas4);
   }
-
+  #endif
 
 
   // ARMAZENAMENTO DOS DADOS DataString //
@@ -334,6 +384,7 @@ void loop() {
 
 
   // SD CARD //
+  #ifdef SDD
   File dataFile = SD.open(nome_do_arquivo, FILE_WRITE);
   // if the file is available, write to it:
   if (dataFile) {
@@ -345,5 +396,7 @@ void loop() {
   else {
     Serial.println("error opening" + nome_do_arquivo);
   }
+  #endif 
+  
   Serial.println(dataString);
 }
