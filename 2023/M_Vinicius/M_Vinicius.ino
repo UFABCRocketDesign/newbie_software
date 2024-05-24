@@ -183,13 +183,11 @@ void setup() {
 
 
 void loop() {
+ 
   // Criação do dataString para armazenar as variaveis //
   String dataString = "";
-
-  unsigned long Tempo_decorrido = millis();
-
-  dataString += String(Tempo_decorrido / 1000.0);
-  dataString += "\t";
+  //CONTAGEM DO TEMPO
+  unsigned long currentMillis = millis();
 
   altura = bmp.readAltitude() - alt_in;
 
@@ -201,6 +199,7 @@ void loop() {
     total += filtro[i];
   }
   altura_semRuido = total / 10;
+  
   // filtro 2 //
   filtro2[indi] = altura_semRuido;
   indi = (indi + 1) % 10;
@@ -211,21 +210,7 @@ void loop() {
 
   altura_sRuido2 = acum / 10;
 
-  // Criação do dataString para armazenar as variaveis //
-
-
-
-  dataString += bmp.readTemperature();
-  dataString += "\t";
-  dataString += bmp.readPressure();
-  dataString += "\t";
-  dataString += String(altura);
-  dataString += "\t";
-  dataString += String(altura_semRuido);
-  dataString += "\t";
-  dataString += String(altura_sRuido2);
-  dataString += "\t";
-
+  
   // DETECTAR APOGEU //
   for (i = 3; i > 0; i--) {
     apogeu[i] = apogeu[i - 1];
@@ -236,10 +221,9 @@ void loop() {
   } else {
     queda = 0;
   }
-  dataString += String(queda);
-  dataString += "\t";
+ 
   // LIBERAR O PRIMEIRO PARAQUEDAS //
-  unsigned long currentMillis = millis();
+  
   if (queda == 1) {
     if (previousMillis == 0 && paraquedas == LOW) {
       paraquedas = HIGH;  // ligado
@@ -281,6 +265,40 @@ void loop() {
     digitalWrite(IGN_3, paraquedas3);
     digitalWrite(IGN_4, paraquedas4);
   }
+
+  // Magnetometro & Acelerometro e Giroscopio
+  //mag
+  sensors_event_t Mag_event;
+  mag.getEvent(&Mag_event);
+
+
+  //acelerometro
+  sensors_event_t Ace_event;
+  accel.getEvent(&Ace_event);
+  
+
+  //giro
+  gyro.read();
+  
+
+// ARMAZENAMENTO DOS DADOS DataString //
+
+  dataString += String(currentMillis / 1000.0);
+  dataString += "\t";
+  dataString += bmp.readTemperature();
+  dataString += "\t";
+  dataString += bmp.readPressure();
+  dataString += "\t";
+  dataString += String(altura);
+  dataString += "\t";
+  dataString += String(altura_semRuido);
+  dataString += "\t";
+  dataString += String(altura_sRuido2);
+  dataString += "\t";
+  dataString += String(queda);
+  dataString += "\t";
+
+  //PARAQUEDAS
   dataString += String(paraquedas);
   dataString += "\t";
   dataString += String(paraquedas2);
@@ -289,10 +307,8 @@ void loop() {
   dataString += "\t";
   dataString += String(paraquedas4);
   dataString += "\t";
-  // Magnetometro & Acelerometro e Giroscopio
-  //mag
-  sensors_event_t Mag_event;
-  mag.getEvent(&Mag_event);
+
+  //MAG
   dataString += (Mag_event.magnetic.x);
   dataString += "\t";
   dataString += (Mag_event.magnetic.y);
@@ -300,9 +316,7 @@ void loop() {
   dataString += (Mag_event.magnetic.z);
   dataString += "\t";
 
-  //acelerometro
-  sensors_event_t Ace_event;
-  accel.getEvent(&Ace_event);
+  //ACEL
   dataString += (Ace_event.acceleration.x);
   dataString += "\t";
   dataString += (Ace_event.acceleration.y);
@@ -310,14 +324,15 @@ void loop() {
   dataString += (Ace_event.acceleration.z);
   dataString += "\t";
 
-  //giro
-  gyro.read();
+  //GIRO
   dataString += ((int)gyro.g.x);
   dataString += "\t";
   dataString += ((int)gyro.g.y);
   dataString += "\t";
   dataString += ((int)gyro.g.z);
   dataString += "\t";
+
+
   // SD CARD //
   File dataFile = SD.open(nome_do_arquivo, FILE_WRITE);
   // if the file is available, write to it:
