@@ -86,18 +86,13 @@ float altInicial = 0;
 // *** Filtros **** //
 class Filtro {
 private:
-  static const int NUM_LEITURAS = 15;
-  float leituras[NUM_LEITURAS];
-  float somaLeituras;
-  int indiceLeitura;
+  static const int NUM_LEITURAS = 10;
+  float leituras[NUM_LEITURAS] = {0};
+  float somaLeituras = 0;
+  int indiceLeitura = 0;
 
 public:
-  Filtro()
-    : somaLeituras(0), indiceLeitura(0) {
-    for (int i = 0; i < NUM_LEITURAS; i++) {
-      leituras[i] = 0;
-    }
-  }
+  Filtro() {}
 
   float atualizarFiltro(float novaLeitura) {
     somaLeituras -= leituras[indiceLeitura];
@@ -112,7 +107,7 @@ public:
   }
 };
 
-const int NUM_FILTROS = 5;
+const int NUM_FILTROS = 3;
 Filtro filtros[NUM_FILTROS];
 
 // *** Apogeu **** //
