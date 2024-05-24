@@ -1,28 +1,29 @@
-// BPM085 SENSOR ( PRESSÃO / TEMPERATURA / ALTITUDE)
+// BPM085 SENSOR ( PRESSÃO / TEMPERATURA / ALTITUDE) & Acelerometro & Giroscopio & Magnetometro
 #include <Adafruit_BMP085.h>
 #include <SPI.h>
 #include <SD.h>
-//Acelerometro
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_ADXL345_U.h>
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
-// Giroscopio
 #include <L3G.h>
 L3G gyro;
-// Magnetometro
 #include <Adafruit_HMC5883_U.h>
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 Adafruit_BMP085 bmp;
+
 #ifdef ARDUINO_AVR_MEGA2560
 #define SD_CS_PIN 53
 #else
 #define SD_CS_PIN 10
 #endif  // ARDUINO_AVR_MEGA2560
+// PINOS PARAQUEDAS
 #define IGN_1 36 /*act1*/
 #define IGN_2 61 /*act2*/
 #define IGN_3 46 /*act3*/
 #define IGN_4 55 /*act4*/
+
+// Declaração variaveis paraquedas:
 int paraquedas = LOW;
 unsigned long previousMillis = 0;
 int paraquedas2 = LOW;
@@ -34,11 +35,12 @@ bool verificar2 = false;
 int paraquedas4 = LOW;
 unsigned long previousMillis4 = 0;
 bool verificar3 = false;
+
+// Declaração De variaveis diversas
 int i;
 float altura, alt_in = 0;  // fazer o sensor pro foguete cair, 1 --> ta caindo
 float altura_semRuido = 0;
 float altura_sRuido2 = 0;
-float vetor[10];
 float filtro[10];
 float filtro2[10];
 float queda;
@@ -50,11 +52,12 @@ float apogeu[4];
 int ap = 0;
 int indicador = 0;
 
-
 String marcos;
 String marcs = "marcs";
 String nome_do_arquivo;
+
 const int chipSelect = 53;
+
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(IGN_1, OUTPUT);
