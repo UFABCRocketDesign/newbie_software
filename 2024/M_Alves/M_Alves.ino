@@ -92,8 +92,6 @@ private:
   int indiceLeitura = 0;
 
 public:
-  Filtro() {}
-
   float atualizarFiltro(float novaLeitura) {
     somaLeituras -= leituras[indiceLeitura];
     leituras[indiceLeitura] = novaLeitura;
