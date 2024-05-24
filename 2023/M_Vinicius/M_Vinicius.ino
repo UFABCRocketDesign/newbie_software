@@ -1,22 +1,24 @@
 // BPM085 SENSOR ( PRESSÃO / TEMPERATURA / ALTITUDE) & Acelerometro & Giroscopio & Magnetometro
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_ADXL345_U.h>
+#include <Adafruit_HMC5883_U.h>
+
 #define BMP 1
-#if BMP 
+#if BMP
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 #endif
 
 #define SDD 1
 
-#ifdef SDD
+#if SDD
 #include <SPI.h>
 #include <SD.h>
 #endif
 
 #define ACEL 1
 #if ACEL
-#include <Wire.h>
-#include <Adafruit_Sensor.h>
-#include <Adafruit_ADXL345_U.h>
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
 #endif
 
@@ -28,7 +30,6 @@ L3G gyro;
 
 #define MAG 1
 #if MAG
-#include <Adafruit_HMC5883_U.h>
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 #endif
 
@@ -47,7 +48,7 @@ Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 #define IGN_4 55 /*act4*/
 
 // Declaração variaveis paraquedas:
-#ifdef PARAQUEDAS
+#if PARAQUEDAS
 int paraquedas = LOW;
 unsigned long previousMillis = 0;
 int paraquedas2 = LOW;
@@ -94,31 +95,31 @@ void setup() {
   Serial.print("Initializing SD card...");
 
 
-  #ifdef ACEL
+#if ACEL
   // iniciar ACELEROMETRO
   if (!accel.begin()) {
     /* There was a problem detecting the ADXL345 ... check your connections */
     Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
   }
-  #endif
+#endif
 
-  #ifdef GIRO
+#if GIRO
   //iniciar GIROSCOPIO
   if (!gyro.init()) {
     Serial.println("Failed to autodetect gyro type!");
   }
   gyro.enableDefault();
 
-  #endif 
+#endif
 
-  #ifdef MAG
+#if MAG
   // iniciar MAGNETOMETRO
   if (!mag.begin()) {
     /* There was a problem detecting the HMC5883 ... check your connections */
     Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
   }
 
-  #endif 
+#endif
 
   // ADICIONAR O CABEÇALHO //
 
@@ -126,7 +127,7 @@ void setup() {
 
   cabString += ("Tempo (s)");
   cabString += "\t";
-
+#if BMP
   cabString += ("Temperature (*C)");
   cabString += "\t";
   cabString += ("Pressure (Pa)");
@@ -139,6 +140,8 @@ void setup() {
   cabString += "\t";
   cabString += ("Detector de queda");
   cabString += "\t";
+#endif
+#if PARAQUEDAS
   cabString += ("Estado paraquedas");
   cabString += "\t";
   cabString += ("Estado paraquedas 2");
@@ -147,28 +150,35 @@ void setup() {
   cabString += "\t";
   cabString += ("Estado paraquedas 4");
   cabString += "\t";
+#endif
+#if MAG
   cabString += ("Mag_X (uT)");
   cabString += "\t";
   cabString += ("Mag_Y");
   cabString += "\t";
   cabString += ("Mag_Z");
   cabString += "\t";
+#endif
+#if ACEL
   cabString += ("Ace_X (m/s^2)");
   cabString += "\t";
   cabString += ("Ace_Y");
   cabString += "\t";
   cabString += ("Ace_Z");
   cabString += "\t";
+#endif
+#if GIRO
   cabString += ("Giro_X");
   cabString += "\t";
   cabString += ("Giro_Y");
   cabString += "\t";
   cabString += ("Giro_Z");
   cabString += "\t";
+#endif
 
   //SD
 
-  #ifdef SDD
+#if SDD
   // VERIFICAR E INICIALIZAR
   if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present");
@@ -199,11 +209,11 @@ void setup() {
   else {
     Serial.println("error opening" + nome_do_arquivo);
   }
-   #endif 
-   
+#endif
+
   Serial.println(cabString);
 
-  #ifdef BMP
+#if BMP
   //INICIAR BMP
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
@@ -216,8 +226,7 @@ void setup() {
   }
   alt_in = alt_in / 5;
 
-  #endif
-
+#endif
 }
 
 
@@ -228,29 +237,29 @@ void loop() {
   //tempo
   unsigned long currentMillis = millis();
 
-  // altura
-  #ifdef BMP
+// altura
+#if BMP
   altura = bmp.readAltitude() - alt_in;
-  #endif
+#endif
 
-  //mag & acel & giro
-  #ifdef MAG
+//mag & acel & giro
+#if MAG
   sensors_event_t Mag_event;
   mag.getEvent(&Mag_event);
-  #endif 
+#endif
 
-  #ifdef ACEL
+#if ACEL
   sensors_event_t Ace_event;
   accel.getEvent(&Ace_event);
-  #endif 
+#endif
 
-  #ifdef GIRO
+#if GIRO
   gyro.read();
-  #endif
+#endif
 
   // PROCESSAMENTO
 
-  // filtro 1 //
+  // FILTRO 1 //
   filtro[index] = altura;
   index = (index + 1) % 10;
   total = 0;
@@ -259,7 +268,7 @@ void loop() {
   }
   altura_semRuido = total / 10;
 
-  // filtro 2 //
+  // FILTRO 2 //
   filtro2[indi] = altura_semRuido;
   indi = (indi + 1) % 10;
   acum = 0;
@@ -283,7 +292,7 @@ void loop() {
 
   // LIBERAR O PRIMEIRO PARAQUEDAS //
 
-  #ifdef PARAQUEDAS
+#if PARAQUEDAS
 
   if (queda == 1) {
     if (previousMillis == 0 && paraquedas == LOW) {
@@ -326,7 +335,7 @@ void loop() {
     digitalWrite(IGN_3, paraquedas3);
     digitalWrite(IGN_4, paraquedas4);
   }
-  #endif
+#endif
 
 
   // ARMAZENAMENTO DOS DADOS DataString //
@@ -335,6 +344,8 @@ void loop() {
 
   dataString += String(currentMillis / 1000.0);
   dataString += "\t";
+
+#if BMP
   dataString += bmp.readTemperature();
   dataString += "\t";
   dataString += bmp.readPressure();
@@ -347,8 +358,10 @@ void loop() {
   dataString += "\t";
   dataString += String(queda);
   dataString += "\t";
+#endif
 
-  //PARAQUEDAS
+//PARAQUEDAS
+#if PARAQUEDAS
   dataString += String(paraquedas);
   dataString += "\t";
   dataString += String(paraquedas2);
@@ -357,46 +370,50 @@ void loop() {
   dataString += "\t";
   dataString += String(paraquedas4);
   dataString += "\t";
+#endif
 
-  //MAG
+//MAG
+#if MAG
   dataString += (Mag_event.magnetic.x);
   dataString += "\t";
   dataString += (Mag_event.magnetic.y);
   dataString += "\t";
   dataString += (Mag_event.magnetic.z);
   dataString += "\t";
+#endif
 
-  //ACEL
+//ACEL
+#if ACEL
   dataString += (Ace_event.acceleration.x);
   dataString += "\t";
   dataString += (Ace_event.acceleration.y);
   dataString += "\t";
   dataString += (Ace_event.acceleration.z);
   dataString += "\t";
+#endif
 
-  //GIRO
+//GIRO
+#if GIRO
   dataString += ((int)gyro.g.x);
   dataString += "\t";
   dataString += ((int)gyro.g.y);
   dataString += "\t";
   dataString += ((int)gyro.g.z);
   dataString += "\t";
+#endif
 
 
-  // SD CARD //
-  #ifdef SDD
+// SD CARD //
+#if SDD
   File dataFile = SD.open(nome_do_arquivo, FILE_WRITE);
-  // if the file is available, write to it:
+  // escrever o arquivo
   if (dataFile) {
     dataFile.println(dataString);
     dataFile.close();
-    // print to the serial port too:
-  }
-  // if the file isn't open, pop up an error:
-  else {
+  } else {
     Serial.println("error opening" + nome_do_arquivo);
   }
-  #endif 
-  
+#endif
+
   Serial.println(dataString);
 }
