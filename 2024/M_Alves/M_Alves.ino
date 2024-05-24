@@ -15,8 +15,7 @@
 #define BMP085_TEMP (1)
 #define BMP085_PRESS (1)
 #define ALT_RAW (1)
-#define ALT_FILTER1 (1)
-#define ALT_FILTER2 (1)
+#define ALT_FILTER (1)
 #define APOGEE (1)
 //Giroscopio
 #define GIRO (1)
@@ -85,20 +84,33 @@ float altInicial = 0;
 #define NUM_LEITURAS_INICIAL 25
 
 // *** Filtros **** //
-#define NUM_FILTROS 2
-#define NUM_LEITURAS 15
+class Filtro {
+private:
+  static const int NUM_LEITURAS = 15;
+  float leituras[NUM_LEITURAS] = {0};
+  float somaLeituras = 0;
+  int indiceLeitura = 0;
 
-float leituras[NUM_FILTROS][NUM_LEITURAS] = { 0 };
-float somaLeituras[NUM_FILTROS] = { 0 };
-int indiceLeitura[NUM_FILTROS] = { 0 };
+public:
+  Filtro()
+    : somaLeituras(0), indiceLeitura(0) {
+    for (int i = 0; i < NUM_LEITURAS; i++) {
+      leituras[i] = 0;
+    }
+  }
 
-float atualizarFiltro(int filtro, float novaLeitura) {
-  somaLeituras[filtro] -= leituras[filtro][indiceLeitura[filtro]];
-  leituras[filtro][indiceLeitura[filtro]] = novaLeitura;
-  somaLeituras[filtro] += novaLeitura;
-  indiceLeitura[filtro] = (indiceLeitura[filtro] + 1) % NUM_LEITURAS;
-  return somaLeituras[filtro] / NUM_LEITURAS;
-}
+  float atualizarFiltro(float novaLeitura) {
+    somaLeituras -= leituras[indiceLeitura];
+    leituras[indiceLeitura] = novaLeitura;
+    somaLeituras += novaLeitura;
+    indiceLeitura = (indiceLeitura + 1) % NUM_LEITURAS;
+    return somaLeituras / NUM_LEITURAS;
+  }
+};
+
+const int NUM_FILTROS = 2;
+Filtro filtros[NUM_FILTROS];
+float resultadosFiltros[NUM_FILTROS];
 
 // *** Apogeu **** //
 bool apogeuAtingido = false;  // Variável global para rastrear se o apogeu foi atingido
@@ -151,7 +163,11 @@ void setup() {
   if (!bmp.begin()) {
     Serial.println("No BMP085 detected");
   }
-  dadosString += "Temperature (*C)\tPressure (Pa)\tAltitude (m)\tAltitude + Filter1 (m)\tAltitude + Filter2 (m)\tApogee (0 ou 1)\t";
+  dadosString += "Temperature (*C)\tPressure (Pa)\tAltitude (m)\t";
+  for (int i = 0; i < NUM_FILTROS; i++) {
+    dadosString += "Altitude + Filter" + String(i + 1) + " (m)\t";  //Adiciona o cabeçalho para cada filtro
+  }
+  dadosString += "Apogee (0 ou 1)\t";
 #endif
 
   // ********** Setando os Paraquedas ********** //
@@ -245,22 +261,24 @@ void loop() {
   int pressure = bmp.readPressure();
   float rawAltitude = bmp.readAltitude() - altInicial;
 
-  // *** Filtro 1 **** //
-  float mediaAltitude = atualizarFiltro(0, rawAltitude);
+  // *** Filtros **** //
+  float filteredAltitude = rawAltitude;
 
-  // *** Filtro 2 **** //
-  float mediaAltitudeFiltrada = atualizarFiltro(1, mediaAltitude);
+  for (int i = 0; i < NUM_FILTROS; i++) {
+    filteredAltitude = filtros[i].atualizarFiltro(filteredAltitude);
+    resultadosFiltros[i] = filteredAltitude;  // Armazena o resultado do filtro "j"
+  }
 
   // ********** Apogeu ********** //
   if (!apogeuAtingido) {  // Chamar detectarApogeu se o apogeu ainda não foi atingido
-    apogeuAtingido = detectarApogeu(mediaAltitudeFiltrada);
+    apogeuAtingido = detectarApogeu(filteredAltitude);
   }
 #endif
 
   // ********** Ativando os Paraquedas 1/2/3/4 ********** //
 #if PARA
   for (int i = 0; i < NUM_PARAQUEDAS; i++) {
-    gerenciarParaquedasIndividual(i, apogeuAtingido, mediaAltitudeFiltrada, currentMillis);
+    gerenciarParaquedasIndividual(i, apogeuAtingido, filteredAltitude, currentMillis);
   }
 #endif
 
@@ -291,11 +309,10 @@ void loop() {
 #if ALT_RAW
   dadosString += String(rawAltitude) + "\t";  //Altura com 0 filtro
 #endif
-#if ALT_FILTER1
-  dadosString += String(mediaAltitude) + "\t";  //Altura com 1 filtro
-#endif
-#if ALT_FILTER2
-  dadosString += String(mediaAltitudeFiltrada) + "\t";  //Altura com 2 filtro
+#if ALT_FILTER
+  for (int i = 0; i < NUM_FILTROS; i++) {
+    dadosString += String(resultadosFiltros[i]) + "\t";  //Altura após passar pelo filtro "i"
+  }
 #endif
 #if APOGEE
   dadosString += String(apogeuAtingido) + "\t";  //Bool indicando se o apogeu foi atingido (0 = não; 1 = sim)
