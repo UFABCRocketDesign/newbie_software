@@ -87,9 +87,9 @@ float altInicial = 0;
 class Filtro {
 private:
   static const int NUM_LEITURAS = 15;
-  float leituras[NUM_LEITURAS] = {0};
-  float somaLeituras = 0;
-  int indiceLeitura = 0;
+  float leituras[NUM_LEITURAS];
+  float somaLeituras;
+  int indiceLeitura;
 
 public:
   Filtro()
@@ -106,11 +106,14 @@ public:
     indiceLeitura = (indiceLeitura + 1) % NUM_LEITURAS;
     return somaLeituras / NUM_LEITURAS;
   }
+
+  float getFiltro() {
+    return somaLeituras / NUM_LEITURAS;
+  }
 };
 
-const int NUM_FILTROS = 2;
+const int NUM_FILTROS = 5;
 Filtro filtros[NUM_FILTROS];
-float resultadosFiltros[NUM_FILTROS];
 
 // *** Apogeu **** //
 bool apogeuAtingido = false;  // Variável global para rastrear se o apogeu foi atingido
@@ -266,7 +269,6 @@ void loop() {
 
   for (int i = 0; i < NUM_FILTROS; i++) {
     filteredAltitude = filtros[i].atualizarFiltro(filteredAltitude);
-    resultadosFiltros[i] = filteredAltitude;  // Armazena o resultado do filtro "j"
   }
 
   // ********** Apogeu ********** //
@@ -311,7 +313,7 @@ void loop() {
 #endif
 #if ALT_FILTER
   for (int i = 0; i < NUM_FILTROS; i++) {
-    dadosString += String(resultadosFiltros[i]) + "\t";  //Altura após passar pelo filtro "i"
+    dadosString += String(filtros[i].getFiltro()) + "\t";  //Resultado do filtro i
   }
 #endif
 #if APOGEE
