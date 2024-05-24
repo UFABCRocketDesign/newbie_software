@@ -87,7 +87,7 @@ void setup() {
     Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
   }
 
- 
+
   // ADICIONAR O CABEÇALHO //
 
   String cabString = "";
@@ -183,13 +183,24 @@ void setup() {
 
 
 void loop() {
- 
-  // Criação do dataString para armazenar as variaveis //
-  String dataString = "";
-  //CONTAGEM DO TEMPO
+
+  // LEITURAS
+
+  //tempo
   unsigned long currentMillis = millis();
 
+  // altura
   altura = bmp.readAltitude() - alt_in;
+
+  //mag & acel & giro
+  sensors_event_t Mag_event;
+  mag.getEvent(&Mag_event);
+  sensors_event_t Ace_event;
+  accel.getEvent(&Ace_event);
+  gyro.read();
+
+
+  // PROCESSAMENTO
 
   // filtro 1 //
   filtro[index] = altura;
@@ -199,7 +210,7 @@ void loop() {
     total += filtro[i];
   }
   altura_semRuido = total / 10;
-  
+
   // filtro 2 //
   filtro2[indi] = altura_semRuido;
   indi = (indi + 1) % 10;
@@ -210,7 +221,7 @@ void loop() {
 
   altura_sRuido2 = acum / 10;
 
-  
+
   // DETECTAR APOGEU //
   for (i = 3; i > 0; i--) {
     apogeu[i] = apogeu[i - 1];
@@ -221,9 +232,9 @@ void loop() {
   } else {
     queda = 0;
   }
- 
+
   // LIBERAR O PRIMEIRO PARAQUEDAS //
-  
+
   if (queda == 1) {
     if (previousMillis == 0 && paraquedas == LOW) {
       paraquedas = HIGH;  // ligado
@@ -266,22 +277,11 @@ void loop() {
     digitalWrite(IGN_4, paraquedas4);
   }
 
-  // Magnetometro & Acelerometro e Giroscopio
-  //mag
-  sensors_event_t Mag_event;
-  mag.getEvent(&Mag_event);
 
 
-  //acelerometro
-  sensors_event_t Ace_event;
-  accel.getEvent(&Ace_event);
-  
+  // ARMAZENAMENTO DOS DADOS DataString //
 
-  //giro
-  gyro.read();
-  
-
-// ARMAZENAMENTO DOS DADOS DataString //
+  String dataString = "";
 
   dataString += String(currentMillis / 1000.0);
   dataString += "\t";
