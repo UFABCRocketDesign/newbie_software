@@ -5,17 +5,18 @@
 
 class BMP085 {
 private:
-    short ac1, ac2, ac3;
-    unsigned short ac4, ac5, ac6;
-    short mb, mc, md;
-    long b1, b2, b3, b5, b6;
-    unsigned long b4, b7;
-    long x1, x2, x3;
-    unsigned long ut = 0;
-	unsigned long up = 0;
-    const int oss = 0; //overSamplingsSetting
+    int16_t ac1, ac2, ac3;
+    uint16_t ac4, ac5, ac6;
+    int16_t mb, mc, md;
+    int32_t b1, b2, b3, b5, b6;
+    uint32_t b4, b7;
+    int32_t x1, x2, x3;
+    uint32_t ut = 0;
+    uint32_t up = 0;
+    const int oss = 0; // over sampling setting
     float t;
-    long p;
+    int32_t p;
+    float h;
 
     float lerCalibracaoT();
     float lerCalibracaoP();
@@ -24,9 +25,11 @@ private:
 
 public:
     BMP085();
-    float begin();
-    float lerTempemperatura();
-    int32_t lerPressao();
-    float lerAltitude(float pressaoAlturaMar = 101325);
-    
-}
+    void begin();
+    void lerTudo();
+    float getTempemperatura();
+    int32_t getPressao();
+    float getAltitude();
+};
+
+#endif
