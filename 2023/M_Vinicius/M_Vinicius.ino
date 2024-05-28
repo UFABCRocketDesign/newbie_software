@@ -5,47 +5,45 @@
 #include <Adafruit_HMC5883_U.h>
 
 #define BMP 1
-#if BMP
-#include <Adafruit_BMP085.h>
-Adafruit_BMP085 bmp;
-#endif
-
-#define SDD 1
-
-#if SDD
-#include <SPI.h>
-#include <SD.h>
-#endif
-
-#define ACEL 1
-#if ACEL
-Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
-#endif
-
-#define GIRO 1
-#if GIRO
-#include <L3G.h>
-L3G gyro;
-#endif
-
-#define MAG 1
-#if MAG
-Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
-#endif
-
-#define PARAQUEDAS 1
-
+#define SDD 0
+#define ACEL 0
+#define GIRO 0
+#define MAG 0
+#define PARAQUEDAS 0
+// PINOS PARAQUEDAS
+#define IGN_1 36 /*act1*/
+#define IGN_2 61 /*act2*/
+#define IGN_3 46 /*act3*/
+#define IGN_4 55 /*act4*/
 
 #ifdef ARDUINO_AVR_MEGA2560
 #define SD_CS_PIN 53
 #else
 #define SD_CS_PIN 10
 #endif  // ARDUINO_AVR_MEGA2560
-// PINOS PARAQUEDAS
-#define IGN_1 36 /*act1*/
-#define IGN_2 61 /*act2*/
-#define IGN_3 46 /*act3*/
-#define IGN_4 55 /*act4*/
+
+#if BMP
+#include <Adafruit_BMP085.h>
+Adafruit_BMP085 bmp;
+#endif
+
+#if SDD
+#include <SPI.h>
+#include <SD.h>
+#endif
+
+#if ACEL
+Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
+#endif
+
+#if GIRO
+#include <L3G.h>
+L3G gyro;
+#endif
+
+#if MAG
+Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
+#endif
 
 // Declaração variaveis paraquedas:
 #if PARAQUEDAS
