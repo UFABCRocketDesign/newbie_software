@@ -4,12 +4,28 @@
 #include <Adafruit_ADXL345_U.h>
 #include <Adafruit_HMC5883_U.h>
 
-#define BMP 1
 #define SDD 0
+#define BMP 1
+#define BMP_ALT (BMP && 1)
+#define BMP_TEMP (BMP && 1)
+#define BMP_PRES (BMP && 1)
+
 #define ACEL 0
+#define ACEL_X (ACEL && 1)
+#define ACEL_Y (ACEL && 1)
+#define ACEL_Z (ACEL && 1)
+
 #define GIRO 0
+#define GIRO_X (GIRO && 1)
+#define GIRO_Y (GIRO && 1)
+#define GIRO_Z (GIRO && 1)
+
 #define MAG 0
-#define PARAQUEDAS 0
+#define MAG_X (MAG && 1)
+#define MAG_Y (MAG && 1)
+#define MAG_Z (MAG && 1)
+
+#define PARAQUEDAS (BMP && 1)
 // PINOS PARAQUEDAS
 #define IGN_1 36 /*act1*/
 #define IGN_2 61 /*act2*/
@@ -125,11 +141,15 @@ void setup() {
 
   cabString += ("Tempo (s)");
   cabString += "\t";
-#if BMP
+#if BMP_TEMP
   cabString += ("Temperature (*C)");
   cabString += "\t";
+#endif
+#if BMP_PRES
   cabString += ("Pressure (Pa)");
   cabString += "\t";
+#endif
+#if BMP_ALT
   cabString += ("Altitude (meters)");
   cabString += "\t";
   cabString += ("Altitude sem ruido (meters)");
@@ -149,27 +169,39 @@ void setup() {
   cabString += ("Estado paraquedas 4");
   cabString += "\t";
 #endif
-#if MAG
+#if MAG_X
   cabString += ("Mag_X (uT)");
   cabString += "\t";
+#endif
+#if MAG_Y
   cabString += ("Mag_Y");
   cabString += "\t";
+#endif
+#if MAG_Z
   cabString += ("Mag_Z");
   cabString += "\t";
 #endif
-#if ACEL
+#if ACEL_X
   cabString += ("Ace_X (m/s^2)");
   cabString += "\t";
+#endif
+#if ACEL_Y
   cabString += ("Ace_Y");
   cabString += "\t";
+#endif
+#if ACEL_Z
   cabString += ("Ace_Z");
   cabString += "\t";
 #endif
-#if GIRO
+#if GIRO_X
   cabString += ("Giro_X");
   cabString += "\t";
+#endif
+#if GIRO_Y
   cabString += ("Giro_Y");
   cabString += "\t";
+#endif
+#if GIRO_Z
   cabString += ("Giro_Z");
   cabString += "\t";
 #endif
@@ -217,7 +249,9 @@ void setup() {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
+#endif
 
+#if BMP_ALT
   //LEITURA ALTITUDE
   for (i = 0; i < 5; i++) {
     alt_in = alt_in + bmp.readAltitude();
@@ -236,7 +270,7 @@ void loop() {
   unsigned long currentMillis = millis();
 
 // altura
-#if BMP
+#if BMP_ALT
   altura = bmp.readAltitude() - alt_in;
 #endif
 
@@ -257,6 +291,7 @@ void loop() {
 
   // PROCESSAMENTO
 
+#if BMP_ALT
   // FILTRO 1 //
   filtro[index] = altura;
   index = (index + 1) % 10;
@@ -287,7 +322,7 @@ void loop() {
   } else {
     queda = 0;
   }
-
+#endif
   // LIBERAR O PRIMEIRO PARAQUEDAS //
 
 #if PARAQUEDAS
@@ -343,11 +378,15 @@ void loop() {
   dataString += String(currentMillis / 1000.0);
   dataString += "\t";
 
-#if BMP
+#if BMP_TEMP
   dataString += bmp.readTemperature();
   dataString += "\t";
+#endif
+#if BMP_PRES
   dataString += bmp.readPressure();
   dataString += "\t";
+#endif
+#if BMP_ALT
   dataString += String(altura);
   dataString += "\t";
   dataString += String(altura_semRuido);
@@ -371,31 +410,43 @@ void loop() {
 #endif
 
 //MAG
-#if MAG
+#if MAG_X
   dataString += (Mag_event.magnetic.x);
   dataString += "\t";
+#endif
+#if MAG_Y
   dataString += (Mag_event.magnetic.y);
   dataString += "\t";
+#endif
+#if MAG_Z
   dataString += (Mag_event.magnetic.z);
   dataString += "\t";
 #endif
 
 //ACEL
-#if ACEL
+#if ACEL_X
   dataString += (Ace_event.acceleration.x);
   dataString += "\t";
+#endif
+#if ACEL_Y
   dataString += (Ace_event.acceleration.y);
   dataString += "\t";
+#endif
+#if ACEL_Z
   dataString += (Ace_event.acceleration.z);
   dataString += "\t";
 #endif
 
 //GIRO
-#if GIRO
+#if GIRO_X
   dataString += ((int)gyro.g.x);
   dataString += "\t";
+#endif
+#if GIRO_Y
   dataString += ((int)gyro.g.y);
   dataString += "\t";
+#endif
+#if GIRO_Z
   dataString += ((int)gyro.g.z);
   dataString += "\t";
 #endif
