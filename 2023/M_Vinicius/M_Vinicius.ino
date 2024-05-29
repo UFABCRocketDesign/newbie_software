@@ -77,22 +77,11 @@ bool verificar3 = false;
 #endif
 
 // Declaração De variaveis diversas
-int i;
-float altura, alt_in = 0;  // fazer o sensor pro foguete cair, 1 --> ta caindo
-float altura_semRuido = 0;
-float altura_sRuido2 = 0;
+float queda, alt_in = 0;  // fazer o sensor pro foguete cair, 1 --> ta caindo
 float filtro[10];
 float filtro2[10];
-float queda;
-int index = 0;
-int indi = 0;
-float total = 0;
-float acum = 0;
 float apogeu[4];
-int ap = 0;
-int indicador = 0;
 
-String marcos;
 String marcs = "marcs";
 String nome_do_arquivo;
 
@@ -219,6 +208,7 @@ void setup() {
   Serial.println("card initialized.");
 
   // CRIAR UM NOVO ARQUIVO DE TEXTO CADA VEZ QUE O CARTÃO SD É INSERIDO //
+  int indicador = 0; // NAO SEI SE ESSE INDICADOR VAI DA ERRADO
   do {
     String qnt_zero;
     for (i = String(indicador).length() + String(marcs).length(); i < 8; i++) {
@@ -253,7 +243,7 @@ void setup() {
 
 #if BMP_ALT
   //LEITURA ALTITUDE
-  for (i = 0; i < 5; i++) {
+  for (int i = 0; i < 5; i++) {
     alt_in = alt_in + bmp.readAltitude();
   }
   alt_in = alt_in / 5;
@@ -271,7 +261,7 @@ void loop() {
 
 // altura
 #if BMP_ALT
-  altura = bmp.readAltitude() - alt_in;
+  float altura = bmp.readAltitude() - alt_in;
 #endif
 
 //mag & acel & giro
@@ -293,27 +283,29 @@ void loop() {
 
 #if BMP_ALT
   // FILTRO 1 //
+  int index = 0;
   filtro[index] = altura;
   index = (index + 1) % 10;
-  total = 0;
+ float total = 0;
   for (int i = 0; i < 10; i++) {
     total += filtro[i];
   }
-  altura_semRuido = total / 10;
+  float altura_semRuido = total / 10;
 
   // FILTRO 2 //
-  filtro2[indi] = altura_semRuido;
-  indi = (indi + 1) % 10;
-  acum = 0;
+  index = 0;   // ANTES ERA INT ind
+  filtro2[index] = altura_semRuido;
+  index = (index + 1) % 10;
+  total = 0;   // ANTES ERA acum
   for (int i = 0; i < 10; i++) {
-    acum += filtro2[i];
+    total += filtro2[i];
   }
 
-  altura_sRuido2 = acum / 10;
+  float altura_sRuido2 = total / 10;
 
 
   // DETECTAR APOGEU //
-  for (i = 3; i > 0; i--) {
+  for (int i = 3; i > 0; i--) {
     apogeu[i] = apogeu[i - 1];
   }
   apogeu[0] = altura_sRuido2;
