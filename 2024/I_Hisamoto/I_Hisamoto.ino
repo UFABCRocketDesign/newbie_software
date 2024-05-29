@@ -12,6 +12,9 @@ int contador = 0;
 float alturaAnterior;
 int numA = 0;
 File arquivo;
+String nomeArquivo;
+String inicio = "data";
+String tipoDeArquivo = ".txt";
 
 float filtroSuavizarCurva_0(float dadosCurva_0) {
 
@@ -52,10 +55,10 @@ void setup() {
   }
   Serial.println("Cartão SD inicializado com sucesso");
 //verificando nome de arquivo
-  String nomeArquivo = "data" + String(numA) + ".txt";
+  nomeArquivo = inicio + String(numA) + tipoDeArquivo;
   while (SD.exists(nomeArquivo)) {
     numA++;
-    nomeArquivo = "data" + String(numA) + ".txt";
+    nomeArquivo = inicio + String(numA) + tipoDeArquivo;
   }
   arquivo = SD.open(nomeArquivo, FILE_WRITE);
   if (arquivo) {
