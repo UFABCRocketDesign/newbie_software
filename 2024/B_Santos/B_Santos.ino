@@ -28,12 +28,12 @@ Adafruit_BMP085 bmp;
     Serial.print("Alt.Nível do mar");
     Serial.println();
 
-  //variaveis
-   for ( i <= 4 ; i++ ) 
+  //Variaveis
+   for ( int i=0; i <= 4 ; i++ ) 
    {Alt += bmp.readAltitude();
    }
   
-  //contas 
+  //Defidinição do ponto "zero" da altidude
    float M = Alt / 5;
 }
 
