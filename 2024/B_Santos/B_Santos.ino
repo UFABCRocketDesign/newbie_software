@@ -2,9 +2,8 @@
 
 Adafruit_BMP085 bmp;
 
-  float Alt = 0
-  int x = 0
-
+  float Alt = 0;
+ 
   void setup() {
 // initialize digital pin LED_BUILTIN as an output.
     pinMode(LED_BUILTIN, OUTPUT);
@@ -30,9 +29,12 @@ Adafruit_BMP085 bmp;
     Serial.println();
 
   //variaveis
-   for ( int x = 0; i <= 4 ; i++ )
+   for ( i <= 4 ; i++ ) 
    {Alt += bmp.readAltitude();
    }
+  
+  //contas 
+   M = ( Alt / 5)
 }
 
  // the loop function runs over and over again forever
