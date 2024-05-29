@@ -33,8 +33,8 @@ Adafruit_BMP085 bmp;
    {Alt += bmp.readAltitude();
    }
   
-  //Defidinição do ponto "zero" da altidude
-   float M = Alt / 5;
+  //Defidinição do ponto "zero" da altitude
+   float Alt = Alt / 5;
 }
 
  // the loop function runs over and over again forever
@@ -48,7 +48,7 @@ Adafruit_BMP085 bmp;
     Serial.print(bmp.readPressure());
     Serial.print("\t");
   
-    Serial.print(bmp.readAltitude());
+    Serial.print(bmp.readAltitude() - Alt);
     Serial.print("\t");
     
     Serial.print(bmp.readSealevelPressure());
