@@ -34,7 +34,7 @@ Adafruit_BMP085 bmp;
    }
   
   //Defidinição do ponto "zero" da altitude
-   float Alt = Alt / 5;
+   Alt = Alt / 5;
 }
 
  // the loop function runs over and over again forever
