@@ -25,35 +25,34 @@ int apogeu = 0;
 
 void setup() {
   Serial.begin(115200);
-  
+
   // erro de iniciar os sensores
 
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-
-  // iniciar SD
-
-  while (!Serial) {;}
+  }
+  while (!Serial) { ; }
   Serial.print("Initializing SD card...");
 
   if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present");
-    while (1);
+    while (1)
+      ;
   }
   Serial.println("card initialized.");
-  }
 
-  
+
+
   String dataString = "";
   dataString += String("Temperatura\tpressão\tAltitude\tpressão em relação ao mar\taltitude real") + "\t";
   File dataFile = SD.open("calvo.txt", FILE_WRITE);
   if (dataFile) {
     dataFile.println(dataString);
-    dataFile.close();}
-  else {
+    dataFile.close();
+  } else {
     Serial.println("error opening datalog.txt");
   }
-// sensores
+  // sensores
   for (int i = 0; i < 20; i++) {
 
     alturainicial = alturainicial + bmp.readAltitude();
@@ -95,7 +94,7 @@ void loop() {
 
 
   if (apojas > filtro) {
-    n=n+0.1;
+    n = n + 0.1;
   } else {
     n = 0;
   }
@@ -144,11 +143,7 @@ void loop() {
   if (dataFile) {
     dataFile.println(dataString);
     dataFile.close();
-  }
-  else {
+  } else {
     Serial.println("error opening datalog.txt");
   }
 }
-  
-
-  

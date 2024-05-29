@@ -100,128 +100,183 @@ String nomeBaseSD = "data";  //setup
 String nomeSD;               //global
 #endif
 
-//Definindo variaveis filtros
 #if (BAR)
-float alturaInicial;  //global
-#define NUM_FILTROS 3
+//Definindo variaveis para os filtros
 #define NUM_LEITURAS 10
-float dados[NUM_FILTROS][NUM_LEITURAS];
-int indices[NUM_FILTROS];
-float filtros[NUM_FILTROS];
-#endif
+#define NUM_FILTROS 3
 
-//Definindo variaveis apogeu
-#if (BAR)
-#define historicoTamanho 20
-float historico[historicoTamanho];  //global
-int indiceHistorico = 0;            //global
-#endif
-
-//Definindo variaveis paraquedas
-
-#if (PARAQUEDAS)
-#define intervaloTempo 10000  //Intervalo de tempo que os skibs ficam ligados
-bool paraquedas[] = { false, false, false, false };
-bool paraquedasData[] = { false, false, false, false };
-unsigned long paraquedasTempo[] = { 0, 0, 0, 0 };
-const int ign[] = { IGN_1, IGN_2, IGN_3, IGN_4 };
-#endif
-
-#if (BAR)
-float aplicarFiltro(float entrada, int filtro) {
-  float soma = 0;
+//Definindo classe dos filtros
+class FiltroMediaMovel {
+  const int numLeitura;
+  float* dados = new float[numLeitura];
+  int indice = 0;
   float media = 0;
-  dados[filtro][indices[filtro]] = entrada;
-  for (int j = 0; j < NUM_LEITURAS; j++) {
-    soma += dados[filtro][j];
-  }
-  media = soma / NUM_LEITURAS;
-  indices[filtro]++;
-  if (indices[filtro] >= NUM_LEITURAS) {
-    indices[filtro] = 0;
-  }
-  return media;
-}
 
-bool deteccaoApogeu(float entrada) {
-  historico[indiceHistorico] = entrada;
-  int contadorHistorico = 0;
-  if (++indiceHistorico >= historicoTamanho) {
-    indiceHistorico = 0;
+public:
+  FiltroMediaMovel(int tamanho = 10)
+    : numLeitura(tamanho) {
+  }
+  ~FiltroMediaMovel() {
+    delete[] dados;
   }
 
-  for (int i = 1; i < historicoTamanho; i++) {
-    if (historico[(indiceHistorico + i - 1) % historicoTamanho] > historico[(indiceHistorico + i) % historicoTamanho]) {
-      contadorHistorico++;
+  float aplicarFiltro(float entrada) {
+    float soma = 0;
+    dados[indice] = entrada;
+    for (int i = 0; i < numLeitura; i++) {
+      soma += dados[i];
     }
+    media = soma / numLeitura;
+    indice++;
+    if (indice >= numLeitura) {
+      indice = 0;
+    }
+    return media;
   }
 
-  bool estaDescendo = false;
-
-  if (contadorHistorico >= 0.85 * historicoTamanho) {
-    estaDescendo = true;
+  float getMedia() {
+    return media;
   }
-  return estaDescendo;
-}
+};
+//Inicializando os filtros
+FiltroMediaMovel f1(NUM_LEITURAS);
+FiltroMediaMovel f2(NUM_LEITURAS);
+FiltroMediaMovel f3(NUM_LEITURAS);
+
+float alturaInicial;  //Var global para altura inicial
+
+//Definindo classe apogeu
+
+class Apogeu {
+  const int historicoTamanho;
+  float* historico = new float[historicoTamanho];
+  int indice = 0;
+  bool estaDescendo;
+
+public:
+  Apogeu(int tamanho = 20)
+    : historicoTamanho(tamanho) {
+  }
+
+  ~Apogeu() {
+    delete[] historico;
+  }
+
+  bool deteccaoApogeu(float entrada) {
+    historico[indice] = entrada;
+    int contadorHistorico = 0;
+    if (++indice >= historicoTamanho) {
+      indice = 0;
+    }
+
+    for (int i = 1; i < historicoTamanho; i++) {
+      if (historico[(indice + i - 1) % historicoTamanho] > historico[(indice + i) % historicoTamanho]) {
+        contadorHistorico++;
+      }
+    }
+
+    estaDescendo = false;
+
+    if (contadorHistorico >= 0.85 * historicoTamanho) {
+      estaDescendo = true;
+    }
+    return estaDescendo;
+  }
+
+  bool getEstaDescendo() {
+    return estaDescendo;
+  }
+};
+
+//Inicializando apogeu
+Apogeu apogeu(20);
+
 #endif
 
+//Definindo classe paraquedas
+
 #if (PARAQUEDAS)
-void ativarParaquedas(unsigned long currentTime, bool estaDescendo, float delay, float altura, int indiceParaquedas) {
+class Paraquedas {
+  const int intervaloLigado;
+  bool paraquedas = false;
+  bool paraquedasData = false;
+  unsigned long paraquedasTempo = 0;
+  const int ign;
+  float delay;
+  float altura;
 
-  if (delay == 0) {
-    if (altura == 0) {
-      if (estaDescendo && !paraquedas[indiceParaquedas]) {
-        paraquedas[indiceParaquedas] = true;
-        paraquedasTempo[indiceParaquedas] = millis();
-        paraquedasData[indiceParaquedas] = true;
-      }
+public:
+  Paraquedas(int tempoLigado, float tempoDelay, int portaIgn, float alturaAtivacao)
+    : intervaloLigado(tempoLigado), delay(tempoDelay), ign(portaIgn), altura(alturaAtivacao) {
+  }
 
-      if (paraquedas[indiceParaquedas] && currentTime >= paraquedasTempo[indiceParaquedas] + intervaloTempo) {
-        paraquedasData[indiceParaquedas] = false;
+  void ativarParaquedas(float alturaAtual, unsigned long currentTime, bool estaDescendo) {
+
+    if (delay == 0) {
+      if (altura == 0) {
+        if (estaDescendo && !paraquedas) {
+          paraquedas = true;
+          paraquedasTempo = millis();
+          paraquedasData = true;
+        }
+
+        if (paraquedas && currentTime >= paraquedasTempo + intervaloLigado) {
+          paraquedasData = false;
+        }
+      } else {
+        if (estaDescendo && !paraquedas) {
+          paraquedas = true;
+        }
+        if (paraquedas && alturaAtual <= altura && paraquedasTempo == 0) {
+          paraquedasTempo = millis();
+          paraquedasData = true;
+        }
+        if (paraquedas && paraquedasTempo != 0 && currentTime >= paraquedasTempo + intervaloLigado) {
+          paraquedasData = false;
+        }
       }
     } else {
-      if (estaDescendo && !paraquedas[indiceParaquedas]) {
-        paraquedas[indiceParaquedas] = true;
-      }
-      if (paraquedas[indiceParaquedas] && filtros[NUM_FILTROS - 1] <= altura && paraquedasTempo[indiceParaquedas] == 0) {
-        paraquedasTempo[indiceParaquedas] = millis();
-        paraquedasData[indiceParaquedas] = true;
-      }
-      if (paraquedas[indiceParaquedas] && paraquedasTempo[indiceParaquedas] != 0 && currentTime >= paraquedasTempo[indiceParaquedas] + intervaloTempo) {
-        paraquedasData[indiceParaquedas] = false;
+      if (altura == 0) {
+        if (estaDescendo && !paraquedas) {
+          paraquedas = true;
+          paraquedasTempo = millis();
+        }
+        if (paraquedas && currentTime >= paraquedasTempo + delay && currentTime < paraquedasTempo + delay + intervaloLigado) {
+          paraquedasData = true;
+        } else if (paraquedas && currentTime >= paraquedasTempo + delay + intervaloLigado) {
+          paraquedasData = false;
+        }
+      } else {
+        if (estaDescendo && !paraquedas) {
+          paraquedas = true;
+        }
+        if (paraquedas && alturaAtual <= altura && paraquedasTempo == 0) {
+          paraquedasTempo = millis();
+        }
+        if (paraquedas && paraquedasTempo != 0 && currentTime >= paraquedasTempo + delay && currentTime < paraquedasTempo + delay + intervaloLigado) {
+          paraquedasData = true;
+        } else if (paraquedas && currentTime >= paraquedasTempo + delay + intervaloLigado) {
+          paraquedasData = false;
+        }
       }
     }
-  } else {
-    if (altura == 0) {
-      if (estaDescendo && !paraquedas[indiceParaquedas]) {
-        paraquedas[indiceParaquedas] = true;
-        paraquedasTempo[indiceParaquedas] = millis();
-      }
-      if (paraquedas[indiceParaquedas] && currentTime >= paraquedasTempo[indiceParaquedas] + delay && currentTime < paraquedasTempo[indiceParaquedas] + delay + intervaloTempo) {
-        paraquedasData[indiceParaquedas] = true;
-      } else if (paraquedas[indiceParaquedas] && currentTime >= paraquedasTempo[indiceParaquedas] + delay + intervaloTempo) {
-        paraquedasData[indiceParaquedas] = false;
-      }
+    if (paraquedasData == true) {
+      digitalWrite(ign, HIGH);
     } else {
-      if (estaDescendo && !paraquedas[indiceParaquedas]) {
-        paraquedas[indiceParaquedas] = true;
-      }
-      if (paraquedas[indiceParaquedas] && filtros[NUM_FILTROS - 1] <= altura && paraquedasTempo[indiceParaquedas] == 0) {
-        paraquedasTempo[indiceParaquedas] = millis();
-      }
-      if (paraquedas[indiceParaquedas] && paraquedasTempo[indiceParaquedas] != 0 && currentTime >= paraquedasTempo[indiceParaquedas] + delay && currentTime < paraquedasTempo[indiceParaquedas] + delay + intervaloTempo) {
-        paraquedasData[indiceParaquedas] = true;
-      } else if (paraquedas[indiceParaquedas] && currentTime >= paraquedasTempo[indiceParaquedas] + delay + intervaloTempo) {
-        paraquedasData[indiceParaquedas] = false;
-      }
+      digitalWrite(ign, LOW);
     }
   }
-  if (paraquedasData[indiceParaquedas] == true) {
-    digitalWrite(ign[indiceParaquedas], HIGH);
-  } else {
-    digitalWrite(ign[indiceParaquedas], LOW);
+
+  bool getData() {
+    return paraquedasData;
   }
-}
+};
+
+Paraquedas p1(10000, 0, IGN_1, 0);
+Paraquedas p2(10000, 5000, IGN_2, 0);
+Paraquedas p3(10000, 0, IGN_3, -3);
+Paraquedas p4(10000, 5000, IGN_4, -3);
+
 #endif
 
 void setup() {
@@ -305,10 +360,6 @@ void setup() {
   }
   alturaInicial = soma / NUM_LEITURAS;
 
-  //Inicializando vetor de historico
-  for (int i = 0; i < historicoTamanho; i++) {
-    historico[i] = 0;
-  }
 #endif
 
   //Definindo cabecalho
@@ -494,33 +545,35 @@ void loop() {
   //Filtros
   float altitude = bmp.readAltitude() - alturaInicial;
 
-  filtros[0] = aplicarFiltro(altitude, 0);
-  for (int i = 0; i < NUM_FILTROS; i++) {
-    filtros[i] = aplicarFiltro(filtros[i - 1], i);
-  }
+  f1.aplicarFiltro(altitude);
+  f2.aplicarFiltro(f1.getMedia());
+  f3.aplicarFiltro(f2.getMedia());
+
+  // Obtendo a média final filtrada
+  float filtroFinal = f3.getMedia();
 
   //Apogeu
-  bool estaDescendo = deteccaoApogeu(filtros[NUM_FILTROS - 1]);
+  apogeu.deteccaoApogeu(filtroFinal);
 #endif
 
   //Paraquedas 1
 #if (P1)
-  ativarParaquedas(currentTime, estaDescendo, 0, 0, 0);
+  p1.ativarParaquedas(filtroFinal, currentTime, apogeu.getEstaDescendo());
 #endif
 
   //Paraquedas 2
 #if (P2)
-  ativarParaquedas(currentTime, estaDescendo, 5000, 0, 1);
+  p2.ativarParaquedas(filtroFinal, currentTime, apogeu.getEstaDescendo());
 #endif
 
 //Paraquedas 3
 #if (P3)
-  ativarParaquedas(currentTime, estaDescendo, 0, -3, 2);
+  p3.ativarParaquedas(filtroFinal, currentTime, apogeu.getEstaDescendo());
 #endif
 
 //Paraquedas 4
 #if (P4)
-  ativarParaquedas(currentTime, estaDescendo, 5000, -3, 3);
+  p4.ativarParaquedas(filtroFinal, currentTime, apogeu.getEstaDescendo());
 #endif
 
   //Inicializando a string
@@ -532,26 +585,26 @@ void loop() {
   dataString += String(bmp.readTemperature()) + "\t";
   dataString += String(bmp.readPressure()) + "\t";
   dataString += String(altitude) + "\t";
-  for (int i = 0; i < NUM_FILTROS; i++) {
-    dataString += String(filtros[i]) + "\t";
-  }
-  dataString += String(estaDescendo) + "\t";
+  dataString += String(f1.getMedia()) + "\t";
+  dataString += String(f2.getMedia()) + "\t";
+  dataString += String(f3.getMedia()) + "\t";
+  dataString += String(apogeu.getEstaDescendo()) + "\t";
 #endif
 
 #if (P1)
-  dataString += String(paraquedasData[0]) + "\t";
+  dataString += String(p1.getData()) + "\t";
 #endif
 
 #if (P2)
-  dataString += String(paraquedasData[1]) + "\t";
+  dataString += String(p2.getData()) + "\t";
 #endif
 
 #if (P3)
-  dataString += String(paraquedasData[2]) + "\t";
+  dataString += String(p3.getData()) + "\t";
 #endif
 
 #if (P4)
-  dataString += String(paraquedasData[3]) + "\t";
+  dataString += String(p4.getData()) + "\t";
 #endif
 
 #if (AX)

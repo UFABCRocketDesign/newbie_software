@@ -7,57 +7,72 @@
 #include <Adafruit_HMC5883_U.h>
 #include <Adafruit_ADXL345_U.h>
 
-#define SDCARD (1)
+#define SDCARD (0)
 //Paraquedas
-#define state (1)
-#define PARA1 (1)
-#define PARA2 (1)
-#define PARA3 (1)
-#define PARA4 (1)
+#define PARA (1)
 //BMP085
 #define BMP085 (1)
-#define BMP085temp (1)
-#define BMP085press (1)
-#define altRAW (1)
-#define altFilter1 (1)
-#define altFilter2 (1)
+#define BMP085_TEMP (1)
+#define BMP085_PRESS (1)
+#define ALT_RAW (1)
+#define ALT_FILTER (1)
+#define APOGEE (1)
 //Giroscopio
 #define GIRO (1)
-#define GIROX (1)
-#define GIROY (1)
-#define GIROZ (1)
+#define GIRO_X (1)
+#define GIRO_Y (1)
+#define GIRO_Z (1)
 //Magnetometro
 #define MAGNETO (1)
-#define MAGNETOX (1)
-#define MAGNETOY (1)
-#define MAGNETOZ (1)
+#define MAGNETO_X (1)
+#define MAGNETO_Y (1)
+#define MAGNETO_Z (1)
 //Acelerometro
 #define ACELERO (1)
-#define ACELEROX (1)
-#define ACELEROY (1)
-#define ACELEROZ (1)
+#define ACELERO_X (1)
+#define ACELERO_Y (1)
+#define ACELERO_Z (1)
 
 // ********** PARAQUEDAS ********** //
-#define IGN_1 36 /*act1*/
-bool ativacao1 = false;
-#define IGN_2 61 /*act2*/
-bool ativacao2 = false;
-#define IGN_3 46 /*act3*/
-bool ativacao3 = false;
-#define IGN_4 55 /*act4*/
-bool ativacao4 = false;
+#if PARA
+#define NUM_PARAQUEDAS 4
+#define ALT_PARAQUEDAS -3
 
-unsigned long futureMillis = 0;
-#define interval 10000
-unsigned long futureMillis2 = 0;
-#define interval2 5000
-unsigned long futureMillis3 = 0;
-#define interval3 10000
-unsigned long futureMillis4 = 0;
-#define interval4 5000
+int ign[NUM_PARAQUEDAS] = { 36, 61, 46, 55 };  // Número dos pinos para cada paraquedas
+bool ativacao[NUM_PARAQUEDAS] = { false };
+bool paraquedasAtivado[NUM_PARAQUEDAS] = { false };
+unsigned long futureMillis[NUM_PARAQUEDAS] = { 0 };
+
+bool apogeuApenas[NUM_PARAQUEDAS] = { true, true, false, false };  // Paraquedas que ativam com apenas o apogeu = true, paraquedas que precisam de uma altura específica = false
+
+unsigned long intervalosApogeu[NUM_PARAQUEDAS] = { 0, 2000, 0, 0 };    // Intervalo de ativação entre os paraquedas de "apenas apogeu"
+unsigned long intervalosAltitude[NUM_PARAQUEDAS] = { 0, 0, 0, 2000 };  // Intervalo de ativação entre os paraquedas de altura específica
+
+unsigned long tempoAtivacao[NUM_PARAQUEDAS] = { 5000, 5000, 5000, 5000 };  // Tempo de ativação de cada paraquedas
+
+void gerenciarParaquedasIndividual(int i, bool apogeuAtingido, float mediaAltitudeFiltrada, unsigned long currentMillis) {
+  static bool altParaquedasBool = false;
+
+  if (apogeuAtingido == true && mediaAltitudeFiltrada < ALT_PARAQUEDAS) {
+    altParaquedasBool = true;
+  }
+
+  if (apogeuAtingido == true && ativacao[i] == false && paraquedasAtivado[i] == false && (apogeuApenas[i] || altParaquedasBool)) {
+    if (i == 0 || (i > 0 && currentMillis >= futureMillis[i - 1] + (apogeuApenas[i] ? intervalosApogeu[i] : intervalosAltitude[i]))) {
+      digitalWrite(ign[i], HIGH);
+      ativacao[i] = true;
+      futureMillis[i] = currentMillis + tempoAtivacao[i];
+    }
+  } else if (ativacao[i] == true && currentMillis >= futureMillis[i]) {
+    digitalWrite(ign[i], LOW);
+    ativacao[i] = false;
+    paraquedasAtivado[i] = true;
+  }
+}
+#endif
 
 // ********** SD Card ********** //
-#define chipSelect 53
+#define CHIP_SELECT 53
 int fileNum = 0;
 String sdName = "Math";
 String fileName;
@@ -65,31 +80,58 @@ String fileName;
 // ********** Altitude, Filtros e Apogeu ********** //
 #if BMP085
 Adafruit_BMP085 bmp;
-float AltInicial = 0;
-#define numLeiturasInicial 25
+float altInicial = 0;
+#define NUM_LEITURAS_INICIAL 25
 
 // *** Filtros **** //
+class Filtro {
+private:
+  static const int NUM_LEITURAS = 10;
+  float leituras[NUM_LEITURAS] = {0};
+  float somaLeituras = 0;
+  int indiceLeitura = 0;
 
-#define NUM_FILTROS 2
-#define NUM_LEITURAS 15
+public:
+  float atualizarFiltro(float novaLeitura) {
+    somaLeituras -= leituras[indiceLeitura];
+    leituras[indiceLeitura] = novaLeitura;
+    somaLeituras += novaLeitura;
+    indiceLeitura = (indiceLeitura + 1) % NUM_LEITURAS;
+    return somaLeituras / NUM_LEITURAS;
+  }
 
-float leituras[NUM_FILTROS][NUM_LEITURAS] = {0};
-float somaLeituras[NUM_FILTROS] = {0};
-int indiceLeitura[NUM_FILTROS] = {0};
+  float getFiltro() {
+    return somaLeituras / NUM_LEITURAS;
+  }
+};
 
-float atualizarFiltro(int filtro, float novaLeitura) {
-  somaLeituras[filtro] -= leituras[filtro][indiceLeitura[filtro]];
-  leituras[filtro][indiceLeitura[filtro]] = novaLeitura;
-  somaLeituras[filtro] += novaLeitura;
-  indiceLeitura[filtro] = (indiceLeitura[filtro] + 1) % NUM_LEITURAS;
-  return somaLeituras[filtro] / NUM_LEITURAS;
-}
+const int NUM_FILTROS = 3;
+Filtro filtros[NUM_FILTROS];
 
 // *** Apogeu **** //
-float altitudeAnterior = -1;
-int contador = 0;
-int estado = 0;  // estado 0 -> subindo; estado 1 -> descendo
-bool apogeu = false;
+bool apogeuAtingido = false;  // Variável global para rastrear se o apogeu foi atingido
+bool detectarApogeu(float alturaAtual) {
+  static float alturaAnterior = -1;
+  static int contador = 0;
+  static int estado = 0;  // estado 0 -> subindo; estado 1 -> descendo
+  static bool apogeu = false;
+
+  if (alturaAnterior != -1 && alturaAtual < alturaAnterior) {
+    contador++;
+    if (contador >= 25) {
+      estado = 1;
+      if (estado == 1) {
+        apogeu = true;
+      }
+    }
+  } else {
+    contador = 0;
+    estado = 0;
+  }
+
+  alturaAnterior = alturaAtual;  // Atualize a altitude anterior para a próxima iteração
+  return apogeu;
+}
 #endif
 
 // ********** Gyro + Mag + Accel ********** //
@@ -105,9 +147,11 @@ Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(1337);
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(1338);
 #endif
 
+String dadosString = "";
+
 void setup() {
   Serial.begin(115200);
-  String dadosString = "Time (s)\t";
+  dadosString = "Time (s)\t";
 
 // ********** Iniciando os Sensores ********** //
 //BME085
@@ -115,8 +159,22 @@ void setup() {
   if (!bmp.begin()) {
     Serial.println("No BMP085 detected");
   }
-  dadosString += "Temperature (*C)\tPressure (Pa)\tAltitude (m)\tAltitude + Filter1 (m)\tAltitude + Filter2 (m)\tApogee (0 ou 1)\tParachute1 (bool)\tParachute2 (bool)\tParachute3 (bool)\tParachute4 (bool)\t";
+  dadosString += "Temperature (*C)\tPressure (Pa)\tAltitude (m)\t";
+  for (int i = 0; i < NUM_FILTROS; i++) {
+    dadosString += "Altitude + Filter" + String(i + 1) + " (m)\t";  //Adiciona o cabeçalho para cada filtro
+  }
+  dadosString += "Apogee (0 ou 1)\t";
 #endif
+
+  // ********** Setando os Paraquedas ********** //
+#if PARA
+  for (int i = 0; i < NUM_PARAQUEDAS; i++) {
+    pinMode(ign[i], OUTPUT);
+    digitalWrite(ign[i], LOW);
+    dadosString += "Parachute" + String(i + 1) + " (bool)\t";
+  }
+#endif
+
 //Giroscópio
 #if GIRO
   Wire.begin();
@@ -126,6 +184,7 @@ void setup() {
   gyro.enableDefault();
   dadosString += "GyroX (dps)\tGyroY (dps)\tGyroZ (dps)\t";
 #endif
+
 //Magnetômetro
 #if MAGNETO
   if (!mag.begin()) {
@@ -133,6 +192,7 @@ void setup() {
   }
   dadosString += "MagX (uT)\t MagY (uT)\t MagZ(uT)\t";
 #endif
+
 //Acelerômetro
 #if ACELERO
   if (!accel.begin()) {
@@ -140,6 +200,7 @@ void setup() {
   }
   dadosString += "AccelX (m/s^2)\tAccelY (m/s^2)\tAccelZ (m/s^2)\n";
 #endif
+
 //SDCard
 #if SDCARD
   if (!SD.begin(chipSelect)) {  // see if the card is present and can be initialized:
@@ -147,26 +208,17 @@ void setup() {
   }
 #endif
 
-  // ********** Setando os Paraquedas ********** //
-#if BMP085
-  pinMode(IGN_1, OUTPUT);
-  digitalWrite(IGN_1, LOW);
-  pinMode(IGN_2, OUTPUT);
-  digitalWrite(IGN_2, LOW);
-  pinMode(IGN_3, OUTPUT);
-  digitalWrite(IGN_3, LOW);
-  pinMode(IGN_4, OUTPUT);
-  digitalWrite(IGN_4, LOW);
-
   // ********** Filtros ********** //
+#if BMP085
   //Leituras iniciais
   float somaAltInicial = 0;
-  for (int i = 0; i < numLeiturasInicial; i++) {
+  for (int i = 0; i < NUM_LEITURAS_INICIAL; i++) {
     somaAltInicial += bmp.readAltitude();
   }
 
-  AltInicial = somaAltInicial / numLeiturasInicial;  //Médias das leituras iniciais
+  altInicial = somaAltInicial / NUM_LEITURAS_INICIAL;  //Médias das leituras iniciais
 #endif
+
   // ********** Cabeçalho ********** //
   dadosString += "\n";
   Serial.println(dadosString);
@@ -202,80 +254,28 @@ void loop() {
 // ********** BME085 - Altura e Filtros ********** //
 #if BMP085
   float temperature = bmp.readTemperature();
-  float pressure = bmp.readPressure();
-  float rawAltitude = bmp.readAltitude() - AltInicial;
+  int pressure = bmp.readPressure();
+  float rawAltitude = bmp.readAltitude() - altInicial;
 
-  // *** Filtro 1 **** //
-  float mediaAltitude = atualizarFiltro(0, rawAltitude);
+  // *** Filtros **** //
+  float filteredAltitude = rawAltitude;
 
-  // *** Filtro 2 **** //
-  float mediaAltitudeFiltrada = atualizarFiltro(1, mediaAltitude);
+  for (int i = 0; i < NUM_FILTROS; i++) {
+    filteredAltitude = filtros[i].atualizarFiltro(filteredAltitude);
+  }
 
   // ********** Apogeu ********** //
-  if (altitudeAnterior != -1 && mediaAltitudeFiltrada < altitudeAnterior) {
-    contador++;
-    if (contador >= 25) {
-      estado = 1;
-      if (estado == 1) {
-        apogeu = true;
-      }
-    }
-  } else {
-    contador = 0;
-    estado = 0;
+  if (!apogeuAtingido) {  // Chamar detectarApogeu se o apogeu ainda não foi atingido
+    apogeuAtingido = detectarApogeu(filteredAltitude);
   }
-
-  altitudeAnterior = mediaAltitudeFiltrada;  // Atualize a altitude anterior para a próxima iteração
 #endif
+
   // ********** Ativando os Paraquedas 1/2/3/4 ********** //
-  // *** Paraquedas 1 **** //
-  if (apogeu == true && ativacao1 == false) {
-    digitalWrite(IGN_1, HIGH);
-    ativacao1 = true;
-    ativacao2 = true;
-    futureMillis = currentMillis + interval;
-    futureMillis2 = currentMillis + interval2;
+#if PARA
+  for (int i = 0; i < NUM_PARAQUEDAS; i++) {
+    gerenciarParaquedasIndividual(i, apogeuAtingido, filteredAltitude, currentMillis);
   }
-
-  // *** Paraquedas 2 **** //
-  if (ativacao2 == true && currentMillis >= futureMillis2) {
-    digitalWrite(IGN_2, HIGH);
-    ativacao2 = false;
-    futureMillis2 = currentMillis + interval;
-  }
-
-  // *** Paraquedas 3 **** //
-  if (apogeu == true && ativacao3 == false && mediaAltitudeFiltrada < -5) {
-    digitalWrite(IGN_3, HIGH);
-    ativacao3 = true;
-    ativacao4 = true;
-    futureMillis3 = currentMillis + interval3;
-    futureMillis4 = currentMillis + interval4;
-  }
-
-  // *** Paraquedas 4 **** //
-  if (ativacao4 == true && currentMillis >= futureMillis4) {
-    digitalWrite(IGN_4, HIGH);
-    ativacao4 = false;
-    futureMillis4 = currentMillis + interval3;
-  }
-
-  // ********** Desativando os Paraquedas 1/2/3/4 ********** //
-  if (currentMillis >= futureMillis) {
-    digitalWrite(IGN_1, LOW);
-  }
-
-  if (currentMillis >= futureMillis2) {
-    digitalWrite(IGN_2, LOW);
-  }
-
-  if (currentMillis >= futureMillis3) {
-    digitalWrite(IGN_3, LOW);
-  }
-
-  if (currentMillis >= futureMillis4) {
-    digitalWrite(IGN_4, LOW);
-  }
+#endif
 
 // ********** Gyro, Mag e Accel ********** //
 #if GIRO
@@ -291,70 +291,63 @@ void loop() {
   sensors_event_t accelEvent;
   accel.getEvent(&accelEvent);
 #endif
+
   // ********** Leitura dos dados ********** //
   dadosString += String(currentMillis / 1000.0) + "\t";  //Tempo atual
 #if BMP085
-#if BMP085temp
+#if BMP085_TEMP
   dadosString += String(temperature) + "\t";  //Temperatura *C
 #endif
-#if BMP085press
+#if BMP085_PRESS
   dadosString += String(pressure) + "\t";  //Pressão Pa
 #endif
-#if altRAW
-  dadosString += String(rawAltitude) + "\t";            //Altura com 0 filtro
-  #endif
-  #if altFilter1
-  dadosString += String(mediaAltitude) + "\t";          //Altura com 1 filtro
-  #endif
-  #if altFilter2
-  dadosString += String(mediaAltitudeFiltrada) + "\t";  //Altura com 2 filtro
-  #endif
-  #if state
-  dadosString += String(estado) + "\t";                 //Bool indicando se o apogeu foi atingido (0 = não; 1 = sim)
-  #endif
-  #if PARA1
-  dadosString += String(digitalRead(IGN_1)) + "\t";     //Estado do Paraquedas 1 (0 = desativado; 1 = ativado)
-  #endif
-  #if PARA2
-  dadosString += String(digitalRead(IGN_2)) + "\t";     //Estado do Paraquedas 2 (0 = desativado; 1 = ativado)
-  #endif
-  #if PARA3
-  dadosString += String(digitalRead(IGN_3)) + "\t";     //Estado do Paraquedas 3 (0 = desativado; 1 = ativado)
-  #endif
-  #if PARA4
-  dadosString += String(digitalRead(IGN_4)) + "\t";     //Estado do Paraquedas 4 (0 = desativado; 1 = ativado)
-  #endif
+#if ALT_RAW
+  dadosString += String(rawAltitude) + "\t";  //Altura com 0 filtro
+#endif
+#if ALT_FILTER
+  for (int i = 0; i < NUM_FILTROS; i++) {
+    dadosString += String(filtros[i].getFiltro()) + "\t";  //Resultado do filtro i
+  }
+#endif
+#if APOGEE
+  dadosString += String(apogeuAtingido) + "\t";  //Bool indicando se o apogeu foi atingido (0 = não; 1 = sim)
+#endif
+#endif
+#if PARA
+  for (int i = 0; i < NUM_PARAQUEDAS; i++) {
+    dadosString += String(digitalRead(ign[i])) + "\t";  //Estado do Paraquedas i (0 = desativado; 1 = ativado)
+  }
 #endif
 #if GIRO
-#if GIROX
+#if GIRO_X
   dadosString += String(gyro.g.x) + "\t";  //Rotação angular do Giroscópio no eixo x
 #endif
-#if GIROY
+#if GIRO_Y
   dadosString += String(gyro.g.y) + "\t";  //Rotação angular do Giroscópio no eixo y
 #endif
-#if GIROZ
+#if GIRO_Z
   dadosString += String(gyro.g.z) + "\t";  //Rotação angular do Giroscópio no eixo z
 #endif
 #endif
 #if MAGNETO
-#if MAGNETOX
+#if MAGNETO_X
   dadosString += String(magEvent.magnetic.x) + "\t";  //Intensidade do campo magnético no eixo x
 #endif
-#if MAGNETOY
+#if MAGNETO_Y
   dadosString += String(magEvent.magnetic.y) + "\t";  //Intensidade do campo magnético no eixo y
 #endif
-#if MAGNETOZ
+#if MAGNETO_Z
   dadosString += String(magEvent.magnetic.z) + "\t";  //Intensidade do campo magnético no eixo z
 #endif
 #endif
 #if ACELERO
-#if ACELEROX
+#if ACELERO_X
   dadosString += String(accelEvent.acceleration.x) + "\t";  //Aceleração ao longo dos eixos x
 #endif
-#if ACELEROY
+#if ACELERO_Y
   dadosString += String(accelEvent.acceleration.y) + "\t";  //Aceleração ao longo dos eixos x
 #endif
-#if ACELEROZ
+#if ACELERO_Z
   dadosString += String(accelEvent.acceleration.z);  //Aceleração ao longo dos eixos x
 #endif
 #endif
