@@ -30,8 +30,8 @@ Adafruit_BMP085 bmp;
     Serial.println();
 
   //variaveis
-   for ( int x = 0; i <= 4 ; i++ ){
-   Alt += Serial(bmp.readAltitude());
+   for ( int x = 0; i <= 4 ; i++ )
+   {Alt += bmp.readAltitude();
    }
 }
 
@@ -46,7 +46,7 @@ Adafruit_BMP085 bmp;
     Serial.print(bmp.readPressure());
     Serial.print("\t");
   
-    Serial(bmp.readAltitude());
+    Serial.print(bmp.readAltitude());
     Serial.print("\t");
     
     Serial.print(bmp.readSealevelPressure());
