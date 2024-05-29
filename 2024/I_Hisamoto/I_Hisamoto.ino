@@ -111,7 +111,7 @@ void loop() {
   dataString += String(fallenCondition) + "\t";
   dataString += String(contador) + "\t";
   Serial.println(dataString);
-  arquivo = SD.open("nomeArquivo", FILE_WRITE);
+  arquivo = SD.open(nomeArquivo, FILE_WRITE);
   if(arquivo){
     arquivo.println(dataString);
     arquivo.close();
