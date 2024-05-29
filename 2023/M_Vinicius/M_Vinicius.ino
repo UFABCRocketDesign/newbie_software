@@ -4,23 +4,23 @@
 #include <Adafruit_ADXL345_U.h>
 #include <Adafruit_HMC5883_U.h>
 
-#define SDD 0
+#define SDD 1
 #define BMP 1
 #define BMP_ALT (BMP && 1)
 #define BMP_TEMP (BMP && 1)
 #define BMP_PRES (BMP && 1)
 
-#define ACEL 0
+#define ACEL 1
 #define ACEL_X (ACEL && 1)
 #define ACEL_Y (ACEL && 1)
 #define ACEL_Z (ACEL && 1)
 
-#define GIRO 0
+#define GIRO 1
 #define GIRO_X (GIRO && 1)
 #define GIRO_Y (GIRO && 1)
 #define GIRO_Z (GIRO && 1)
 
-#define MAG 0
+#define MAG 1
 #define MAG_X (MAG && 1)
 #define MAG_Y (MAG && 1)
 #define MAG_Z (MAG && 1)
@@ -78,6 +78,8 @@ bool verificar3 = false;
 
 // Declaração De variaveis diversas
 float queda, alt_in = 0;  // fazer o sensor pro foguete cair, 1 --> ta caindo
+int index = 0;
+int indi = 0;
 float filtro[10];
 float filtro2[10];
 float apogeu[4];
@@ -211,7 +213,7 @@ void setup() {
   int indicador = 0; // NAO SEI SE ESSE INDICADOR VAI DA ERRADO
   do {
     String qnt_zero;
-    for (i = String(indicador).length() + String(marcs).length(); i < 8; i++) {
+    for (int i = String(indicador).length() + String(marcs).length(); i < 8; i++) {
       qnt_zero += "0";
     }
     nome_do_arquivo = marcs + qnt_zero + String(indicador) + ".txt";
@@ -283,19 +285,18 @@ void loop() {
 
 #if BMP_ALT
   // FILTRO 1 //
-  int index = 0;
   filtro[index] = altura;
   index = (index + 1) % 10;
- float total = 0;
+  float total = 0;
   for (int i = 0; i < 10; i++) {
     total += filtro[i];
   }
   float altura_semRuido = total / 10;
 
   // FILTRO 2 //
-  index = 0;   // ANTES ERA INT ind
-  filtro2[index] = altura_semRuido;
-  index = (index + 1) % 10;
+     
+  filtro2[indi] = altura_semRuido;
+  indi = (indi + 1) % 10;
   total = 0;   // ANTES ERA acum
   for (int i = 0; i < 10; i++) {
     total += filtro2[i];
