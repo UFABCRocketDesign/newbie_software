@@ -34,7 +34,7 @@ Adafruit_BMP085 bmp;
    }
   
   //contas 
-   M = ( Alt / 5)
+   float M = Alt / 5;
 }
 
  // the loop function runs over and over again forever
