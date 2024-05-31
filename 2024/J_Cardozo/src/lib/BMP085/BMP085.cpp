@@ -10,7 +10,7 @@ void BMP085::begin() {
 	Wire.write(0XAA);
 	Wire.endTransmission();
 
-	Wire.requestFrom(BMP085_ADDRESS, (uint8_t)22);
+	Wire.requestFrom((uint8_t)BMP085_ADDRESS, (uint8_t)22);
 	unsigned long tempo = micros();
 	while (Wire.available() < 22)
 	{
@@ -41,7 +41,7 @@ long BMP085::lerCalibracaoT() {
     Wire.write(0xF6);
     Wire.endTransmission();
 
-    Wire.requestFrom(BMP085_ADDRESS, (uint8_t)2);
+    Wire.requestFrom((uint8_t)BMP085_ADDRESS, (uint8_t)2);
     unsigned long tempo = micros();
     while (Wire.available() < 2)
     {
@@ -63,7 +63,7 @@ long BMP085::lerCalibracaoP() {
     Wire.write(0xF6);
     Wire.endTransmission();
 
-    Wire.requestFrom(BMP085_ADDRESS, (uint8_t)3);
+    Wire.requestFrom((uint8_t)BMP085_ADDRESS, (uint8_t)3);
     unsigned long tempo = micros();
     while (Wire.available() < 3)
     {

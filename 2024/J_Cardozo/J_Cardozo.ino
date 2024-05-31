@@ -547,6 +547,8 @@ void loop() {
 
 #if (BAR)
   //Filtros
+  Serial.println("inicio bar");
+
   bmp.lerTudo();
   float altitude = bmp.getAltitude() - alturaInicial;
 
@@ -557,8 +559,13 @@ void loop() {
   // Obtendo a média final filtrada
   float filtroFinal = f3.getMedia();
 
+  Serial.println("final bar");
+  Serial.println("inicio apo");
+
   //Apogeu
   apogeu.deteccaoApogeu(filtroFinal);
+  Serial.println("fim apo");
+
 #endif
 
   //Paraquedas 1
