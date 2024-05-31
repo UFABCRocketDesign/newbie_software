@@ -17,7 +17,7 @@
 
 #define BAR (SENSORES && 1)
 
-#define PARAQUEDAS (BAR && 1)
+#define PARAQUEDAS (BAR && 0)
 #define P1 (PARAQUEDAS && 1)
 #define P2 (PARAQUEDAS && 1)
 #define P3 (PARAQUEDAS && 1)
@@ -553,7 +553,7 @@ void loop() {
   float filtroFinal = f3.getMedia();
 
   //Apogeu
-  apogeu.deteccaoApogeu(filtroFinal);
+  //apogeu.deteccaoApogeu(filtroFinal);
 #endif
 
   //Paraquedas 1
@@ -588,7 +588,7 @@ void loop() {
   dataString += String(f1.getMedia()) + "\t";
   dataString += String(f2.getMedia()) + "\t";
   dataString += String(f3.getMedia()) + "\t";
-  dataString += String(apogeu.getEstaDescendo()) + "\t";
+  //dataString += String(apogeu.getEstaDescendo()) + "\t";
 #endif
 
 #if (P1)
