@@ -1,10 +1,9 @@
-#include "bibliotecaBMP085.h"
+#include "BMP085.h"
 
 
 #define BMP085_ADDRESS 0x77
 
 #define BMP085_AC1 0xAA
-
 
 void BMP085::begin() {
     Wire.beginTransmission(BMP085_ADDRESS);
@@ -65,7 +64,7 @@ long BMP085::lerCalibracaoP() {
     Wire.endTransmission();
 
     Wire.requestFrom(BMP085_ADDRESS, (uint8_t)3);
-    tempo = micros();
+    unsigned long tempo = micros();
     while (Wire.available() < 3)
     {
         if (tempo + 10 < micros())break;
@@ -75,7 +74,7 @@ long BMP085::lerCalibracaoP() {
     return up;
 }
 
-void BMP085::lerTudo(float alturaInicial = 101325.0) {
+void BMP085::lerTudo(float alturaInicial = 1013.25) {
     ut = lerCalibracaoT();
     up = lerCalibracaoP();
 
@@ -110,10 +109,10 @@ void BMP085::lerTudo(float alturaInicial = 101325.0) {
     pressao += (x1 + x2 + 3791) >> 4;
 
     //Calculo da altitude(absoluta ou relativa)
-    altura = 44330 * (1.0 - pow((pressao / alturaInicial), (1/5.255)));
+    altura = 44330 * (1.0 - pow((pressao / (alturaInicial/100)), (1/5.255)));
 }
 
-float BMP085::getTempemperatura() {
+float BMP085::getTemperatura() {
     return temperatura;
 }
 

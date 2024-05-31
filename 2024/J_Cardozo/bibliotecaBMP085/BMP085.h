@@ -25,7 +25,7 @@ public:
     BMP085();
     void begin();
     void lerTudo();
-    float getTempemperatura();
+    float getTemperatura();
     long getPressao();
     float getAltitude();
 };
