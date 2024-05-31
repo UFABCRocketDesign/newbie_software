@@ -1,6 +1,12 @@
 #ifndef BMP085_H
 #define BMP085_H
 
+#if defined(ARDUINO) && ARDUINO >= 100
+#include "arduino.h"
+#else
+#include "WProgram.h"
+#endif
+
 #include <Wire.h>
 
 class BMP085 {
@@ -24,7 +30,7 @@ private:
 public:
     BMP085();
     void begin();
-    void lerTudo();
+    void lerTudo(float alturaInicial = 1013.25);
     float getTemperatura();
     long getPressao();
     float getAltitude();

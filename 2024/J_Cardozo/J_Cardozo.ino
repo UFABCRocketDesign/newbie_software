@@ -36,7 +36,7 @@
 
 #if (BAR)
 //#include <Adafruit_BMP085.h>
-#include "bibliotecaBMP085/BMP085.h"
+#include "src/lib/BMP085/BMP085.h"
 #endif
 
 #if (ACEL)
