@@ -35,8 +35,7 @@
 #endif
 
 #if (BAR)
-//#include <Adafruit_BMP085.h>
-#include "src/lib/BMP085/BMP085.h"
+#include <Adafruit_BMP085.h>
 #endif
 
 #if (ACEL)
@@ -80,8 +79,7 @@ Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(123456);
 #endif
 
 #if (BAR)
-//Adafruit_BMP085 bmp;
-BMP085 bmp;
+Adafruit_BMP085 bmp;
 #endif
 
 #if (GYRO)
@@ -287,11 +285,10 @@ void setup() {
 
 //Inicializando BMP, SD, Acelerometro, Giroscopio e Magnetometro
 #if (BAR)
-  // if (!bmp.begin()) {
-  //   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-  //   while (1) {}
-  // }
-  bmp.begin();
+  if (!bmp.begin()) {
+    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+    while (1) {}
+  }
 #endif
 
 #if (RFREQ)
@@ -359,8 +356,7 @@ void setup() {
   //Primeiras leituras BMP
   float soma = 0;
   for (int i = 0; i < NUM_LEITURAS; i++) {
-    bmp.lerTudo();
-    soma += bmp.getAltitude();
+    soma += bmp.readAltitude();
   }
   alturaInicial = soma / NUM_LEITURAS;
 
@@ -547,10 +543,7 @@ void loop() {
 
 #if (BAR)
   //Filtros
-  Serial.println("inicio bar");
-
-  bmp.lerTudo();
-  float altitude = bmp.getAltitude() - alturaInicial;
+  float altitude = bmp.readAltitude() - alturaInicial;
 
   f1.aplicarFiltro(altitude);
   f2.aplicarFiltro(f1.getMedia());
@@ -559,13 +552,8 @@ void loop() {
   // Obtendo a média final filtrada
   float filtroFinal = f3.getMedia();
 
-  Serial.println("final bar");
-  Serial.println("inicio apo");
-
   //Apogeu
   apogeu.deteccaoApogeu(filtroFinal);
-  Serial.println("fim apo");
-
 #endif
 
   //Paraquedas 1
@@ -594,8 +582,8 @@ void loop() {
   dataString += String(currentTime / 1000.0) + "\t";
 
 #if (BAR)
-  dataString += String(bmp.getTemperatura()) + "\t";
-  dataString += String(bmp.getPressao()) + "\t";
+  dataString += String(bmp.readTemperature()) + "\t";
+  dataString += String(bmp.readPressure()) + "\t";
   dataString += String(altitude) + "\t";
   dataString += String(f1.getMedia()) + "\t";
   dataString += String(f2.getMedia()) + "\t";
