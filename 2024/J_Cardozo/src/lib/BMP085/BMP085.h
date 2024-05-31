@@ -28,7 +28,6 @@ private:
     long lerCalibracaoP();
     
 public:
-    BMP085();
     void begin();
     void lerTudo(float alturaInicial = 1013.25);
     float getTemperatura();
