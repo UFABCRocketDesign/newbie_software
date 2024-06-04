@@ -23,7 +23,7 @@
 #define P3 (PARAQUEDAS && 1)
 #define P4 (PARAQUEDAS && 1)
 
-#define SD_CARD 0
+#define SD_CARD 1
 
 #define RFREQ 0
 
