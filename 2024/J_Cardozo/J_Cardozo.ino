@@ -102,7 +102,7 @@ const long interval = 200;
 //Definindo SD
 #if (SD_CARD)
 #define chipSelect 53
-String nomeBaseSD = "data";  //setup
+String nomeBaseSD = "joao";  //setup
 String nomeSD;               //global
 #endif
 
