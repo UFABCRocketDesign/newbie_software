@@ -22,8 +22,8 @@ int j = 0;
 int r = 0;
 int y = 1;
 int apogeu = 0;
-
 int counter = 0;
+String nome = "calvo0.txt";
 
 void setup() {
   Serial.begin(115200);
@@ -45,12 +45,17 @@ void setup() {
 
   String dataString = "";
   dataString += String("Temperatura\tpressão\tAltitude\tpressão em relação ao mar\taltitude real") + "\t";
-
-  String(runs) = String(counter); 
-  if (SD.exists("calvo"+runs+".txt")){
-    counter =+ 1;
+  
+  do {
+    if(SD.exists(nome)){
+      counter += 1;
+      nome = ("calvo"+ String(counter) +".txt");
+    }  
   }
-  File dataFile = SD.open("calvo"+(runs)+".txt", FILE_WRITE);
+  while(SD.exists(nome));
+    
+  
+  File dataFile = SD.open(nome, FILE_WRITE);
   if (dataFile) {
     dataFile.println(dataString);
     dataFile.close();
@@ -111,11 +116,15 @@ void loop() {
   apojas = filtro;
   temperatura = bmp.readTemperature();
   pressao = bmp.readPressure();
-  String(runs) = String(counter); 
-    if (SD.exists("calvo"+runs+".txt")){
-    counter =+ 1;
+  do {
+    if(SD.exists(nome)){
+      counter += 1;
+      nome = ("calvo"+ String(counter) +".txt");
+    }  
   }
-  File dataFile = SD.open("calvo"+(runs)+".txt", FILE_WRITE);
+  while(SD.exists(nome));
+
+  File dataFile = SD.open(nome, FILE_WRITE);
   String dataString = "";
 
   dataString += String(temperatura) + "\t";
