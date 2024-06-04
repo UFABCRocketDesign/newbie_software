@@ -10,6 +10,10 @@
 #define SDCARD (0)
 //Paraquedas
 #define PARA (1)
+#define IGN_1 36  //Paraquedas 1
+#define IGN_2 61  //Paraquedas 2
+#define IGN_3 46  //Paraquedas 3
+#define IGN_4 55  //Paraquedas 4
 //BMP085
 #define BMP085 (1)
 #define BMP085_TEMP (1)
@@ -35,40 +39,58 @@
 
 // ********** PARAQUEDAS ********** //
 #if PARA
-#define NUM_PARAQUEDAS 4
-#define ALT_PARAQUEDAS -3
+class Paraquedas {
+public:
+  static const int ALT_PARAQUEDAS = -3;
+  int pino;
+  bool ativado;
+  bool apogeuApenas;
+  unsigned long intervaloApogeu;
+  unsigned long intervaloAltitude;
+  unsigned long tempoAtivacao;
+  unsigned long futureMillis;
+  bool paraquedasAtivado;
 
-int ign[NUM_PARAQUEDAS] = { 36, 61, 46, 55 };  // Número dos pinos para cada paraquedas
-bool ativacao[NUM_PARAQUEDAS] = { false };
-bool paraquedasAtivado[NUM_PARAQUEDAS] = { false };
-unsigned long futureMillis[NUM_PARAQUEDAS] = { 0 };
-
-bool apogeuApenas[NUM_PARAQUEDAS] = { true, true, false, false };  // Paraquedas que ativam com apenas o apogeu = true, paraquedas que precisam de uma altura específica = false
-
-unsigned long intervalosApogeu[NUM_PARAQUEDAS] = { 0, 2000, 0, 0 };    // Intervalo de ativação entre os paraquedas de "apenas apogeu"
-unsigned long intervalosAltitude[NUM_PARAQUEDAS] = { 0, 0, 0, 2000 };  // Intervalo de ativação entre os paraquedas de altura específica
-
-unsigned long tempoAtivacao[NUM_PARAQUEDAS] = { 5000, 5000, 5000, 5000 };  // Tempo de ativação de cada paraquedas
-
-void gerenciarParaquedasIndividual(int i, bool apogeuAtingido, float mediaAltitudeFiltrada, unsigned long currentMillis) {
-  static bool altParaquedasBool = false;
-
-  if (apogeuAtingido == true && mediaAltitudeFiltrada < ALT_PARAQUEDAS) {
-    altParaquedasBool = true;
+  // Construtor
+  Paraquedas(int pino, bool apogeuApenas, unsigned long intervaloApogeu, unsigned long intervaloAltitude, unsigned long tempoAtivacao)
+    : pino(pino), ativado(false), apogeuApenas(apogeuApenas), intervaloApogeu(intervaloApogeu), intervaloAltitude(intervaloAltitude), tempoAtivacao(tempoAtivacao), futureMillis(0), paraquedasAtivado(false) {
   }
 
-  if (apogeuAtingido == true && ativacao[i] == false && paraquedasAtivado[i] == false && (apogeuApenas[i] || altParaquedasBool)) {
-    if (i == 0 || (i > 0 && currentMillis >= futureMillis[i - 1] + (apogeuApenas[i] ? intervalosApogeu[i] : intervalosAltitude[i]))) {
-      digitalWrite(ign[i], HIGH);
-      ativacao[i] = true;
-      futureMillis[i] = currentMillis + tempoAtivacao[i];
+  // Método para inicializar o pino do paraquedas no setup
+  void iniciar() {
+    pinMode(pino, OUTPUT);
+    digitalWrite(pino, LOW);
+  }
+
+  // Método para gerenciar a ativação dos paraquedas
+  void gerenciar(bool apogeuAtingido, float mediaAltitudeFiltrada, unsigned long currentMillis) {
+    if (apogeuAtingido && !ativado && !paraquedasAtivado && (apogeuApenas || mediaAltitudeFiltrada < ALT_PARAQUEDAS)) {
+      if (currentMillis >= futureMillis + (apogeuApenas ? intervaloApogeu : intervaloAltitude)) {
+        digitalWrite(pino, HIGH);
+        ativado = true;
+        futureMillis = currentMillis + tempoAtivacao;
+      }
+    } else if (ativado && currentMillis >= futureMillis) {
+      digitalWrite(pino, LOW);
+      ativado = false;
+      paraquedasAtivado = true;
     }
-  } else if (ativacao[i] == true && currentMillis >= futureMillis[i]) {
-    digitalWrite(ign[i], LOW);
-    ativacao[i] = false;
-    paraquedasAtivado[i] = true;
   }
-}
+
+  // Método para verificar o estado do paraquedas e printar
+  bool isAtivado() {
+    return ativado;
+  }
+};
+
+// Variáveis globais
+#define NUM_PARAQUEDAS 4
+Paraquedas paraquedas[NUM_PARAQUEDAS] = {  //{pino, paraquedas de apogeu (true) ou apogeu+altura (false), intervalo para acionar após o apogeu, intervalo para acionar após o apogeu+altura, intervalo que ficará acionado}
+  Paraquedas(IGN_1, true, 0, 0, 5000),
+  Paraquedas(IGN_2, true, 2000, 0, 5000),
+  Paraquedas(IGN_3, false, 0, 0, 5000),
+  Paraquedas(IGN_4, false, 0, 2000, 5000)
+};
 #endif
 
 // ********** SD Card ********** //
@@ -87,7 +109,7 @@ float altInicial = 0;
 class Filtro {
 private:
   static const int NUM_LEITURAS = 10;
-  float leituras[NUM_LEITURAS] = {0};
+  float leituras[NUM_LEITURAS] = { 0 };
   float somaLeituras = 0;
   int indiceLeitura = 0;
 
@@ -169,8 +191,7 @@ void setup() {
   // ********** Setando os Paraquedas ********** //
 #if PARA
   for (int i = 0; i < NUM_PARAQUEDAS; i++) {
-    pinMode(ign[i], OUTPUT);
-    digitalWrite(ign[i], LOW);
+    paraquedas[i].iniciar();
     dadosString += "Parachute" + String(i + 1) + " (bool)\t";
   }
 #endif
@@ -259,7 +280,6 @@ void loop() {
 
   // *** Filtros **** //
   float filteredAltitude = rawAltitude;
-
   for (int i = 0; i < NUM_FILTROS; i++) {
     filteredAltitude = filtros[i].atualizarFiltro(filteredAltitude);
   }
@@ -270,10 +290,10 @@ void loop() {
   }
 #endif
 
-  // ********** Ativando os Paraquedas 1/2/3/4 ********** //
+// ********** Ativando os Paraquedas 1/2/3/4 ********** //
 #if PARA
   for (int i = 0; i < NUM_PARAQUEDAS; i++) {
-    gerenciarParaquedasIndividual(i, apogeuAtingido, filteredAltitude, currentMillis);
+    paraquedas[i].gerenciar(apogeuAtingido, filteredAltitude, currentMillis);
   }
 #endif
 
@@ -315,7 +335,7 @@ void loop() {
 #endif
 #if PARA
   for (int i = 0; i < NUM_PARAQUEDAS; i++) {
-    dadosString += String(digitalRead(ign[i])) + "\t";  //Estado do Paraquedas i (0 = desativado; 1 = ativado)
+    dadosString += String(paraquedas[i].isAtivado()) + "\t";
   }
 #endif
 #if GIRO
