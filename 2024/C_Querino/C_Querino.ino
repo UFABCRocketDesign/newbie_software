@@ -46,11 +46,11 @@ void setup() {
   String dataString = "";
   dataString += String("Temperatura\tpressão\tAltitude\tpressão em relação ao mar\taltitude real") + "\t";
 
-  String(counter); 
-  if ("calvo"+String(counter)+".txt" == 1){
+  String(runs) = String(counter); 
+  if (SD.exists("calvo"+runs+".txt")){
     counter =+ 1;
   }
-  File dataFile = SD.open("calvo"+String(counter)+".txt", FILE_WRITE);
+  File dataFile = SD.open("calvo"+(runs)+".txt", FILE_WRITE);
   if (dataFile) {
     dataFile.println(dataString);
     dataFile.close();
@@ -111,8 +111,11 @@ void loop() {
   apojas = filtro;
   temperatura = bmp.readTemperature();
   pressao = bmp.readPressure();
-
-  File dataFile = SD.open("calvo"+String(counter)+".txt", FILE_WRITE);
+  String(runs) = String(counter); 
+    if (SD.exists("calvo"+runs+".txt")){
+    counter =+ 1;
+  }
+  File dataFile = SD.open("calvo"+(runs)+".txt", FILE_WRITE);
   String dataString = "";
 
   dataString += String(temperatura) + "\t";
