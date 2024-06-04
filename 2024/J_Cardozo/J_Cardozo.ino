@@ -35,7 +35,7 @@
 #endif
 
 #if (BAR)
-#include "src/lib/BMP085/BMP085.h"
+#include "src/lib/Barometro/BMP085.h"
 #include "src/lib/Filtros/Filtros.h"
 #include "src/lib/Apogeu/Apogeu.h"
 #endif
