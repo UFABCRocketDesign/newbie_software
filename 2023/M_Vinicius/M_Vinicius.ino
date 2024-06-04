@@ -78,11 +78,13 @@ bool verificar3 = false;
 
 // Declaração De variaveis diversas
 float queda, alt_in = 0;  // fazer o sensor pro foguete cair, 1 --> ta caindo
-int index = 0;
-int indi = 0;
-float filtro[10];
-float filtro2[10];
+//int index = 0;
+//int indi = 0;
+//float filtro[10];
+//float filtro2[10];
 float apogeu[4];
+float filtro[2][10];
+int index[2];
 
 String marcs = "marcs";
 String nome_do_arquivo;
@@ -92,12 +94,13 @@ const int chipSelect = 53;
 
 // FUNÇÕES
 
-float filtro_altura(float altura, int index) {
+float filtro_altura(float altura, int qual) {
 
-  filtro[index] = altura;
+  filtro[qual][index[qual]] = altura;
+  index[qual] = (index[qual] + 1) % 10;
   float total = 0;
   for (int i = 0; i < 10; i++) {
-    total += filtro[i];
+    total += filtro[qual][i];
   }
   float altura_semRuido = total / 10;
   return altura_semRuido;
@@ -320,11 +323,10 @@ void loop() {
 
   float altura_sRuido2 = total / 10;*/
   
-  float altura_semRuido = filtro_altura(altura, index);
-  index = (index + 1) % 10;
+  float altura_semRuido = filtro_altura(altura, 1);  
   
-  float altura_sRuido2 = filtro_altura(altura_semRuido, indi);
-  indi = (indi + 1) % 10;
+  float altura_sRuido2 = filtro_altura(altura_semRuido, 2);
+  
 
 
   // DETECTAR APOGEU //
