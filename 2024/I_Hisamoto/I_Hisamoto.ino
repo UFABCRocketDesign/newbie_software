@@ -10,7 +10,7 @@ float listaSuavizarCurva_1[5];
 float listaDeteccaoQueda[2];
 int contador = 0;
 float alturaAnterior;
-int numA = 0;
+String numA;
 File arquivo;
 String nomeArquivo;
 String inicio = "data";
@@ -44,7 +44,6 @@ float filtroSuavizarCurva_1(float dadosCurva_1) {
   return mediaFiltro;
 }
 
-
 void setup() {
 //abrindo o SD
   pinMode(chipSelect,OUTPUT);
@@ -54,12 +53,21 @@ void setup() {
     return;
   }
   Serial.println("Cartão SD inicializado com sucesso");
+
 //verificando nome de arquivo
-  nomeArquivo = inicio + String(numA) + tipoDeArquivo;
-  while (SD.exists(nomeArquivo)) {
-    numA++;
-    nomeArquivo = inicio + String(numA) + tipoDeArquivo;
+  int tamInicio = inicio.length();
+  numA = "";
+  for (int i = tamInicio; i < 8; i++){
+    numA += "0"; //concatenando 0 a string
   }
+
+  nomeArquivo = inicio + String(numA) + tipoDeArquivo;
+
+  while (SD.exists(nomeArquivo)) {
+    nomeArquivo = inicio + String(numA) + tipoDeArquivo;
+    numA = String(numA.toInt() + 1);
+  }
+  Serial.print(nomeArquivo);
   arquivo = SD.open(nomeArquivo, FILE_WRITE);
   if (arquivo) {
     String header = "Temperature(C), Pressure(Pa), High(meters), Filtered High 0(meters), Filtered High 1(meters), Fallen(1)/ Not fallen (0), Contador de Queda";
