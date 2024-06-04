@@ -10,7 +10,7 @@
 #define MY (MAG && 1)
 #define MZ (MAG && 1)
 
-#define ACEL (SENSORES && 0)
+#define ACEL (SENSORES && 1)
 #define AX (ACEL && 1)
 #define AY (ACEL && 1)
 #define AZ (ACEL && 1)
@@ -41,7 +41,8 @@
 #endif
 
 #if (ACEL)
-#include <Adafruit_ADXL345_U.h>
+//#include <Adafruit_ADXL345_U.h>
+#include "src/lib/Acelerometro/ADXL345.h"
 #endif
 
 #if (MAG)
@@ -77,7 +78,8 @@
 #endif
 
 #if (ACEL)
-Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
+//Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
+ADXL345 acel(2);
 #endif
 
 #if (MAG)
@@ -163,12 +165,17 @@ void setup() {
 #endif
 
 #if (ACEL)
-  if (!accel.begin()) {
+  // if (!accel.begin()) {
+  //   Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
+  //   while (1)
+  //     ;
+  // }
+  // accel.setRange(ADXL345_RANGE_16_G);
+  if (!acel.begin()) {
     Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
     while (1)
       ;
   }
-  accel.setRange(ADXL345_RANGE_16_G);
 #endif
 
 #if (GYRO)
@@ -356,17 +363,28 @@ void loop() {
 #endif
 
 #if (ACEL)
-  sensors_event_t eventACEL;
-  accel.getEvent(&eventACEL);
+  // sensors_event_t eventACEL;
+  // accel.getEvent(&eventACEL);
+  acel.lerTudo();
 #endif
+// #if (AX)
+//   acelX = eventACEL.acceleration.x;
+// #endif
+// #if (AY)
+//   acelY = eventACEL.acceleration.y;
+// #endif
+// #if (AZ)
+//   acelZ = eventACEL.acceleration.z;
+// #endif
+
 #if (AX)
-  acelX = eventACEL.acceleration.x;
+  acelX = acel.getX();
 #endif
 #if (AY)
-  acelY = eventACEL.acceleration.y;
+  acelY = acel.getY();
 #endif
 #if (AZ)
-  acelZ = eventACEL.acceleration.z;
+  acelZ = acel.getZ();
 #endif
 
 #if (GYRO)

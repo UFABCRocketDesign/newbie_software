@@ -17,7 +17,7 @@ private:
   float scale;
 
 public:
-  ADXL345(uint8_t range);
+  ADXL345(uint8_t range = 2);
   bool begin();
   void lerTudo();
   float getX();
