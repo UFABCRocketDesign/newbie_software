@@ -77,11 +77,8 @@ bool verificar3 = false;
 #endif
 
 // Declaração De variaveis diversas
-float queda, alt_in = 0;  // fazer o sensor pro foguete cair, 1 --> ta caindo
-//int index = 0;
-//int indi = 0;
-//float filtro[10];
-//float filtro2[10];
+bool queda;
+float alt_in = 0;  // fazer o sensor pro foguete cair, 1 --> ta caindo
 float apogeu[4];
 float filtro[2][10];
 int index[2];
@@ -104,6 +101,17 @@ float filtro_altura(float altura, int qual) {
   }
   float altura_semRuido = total / 10;
   return altura_semRuido;
+}
+
+bool det_apogeu(float altura) {
+  for (int i = 3; i > 0; i--) {
+    apogeu[i] = apogeu[i - 1];
+  }
+  apogeu[0] = altura;
+  if (apogeu[0] < apogeu[1] && apogeu[1] < apogeu[2] && apogeu[2] < apogeu[3]) {
+    //queda = 1;  //caindo
+    return true;
+  }
 }
 
 
@@ -302,27 +310,8 @@ void loop() {
   // PROCESSAMENTO
 
 #if BMP_ALT
-  // FILTRO 1 //
+  // FILTRO ALTURA //     FUTURAMENTE POSSO ADD A IDEIA DE UM FOR PARA VARIOS FILTROS
 
-  /* filtro[index] = altura;
-  index = (index + 1) % 10;
-  float total = 0;
-  for (int i = 0; i < 10; i++) {
-    total += filtro[i];
-  }
-  float altura_semRuido = total / 10;*/
-
-  // FILTRO 2 //
-
-  /*filtro2[indi] = altura_semRuido;
-  indi = (indi + 1) % 10;
-  total = 0;   // ANTES ERA acum
-  for (int i = 0; i < 10; i++) {
-    total += filtro2[i];
-  }
-
-  float altura_sRuido2 = total / 10;*/
-  
   float altura_semRuido = filtro_altura(altura, 0);  
   
   float altura_sRuido2 = filtro_altura(altura_semRuido, 1);
@@ -330,7 +319,7 @@ void loop() {
 
 
   // DETECTAR APOGEU //
-  for (int i = 3; i > 0; i--) {
+  /*for (int i = 3; i > 0; i--) {
     apogeu[i] = apogeu[i - 1];
   }
   apogeu[0] = altura_sRuido2;
@@ -338,13 +327,19 @@ void loop() {
     queda = 1;  //caindo
   } else {
     queda = 0;
-  }
+  }*/
+
+ queda = det_apogeu(altura_sRuido2);
+
+ 
+
+
 #endif
   // LIBERAR O PRIMEIRO PARAQUEDAS //
 
 #if PARAQUEDAS
 
-  if (queda == 1) {
+  if (queda) {
     if (previousMillis == 0 && paraquedas == LOW) {
       paraquedas = HIGH;  // ligado
       previousMillis = currentMillis;
