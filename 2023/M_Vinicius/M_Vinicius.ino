@@ -323,9 +323,9 @@ void loop() {
 
   float altura_sRuido2 = total / 10;*/
   
-  float altura_semRuido = filtro_altura(altura, 1);  
+  float altura_semRuido = filtro_altura(altura, 0);  
   
-  float altura_sRuido2 = filtro_altura(altura_semRuido, 2);
+  float altura_sRuido2 = filtro_altura(altura_semRuido, 1);
   
 
 
