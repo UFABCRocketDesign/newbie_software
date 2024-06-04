@@ -288,7 +288,7 @@ void setup() {
 
 
 //Logica para nome do arquivo SD
-#if (SD)
+#if (SD_CARD)
   int iSD = 0;
   while (true) {
     int numZeros = 8 - nomeBaseSD.length() - String(iSD).length();
