@@ -89,6 +89,21 @@ String nome_do_arquivo;
 
 const int chipSelect = 53;
 
+
+// FUNÇÕES
+
+float filtro_altura(float altura, int index) {
+
+  filtro[index] = altura;
+  float total = 0;
+  for (int i = 0; i < 10; i++) {
+    total += filtro[i];
+  }
+  float altura_semRuido = total / 10;
+  return altura_semRuido;
+}
+
+
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(IGN_1, OUTPUT);
@@ -210,7 +225,7 @@ void setup() {
   Serial.println("card initialized.");
 
   // CRIAR UM NOVO ARQUIVO DE TEXTO CADA VEZ QUE O CARTÃO SD É INSERIDO //
-  int indicador = 0; // NAO SEI SE ESSE INDICADOR VAI DA ERRADO
+  int indicador = 0;  // NAO SEI SE ESSE INDICADOR VAI DA ERRADO
   do {
     String qnt_zero;
     for (int i = String(indicador).length() + String(marcs).length(); i < 8; i++) {
@@ -285,24 +300,31 @@ void loop() {
 
 #if BMP_ALT
   // FILTRO 1 //
-  filtro[index] = altura;
+
+  /* filtro[index] = altura;
   index = (index + 1) % 10;
   float total = 0;
   for (int i = 0; i < 10; i++) {
     total += filtro[i];
   }
-  float altura_semRuido = total / 10;
+  float altura_semRuido = total / 10;*/
 
   // FILTRO 2 //
-     
-  filtro2[indi] = altura_semRuido;
+
+  /*filtro2[indi] = altura_semRuido;
   indi = (indi + 1) % 10;
   total = 0;   // ANTES ERA acum
   for (int i = 0; i < 10; i++) {
     total += filtro2[i];
   }
 
-  float altura_sRuido2 = total / 10;
+  float altura_sRuido2 = total / 10;*/
+  
+  float altura_semRuido = filtro_altura(altura, index);
+  index = (index + 1) % 10;
+  
+  float altura_sRuido2 = filtro_altura(altura_semRuido, indi);
+  indi = (indi + 1) % 10;
 
 
   // DETECTAR APOGEU //
