@@ -9,6 +9,8 @@
 
 #include <Wire.h>
 
+#define BMP085_ADDRESS 0x77
+
 class BMP085 {
 private:
     int ac1, ac2, ac3;
@@ -22,14 +24,14 @@ private:
     const int oss = 0; // over sampling setting
     float temperatura;
     long pressao;
-    float altura;
+    float altitude;
 
     long lerCalibracaoT();
     long lerCalibracaoP();
     
 public:
-    void begin();
-    void lerTudo(float alturaInicial = 1013.25);
+    bool begin();
+    void lerTudo(float pressaoInicial = 101325.0);
     float getTemperatura();
     long getPressao();
     float getAltitude();

@@ -1,33 +1,35 @@
 #include "BMP085.h"
 
-
-#define BMP085_ADDRESS 0x77
-
-#define BMP085_AC1 0xAA
-
-void BMP085::begin() {
+bool BMP085::begin() {
     Wire.beginTransmission(BMP085_ADDRESS);
-	Wire.write(0XAA);
-	Wire.endTransmission();
+    Wire.write(0XAA);
+    if (Wire.endTransmission() != 0) {
+        return false; // Falha na comunicação com o sensor
+    }
 
-	Wire.requestFrom((uint8_t)BMP085_ADDRESS, (uint8_t)22);
-	unsigned long tempo = micros();
-	while (Wire.available() < 22)
-	{
-		if (tempo + 10 < micros())break;
-	}
-	ac1 = Wire.read() << 8 | Wire.read();
-	ac2 = Wire.read() << 8 | Wire.read();
-	ac3 = Wire.read() << 8 | Wire.read();
-	ac4 = Wire.read() << 8 | Wire.read();
-	ac5 = Wire.read() << 8 | Wire.read();
-	ac6 = Wire.read() << 8 | Wire.read();
-	b1 = Wire.read() << 8 | Wire.read();
-	b2 = Wire.read() << 8 | Wire.read();
-	mb = Wire.read() << 8 | Wire.read();
-	mc = Wire.read() << 8 | Wire.read();
-	md = Wire.read() << 8 | Wire.read();
+    Wire.requestFrom((uint8_t)BMP085_ADDRESS, (uint8_t)22);
+    unsigned long tempo = micros();
+    while (Wire.available() < 22) {
+        if (tempo + 10 < micros()) {
+            return false; // Timeout
+        }
+    }
+
+    ac1 = Wire.read() << 8 | Wire.read();
+    ac2 = Wire.read() << 8 | Wire.read();
+    ac3 = Wire.read() << 8 | Wire.read();
+    ac4 = Wire.read() << 8 | Wire.read();
+    ac5 = Wire.read() << 8 | Wire.read();
+    ac6 = Wire.read() << 8 | Wire.read();
+    b1 = Wire.read() << 8 | Wire.read();
+    b2 = Wire.read() << 8 | Wire.read();
+    mb = Wire.read() << 8 | Wire.read();
+    mc = Wire.read() << 8 | Wire.read();
+    md = Wire.read() << 8 | Wire.read();
+
+    return true; // Comunicação bem-sucedida e dados lidos
 }
+
 
 long BMP085::lerCalibracaoT() {
     Wire.beginTransmission(BMP085_ADDRESS);
@@ -74,7 +76,7 @@ long BMP085::lerCalibracaoP() {
     return up;
 }
 
-void BMP085::lerTudo(float alturaInicial = 1013.25) {
+void BMP085::lerTudo(float pressaoInicial = 101325.0) {
     ut = lerCalibracaoT();
     up = lerCalibracaoP();
 
@@ -109,7 +111,7 @@ void BMP085::lerTudo(float alturaInicial = 1013.25) {
     pressao += (x1 + x2 + 3791) >> 4;
 
     //Calculo da altitude(absoluta ou relativa)
-    altura = 44330 * (1.0 - pow((pressao / (alturaInicial/100)), (1/5.255)));
+    altitude = 44330 * (1.0 - pow((pressao / (pressaoInicial/100)), (1/5.255)));
 }
 
 float BMP085::getTemperatura() {
@@ -121,5 +123,5 @@ long BMP085::getPressao() {
 }
 
 float BMP085::getAltitude() {
-    return altura;
+    return altitude;
 }

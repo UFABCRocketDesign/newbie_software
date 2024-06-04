@@ -17,7 +17,7 @@
 
 #define BAR (SENSORES && 1)
 
-#define PARAQUEDAS (BAR && 0)
+#define PARAQUEDAS (BAR && 1)
 #define P1 (PARAQUEDAS && 1)
 #define P2 (PARAQUEDAS && 1)
 #define P3 (PARAQUEDAS && 1)
@@ -35,7 +35,9 @@
 #endif
 
 #if (BAR)
-#include <Adafruit_BMP085.h>
+#include "src/lib/BMP085/BMP085.h"
+#include "src/lib/Filtros/Filtros.h"
+#include "src/lib/Apogeu/Apogeu.h"
 #endif
 
 #if (ACEL)
@@ -52,6 +54,10 @@
 
 #if (SD_CARD)
 #include <SD.h>
+#endif
+
+#if (PARAQUEDAS)
+#include "src/lib/Paraquedas/Paraquedas.h"
 #endif
 
 #if (P1)
@@ -79,7 +85,7 @@ Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(123456);
 #endif
 
 #if (BAR)
-Adafruit_BMP085 bmp;
+BMP085 bmp;
 #endif
 
 #if (GYRO)
@@ -105,173 +111,21 @@ String nomeSD;               //global
 #define NUM_LEITURAS 10
 #define NUM_FILTROS 3
 
-//Definindo classe dos filtros
-class FiltroMediaMovel {
-  const int numLeitura;
-  float* dados = new float[numLeitura];
-  int indice = 0;
-  float media = 0;
-
-public:
-  FiltroMediaMovel(int tamanho = 10)
-    : numLeitura(tamanho) {
-  }
-  ~FiltroMediaMovel() {
-    delete[] dados;
-  }
-
-  float aplicarFiltro(float entrada) {
-    float soma = 0;
-    dados[indice] = entrada;
-    for (int i = 0; i < numLeitura; i++) {
-      soma += dados[i];
-    }
-    media = soma / numLeitura;
-    indice++;
-    if (indice >= numLeitura) {
-      indice = 0;
-    }
-    return media;
-  }
-
-  float getMedia() {
-    return media;
-  }
-};
 //Inicializando os filtros
 FiltroMediaMovel f1(NUM_LEITURAS);
 FiltroMediaMovel f2(NUM_LEITURAS);
 FiltroMediaMovel f3(NUM_LEITURAS);
 
-float alturaInicial;  //Var global para altura inicial
-
-//Definindo classe apogeu
-
-class Apogeu {
-  const int historicoTamanho;
-  float* historico = new float[historicoTamanho];
-  int indice = 0;
-  bool estaDescendo;
-
-public:
-  Apogeu(int tamanho = 20)
-    : historicoTamanho(tamanho) {
-  }
-
-  ~Apogeu() {
-    delete[] historico;
-  }
-
-  bool deteccaoApogeu(float entrada) {
-    historico[indice] = entrada;
-    int contadorHistorico = 0;
-    if (++indice >= historicoTamanho) {
-      indice = 0;
-    }
-
-    for (int i = 1; i < historicoTamanho; i++) {
-      if (historico[(indice + i - 1) % historicoTamanho] > historico[(indice + i) % historicoTamanho]) {
-        contadorHistorico++;
-      }
-    }
-
-    estaDescendo = false;
-
-    if (contadorHistorico >= 0.85 * historicoTamanho) {
-      estaDescendo = true;
-    }
-    return estaDescendo;
-  }
-
-  bool getEstaDescendo() {
-    return estaDescendo;
-  }
-};
-
 //Inicializando apogeu
-Apogeu apogeu(20);
+Apogeu apogeu(20, 0.85f);
+
+float alturaInicial;  //Variavel global para altura inicial
 
 #endif
 
-//Definindo classe paraquedas
-
 #if (PARAQUEDAS)
-class Paraquedas {
-  const int intervaloLigado;
-  bool paraquedas = false;
-  bool paraquedasData = false;
-  unsigned long paraquedasTempo = 0;
-  const int ign;
-  float delay;
-  float altura;
 
-public:
-  Paraquedas(int tempoLigado, float tempoDelay, int portaIgn, float alturaAtivacao)
-    : intervaloLigado(tempoLigado), delay(tempoDelay), ign(portaIgn), altura(alturaAtivacao) {
-  }
-
-  void ativarParaquedas(float alturaAtual, unsigned long currentTime, bool estaDescendo) {
-
-    if (delay == 0) {
-      if (altura == 0) {
-        if (estaDescendo && !paraquedas) {
-          paraquedas = true;
-          paraquedasTempo = millis();
-          paraquedasData = true;
-        }
-
-        if (paraquedas && currentTime >= paraquedasTempo + intervaloLigado) {
-          paraquedasData = false;
-        }
-      } else {
-        if (estaDescendo && !paraquedas) {
-          paraquedas = true;
-        }
-        if (paraquedas && alturaAtual <= altura && paraquedasTempo == 0) {
-          paraquedasTempo = millis();
-          paraquedasData = true;
-        }
-        if (paraquedas && paraquedasTempo != 0 && currentTime >= paraquedasTempo + intervaloLigado) {
-          paraquedasData = false;
-        }
-      }
-    } else {
-      if (altura == 0) {
-        if (estaDescendo && !paraquedas) {
-          paraquedas = true;
-          paraquedasTempo = millis();
-        }
-        if (paraquedas && currentTime >= paraquedasTempo + delay && currentTime < paraquedasTempo + delay + intervaloLigado) {
-          paraquedasData = true;
-        } else if (paraquedas && currentTime >= paraquedasTempo + delay + intervaloLigado) {
-          paraquedasData = false;
-        }
-      } else {
-        if (estaDescendo && !paraquedas) {
-          paraquedas = true;
-        }
-        if (paraquedas && alturaAtual <= altura && paraquedasTempo == 0) {
-          paraquedasTempo = millis();
-        }
-        if (paraquedas && paraquedasTempo != 0 && currentTime >= paraquedasTempo + delay && currentTime < paraquedasTempo + delay + intervaloLigado) {
-          paraquedasData = true;
-        } else if (paraquedas && currentTime >= paraquedasTempo + delay + intervaloLigado) {
-          paraquedasData = false;
-        }
-      }
-    }
-    if (paraquedasData == true) {
-      digitalWrite(ign, HIGH);
-    } else {
-      digitalWrite(ign, LOW);
-    }
-  }
-
-  bool getData() {
-    return paraquedasData;
-  }
-};
-
+//Inicializando paraquedas
 Paraquedas p1(10000, 0, IGN_1, 0);
 Paraquedas p2(10000, 5000, IGN_2, 0);
 Paraquedas p3(10000, 0, IGN_3, -3);
@@ -356,7 +210,8 @@ void setup() {
   //Primeiras leituras BMP
   float soma = 0;
   for (int i = 0; i < NUM_LEITURAS; i++) {
-    soma += bmp.readAltitude();
+    bmp.lerTudo();
+    soma += bmp.getAltitude();
   }
   alturaInicial = soma / NUM_LEITURAS;
 
@@ -543,7 +398,8 @@ void loop() {
 
 #if (BAR)
   //Filtros
-  float altitude = bmp.readAltitude() - alturaInicial;
+  bmp.lerTudo();
+  float altitude = bmp.getAltitude() - alturaInicial;
 
   f1.aplicarFiltro(altitude);
   f2.aplicarFiltro(f1.getMedia());
@@ -553,7 +409,7 @@ void loop() {
   float filtroFinal = f3.getMedia();
 
   //Apogeu
-  //apogeu.deteccaoApogeu(filtroFinal);
+  apogeu.deteccaoApogeu(filtroFinal);
 #endif
 
   //Paraquedas 1
@@ -582,13 +438,13 @@ void loop() {
   dataString += String(currentTime / 1000.0) + "\t";
 
 #if (BAR)
-  dataString += String(bmp.readTemperature()) + "\t";
-  dataString += String(bmp.readPressure()) + "\t";
+  dataString += String(bmp.getTemperatura()) + "\t";
+  dataString += String(bmp.getPressao()) + "\t";
   dataString += String(altitude) + "\t";
   dataString += String(f1.getMedia()) + "\t";
   dataString += String(f2.getMedia()) + "\t";
   dataString += String(f3.getMedia()) + "\t";
-  //dataString += String(apogeu.getEstaDescendo()) + "\t";
+  dataString += String(apogeu.getEstaDescendo()) + "\t";
 #endif
 
 #if (P1)
