@@ -5,7 +5,7 @@
 #define GY (GYRO && 1)
 #define GZ (GYRO && 1)
 
-#define MAG (SENSORES && 0)
+#define MAG (SENSORES && 1)
 #define MX (MAG && 1)
 #define MY (MAG && 1)
 #define MZ (MAG && 1)
@@ -46,7 +46,8 @@
 #endif
 
 #if (MAG)
-#include <Adafruit_HMC5883_U.h>
+//#include <Adafruit_HMC5883_U.h>
+#include "src/lib/Magnetometro/HMC5883L.h"
 #endif
 
 #if (GYRO)
@@ -84,7 +85,8 @@ ADXL345 acel(2);
 #endif
 
 #if (MAG)
-Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(123456);
+//Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(123456);
+HMC5883L mag;
 #endif
 
 #if (BAR)
@@ -409,17 +411,21 @@ void loop() {
 #endif
 
 #if (MAG)
-  sensors_event_t eventMAG;
-  mag.getEvent(&eventMAG);
+  // sensors_event_t eventMAG;
+  // mag.getEvent(&eventMAG);
+  mag.lerTudo();
 #endif
 #if (MX)
-  magX = eventMAG.magnetic.x;
+  //magX = eventMAG.magnetic.x;
+  magX = mag.getX();
 #endif
 #if (MY)
-  magY = eventMAG.magnetic.y;
+  //magY = eventMAG.magnetic.y;
+  magY = mag.getY();
 #endif
 #if (MZ)
-  magZ = eventMAG.magnetic.z;
+  //magZ = eventMAG.magnetic.z;
+  magZ = mag.getZ();
 #endif
 
 #if (BAR)
