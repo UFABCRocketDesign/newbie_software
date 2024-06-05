@@ -25,6 +25,7 @@ int apogeu = 0;
 int counter = 0;
 String nome = "calvo";
 String nomearq = "";
+String zeros = "";
 
 void setup() {
   Serial.begin(115200);
@@ -48,8 +49,14 @@ void setup() {
   dataString += String("Temperatura\tpressão\tAltitude\tpressão em relação ao mar\taltitude real") + "\t";
   
   do {   
-      nomearq = nome + String(counter) + ".txt";
-      counter += 1;
+    nomearq = nome + String(counter) + ".txt";
+    
+    int tamanho = nomearq.length();
+    for(tamanho; tamanho < 13; tamanho =+ 1){
+      zeros += "0";
+      nomearq = nome + zeros + String(counter) + ".txt";
+    }
+    counter += 1;
   }
   while(SD.exists(nomearq));
     
