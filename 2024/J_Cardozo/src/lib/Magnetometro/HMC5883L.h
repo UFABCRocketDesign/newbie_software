@@ -19,9 +19,9 @@ public:
     HMC5883L(uint8_t samples = 8, uint16_t gain = 1090, uint8_t mode = 0);
     bool begin();
     void lerTudo();
-    float getX();
-    float getY();
-    float getZ();
+    int getX();
+    int getY();
+    int getZ();
 };
 
 #endif

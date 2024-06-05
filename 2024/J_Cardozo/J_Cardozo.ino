@@ -265,39 +265,39 @@ void setup() {
 #endif
 
 #if (AX)
-  dataStringInicial += "Acel X\t";
+  dataStringInicial += "Acel X(G)\t";
 #endif
 
 #if (AY)
-  dataStringInicial += "Acel Y\t";
+  dataStringInicial += "Acel Y(G)\t";
 #endif
 
 #if (AZ)
-  dataStringInicial += "Acel Z\t";
+  dataStringInicial += "Acel Z(G)\t";
 #endif
 
 #if (GX)
-  dataStringInicial += "Gyro X\t";
+  dataStringInicial += "Gyro X(rad/s)\t";
 #endif
 
 #if (GY)
-  dataStringInicial += "Gyro Y\t";
+  dataStringInicial += "Gyro Y(rad/s)\t";
 #endif
 
 #if (GZ)
-  dataStringInicial += "Gyro Z\t";
+  dataStringInicial += "Gyro Z(rad/s)\t";
 #endif
 
 #if (MX)
-  dataStringInicial += "Mag X\t";
+  dataStringInicial += "Mag X(T)\t";
 #endif
 
 #if (MY)
-  dataStringInicial += "Mag Y\t";
+  dataStringInicial += "Mag Y(T)\t";
 #endif
 
 #if (MZ)
-  dataStringInicial += "Mag Z\n";
+  dataStringInicial += "Mag Z(T)\n";
 #endif
 
   Serial.println(dataStringInicial);

@@ -101,14 +101,14 @@ void HMC5883L::lerTudo() {
     }
 }
 
-float HMC5883L::getX() {
-    return x;
+int HMC5883L::getX() {
+    return x * 1e-3; 
 }
 
-float HMC5883L::getY() {
-    return y;
+int HMC5883L::getY() {
+    return y * 1e-3; 
 }
 
-float HMC5883L::getZ() {
-    return z;
+int HMC5883L::getZ() {
+    return z * 1e-3; 
 }

@@ -20,9 +20,9 @@ public:
     L3G4200D(uint16_t odr = 100, uint16_t scale = 250);
     bool begin();
     void lerTudo();
-    float getX();
-    float getY();
-    float getZ();
+    int getX();
+    int getY();
+    int getZ();
 };
 
 #endif
