@@ -48,20 +48,22 @@ void setup() {
   String dataString = "";
   dataString += String("Temperatura\tpressão\tAltitude\tpressão em relação ao mar\taltitude real") + "\t";
   
+  Serial.print("Temperatura\tpressão\tAltitude\tpressão em relação ao mar\taltitude real\t");
+  
   do {   
    String zeros = "";
-    for(int tamanho = nome.length()+ String(counter).length(); tamanho < 9; tamanho++){
+    for(int tamanho = nome.length()+ String(counter).length(); tamanho < 8; tamanho++){
       zeros += "0";
       Serial.print(tamanho);
       Serial.print(counter);
     }
     
     nomearq = nome + zeros + String(counter) + ".txt";
-
+    
     counter += 1;
   }
   while(SD.exists(nomearq));
-    
+  Serial.print(nomearq);
   
   File dataFile = SD.open(nomearq, FILE_WRITE);
   if (dataFile) {
