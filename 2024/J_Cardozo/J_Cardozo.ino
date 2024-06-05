@@ -1,6 +1,6 @@
 #define SENSORES 1
 
-#define GYRO (SENSORES && 0)
+#define GYRO (SENSORES && 1)
 #define GX (GYRO && 1)
 #define GY (GYRO && 1)
 #define GZ (GYRO && 1)
@@ -50,7 +50,8 @@
 #endif
 
 #if (GYRO)
-#include <L3G.h>
+//#include <L3G.h>
+#include "src/lib/Giroscopio/L3G4200D.h"
 #endif
 
 #if (SD_CARD)
@@ -91,7 +92,8 @@ BMP085 bmp;
 #endif
 
 #if (GYRO)
-L3G gyro;
+//L3G gyro;
+L3G4200D gyro(100, 250);
 #endif
 
 #if (RFREQ)
@@ -179,12 +181,17 @@ void setup() {
 #endif
 
 #if (GYRO)
-  if (!gyro.init()) {
+  // if (!gyro.init()) {
+  //   Serial.println("Failed to autodetect gyro type!");
+  //   while (1)
+  //     ;
+  // }
+  // gyro.enableDefault();
+  if (!gyro.begin()) {
     Serial.println("Failed to autodetect gyro type!");
     while (1)
       ;
   }
-  gyro.enableDefault();
 #endif
 
 
@@ -388,16 +395,17 @@ void loop() {
 #endif
 
 #if (GYRO)
-  gyro.read();
+  //gyro.read();
+  gyro.lerTudo();
 #endif
 #if (GX)
-  gyroX = gyro.g.x;
+  gyroX = gyro.getX();
 #endif
 #if (GY)
-  gyroY = gyro.g.y;
+  gyroY = gyro.getY();
 #endif
 #if (GZ)
-  gyroZ = gyro.g.z;
+  gyroZ = gyro.getZ();
 #endif
 
 #if (MAG)
