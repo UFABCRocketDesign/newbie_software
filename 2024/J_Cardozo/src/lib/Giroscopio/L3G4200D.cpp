@@ -77,14 +77,14 @@ void L3G4200D::lerTudo() {
     }
 }
 
-int L3G4200D::getX() {
+float L3G4200D::getX() {
     return x * (3.14159265359 / 180.0);
 }
 
-int L3G4200D::getY() {
+float L3G4200D::getY() {
     return y * (3.14159265359 / 180.0);
 }
 
-int L3G4200D::getZ() {
+float L3G4200D::getZ() {
     return z * (3.14159265359 / 180.0);
 }

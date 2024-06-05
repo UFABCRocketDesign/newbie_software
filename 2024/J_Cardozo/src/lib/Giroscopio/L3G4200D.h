@@ -10,7 +10,7 @@
 
 class L3G4200D {
 private:
-    int16_t x, y, z;
+    float x, y, z;
     uint8_t odr; //Taxa de Dados de Saída
     uint8_t scale; //Faixa de medicao
     uint8_t getODR(uint16_t odr);
@@ -20,9 +20,9 @@ public:
     L3G4200D(uint16_t odr = 100, uint16_t scale = 250);
     bool begin();
     void lerTudo();
-    int getX();
-    int getY();
-    int getZ();
+    float getX();
+    float getY();
+    float getZ();
 };
 
 #endif

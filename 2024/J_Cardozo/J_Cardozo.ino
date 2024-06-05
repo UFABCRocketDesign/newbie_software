@@ -289,15 +289,15 @@ void setup() {
 #endif
 
 #if (MX)
-  dataStringInicial += "Mag X(T)\t";
+  dataStringInicial += "Mag X(uT)\t";
 #endif
 
 #if (MY)
-  dataStringInicial += "Mag Y(T)\t";
+  dataStringInicial += "Mag Y(uT)\t";
 #endif
 
 #if (MZ)
-  dataStringInicial += "Mag Z(T)\n";
+  dataStringInicial += "Mag Z(uT)\n";
 #endif
 
   Serial.println(dataStringInicial);
