@@ -1,12 +1,12 @@
 #include "HMC5883L.h"
 
-HMC5883L::HMC5883L(ufloat8_t samples, ufloat16_t gain, ufloat8_t mode) : x(0), y(0), z(0) {
+HMC5883L::HMC5883L(uint8_t samples, uint16_t gain, uint8_t mode) : x(0), y(0), z(0) {
     configA = (getSamples(samples) << 5) | 0x18;
     configB = getGain(gain);
     this->mode = getMode(mode);
 }
 
-ufloat8_t HMC5883L::getGain(ufloat16_t gain) {
+uint8_t HMC5883L::getGain(uint16_t gain) {
     switch (gain) {
         case 1370:
             return 0x00; // ±0.88 Ga
@@ -29,7 +29,7 @@ ufloat8_t HMC5883L::getGain(ufloat16_t gain) {
     }
 }
 
-ufloat8_t HMC5883L::getSamples(ufloat8_t samples) {
+uint8_t HMC5883L::getSamples(uint8_t samples) {
     switch (samples) {
         case 1:
             return 0x00; // 1 sample 
@@ -44,7 +44,7 @@ ufloat8_t HMC5883L::getSamples(ufloat8_t samples) {
     }
 }
 
-ufloat8_t HMC5883L::getMode(ufloat8_t mode) {
+uint8_t HMC5883L::getMode(uint8_t mode) {
     switch (mode) {
         case 0:
             return 0x00; // Continuous-measurement mode
@@ -57,26 +57,25 @@ ufloat8_t HMC5883L::getMode(ufloat8_t mode) {
     }
 }
 
-
 bool HMC5883L::begin() {
     Wire.begin();
 
-    Wire.begfloatransmission(HMC5883L_Address);
+    Wire.beginTransmission(HMC5883L_Address);
     Wire.write(0x00);
     Wire.write(configA);
     Wire.endTransmission();
 
-    Wire.begfloatransmission(HMC5883L_Address);
+    Wire.beginTransmission(HMC5883L_Address);
     Wire.write(0x01);
     Wire.write(configB);
     Wire.endTransmission();
 
-    Wire.begfloatransmission(HMC5883L_Address);
+    Wire.beginTransmission(HMC5883L_Address);
     Wire.write(0x02);
     Wire.write(mode);
     Wire.endTransmission();
 
-    Wire.begfloatransmission(HMC5883L_Address);
+    Wire.beginTransmission(HMC5883L_Address);
     Wire.write(0x02);
     Wire.endTransmission();
     Wire.requestFrom(HMC5883L_Address, 1);
@@ -87,7 +86,7 @@ bool HMC5883L::begin() {
 }
 
 void HMC5883L::lerTudo() {
-    Wire.begfloatransmission(HMC5883L_Address);
+    Wire.beginTransmission(HMC5883L_Address);
     Wire.write(0x03); 
     Wire.endTransmission();
     Wire.requestFrom(HMC5883L_Address, 6);
@@ -102,13 +101,13 @@ void HMC5883L::lerTudo() {
 }
 
 float HMC5883L::getX() {
-    return x; 
+    return x;
 }
 
 float HMC5883L::getY() {
-    return y; 
+    return y;
 }
 
 float HMC5883L::getZ() {
-    return z; 
+    return z;
 }

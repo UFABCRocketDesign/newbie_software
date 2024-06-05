@@ -7,16 +7,17 @@
 
 class HMC5883L {
 private:
-    float x, y, z;
+    int16_t x, y, z;
     uint8_t configA;
     uint8_t configB;
     uint8_t mode;
+    void readMagData();
     uint8_t getGain(uint16_t gain);
     uint8_t getSamples(uint8_t samples);
     uint8_t getMode(uint8_t mode);
 
 public:
-    HMC5883L(uint8_t samples = 8, uint16_t gain = 1090, uint8_t mode = 0);
+    HMC5883L(uint8_t samples = 8, uint16_t gain = 1090, uint8_t mode = 0x00);
     bool begin();
     void lerTudo();
     float getX();
