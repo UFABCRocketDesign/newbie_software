@@ -54,8 +54,6 @@ void setup() {
    String zeros = "";
     for(int tamanho = nome.length()+ String(counter).length(); tamanho < 8; tamanho++){
       zeros += "0";
-      Serial.print(tamanho);
-      Serial.print(counter);
     }
     
     nomearq = nome + zeros + String(counter) + ".txt";
@@ -63,7 +61,8 @@ void setup() {
     counter += 1;
   }
   while(SD.exists(nomearq));
-  Serial.print(nomearq);
+  
+  Serial.println(nomearq+"\t");
   
   File dataFile = SD.open(nomearq, FILE_WRITE);
   if (dataFile) {
