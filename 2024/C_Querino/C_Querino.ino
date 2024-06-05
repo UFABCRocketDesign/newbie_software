@@ -48,7 +48,7 @@ void setup() {
   String dataString = "";
   dataString += String("Temperatura\tpressão\tAltitude\tpressão em relação ao mar\taltitude real") + "\t";
   
-  Serial.print("Temperatura\tpressão\tAltitude\tpressão em relação ao mar\taltitude real\t");
+  Serial.println(dataString);
   
   do {   
    String zeros = "";
