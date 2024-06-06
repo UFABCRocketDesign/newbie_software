@@ -78,7 +78,7 @@ public:
   }
 
   // Método para verificar o estado do paraquedas e printar
-  bool isAtivado() {
+  bool getParaquedas() {
     return ativado;
   }
 };
@@ -335,7 +335,7 @@ void loop() {
 #endif
 #if PARA
   for (int i = 0; i < NUM_PARAQUEDAS; i++) {
-    dadosString += String(paraquedas[i].isAtivado()) + "\t";
+    dadosString += String(paraquedas[i].getParaquedas()) + "\t";
   }
 #endif
 #if GIRO
