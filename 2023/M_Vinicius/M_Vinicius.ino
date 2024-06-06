@@ -66,14 +66,16 @@ Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 int paraquedas = LOW;
 unsigned long previousMillis = 0;
 int paraquedas2 = LOW;
-unsigned long previousMillis2 = 0;
+//unsigned long previousMillis2 = 0;
 bool verificar = false;
 int paraquedas3 = LOW;
-unsigned long previousMillis3 = 0;
+//unsigned long previousMillis3 = 0;
 bool verificar2 = false;
+bool verificar2_2 = false;
 int paraquedas4 = LOW;
-unsigned long previousMillis4 = 0;
+//unsigned long previousMillis4 = 0;
 bool verificar3 = false;
+bool verificar4 = false;
 #endif
 
 // Declaração De variaveis diversas
@@ -91,7 +93,7 @@ const int chipSelect = 53;
 
 // FUNÇÕES
 
-float filtro_altura(float altura, int qual) {
+float filtro_altura(float altura, int qual) {  //FILTRO ALTURA
 
   filtro[qual][index[qual]] = altura;
   index[qual] = (index[qual] + 1) % 10;
@@ -103,7 +105,7 @@ float filtro_altura(float altura, int qual) {
   return altura_semRuido;
 }
 
-bool det_apogeu(float altura) {
+bool det_apogeu(float altura) {  // DETECÇÃO DE APOGEU
   for (int i = 3; i > 0; i--) {
     apogeu[i] = apogeu[i - 1];
   }
@@ -111,8 +113,55 @@ bool det_apogeu(float altura) {
   if (apogeu[0] < apogeu[1] && apogeu[1] < apogeu[2] && apogeu[2] < apogeu[3]) {
     //queda = 1;  //caindo
     return true;
-  }else{
+  } else {
     return false;
+  }
+}
+
+
+// PARAQUEDAS
+void acionar_paraquedas(bool queda, int pino, bool paraquedas, unsigned long currentMillis, float altura_sRuido2) {
+  if (queda) {
+    if (previousMillis == 0 && paraquedas == LOW) {
+      paraquedas = HIGH;  // ligado
+      previousMillis = currentMillis;
+
+    } else if (currentMillis - previousMillis > 4000 && verificar == false) {
+      paraquedas = LOW;  //desligado
+      previousMillis = currentMillis;
+      verificar = true;
+    }
+    if (currentMillis - previousMillis > 4000 && paraquedas == LOW && verificar2 == false) {
+      paraquedas = HIGH;
+      previousMillis = currentMillis;
+      verificar2 = true;
+
+    } else if (currentMillis - previousMillis > 4000 && verificar2_2 == false) {
+      paraquedas = LOW;
+      previousMillis = currentMillis;
+      verificar2_2 == true;
+    }
+
+    if (altura_sRuido2 <= -5 && verificar3 == false && paraquedas == LOW) {
+      paraquedas = HIGH;
+      verificar3 = true;
+      previousMillis = currentMillis;
+
+    } else if (currentMillis - previousMillis > 4000 && verificar3 == true) {
+      paraquedas = LOW;
+      previousMillis = currentMillis;
+    }
+
+    if (verificar3 == true && paraquedas == LOW && currentMillis - previousMillis > 4000){
+      paraquedas = HIGH;
+      previousMillis = currentMillis + 5000;
+      verificar4 = true;
+
+    } else if ( currentMillis >= previousMillis && verificar4 == true){
+      paraquedas = LOW;
+    }
+
+    digitalWrite(pino, paraquedas);
   }
 }
 
@@ -312,25 +361,21 @@ void loop() {
   // PROCESSAMENTO
 
 #if BMP_ALT
-  // FILTRO ALTURA //     FUTURAMENTE POSSO ADD A IDEIA DE UM FOR PARA VARIOS FILTROS
-
-  float altura_semRuido = filtro_altura(altura, 0);  
-  
+  // FILTRO ALTURA //     FUTURAMENTE POSSO ADD A IDEIA DE UM "for" PARA VARIOS FILTROS
+  float altura_semRuido = filtro_altura(altura, 0);
   float altura_sRuido2 = filtro_altura(altura_semRuido, 1);
-  
 
 
   // DETECTAR APOGEU //
- 
- queda = queda || det_apogeu(altura_sRuido2); 
+  queda = queda || det_apogeu(altura_sRuido2);  // as duas barras (significam or), ou seja, se ja deu como queda verdadeiro uma vez, sempre mantera verdadeiro.
 
 
 #endif
-  // LIBERAR O PRIMEIRO PARAQUEDAS //
+    // LIBERAR O PRIMEIRO PARAQUEDAS //
 
 #if PARAQUEDAS
 
-  if (queda) {
+  /*if (queda) {
     if (previousMillis == 0 && paraquedas == LOW) {
       paraquedas = HIGH;  // ligado
       previousMillis = currentMillis;
@@ -339,7 +384,7 @@ void loop() {
       paraquedas = LOW;  //desligado
     }
     // LIBERAR O SEGUNDO PARAQUEDAS //
-    if (queda == 1 && previousMillis2 == 0) {
+    if (queda && previousMillis2 == 0) {
       previousMillis2 = currentMillis;
     }
     if (currentMillis - previousMillis2 >= 10000 && paraquedas2 == LOW && verificar == false) {
@@ -371,6 +416,15 @@ void loop() {
     digitalWrite(IGN_3, paraquedas3);
     digitalWrite(IGN_4, paraquedas4);
   }
+  */
+
+
+    acionar_paraquedas(queda, IGN_1, paraquedas, currentMillis, altura_sRuido2);
+    acionar_paraquedas(queda, IGN_2, paraquedas2, currentMillis, altura_sRuido2);
+    acionar_paraquedas(queda, IGN_3, paraquedas3, currentMillis, altura_sRuido2);
+    acionar_paraquedas(queda, IGN_4, paraquedas4, currentMillis, altura_sRuido2);
+
+
 #endif
 
 
