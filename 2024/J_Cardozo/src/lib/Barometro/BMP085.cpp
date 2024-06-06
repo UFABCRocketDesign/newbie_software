@@ -4,14 +4,14 @@ bool BMP085::begin() {
     Wire.beginTransmission(BMP085_ADDRESS);
     Wire.write(0XAA);
     if (Wire.endTransmission() != 0) {
-        return false; // Falha na comunicação com o sensor
+        return false; 
     }
 
     Wire.requestFrom((uint8_t)BMP085_ADDRESS, (uint8_t)22);
     unsigned long tempo = micros();
     while (Wire.available() < 22) {
         if (tempo + 10 < micros()) {
-            return false; // Timeout
+            return false; 
         }
     }
 
@@ -27,7 +27,7 @@ bool BMP085::begin() {
     mc = Wire.read() << 8 | Wire.read();
     md = Wire.read() << 8 | Wire.read();
 
-    return true; // Comunicação bem-sucedida e dados lidos
+    return true; 
 }
 
 

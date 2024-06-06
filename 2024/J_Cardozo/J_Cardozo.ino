@@ -277,15 +277,15 @@ void setup() {
 #endif
 
 #if (GX)
-  dataStringInicial += "Gyro X(rad/s)\t";
+  dataStringInicial += "Gyro X(graus/s)\t";
 #endif
 
 #if (GY)
-  dataStringInicial += "Gyro Y(rad/s)\t";
+  dataStringInicial += "Gyro Y(graus/s)\t";
 #endif
 
 #if (GZ)
-  dataStringInicial += "Gyro Z(rad/s)\t";
+  dataStringInicial += "Gyro Z(graus/s)\t";
 #endif
 
 #if (MX)
@@ -315,12 +315,12 @@ void setup() {
 
     nomeSD = nomeBaseSD + zeros + String(iSD) + ".txt";
 
-    Serial.println("Verificando: " + nomeSD);
+    //Serial.println("Verificando: " + nomeSD);
 
     if (SD.exists(nomeSD)) {
-      Serial.println(nomeSD + " já existe.");
+      //Serial.println(nomeSD + " já existe.");
     } else {
-      Serial.println(nomeSD + " não existe, criando...");
+      //Serial.println(nomeSD + " não existe, criando...");
       File dataFile = SD.open(nomeSD, FILE_WRITE);
       if (dataFile) {
         Serial.println(nomeSD + " criado.");

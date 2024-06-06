@@ -1,17 +1,17 @@
 #ifndef HMC5883L_H
 #define HMC5883L_H
 
+#include "src/lib/SensoresUnificados/Sensores.h"
 #include <Wire.h>
 
 #define HMC5883L_Address 0x1E
 
-class HMC5883L {
+class HMC5883L : public Sensor {
 private:
     int16_t x, y, z;
     uint8_t configA;
     uint8_t configB;
     uint8_t mode;
-    void readMagData();
     uint8_t getGain(uint16_t gain);
     uint8_t getSamples(uint8_t samples);
     uint8_t getMode(uint8_t mode);
