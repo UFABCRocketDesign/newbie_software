@@ -41,7 +41,7 @@
 #if PARA
 class Paraquedas {
 public:
-  static const int ALT_PARAQUEDAS = -3;
+  const int ALT_PARAQUEDAS = -3;
   int pino;
   bool ativado;
   bool apogeuApenas;
@@ -108,12 +108,24 @@ float altInicial = 0;
 // *** Filtros **** //
 class Filtro {
 private:
-  static const int NUM_LEITURAS = 10;
-  float leituras[NUM_LEITURAS] = { 0 };
+  int NUM_LEITURAS = 10;
+  float *leituras = new float[NUM_LEITURAS];
   float somaLeituras = 0;
   int indiceLeitura = 0;
 
 public:
+  // Construtor
+  Filtro() {
+    for (int i = 0; i < NUM_LEITURAS; i++) {
+      leituras[i] = 0;
+    }
+  }
+
+  // Destrutor
+  ~Filtro() {
+    delete[] leituras;
+  }
+
   float atualizarFiltro(float novaLeitura) {
     somaLeituras -= leituras[indiceLeitura];
     leituras[indiceLeitura] = novaLeitura;
