@@ -10,7 +10,7 @@ float listaSuavizarCurva_1[5];
 float listaDeteccaoQueda[2];
 int contador = 0;
 float alturaAnterior;
-String numA;
+int numA = 0;
 File arquivo;
 String nomeArquivo;
 String inicio = "data";
@@ -55,18 +55,22 @@ void setup() {
   Serial.println("Cartão SD inicializado com sucesso");
 
 //verificando nome de arquivo
-  int tamInicio = inicio.length();
-  numA = "";
-  for (int i = tamInicio; i < 8; i++){
-    numA += "0"; //concatenando 0 a string
-  }
-
   nomeArquivo = inicio + String(numA) + tipoDeArquivo;
 
-  while (SD.exists(nomeArquivo)) {
-    nomeArquivo = inicio + String(numA) + tipoDeArquivo;
-    numA = String(numA.toInt() + 1);
-  }
+  do {
+    int tamArquivo = inicio.length() + String(numA).length();
+    int num = 0;
+    for (int i = tamArquivo; i < 8; i++){
+      num ++; //contando num de espaços vazios entre inicio e numA
+    }
+    String zerosAdicionais = "";
+    for (int i = 0; i < num; i++){
+      zerosAdicionais += "0"; // concatenando 0's a string
+    }
+    nomeArquivo = inicio + zerosAdicionais + String(numA) + tipoDeArquivo;
+    numA++;
+  } while (SD.exists(nomeArquivo));
+
   Serial.print(nomeArquivo);
   arquivo = SD.open(nomeArquivo, FILE_WRITE);
   if (arquivo) {
@@ -76,7 +80,6 @@ void setup() {
   } else {
     Serial.println("Erro ao abrir o arquivo");
   }
-
 //end 
   Serial.begin(115200);
   if (!bmp.begin()) {
