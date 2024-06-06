@@ -15,6 +15,7 @@ File arquivo;
 String nomeArquivo;
 String inicio = "isa";
 String tipoDeArquivo = ".txt";
+String header = "Temperature(C)\tPressure(Pa)\tHigh(meters)\tFiltered High 0(meters)\tFiltered High 1(meters)\tFallen(1)/ Not fallen (0)\tContador de Queda";
 
 float filtroSuavizarCurva_0(float dadosCurva_0) {
 
@@ -75,7 +76,7 @@ Serial.begin(115200);
   Serial.println(nomeArquivo);
   arquivo = SD.open(nomeArquivo, FILE_WRITE);
   if (arquivo) {
-    String header = "Temperature(C), Pressure(Pa), High(meters), Filtered High 0(meters), Filtered High 1(meters), Fallen(1)/ Not fallen (0), Contador de Queda";
+    
     arquivo.println(header);
     arquivo.close();
   } else {
@@ -83,7 +84,7 @@ Serial.begin(115200);
   }
 //end 
 
-  Serial.print("Temperature(C)\t Pressure(Pa)\t High(meters)\t Filtered High 0(meters)\t Filtered High 1(meters)\t Fallen(1)/ Not fallen (0)\t Contador de Queda");
+  Serial.println(header);
 
   somaAltitude = 0;
   for (int posicaoListaAltitude = 0; posicaoListaAltitude < 10; posicaoListaAltitude++) {
