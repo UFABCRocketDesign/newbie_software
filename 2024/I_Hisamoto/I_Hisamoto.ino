@@ -13,7 +13,7 @@ float alturaAnterior;
 int numA = 0;
 File arquivo;
 String nomeArquivo;
-String inicio = "data";
+String inicio = "isa";
 String tipoDeArquivo = ".txt";
 
 float filtroSuavizarCurva_0(float dadosCurva_0) {
@@ -45,7 +45,14 @@ float filtroSuavizarCurva_1(float dadosCurva_1) {
 }
 
 void setup() {
-//abrindo o SD
+
+Serial.begin(115200);
+  if (!bmp.begin()) {
+    Serial.println("Não foi possível achar um sensor BMP085 válido, verifique os fios!");
+    while (1) {}
+  }
+
+  //abrindo o SD
   pinMode(chipSelect,OUTPUT);
 
   if (!SD.begin(chipSelect)) {
@@ -55,23 +62,17 @@ void setup() {
   Serial.println("Cartão SD inicializado com sucesso");
 
 //verificando nome de arquivo
-  nomeArquivo = inicio + String(numA) + tipoDeArquivo;
-
   do {
-    int tamArquivo = inicio.length() + String(numA).length();
-    int num = 0;
-    for (int i = tamArquivo; i < 8; i++){
-      num ++; //contando num de espaços vazios entre inicio e numA
-    }
+    int tamArquivo = inicio.length() + String(numA).length(); 
     String zerosAdicionais = "";
-    for (int i = 0; i < num; i++){
-      zerosAdicionais += "0"; // concatenando 0's a string
+    for (int i = tamArquivo; i < 8; i++){
+      zerosAdicionais += "0";
     }
     nomeArquivo = inicio + zerosAdicionais + String(numA) + tipoDeArquivo;
     numA++;
   } while (SD.exists(nomeArquivo));
 
-  Serial.print(nomeArquivo);
+  Serial.println(nomeArquivo);
   arquivo = SD.open(nomeArquivo, FILE_WRITE);
   if (arquivo) {
     String header = "Temperature(C), Pressure(Pa), High(meters), Filtered High 0(meters), Filtered High 1(meters), Fallen(1)/ Not fallen (0), Contador de Queda";
@@ -81,11 +82,6 @@ void setup() {
     Serial.println("Erro ao abrir o arquivo");
   }
 //end 
-  Serial.begin(115200);
-  if (!bmp.begin()) {
-    Serial.println("Não foi possível achar um sensor BMP085 válido, verifique os fios!");
-    while (1) {}
-  }
 
   Serial.print("Temperature(C)\t Pressure(Pa)\t High(meters)\t Filtered High 0(meters)\t Filtered High 1(meters)\t Fallen(1)/ Not fallen (0)\t Contador de Queda");
 
