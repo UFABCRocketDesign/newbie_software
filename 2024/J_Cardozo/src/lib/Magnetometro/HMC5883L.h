@@ -1,7 +1,7 @@
 #ifndef HMC5883L_H
 #define HMC5883L_H
 
-#include "src/lib/SensoresUnificados/Sensores.h"
+#include "../SensoresUnificados/Sensores.h"
 #include <Wire.h>
 
 #define HMC5883L_Address 0x1E

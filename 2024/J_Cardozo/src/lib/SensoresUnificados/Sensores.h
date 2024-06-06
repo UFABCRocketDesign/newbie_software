@@ -1,6 +1,12 @@
 #ifndef SENSOR_H
 #define SENSOR_H
 
+#if defined(ARDUINO) && ARDUINO >= 100
+#include "arduino.h"
+#else
+#include "WProgram.h"
+#endif
+
 class Sensor {
 private: 
     const uint8_t address;
