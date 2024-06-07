@@ -301,6 +301,12 @@ void setup() {
 #if (GPS)
   dataStringInicial += "Latitude (deg)\t";
   dataStringInicial += "Longitude (deg)\t";
+  dataStringInicial += "Satelites \t";
+  dataStringInicial += "Precisao \t";
+  dataStringInicial += "Age \t";
+  dataStringInicial += "AltitudeGPS (m)\t";
+  dataStringInicial += "VelocidadeGPS (km/h)\t";
+
 #endif
 
   Serial.println(dataStringInicial);
@@ -475,7 +481,7 @@ void loop() {
   float latitude = gps.location.lat();
   float longitude = gps.location.lng();
   int satelites = gps.satellites.value();
-  float precisao = gps.hdop.hdop();
+  int precisao = gps.hdop.hdop();
   int age = gps.location.age();
   float altitudeGPS = gps.altitude.meters();
   float velocidade = gps.speed.kmph();
@@ -545,11 +551,11 @@ void loop() {
 #if (GPS)
   dataString += String(latitude, 6) + "\t";
   dataString += String(longitude, 6) + "\t";
-  dataString += String(satelites, 6) + "\t";
-  dataString += String(precisao, 6) + "\t";
-  dataString += String(age, 6) + "\t";
-  dataString += String(altitudeGPS, 6) + "\t";
-  dataString += String(velocidade, 6) + "\t";
+  dataString += String(satelites) + "\t";
+  dataString += String(precisao) + "\t";
+  dataString += String(age) + "\t";
+  dataString += String(altitudeGPS) + "\t";
+  dataString += String(velocidade) + "\t";
 #endif
 
   Serial.println(dataString);
