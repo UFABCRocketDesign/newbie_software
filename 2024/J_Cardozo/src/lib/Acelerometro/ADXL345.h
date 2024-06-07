@@ -15,7 +15,6 @@ private:
   int X0,X1,X_out;
   int Y0,Y1,Y_out;
   int Z1,Z0,Z_out;
-  float x, y, z;
   uint8_t range;
   float scale;
 

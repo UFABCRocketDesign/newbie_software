@@ -118,11 +118,12 @@ Paraquedas p4(10000, 5000, IGN_4, -3);
 
 #if (GPS)
 #include <TinyGPSPlus.h>
-#include <SoftwareSerial.h>
-static const int RXPin = 4, TXPin = 3;
-static const uint32_t GPSBaud = 4800;
+//#include <SoftwareSerial.h>
+//static const int RXPin = 4, TXPin = 3;
+static const uint32_t GPSBaud = 9600;
 TinyGPSPlus gps;
-SoftwareSerial ss(RXPin, TXPin);
+//SoftwareSerial ss(RXPin, TXPin);
+HardwareSerial &GPSSerial = Serial1;
 #endif
 
 #if (RFREQ)
@@ -131,7 +132,6 @@ RH_ASK rf_driver;
 unsigned long previousMillis = 0;
 const long interval = 200;
 #endif
-
 
 void setup() {
   Serial.begin(115200);
@@ -228,7 +228,7 @@ void setup() {
 #endif
 
 #if (GPS)
-  ss.begin(GPSBaud);
+  GPSSerial.begin(GPSBaud);
 #endif
 
   //Definindo cabecalho
@@ -468,8 +468,8 @@ void loop() {
 #endif
 
 #if (GPS)
-  while (ss.available() > 0) {
-    gps.encode(ss.read());
+  while (GPSSerial.available() > 0) {
+    gps.encode(GPSSerial.read());
   }
 
   float latitude = gps.location.lat();
@@ -537,8 +537,8 @@ void loop() {
   dataString += String(magZ) + "\t";
 #endif
 #if (GPS)
-  dataString += String(latitude) + "\t";
-  dataString += String(longitude) + "\t";
+  dataString += String(latitude, 6) + "\t";
+  dataString += String(longitude, 6) + "\t";
 #endif
 
   Serial.println(dataString);

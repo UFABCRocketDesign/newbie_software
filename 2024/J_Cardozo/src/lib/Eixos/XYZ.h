@@ -7,7 +7,6 @@ protected:
     float y = 0;
     float z = 0;
 public:
-    virtual void lerTudo() = 0;
     float getX();
 	float getY();
 	float getZ();
