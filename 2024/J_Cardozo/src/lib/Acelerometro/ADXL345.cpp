@@ -47,19 +47,7 @@ void ADXL345::lerTudo() {
     Z_out = Z0 + Z1;
   }
 
-  Xg = X_out / scale;
-  Yg = Y_out / scale;
-  Zg = Z_out / scale;
-}
-
-float ADXL345::getX() {
-  return Xg;
-}
-
-float ADXL345::getY() {
-  return Yg;
-}
-
-float ADXL345::getZ() {
-  return Zg;
+  x = X_out / scale;
+  y = Y_out / scale;
+  z = Z_out / scale;
 }

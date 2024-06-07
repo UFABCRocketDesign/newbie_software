@@ -1,11 +1,11 @@
 #define SENSORES 1
 
-#define GYRO (SENSORES && 1)
+#define GYRO (SENSORES && 0)
 #define GX (GYRO && 1)
 #define GY (GYRO && 1)
 #define GZ (GYRO && 1)
 
-#define MAG (SENSORES && 1)
+#define MAG (SENSORES && 0)
 #define MX (MAG && 1)
 #define MY (MAG && 1)
 #define MZ (MAG && 1)
@@ -27,6 +27,10 @@
 
 #define RFREQ 0
 
+#define GPS 1
+
+#define LORA 0
+
 #include <SPI.h>
 #include <Wire.h>
 
@@ -38,81 +42,9 @@
 #include "src/lib/Barometro/BMP085.h"
 #include "src/lib/Filtros/Filtros.h"
 #include "src/lib/Apogeu/Apogeu.h"
-#endif
 
-#if (ACEL)
-//#include <Adafruit_ADXL345_U.h>
-#include "src/lib/Acelerometro/ADXL345.h"
-#endif
-
-#if (MAG)
-//#include <Adafruit_HMC5883_U.h>
-#include "src/lib/Magnetometro/HMC5883L.h"
-#endif
-
-#if (GYRO)
-//#include <L3G.h>
-#include "src/lib/Giroscopio/L3G4200D.h"
-#endif
-
-#if (SD_CARD)
-#include <SD.h>
-#endif
-
-#if (PARAQUEDAS)
-#include "src/lib/Paraquedas/Paraquedas.h"
-#endif
-
-#if (P1)
-#define IGN_1 36 /*act1*/
-#endif
-
-#if (P2)
-#define IGN_2 61 /*act2*/
-#endif
-
-#if (P3)
-#define IGN_3 46 /*act3*/
-#endif
-
-#if (P4)
-#define IGN_4 55 /*act4*/
-#endif
-
-#if (ACEL)
-//Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
-ADXL345 acel(2);
-#endif
-
-#if (MAG)
-//Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(123456);
-HMC5883L mag;
-#endif
-
-#if (BAR)
 BMP085 bmp;
-#endif
 
-#if (GYRO)
-//L3G gyro;
-L3G4200D gyro(100, 250);
-#endif
-
-#if (RFREQ)
-#include <RH_ASK.h>
-RH_ASK rf_driver;
-unsigned long previousMillis = 0;
-const long interval = 200;
-#endif
-
-//Definindo SD
-#if (SD_CARD)
-#define chipSelect 53
-String nomeBaseSD = "joao";  //setup
-String nomeSD;               //global
-#endif
-
-#if (BAR)
 //Definindo variaveis para os filtros
 #define NUM_LEITURAS 10
 #define NUM_FILTROS 3
@@ -129,7 +61,52 @@ float alturaInicial;  //Variavel global para altura inicial
 
 #endif
 
+#if (ACEL)
+//#include <Adafruit_ADXL345_U.h>
+#include "src/lib/Acelerometro/ADXL345.h"
+//Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
+ADXL345 acel(2);
+#endif
+
+#if (MAG)
+//#include <Adafruit_HMC5883_U.h>
+#include "src/lib/Magnetometro/HMC5883L.h"
+//Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(123456);
+HMC5883L mag;
+#endif
+
+#if (GYRO)
+//#include <L3G.h>
+#include "src/lib/Giroscopio/L3G4200D.h"
+//L3G gyro;
+L3G4200D gyro(100, 250);
+#endif
+
+#if (SD_CARD)
+#include <SD.h>
+//Definindo SD
+#define chipSelect 53
+String nomeBaseSD = "joao";  //setup
+String nomeSD;               //global
+#endif
+
 #if (PARAQUEDAS)
+#include "src/lib/Paraquedas/Paraquedas.h"
+#if (P1)
+#define IGN_1 36 /*act1*/
+#endif
+
+#if (P2)
+#define IGN_2 61 /*act2*/
+#endif
+
+#if (P3)
+#define IGN_3 46 /*act3*/
+#endif
+
+#if (P4)
+#define IGN_4 55 /*act4*/
+#endif
 
 //Inicializando paraquedas
 Paraquedas p1(10000, 0, IGN_1, 0);
@@ -138,6 +115,23 @@ Paraquedas p3(10000, 0, IGN_3, -3);
 Paraquedas p4(10000, 5000, IGN_4, -3);
 
 #endif
+
+#if (GPS)
+#include <TinyGPSPlus.h>
+#include <SoftwareSerial.h>
+static const int RXPin = 4, TXPin = 3;
+static const uint32_t GPSBaud = 4800;
+TinyGPSPlus gps;
+SoftwareSerial ss(RXPin, TXPin);
+#endif
+
+#if (RFREQ)
+#include <RH_ASK.h>
+RH_ASK rf_driver;
+unsigned long previousMillis = 0;
+const long interval = 200;
+#endif
+
 
 void setup() {
   Serial.begin(115200);
@@ -233,6 +227,10 @@ void setup() {
 
 #endif
 
+#if (GPS)
+  ss.begin(GPSBaud);
+#endif
+
   //Definindo cabecalho
   String dataStringInicial = "";
   dataStringInicial += "Tempo(s)\t";
@@ -277,15 +275,15 @@ void setup() {
 #endif
 
 #if (GX)
-  dataStringInicial += "Gyro X(graus/s)\t";
+  dataStringInicial += "Gyro X(deg/s)\t";
 #endif
 
 #if (GY)
-  dataStringInicial += "Gyro Y(graus/s)\t";
+  dataStringInicial += "Gyro Y(deg/s)\t";
 #endif
 
 #if (GZ)
-  dataStringInicial += "Gyro Z(graus/s)\t";
+  dataStringInicial += "Gyro Z(deg/s)\t";
 #endif
 
 #if (MX)
@@ -297,7 +295,12 @@ void setup() {
 #endif
 
 #if (MZ)
-  dataStringInicial += "Mag Z(uT)\n";
+  dataStringInicial += "Mag Z(uT)\t";
+#endif
+
+#if (GPS)
+  dataStringInicial += "Latitude (deg)\t";
+  dataStringInicial += "Longitude (deg)\t";
 #endif
 
   Serial.println(dataStringInicial);
@@ -464,6 +467,15 @@ void loop() {
   p4.ativarParaquedas(filtroFinal, currentTime, apogeu.getEstaDescendo());
 #endif
 
+#if (GPS)
+  while (ss.available() > 0) {
+    gps.encode(ss.read());
+  }
+
+  float latitude = gps.location.lat();
+  float longitude = gps.location.lng();
+#endif
+
   //Inicializando a string
   String dataString = "";
   //String de dados
@@ -523,6 +535,10 @@ void loop() {
 #endif
 #if (MZ)
   dataString += String(magZ) + "\t";
+#endif
+#if (GPS)
+  dataString += String(latitude) + "\t";
+  dataString += String(longitude) + "\t";
 #endif
 
   Serial.println(dataString);

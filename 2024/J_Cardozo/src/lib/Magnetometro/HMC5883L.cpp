@@ -78,7 +78,7 @@ bool HMC5883L::begin() {
     Wire.beginTransmission(address);
     Wire.write(0x02);
     Wire.endTransmission();
-    Wire.requestFrom(address, 1);
+    Wire.requestFrom((uint8_t)address, (uint8_t)1);
     if (Wire.available()) {
         return (Wire.read() == mode);
     }
@@ -89,7 +89,7 @@ void HMC5883L::lerTudo() {
     Wire.beginTransmission(address);
     Wire.write(0x03); 
     Wire.endTransmission();
-    Wire.requestFrom(address, 6);
+    Wire.requestFrom((uint8_t)address, (uint8_t)6);
     if (Wire.available() == 6) {
         x = Wire.read() << 8; 
         x |= Wire.read();    
