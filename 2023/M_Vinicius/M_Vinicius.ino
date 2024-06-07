@@ -31,6 +31,7 @@
 #define IGN_2 61 /*act2*/
 #define IGN_3 46 /*act3*/
 #define IGN_4 55 /*act4*/
+int IGN[] = {IGN_1, IGN_2, IGN_3, IGN_4};
 
 #ifdef ARDUINO_AVR_MEGA2560
 #define SD_CS_PIN 53
@@ -63,11 +64,11 @@ Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 
 // Declaração variaveis paraquedas:
 #if PARAQUEDAS
-int paraquedas = LOW;
-unsigned long previousMillis = 0;
+//int paraquedas = LOW;
+//unsigned long previousMillis = 0;
 int paraquedas2 = LOW;
 //unsigned long previousMillis2 = 0;
-bool verificar = false;
+//bool verificar = false;
 int paraquedas3 = LOW;
 //unsigned long previousMillis3 = 0;
 bool verificar2 = false;
@@ -76,6 +77,7 @@ int paraquedas4 = LOW;
 //unsigned long previousMillis4 = 0;
 bool verificar3 = false;
 bool verificar4 = false;
+
 #endif
 
 // Declaração De variaveis diversas
@@ -84,6 +86,9 @@ float alt_in = 0;  // fazer o sensor pro foguete cair, 1 --> ta caindo
 float apogeu[4];
 float filtro[2][10];
 int index[2];
+bool paraquedas[4];
+unsigned long previousMillis[4];
+bool verificar[4];
 
 String marcs = "marcs";
 String nome_do_arquivo;
@@ -120,48 +125,37 @@ bool det_apogeu(float altura) {  // DETECÇÃO DE APOGEU
 
 
 // PARAQUEDAS
-void acionar_paraquedas(bool queda, int pino, bool paraquedas, unsigned long currentMillis, float altura_sRuido2) {
+void acionar_paraquedas(bool queda, int pino, int qual, unsigned long currentMillis, float altura_sRuido2) {
   if (queda) {
-    if (previousMillis == 0 && paraquedas == LOW) {
-      paraquedas = HIGH;  // ligado
-      previousMillis = currentMillis;
+    if (altura_sRuido2 > -5) {
+      if (qual == 0 || previousMillis[qual] + 5000 < currentMillis && paraquedas[qual] == LOW && verificar[qual] == false) {
+        paraquedas[qual] = HIGH;  // ligado
+        previousMillis[qual] = currentMillis;
 
-    } else if (currentMillis - previousMillis > 4000 && verificar == false) {
-      paraquedas = LOW;  //desligado
-      previousMillis = currentMillis;
-      verificar = true;
-    }
-    if (currentMillis - previousMillis > 4000 && paraquedas == LOW && verificar2 == false) {
-      paraquedas = HIGH;
-      previousMillis = currentMillis;
-      verificar2 = true;
+        if (qual == 0) {
+          previousMillis[qual + 1] = previousMillis[qual];
+        }
 
-    } else if (currentMillis - previousMillis > 4000 && verificar2_2 == false) {
-      paraquedas = LOW;
-      previousMillis = currentMillis;
-      verificar2_2 == true;
+      } else if (currentMillis - previousMillis[qual] > 4000 && paraquedas[qual] == HIGH) {
+        paraquedas[qual] = LOW;  //desligado
+        verificar[qual] = true;
+      }
     }
 
-    if (altura_sRuido2 <= -5 && verificar3 == false && paraquedas == LOW) {
-      paraquedas = HIGH;
-      verificar3 = true;
-      previousMillis = currentMillis;
+    else if (qual == 2 || previousMillis[qual] + 5000 < currentMillis && paraquedas[qual] == LOW && verificar[qual] == false) {
+      paraquedas[qual] = HIGH;
+      previousMillis[qual] = currentMillis;
 
-    } else if (currentMillis - previousMillis > 4000 && verificar3 == true) {
-      paraquedas = LOW;
-      previousMillis = currentMillis;
+      if (qual == 2) {
+        previousMillis[qual + 1] = currentMillis;
+      }
+
+    } else if (currentMillis - previousMillis[qual] > 4000) {
+      paraquedas[qual] = LOW;
+      verificar[qual] = true;
     }
 
-    if (verificar3 == true && paraquedas == LOW && currentMillis - previousMillis > 4000){
-      paraquedas = HIGH;
-      previousMillis = currentMillis + 5000;
-      verificar4 = true;
-
-    } else if ( currentMillis >= previousMillis && verificar4 == true){
-      paraquedas = LOW;
-    }
-
-    digitalWrite(pino, paraquedas);
+    digitalWrite(pino, paraquedas[qual]);
   }
 }
 
@@ -371,59 +365,13 @@ void loop() {
 
 
 #endif
-    // LIBERAR O PRIMEIRO PARAQUEDAS //
+  
 
 #if PARAQUEDAS
 
-  /*if (queda) {
-    if (previousMillis == 0 && paraquedas == LOW) {
-      paraquedas = HIGH;  // ligado
-      previousMillis = currentMillis;
-
-    } else if (currentMillis - previousMillis > 4000) {
-      paraquedas = LOW;  //desligado
-    }
-    // LIBERAR O SEGUNDO PARAQUEDAS //
-    if (queda && previousMillis2 == 0) {
-      previousMillis2 = currentMillis;
-    }
-    if (currentMillis - previousMillis2 >= 10000 && paraquedas2 == LOW && verificar == false) {
-      paraquedas2 = HIGH;  // ligado
-      previousMillis2 = currentMillis;
-    } else if (currentMillis - previousMillis2 > 11000) {
-      paraquedas2 = LOW;  //desligado
-      verificar = true;
-    }
-    // LIBERAR O TERCEIRO PARAQUEDAS //
-    if (altura_sRuido2 <= -5 && verificar2 == false) {
-      paraquedas3 = HIGH;  // ligado
-      previousMillis3 = currentMillis;
-      verificar2 = true;
-      previousMillis4 = currentMillis + 5000;
-    } else if (currentMillis - previousMillis3 > 3000) {
-      paraquedas3 = LOW;  //desligado
-    }
-    // LIBERAR O QUARTO PARAQUEDAS //
-    if (paraquedas4 == LOW && verificar2 == true && verificar3 == false && currentMillis >= previousMillis4) {
-      paraquedas4 = HIGH;  // ligado
-      previousMillis4 = currentMillis;
-      verificar3 = true;
-    } else if (currentMillis - previousMillis4 > 3000) {
-      paraquedas4 = LOW;  //desligado
-    }
-    digitalWrite(IGN_1, paraquedas);
-    digitalWrite(IGN_2, paraquedas2);
-    digitalWrite(IGN_3, paraquedas3);
-    digitalWrite(IGN_4, paraquedas4);
+for (int i = 0 ; i < 4 ; i++){
+  acionar_paraquedas(queda, IGN[i], i, currentMillis, altura_sRuido2);
   }
-  */
-
-
-    acionar_paraquedas(queda, IGN_1, paraquedas, currentMillis, altura_sRuido2);
-    acionar_paraquedas(queda, IGN_2, paraquedas2, currentMillis, altura_sRuido2);
-    acionar_paraquedas(queda, IGN_3, paraquedas3, currentMillis, altura_sRuido2);
-    acionar_paraquedas(queda, IGN_4, paraquedas4, currentMillis, altura_sRuido2);
-
 
 #endif
 
@@ -456,13 +404,13 @@ void loop() {
 
 //PARAQUEDAS
 #if PARAQUEDAS
-  dataString += String(paraquedas);
+  dataString += String(paraquedas[1]);
   dataString += "\t";
-  dataString += String(paraquedas2);
+  dataString += String(paraquedas[2]);
   dataString += "\t";
-  dataString += String(paraquedas3);
+  dataString += String(paraquedas[3]);
   dataString += "\t";
-  dataString += String(paraquedas4);
+  dataString += String(paraquedas[4]);
   dataString += "\t";
 #endif
 
