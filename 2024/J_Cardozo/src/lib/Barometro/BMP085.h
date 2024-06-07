@@ -1,17 +1,12 @@
 #ifndef BMP085_H
 #define BMP085_H
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
+#include "../SensoresUnificados/Sensores.h"
 #include <Wire.h>
 
 #define BMP085_ADDRESS 0x77
 
-class BMP085 {
+class BMP085 : public Sensor {
 private:
     int ac1, ac2, ac3;
     unsigned int ac4, ac5, ac6;
@@ -30,8 +25,10 @@ private:
     long lerCalibracaoP();
     
 public:
+    BMP085();
     bool begin();
-    void lerTudo(float pressaoInicial = 101325.0);
+    void lerTudo(float pressaoInicial);
+    void lerTudo();
     float getTemperatura();
     long getPressao();
     float getAltitude();

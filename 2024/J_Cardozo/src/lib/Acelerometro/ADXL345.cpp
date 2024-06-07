@@ -1,6 +1,6 @@
 #include "ADXL345.h"
 
-ADXL345::ADXL345(uint8_t range) : range(range) {
+ADXL345::ADXL345(uint8_t range) : range(range), Sensor(ADXAddress) {
   switch (range) {
     case 2:
       scale = 256.0;
@@ -17,17 +17,17 @@ ADXL345::ADXL345(uint8_t range) : range(range) {
 }
 
 bool ADXL345::begin() {
-  Wire.beginTransmission(ADXAddress);
+  Wire.beginTransmission(address);
   Wire.write(Reg_2D);
   Wire.write(8);
   return (Wire.endTransmission() == 0);
 }
 
 void ADXL345::lerTudo() {
-  Wire.beginTransmission(ADXAddress);
+  Wire.beginTransmission(address);
   Wire.write(Reg_X0); 
   Wire.endTransmission();
-  Wire.requestFrom(ADXAddress, 6); 
+  Wire.requestFrom(address, (uint8_t)6); 
 
   if (Wire.available() == 6) { 
     X0 = Wire.read();

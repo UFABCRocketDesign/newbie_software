@@ -1,6 +1,7 @@
 #ifndef L3G4200D_H
 #define L3G4200D_H
 
+#include "../SensoresUnificados/Sensores.h"
 #include <Wire.h>
 
 #define CTRL_REG1 0x20
@@ -8,7 +9,7 @@
 #define OUT_X_L 0x28
 #define L3G4200D_Address 0x69
 
-class L3G4200D {
+class L3G4200D : public Sensor {
 private:
     int16_t x, y, z;
     uint8_t odr; //Taxa de Dados de Saída

@@ -1,13 +1,17 @@
 #include "BMP085.h"
 
+BMP085::BMP085() : Sensor(BMP085_ADDRESS) {
+
+}
+
 bool BMP085::begin() {
-    Wire.beginTransmission(BMP085_ADDRESS);
+    Wire.beginTransmission(address);
     Wire.write(0XAA);
     if (Wire.endTransmission() != 0) {
         return false; 
     }
 
-    Wire.requestFrom((uint8_t)BMP085_ADDRESS, (uint8_t)22);
+    Wire.requestFrom((uint8_t)address, (uint8_t)22);
     unsigned long tempo = micros();
     while (Wire.available() < 22) {
         if (tempo + 10 < micros()) {
@@ -32,18 +36,18 @@ bool BMP085::begin() {
 
 
 long BMP085::lerCalibracaoT() {
-    Wire.beginTransmission(BMP085_ADDRESS);
+    Wire.beginTransmission(address);
     Wire.write(0xF4);
     Wire.write(0x2E);
     Wire.endTransmission();
 
     delayMicroseconds(4550);
 
-    Wire.beginTransmission(BMP085_ADDRESS);
+    Wire.beginTransmission(address);
     Wire.write(0xF6);
     Wire.endTransmission();
 
-    Wire.requestFrom((uint8_t)BMP085_ADDRESS, (uint8_t)2);
+    Wire.requestFrom((uint8_t)address, (uint8_t)2);
     unsigned long tempo = micros();
     while (Wire.available() < 2)
     {
@@ -54,18 +58,18 @@ long BMP085::lerCalibracaoT() {
 }
 
 long BMP085::lerCalibracaoP() {
-    Wire.beginTransmission(BMP085_ADDRESS);
+    Wire.beginTransmission(address);
     Wire.write(0xF4);
     Wire.write(0x34 + (oss << 6));
     Wire.endTransmission();
 
     delay(2 + (3 << oss));
 
-    Wire.beginTransmission(BMP085_ADDRESS);
+    Wire.beginTransmission(address);
     Wire.write(0xF6);
     Wire.endTransmission();
 
-    Wire.requestFrom((uint8_t)BMP085_ADDRESS, (uint8_t)3);
+    Wire.requestFrom((uint8_t)address, (uint8_t)3);
     unsigned long tempo = micros();
     while (Wire.available() < 3)
     {
@@ -76,7 +80,7 @@ long BMP085::lerCalibracaoP() {
     return up;
 }
 
-void BMP085::lerTudo(float pressaoInicial = 101325.0) {
+void BMP085::lerTudo(float pressaoInicial) {
     ut = lerCalibracaoT();
     up = lerCalibracaoP();
 
@@ -112,6 +116,10 @@ void BMP085::lerTudo(float pressaoInicial = 101325.0) {
 
     //Calculo da altitude(absoluta ou relativa)
     altitude = 44330 * (1.0 - pow((pressao / (pressaoInicial/100)), (1/5.255)));
+}
+
+void BMP085::lerTudo() {
+    this->lerTudo(101325.0);
 }
 
 float BMP085::getTemperatura() {

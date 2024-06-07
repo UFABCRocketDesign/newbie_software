@@ -8,7 +8,7 @@
 #endif
 
 class Sensor {
-private: 
+protected: 
     const uint8_t address;
 public:
     Sensor(uint8_t endereco);

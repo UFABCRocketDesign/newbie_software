@@ -1,6 +1,6 @@
 #include "L3G4200D.h"
 
-L3G4200D::L3G4200D(uint16_t odr, uint16_t scale) : x(0), y(0), z(0), odr(getODR(odr)), scale(getScale(scale)) {}
+L3G4200D::L3G4200D(uint16_t odr, uint16_t scale) : x(0), y(0), z(0), odr(getODR(odr)), scale(getScale(scale)), Sensor(L3G4200D_Address) {}
 
 uint8_t L3G4200D::getODR(uint16_t odr) {
     switch (odr) {
@@ -38,20 +38,20 @@ uint8_t L3G4200D::getScale(uint16_t scale) {
 
 bool L3G4200D::begin() {
     Wire.begin();
-    Wire.beginTransmission(L3G4200D_Address);
+    Wire.beginTransmission(address);
     Wire.write(CTRL_REG1);
     Wire.write(0x0F | odr);
     Wire.endTransmission();
 
-    Wire.beginTransmission(L3G4200D_Address);
+    Wire.beginTransmission(address);
     Wire.write(CTRL_REG4);
     Wire.write(scale);
     Wire.endTransmission();
 
-    Wire.beginTransmission(L3G4200D_Address);
+    Wire.beginTransmission(address);
     Wire.write(CTRL_REG1);
     Wire.endTransmission();
-    Wire.requestFrom(L3G4200D_Address, 1);
+    Wire.requestFrom(address, 1);
     if (Wire.available()) {
         return (Wire.read() == (0x0F | odr));
     }
@@ -59,10 +59,10 @@ bool L3G4200D::begin() {
 }
 
 void L3G4200D::lerTudo() {
-    Wire.beginTransmission(L3G4200D_Address);
+    Wire.beginTransmission(address);
     Wire.write(OUT_X_L | 0x80);
     Wire.endTransmission();
-    Wire.requestFrom(L3G4200D_Address, 6);
+    Wire.requestFrom(address, 6);
     if (Wire.available() == 6) {
         uint8_t xlo = Wire.read();
         uint8_t xhi = Wire.read();
