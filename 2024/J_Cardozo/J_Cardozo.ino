@@ -481,10 +481,10 @@ void loop() {
   float latitude = gps.location.lat();
   float longitude = gps.location.lng();
   int satelites = gps.satellites.value();
-  int precisao = gps.hdop.hdop();
+  float precisao = gps.hdop.hdop();
   int age = gps.location.age();
   float altitudeGPS = gps.altitude.meters();
-  float velocidade = gps.speed.kmph();
+  float velocidade = gps.speed.mph();
 
 #endif
 
