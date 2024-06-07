@@ -404,14 +404,11 @@ for (int i = 0 ; i < 4 ; i++){
 
 //PARAQUEDAS
 #if PARAQUEDAS
-  dataString += String(paraquedas[1]);
+for (int i = 0; i<4; i++){
+  dataString += String(paraquedas[i]);
   dataString += "\t";
-  dataString += String(paraquedas[2]);
-  dataString += "\t";
-  dataString += String(paraquedas[3]);
-  dataString += "\t";
-  dataString += String(paraquedas[4]);
-  dataString += "\t";
+}
+
 #endif
 
 //MAG
