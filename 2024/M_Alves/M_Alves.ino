@@ -108,17 +108,16 @@ float altInicial = 0;
 // *** Filtros **** //
 class Filtro {
 private:
-  int NUM_LEITURAS = 10;
-  float *leituras = new float[NUM_LEITURAS];
+  const int NUM_LEITURAS;
+  float *leituras;
   float somaLeituras = 0;
   int indiceLeitura = 0;
 
 public:
   // Construtor
-  Filtro() {
-    for (int i = 0; i < NUM_LEITURAS; i++) {
-      leituras[i] = 0;
-    }
+  Filtro()
+    : NUM_LEITURAS(10) {
+    leituras = new float[NUM_LEITURAS];
   }
 
   // Destrutor
