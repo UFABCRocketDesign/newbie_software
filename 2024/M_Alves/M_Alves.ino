@@ -41,7 +41,7 @@
 #if PARA
 class Paraquedas {
 public:
-  const int ALT_PARAQUEDAS = -3;
+  const int ALT_PARAQUEDAS;
   int pino;
   bool ativado;
   bool apogeuApenas;
@@ -52,8 +52,8 @@ public:
   bool paraquedasAtivado;
 
   // Construtor
-  Paraquedas(int pino, bool apogeuApenas, unsigned long intervaloApogeu, unsigned long intervaloAltitude, unsigned long tempoAtivacao)
-    : pino(pino), ativado(false), apogeuApenas(apogeuApenas), intervaloApogeu(intervaloApogeu), intervaloAltitude(intervaloAltitude), tempoAtivacao(tempoAtivacao), futureMillis(0), paraquedasAtivado(false) {
+  Paraquedas(int pino, int altParaquedas, unsigned long intervaloApogeu, unsigned long intervaloAltitude, unsigned long tempoAtivacao)
+    : pino(pino), ALT_PARAQUEDAS(altParaquedas), ativado(false), apogeuApenas(altParaquedas == 0), intervaloApogeu(intervaloApogeu), intervaloAltitude(intervaloAltitude), tempoAtivacao(tempoAtivacao), futureMillis(0), paraquedasAtivado(false) {
   }
 
   // Método para inicializar o pino do paraquedas no setup
@@ -85,11 +85,11 @@ public:
 
 // Variáveis globais
 #define NUM_PARAQUEDAS 4
-Paraquedas paraquedas[NUM_PARAQUEDAS] = {  //{pino, paraquedas de apogeu (true) ou apogeu+altura (false), intervalo para acionar após o apogeu, intervalo para acionar após o apogeu+altura, intervalo que ficará acionado}
-  Paraquedas(IGN_1, true, 0, 0, 5000),
-  Paraquedas(IGN_2, true, 2000, 0, 5000),
-  Paraquedas(IGN_3, false, 0, 0, 5000),
-  Paraquedas(IGN_4, false, 0, 2000, 5000)
+Paraquedas paraquedas[NUM_PARAQUEDAS] = {  //{pino, altitude paraquedas, intervalo para acionar após o apogeu, intervalo para acionar após o apogeu+altura, intervalo que ficará acionado}
+  Paraquedas(IGN_1, 0, 0, 0, 5000),
+  Paraquedas(IGN_2, 0, 2000, 0, 5000),
+  Paraquedas(IGN_3, -2, 0, 0, 5000),
+  Paraquedas(IGN_4, -5, 0, 5000, 5000)
 };
 #endif
 
@@ -109,7 +109,7 @@ float altInicial = 0;
 class Filtro {
 private:
   const int NUM_LEITURAS;
-  float *leituras;
+  float *leituras = new float[NUM_LEITURAS];
   float somaLeituras = 0;
   int indiceLeitura = 0;
 
@@ -117,7 +117,6 @@ public:
   // Construtor
   Filtro()
     : NUM_LEITURAS(10) {
-    leituras = new float[NUM_LEITURAS];
   }
 
   // Destrutor
