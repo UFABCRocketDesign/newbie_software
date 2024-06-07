@@ -474,6 +474,12 @@ void loop() {
 
   float latitude = gps.location.lat();
   float longitude = gps.location.lng();
+  int satelites = gps.satellites.value();
+  float precisao = gps.hdop.hdop();
+  int age = gps.location.age();
+  float altitudeGPS = gps.altitude.meters();
+  float velocidade = gps.speed.kmph();
+
 #endif
 
   //Inicializando a string
@@ -539,6 +545,11 @@ void loop() {
 #if (GPS)
   dataString += String(latitude, 6) + "\t";
   dataString += String(longitude, 6) + "\t";
+  dataString += String(satelites, 6) + "\t";
+  dataString += String(precisao, 6) + "\t";
+  dataString += String(age, 6) + "\t";
+  dataString += String(altitudeGPS, 6) + "\t";
+  dataString += String(velocidade, 6) + "\t";
 #endif
 
   Serial.println(dataString);
