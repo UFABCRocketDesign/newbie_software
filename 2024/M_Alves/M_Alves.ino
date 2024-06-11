@@ -42,19 +42,18 @@
 class Paraquedas {
 public:
   const int ALT_PARAQUEDAS;
-  int pino;
-  bool ativado;
-  bool apogeuApenas;
-  unsigned long intervaloApogeu;
-  unsigned long intervaloAltitude;
+  const int pino;
+  bool ativado = false;
+  const bool apogeuApenas;
+  unsigned long atraso;
   unsigned long tempoAtivacao;
-  unsigned long futureMillis;
-  bool paraquedasAtivado;
-  bool intervaloIniciado;
+  unsigned long futureMillis = 0;
+  bool paraquedasAtivado = false;
+  bool intervaloIniciado = false;
 
   // Construtor
-  Paraquedas(int pino, int altParaquedas, unsigned long intervaloApogeu, unsigned long intervaloAltitude, unsigned long tempoAtivacao)
-    : pino(pino), ALT_PARAQUEDAS(altParaquedas), ativado(false), apogeuApenas(altParaquedas == 0), intervaloApogeu(intervaloApogeu), intervaloAltitude(intervaloAltitude), tempoAtivacao(tempoAtivacao), futureMillis(0), paraquedasAtivado(false), intervaloIniciado(false) {
+  Paraquedas(int pino, int altParaquedas, unsigned long atraso, unsigned long tempoAtivacao)
+    : pino(pino), ALT_PARAQUEDAS(altParaquedas), apogeuApenas(altParaquedas == 0), atraso(atraso), tempoAtivacao(tempoAtivacao) {
   }
 
   // Método para inicializar o pino do paraquedas no setup
@@ -67,7 +66,7 @@ public:
   void gerenciar(bool apogeuAtingido, float mediaAltitudeFiltrada, unsigned long currentMillis) {
     if (apogeuAtingido && !ativado && !paraquedasAtivado && (apogeuApenas || mediaAltitudeFiltrada < ALT_PARAQUEDAS)) {
       if (!intervaloIniciado) {
-        futureMillis = currentMillis + (apogeuApenas ? intervaloApogeu : intervaloAltitude);
+        futureMillis = currentMillis + atraso;
         intervaloIniciado = true;
       }
       if (currentMillis >= futureMillis) {
@@ -90,14 +89,13 @@ public:
 
 // Variáveis globais
 #define NUM_PARAQUEDAS 4
-Paraquedas paraquedas[NUM_PARAQUEDAS] = {  //{pino, altitude paraquedas, intervalo para acionar após o apogeu, intervalo para acionar após o apogeu+altura, intervalo que ficará acionado}
-  Paraquedas(IGN_1, 0, 0, 0, 5000),
-  Paraquedas(IGN_2, 0, 3000, 0, 5000),
-  Paraquedas(IGN_3, -2, 0, 0, 5000),
-  Paraquedas(IGN_4, -2, 0, 3000, 5000)
+Paraquedas paraquedas[NUM_PARAQUEDAS] = {  //{pino, altitude paraquedas, atraso, intervalo que ficará acionado}
+  Paraquedas(IGN_1, 0, 0, 5000),
+  Paraquedas(IGN_2, 0, 3000, 5000),
+  Paraquedas(IGN_3, -2, 0, 5000),
+  Paraquedas(IGN_4, -2, 3000, 5000)
 };
 #endif
-
 
 // ********** SD Card ********** //
 #define CHIP_SELECT 53
