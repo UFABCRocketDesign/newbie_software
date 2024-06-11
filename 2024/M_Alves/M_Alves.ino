@@ -50,10 +50,11 @@ public:
   unsigned long tempoAtivacao;
   unsigned long futureMillis;
   bool paraquedasAtivado;
+  bool intervaloIniciado;
 
   // Construtor
   Paraquedas(int pino, int altParaquedas, unsigned long intervaloApogeu, unsigned long intervaloAltitude, unsigned long tempoAtivacao)
-    : pino(pino), ALT_PARAQUEDAS(altParaquedas), ativado(false), apogeuApenas(altParaquedas == 0), intervaloApogeu(intervaloApogeu), intervaloAltitude(intervaloAltitude), tempoAtivacao(tempoAtivacao), futureMillis(0), paraquedasAtivado(false) {
+    : pino(pino), ALT_PARAQUEDAS(altParaquedas), ativado(false), apogeuApenas(altParaquedas == 0), intervaloApogeu(intervaloApogeu), intervaloAltitude(intervaloAltitude), tempoAtivacao(tempoAtivacao), futureMillis(0), paraquedasAtivado(false), intervaloIniciado(false) {
   }
 
   // Método para inicializar o pino do paraquedas no setup
@@ -65,7 +66,11 @@ public:
   // Método para gerenciar a ativação dos paraquedas
   void gerenciar(bool apogeuAtingido, float mediaAltitudeFiltrada, unsigned long currentMillis) {
     if (apogeuAtingido && !ativado && !paraquedasAtivado && (apogeuApenas || mediaAltitudeFiltrada < ALT_PARAQUEDAS)) {
-      if (currentMillis >= futureMillis + (apogeuApenas ? intervaloApogeu : intervaloAltitude)) {
+      if (!intervaloIniciado) {
+        futureMillis = currentMillis + (apogeuApenas ? intervaloApogeu : intervaloAltitude);
+        intervaloIniciado = true;
+      }
+      if (currentMillis >= futureMillis) {
         digitalWrite(pino, HIGH);
         ativado = true;
         futureMillis = currentMillis + tempoAtivacao;
@@ -93,6 +98,7 @@ Paraquedas paraquedas[NUM_PARAQUEDAS] = {  //{pino, altitude paraquedas, interva
 };
 #endif
 
+
 // ********** SD Card ********** //
 #define CHIP_SELECT 53
 int fileNum = 0;
@@ -116,7 +122,7 @@ private:
 public:
   // Construtor
   Filtro() {
-    for(int i = 0; i < NUM_LEITURAS; i++) {
+    for (int i = 0; i < NUM_LEITURAS; i++) {
       leituras[i] = 0;
     }
   }
