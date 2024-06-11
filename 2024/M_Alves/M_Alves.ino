@@ -94,7 +94,7 @@ Paraquedas paraquedas[NUM_PARAQUEDAS] = {  //{pino, altitude paraquedas, interva
   Paraquedas(IGN_1, 0, 0, 0, 5000),
   Paraquedas(IGN_2, 0, 3000, 0, 5000),
   Paraquedas(IGN_3, -2, 0, 0, 5000),
-  Paraquedas(IGN_4, -4, 0, 0, 5000)
+  Paraquedas(IGN_4, -2, 0, 3000, 5000)
 };
 #endif
 
