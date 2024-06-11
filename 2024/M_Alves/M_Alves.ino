@@ -93,7 +93,7 @@ Paraquedas paraquedas[NUM_PARAQUEDAS] = {  //{pino, altitude paraquedas, atraso,
   Paraquedas(IGN_1, 0, 0, 5000),
   Paraquedas(IGN_2, 0, 3000, 5000),
   Paraquedas(IGN_3, -2, 0, 5000),
-  Paraquedas(IGN_4, -4, 3000, 5000)
+  Paraquedas(IGN_4, -2, 3000, 5000)
 };
 #endif
 
@@ -142,35 +142,44 @@ public:
     return somaLeituras / NUM_LEITURAS;
   }
 };
-
 const int NUM_FILTROS = 3;
 Filtro filtros[NUM_FILTROS];
 
-
 // *** Apogeu **** //
-bool apogeuAtingido = false;  // Variável global para rastrear se o apogeu foi atingido
-bool detectarApogeu(float alturaAtual) {
-  static float alturaAnterior = -1;
-  static int contador = 0;
-  static int estado = 0;  // estado 0 -> subindo; estado 1 -> descendo
-  static bool apogeu = false;
+class Apogeu {
+private:
+  float alturaAnterior = -1;
+  int contador = 0;
+  int estado = 0;  // estado 0 -> subindo; estado 1 -> descendo
+  bool apogeu = false;
 
-  if (alturaAnterior != -1 && alturaAtual < alturaAnterior) {
-    contador++;
-    if (contador >= 25) {
-      estado = 1;
-      if (estado == 1) {
-        apogeu = true;
+public:
+  // Método para detectar o apogeu
+  bool detectar(float alturaAtual) {
+    if (alturaAnterior != -1 && alturaAtual < alturaAnterior) {
+      contador++;
+      if (contador >= 25) {
+        estado = 1;
+        if (estado == 1) {
+          apogeu = true;
+        }
       }
+    } else {
+      contador = 0;
+      estado = 0;
     }
-  } else {
-    contador = 0;
-    estado = 0;
+
+    alturaAnterior = alturaAtual;  // Atualize a altitude anterior para a próxima iteração
+    return apogeu;
   }
 
-  alturaAnterior = alturaAtual;  // Atualize a altitude anterior para a próxima iteração
-  return apogeu;
-}
+  bool getApogeu() {
+    return apogeu;
+  }
+};
+Apogeu apogeu;
+bool apogeuAtingido = false;
+
 #endif
 
 // ********** Gyro + Mag + Accel ********** //
@@ -302,8 +311,8 @@ void loop() {
   }
 
   // ********** Apogeu ********** //
-  if (!apogeuAtingido) {  // Chamar detectarApogeu se o apogeu ainda não foi atingido
-    apogeuAtingido = detectarApogeu(filteredAltitude);
+  if (!apogeuAtingido) {  // Chamar detectar se o apogeu ainda não foi atingido
+    apogeuAtingido = apogeu.detectar(filteredAltitude);
   }
 #endif
 
@@ -347,7 +356,7 @@ void loop() {
   }
 #endif
 #if APOGEE
-  dadosString += String(apogeuAtingido) + "\t";  //Bool indicando se o apogeu foi atingido (0 = não; 1 = sim)
+  dadosString += String(apogeu.getApogeu()) + "\t";  //Bool indicando se o apogeu foi atingido (0 = não; 1 = sim)
 #endif
 #endif
 #if PARA
