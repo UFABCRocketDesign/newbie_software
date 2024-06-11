@@ -25,11 +25,11 @@
 
 #define SD_CARD 0
 
-#define RFREQ 1
+#define RFREQ 0
 
-#define GPS 0
+#define GPS 1
 
-#define LORA 0
+#define LORA 1
 
 #define SERIAL_PRINT 1
 
