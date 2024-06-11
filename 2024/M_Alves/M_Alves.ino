@@ -160,7 +160,7 @@ public:
       contador++;
       if (contador >= 25) {
         estado = 1;
-        if (estado == 1) {
+        if (estado == 1 && !apogeu) {
           apogeu = true;
         }
       }
@@ -178,7 +178,7 @@ public:
   }
 };
 Apogeu apogeu;
-bool apogeuAtingido = false;
+
 
 #endif
 
@@ -311,9 +311,9 @@ void loop() {
   }
 
   // ********** Apogeu ********** //
-  if (!apogeuAtingido) {  // Chamar detectar se o apogeu ainda não foi atingido
-    apogeuAtingido = apogeu.detectar(filteredAltitude);
-  }
+if (!apogeu.getApogeu()) {  // Chamar detectar se o apogeu ainda não foi atingido
+  apogeu.detectar(filteredAltitude);
+}
 #endif
 
 // ********** Ativando os Paraquedas 1/2/3/4 ********** //
