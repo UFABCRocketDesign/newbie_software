@@ -2,8 +2,16 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 
+#ifdef ARDUINO_AVR_MEGA2560
+#define SD_CS_PIN 53
+#else
+#define SD_CS_PIN 10
+#endif // ARDUINO_AVR_MEGA2560
+#define IGN_1 36	/*act1*/
+#define IGN_2 61	/*act2*/
+#define IGN_3 46	/*act3*/
+#define IGN_4 55	/*act4*/
 int chipSelect = 53;
-int pin;
 float altitudeInicial;
 float somaAltitude;
 float listaSuavizarCurva_0[10];
@@ -98,7 +106,7 @@ Serial.begin(115200);
   altitudeInicial = somaAltitude / 10;
 
 //definindo pino como porta de saída
-  pinMode(pin, OUTPUT);
+  pinMode(IGN_1, OUTPUT);
 }
 
 void loop() {
@@ -118,12 +126,12 @@ void loop() {
 
 //acionando o primeiro paraquedas
   if (fallenCondition == 1 && !pinoBlinking) { //verifica se esta caindo e se o led não esta piscando
-    digitalWrite(pin, HIGH);
+    digitalWrite(IGN_1, HIGH);
     inicioBlink = millis();
     pinoBlinking = true;
   }
   if (pinoBlinking && (millis() - inicioBlink >= intervaloBlink)) {
-    digitalWrite(pin, LOW);
+    digitalWrite(IGN_1, LOW);
     pinoBlinking = false;
   }
   
