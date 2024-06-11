@@ -584,6 +584,7 @@ void loop() {
   if (currentTime >= contadorLora * LoRaDelay) {
     LoRa.println(dataString);
     contadorLora++;
+    Serial.println("heitor");
   }
 #endif
 
