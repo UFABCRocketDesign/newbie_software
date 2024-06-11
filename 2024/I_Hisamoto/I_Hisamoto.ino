@@ -24,10 +24,10 @@ File arquivo;
 String nomeArquivo;
 String inicio = "isa";
 String tipoDeArquivo = ".txt";
-String header = "Temperature(C)\tPressure(Pa)\tHigh(meters)\tFiltered High 0(meters)\tFiltered High 1(meters)\tFallen(1)/ Not fallen (0)\tContador de Queda";
+String header = "Temperature(C)\tPressure(Pa)\tHigh(meters)\tFiltered High 0(meters)\tFiltered High 1(meters)\tFallen(1)/ Not fallen (0)\tContador de Queda\tBlinking";
 float inicioBlink;
 int intervaloBlink = 1000;
-bool pinoBlinking = false; // estado de piscar
+bool pinoBlinking = 0; // estado de piscar
 
 
 float filtroSuavizarCurva_0(float dadosCurva_0) {
@@ -126,13 +126,13 @@ void loop() {
 
 //acionando o primeiro paraquedas
   if (fallenCondition == 1 && !pinoBlinking) { //verifica se esta caindo e se o led não esta piscando
-    digitalWrite(IGN_1, HIGH);
+    digitalWrite(IGN_1, pinoBlinking);
     inicioBlink = millis();
-    pinoBlinking = true;
+    pinoBlinking = 1;
   }
   if (pinoBlinking && (millis() - inicioBlink >= intervaloBlink)) {
-    digitalWrite(IGN_1, LOW);
-    pinoBlinking = false;
+    digitalWrite(IGN_1, pinoBlinking);
+    pinoBlinking = 0;
   }
   
 //salvando dados no sd
@@ -144,6 +144,7 @@ void loop() {
   dataString += String(alturaFiltrada_1) + "\t";
   dataString += String(fallenCondition) + "\t";
   dataString += String(contador) + "\t";
+  dataString += String(pinoBlinking) + "\t";
   Serial.println(dataString);
   arquivo = SD.open(nomeArquivo, FILE_WRITE);
   if(arquivo){
