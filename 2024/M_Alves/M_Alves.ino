@@ -319,7 +319,7 @@ if (!apogeu.getApogeu()) {  // Chamar detectar se o apogeu ainda não foi atingi
 // ********** Ativando os Paraquedas 1/2/3/4 ********** //
 #if PARA
   for (int i = 0; i < NUM_PARAQUEDAS; i++) {
-    paraquedas[i].gerenciar(apogeuAtingido, filteredAltitude, currentMillis);
+    paraquedas[i].gerenciar(apogeu.getApogeu(), filteredAltitude, currentMillis);
   }
 #endif
 
