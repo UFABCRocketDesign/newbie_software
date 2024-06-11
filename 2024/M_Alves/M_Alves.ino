@@ -116,6 +116,9 @@ private:
 public:
   // Construtor
   Filtro() {
+    for(int i = 0; i < NUM_LEITURAS; i++) {
+      leituras[i] = 0;
+    }
   }
 
   // Destrutor
@@ -138,6 +141,7 @@ public:
 
 const int NUM_FILTROS = 3;
 Filtro filtros[NUM_FILTROS];
+
 
 // *** Apogeu **** //
 bool apogeuAtingido = false;  // Variável global para rastrear se o apogeu foi atingido
