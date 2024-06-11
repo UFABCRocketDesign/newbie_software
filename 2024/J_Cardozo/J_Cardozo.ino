@@ -129,10 +129,10 @@ HardwareSerial &GPSSerial = Serial1;
 #endif
 
 #if (LORA)
-#define LoRaDelay 2000
+#define LoRaDelay 3000
 #define LoRa LongRange
 HardwareSerial &LoRa(Serial3);
-int contadorLora = 0;
+unsigned long previousMillisLora = 0;
 #endif
 
 #if (RFREQ)
@@ -581,10 +581,9 @@ void loop() {
 #endif
 
 #if (LORA)
-  if (currentTime >= contadorLora * LoRaDelay) {
+  if (currentTime - previousMillis >= LoRaDelay) {
+    previousMillisLora = currentTime;
     LoRa.println(dataString);
-    contadorLora++;
-    Serial.println("heitor");
   }
 #endif
 
