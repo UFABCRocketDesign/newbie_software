@@ -581,7 +581,7 @@ void loop() {
 #endif
 
 #if (LORA)
-  if (currentTime - previousMillis >= LoRaDelay) {
+  if (currentTime - previousMillisLora >= LoRaDelay) {
     previousMillisLora = currentTime;
     LoRa.println(dataString);
   }
