@@ -142,6 +142,12 @@ unsigned long previousMillis = 0;
 const long interval = 200;
 #endif
 
+//Inicializando variavel de tempo
+unsigned long currentTime = 0;
+//Inicializando a string
+String dataString = "";
+
+
 void setup() {
   Serial.begin(115200);
   Wire.begin();
@@ -365,7 +371,62 @@ void setup() {
 
 void loop() {
 
-  unsigned long currentTime = millis();
+leituras();
+
+#if (SERIAL_PRINT)
+  Serial.println(dataString);
+#endif
+
+#if (LORA)
+  if (currentTime - previousMillisLora >= LoRaDelay) {
+    previousMillisLora = currentTime;
+    LoRa.println(dataString);
+  }
+#endif
+
+#if (RFREQ)
+
+
+  if (currentTime - previousMillis >= interval) {
+    char msg[64];
+    dataString.toCharArray(msg, 64);
+    // salva o tempo atual como o último tempo de execução
+    previousMillis = currentTime;
+
+    // Inverte o estado do LED
+    int ledState = digitalRead(LED_BUILTIN);
+    digitalWrite(LED_BUILTIN, !ledState);
+
+    // Envia os dados
+    if (rf_driver.send((uint8_t *)msg, strlen(msg))) {
+      rf_driver.waitPacketSent();
+    } else {
+      Serial.print("\tFailed to send message.");
+    }
+  }
+
+
+
+  // Desliga o LED
+  digitalWrite(LED_BUILTIN, LOW);
+#endif
+
+#if (SD_CARD)
+  File dataFile = SD.open(nomeSD, FILE_WRITE);
+  if (dataFile) {
+    dataFile.println(dataString);
+    dataFile.close();
+  } else {
+    Serial.print("Error opening ");
+    Serial.print(nomeSD);
+    Serial.println();
+  }
+#endif
+}
+
+void leituras() {
+  dataString = "";
+  currentTime = millis();
 
 //Definindo variaveis acelerometro, giroscopio e magnetometro
 #if (AX)
@@ -468,7 +529,7 @@ void loop() {
   float filtroFinal = f3.getMedia();
 
   //Apogeu
-  apogeu.deteccaoApogeu(filtroFinal, 1);
+  apogeu.deteccaoApogeu(filtroFinal, 0);
 #endif
 
   //Paraquedas 1
@@ -506,8 +567,6 @@ void loop() {
 
 #endif
 
-  //Inicializando a string
-  String dataString = "";
   //String de dados
   dataString += String(currentTime / 1000.0) + "\t";
 
@@ -574,55 +633,5 @@ void loop() {
   dataString += String(age) + "\t";
   dataString += String(altitudeGPS) + "\t";
   dataString += String(velocidade) + "\t";
-#endif
-
-#if (SERIAL_PRINT)
-  Serial.println(dataString);
-#endif
-
-#if (LORA)
-  if (currentTime - previousMillisLora >= LoRaDelay) {
-    previousMillisLora = currentTime;
-    LoRa.println(dataString);
-  }
-#endif
-
-#if (RFREQ)
-
-
-  if (currentTime - previousMillis >= interval) {
-    char msg[64];
-    dataString.toCharArray(msg, 64);
-    // salva o tempo atual como o último tempo de execução
-    previousMillis = currentTime;
-
-    // Inverte o estado do LED
-    int ledState = digitalRead(LED_BUILTIN);
-    digitalWrite(LED_BUILTIN, !ledState);
-
-    // Envia os dados
-    if (rf_driver.send((uint8_t *)msg, strlen(msg))) {
-      rf_driver.waitPacketSent();
-    } else {
-      Serial.print("\tFailed to send message.");
-    }
-  }
-
-
-
-  // Desliga o LED
-  digitalWrite(LED_BUILTIN, LOW);
-#endif
-
-#if (SD_CARD)
-  File dataFile = SD.open(nomeSD, FILE_WRITE);
-  if (dataFile) {
-    dataFile.println(dataString);
-    dataFile.close();
-  } else {
-    Serial.print("Error opening ");
-    Serial.print(nomeSD);
-    Serial.println();
-  }
 #endif
 }
