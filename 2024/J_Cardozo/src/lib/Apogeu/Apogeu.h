@@ -12,7 +12,7 @@ public:
   Apogeu(int tamanho = 20, float fator = 0.85f);
   ~Apogeu();
 
-  bool deteccaoApogeu(float entrada);
+  bool deteccaoApogeu(float entrada, short tipo);
   bool getEstaDescendo() const;
 };
 

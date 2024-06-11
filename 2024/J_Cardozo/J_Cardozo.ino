@@ -10,26 +10,28 @@
 #define MY (MAG && 1)
 #define MZ (MAG && 1)
 
-#define ACEL (SENSORES && 1)
+#define ACEL (SENSORES && 0)
 #define AX (ACEL && 1)
 #define AY (ACEL && 1)
 #define AZ (ACEL && 1)
 
 #define BAR (SENSORES && 1)
 
-#define PARAQUEDAS (BAR && 1)
+#define PARAQUEDAS (BAR && 0)
 #define P1 (PARAQUEDAS && 1)
 #define P2 (PARAQUEDAS && 1)
 #define P3 (PARAQUEDAS && 1)
 #define P4 (PARAQUEDAS && 1)
 
-#define SD_CARD 1
+#define SD_CARD 0
 
-#define RFREQ 0
+#define RFREQ 1
 
-#define GPS 1
+#define GPS 0
 
 #define LORA 0
+
+#define SERIAL_PRINT 1
 
 #include <SPI.h>
 #include <Wire.h>
@@ -126,6 +128,13 @@ TinyGPSPlus gps;
 HardwareSerial &GPSSerial = Serial1;
 #endif
 
+#if (LORA)
+#define LoRaDelay 2000
+#define LoRa LongRange
+HardwareSerial &LoRa(Serial3);
+int contadorLora = 0;
+#endif
+
 #if (RFREQ)
 #include <RH_ASK.h>
 RH_ASK rf_driver;
@@ -197,6 +206,10 @@ void setup() {
     while (1)
       ;
   }
+#endif
+
+#if (LORA)
+  LoRa.begin(9600);
 #endif
 
 //Definindo pinos dos paraquedas
@@ -309,8 +322,13 @@ void setup() {
 
 #endif
 
+#if (SERIAL_PRINT)
   Serial.println(dataStringInicial);
+#endif
 
+#if (LORA)
+  LoRa.println(dataStringInicial);
+#endif
 
 //Logica para nome do arquivo SD
 #if (SD_CARD)
@@ -385,15 +403,15 @@ void loop() {
   // accel.getEvent(&eventACEL);
   acel.lerTudo();
 #endif
-// #if (AX)
-//   acelX = eventACEL.acceleration.x;
-// #endif
-// #if (AY)
-//   acelY = eventACEL.acceleration.y;
-// #endif
-// #if (AZ)
-//   acelZ = eventACEL.acceleration.z;
-// #endif
+  // #if (AX)
+  //   acelX = eventACEL.acceleration.x;
+  // #endif
+  // #if (AY)
+  //   acelY = eventACEL.acceleration.y;
+  // #endif
+  // #if (AZ)
+  //   acelZ = eventACEL.acceleration.z;
+  // #endif
 
 #if (AX)
   acelX = acel.getX();
@@ -450,7 +468,7 @@ void loop() {
   float filtroFinal = f3.getMedia();
 
   //Apogeu
-  apogeu.deteccaoApogeu(filtroFinal);
+  apogeu.deteccaoApogeu(filtroFinal, 1);
 #endif
 
   //Paraquedas 1
@@ -558,27 +576,39 @@ void loop() {
   dataString += String(velocidade) + "\t";
 #endif
 
+#if (SERIAL_PRINT)
   Serial.println(dataString);
+#endif
+
+#if (LORA)
+  if (currentTime >= contadorLora * LoRaDelay) {
+    LoRa.println(dataString);
+    contadorLora++;
+  }
+#endif
 
 #if (RFREQ)
-  char msg[64];
-  dataString.toCharArray(msg, 64);
+
 
   if (currentTime - previousMillis >= interval) {
+    char msg[64];
+    dataString.toCharArray(msg, 64);
     // salva o tempo atual como o último tempo de execução
     previousMillis = currentTime;
 
     // Inverte o estado do LED
     int ledState = digitalRead(LED_BUILTIN);
     digitalWrite(LED_BUILTIN, !ledState);
+
+    // Envia os dados
+    if (rf_driver.send((uint8_t *)msg, strlen(msg))) {
+      rf_driver.waitPacketSent();
+    } else {
+      Serial.print("\tFailed to send message.");
+    }
   }
 
-  // Envia os dados
-  if (rf_driver.send((uint8_t*)msg, strlen(msg))) {
-    rf_driver.waitPacketSent();
-  } else {
-    Serial.print("\tFailed to send message.");
-  }
+
 
   // Desliga o LED
   digitalWrite(LED_BUILTIN, LOW);

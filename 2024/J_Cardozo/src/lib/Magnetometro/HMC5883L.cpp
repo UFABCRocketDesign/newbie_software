@@ -1,6 +1,6 @@
 #include "HMC5883L.h"
 
-HMC5883L::HMC5883L(uint8_t samples, uint16_t gain, uint8_t mode) : x(0), y(0), z(0), Sensor(HMC5883L_Address) {
+HMC5883L::HMC5883L(uint8_t samples, uint16_t gain, uint8_t mode) : Sensor(HMC5883L_Address) {
     configA = (getSamples(samples) << 5) | 0x18;
     configB = getGain(gain);
     this->mode = getMode(mode);
@@ -91,23 +91,10 @@ void HMC5883L::lerTudo() {
     Wire.endTransmission();
     Wire.requestFrom((uint8_t)address, (uint8_t)6);
     if (Wire.available() == 6) {
-        x = Wire.read() << 8; 
-        x |= Wire.read();    
-        z = Wire.read() << 8;
-        z |= Wire.read();     
-        y = Wire.read() << 8; 
-        y |= Wire.read();    
+        x = Wire.read() << 8 | Wire.read();   
+        z = Wire.read() << 8 | Wire.read(); 
+        y = Wire.read() << 8 | Wire.read();   
+         
     }
 }
 
-float HMC5883L::getX() {
-    return x;
-}
-
-float HMC5883L::getY() {
-    return y;
-}
-
-float HMC5883L::getZ() {
-    return z;
-}
