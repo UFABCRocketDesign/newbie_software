@@ -3,6 +3,7 @@
 Adafruit_BMP085 bmp;
 
 int chipSelect = 53;
+int pin;
 float altitudeInicial;
 float somaAltitude;
 float listaSuavizarCurva_0[10];
@@ -16,6 +17,10 @@ String nomeArquivo;
 String inicio = "isa";
 String tipoDeArquivo = ".txt";
 String header = "Temperature(C)\tPressure(Pa)\tHigh(meters)\tFiltered High 0(meters)\tFiltered High 1(meters)\tFallen(1)/ Not fallen (0)\tContador de Queda";
+float inicioBlink;
+int intervaloBlink = 1000;
+bool pinoBlinking = false; // estado de piscar
+
 
 float filtroSuavizarCurva_0(float dadosCurva_0) {
 
@@ -82,16 +87,18 @@ Serial.begin(115200);
   } else {
     Serial.println("Erro ao abrir o arquivo");
   }
-//end 
 
   Serial.println(header);
 
+// determinando altitude inicial
   somaAltitude = 0;
   for (int posicaoListaAltitude = 0; posicaoListaAltitude < 10; posicaoListaAltitude++) {
     somaAltitude += bmp.readAltitude();
   }
-
   altitudeInicial = somaAltitude / 10;
+
+//definindo pino como porta de saída
+  pinMode(pin, OUTPUT);
 }
 
 void loop() {
@@ -109,6 +116,17 @@ void loop() {
   alturaAnterior = alturaFiltrada_1;
   fallenCondition = (contador >= 5) ? 1 : 0;
 
+//acionando o primeiro paraquedas
+  if (fallenCondition == 1 && !pinoBlinking) { //verifica se esta caindo e se o led não esta piscando
+    digitalWrite(pin, HIGH);
+    inicioBlink = millis();
+    pinoBlinking = true;
+  }
+  if (pinoBlinking && (millis() - inicioBlink >= intervaloBlink)) {
+    digitalWrite(pin, LOW);
+    pinoBlinking = false;
+  }
+  
 //salvando dados no sd
   String dataString = "";
   dataString += String(bmp.readTemperature()) + "\t";
