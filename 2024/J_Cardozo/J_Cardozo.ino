@@ -65,15 +65,15 @@ float alturaInicial;  //Variavel global para altura inicial
 
 #if (ACEL)
 //#include <Adafruit_ADXL345_U.h>
-#include "src/lib/Acelerometro/ADXL345.h"
 //Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
+#include "src/lib/Acelerometro/ADXL345.h"
 ADXL345 acel(2);
 #endif
 
 #if (MAG)
 //#include <Adafruit_HMC5883_U.h>
-#include "src/lib/Magnetometro/HMC5883L.h"
 //Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(123456);
+#include "src/lib/Magnetometro/HMC5883L.h"
 HMC5883L mag;
 #endif
 
@@ -120,11 +120,8 @@ Paraquedas p4(10000, 5000, IGN_4, -3);
 
 #if (GPS)
 #include <TinyGPSPlus.h>
-//#include <SoftwareSerial.h>
-//static const int RXPin = 4, TXPin = 3;
 static const uint32_t GPSBaud = 9600;
 TinyGPSPlus gps;
-//SoftwareSerial ss(RXPin, TXPin);
 HardwareSerial &GPSSerial = Serial1;
 #endif
 
@@ -138,7 +135,7 @@ unsigned long previousMillisLora = 0;
 #if (RFREQ)
 #include <RH_ASK.h>
 RH_ASK rf_driver;
-unsigned long previousMillis = 0;
+unsigned long previousMillisRFREQ = 0;
 const long interval = 200;
 #endif
 
@@ -148,6 +145,159 @@ unsigned long currentTime = 0;
 String dataString = "";
 //Inicializando altitude
 float altitude = 0;
+
+void readAll() {
+
+//Definindo variaveis acelerometro, giroscopio e magnetometro
+#if (ACEL)
+  acel.lerTudo();
+#endif
+
+#if (GYRO)
+  gyro.lerTudo();
+#endif
+
+#if (MAG)
+  mag.lerTudo();
+#endif
+
+#if (BAR)
+  //Filtros
+  bmp.lerTudo();
+  altitude = bmp.getAltitude() - alturaInicial;
+
+  f1.aplicarFiltro(altitude);
+  f2.aplicarFiltro(f1.getMedia());
+  f3.aplicarFiltro(f2.getMedia());
+
+#endif
+
+#if (GPS)
+  while (GPSSerial.available() > 0) {
+    gps.encode(GPSSerial.read());
+  }
+#endif
+
+  //String de dados
+  dataString = "";
+  dataString += String(currentTime / 1000.0) + "\t";
+
+#if (BAR)
+  dataString += String(bmp.getTemperatura()) + "\t";
+  dataString += String(bmp.getPressao()) + "\t";
+  dataString += String(altitude) + "\t";
+  dataString += String(f1.getMedia()) + "\t";
+  dataString += String(f2.getMedia()) + "\t";
+  dataString += String(f3.getMedia()) + "\t";
+  dataString += String(apogeu.getEstaDescendo()) + "\t";
+#endif
+
+#if (P1)
+  dataString += String(p1.getData()) + "\t";
+#endif
+
+#if (P2)
+  dataString += String(p2.getData()) + "\t";
+#endif
+
+#if (P3)
+  dataString += String(p3.getData()) + "\t";
+#endif
+
+#if (P4)
+  dataString += String(p4.getData()) + "\t";
+#endif
+
+#if (AX)
+  dataString += String(acel.getX()) + "\t";
+#endif
+#if (AY)
+  dataString += String(acel.getY()) + "\t";
+#endif
+#if (AZ)
+  dataString += String(acel.getZ()) + "\t";
+#endif
+
+#if (GX)
+  dataString += String(gyro.getX()) + "\t";
+#endif
+#if (GY)
+  dataString += String(gyro.getY()) + "\t";
+#endif
+#if (GZ)
+  dataString += String(gyro.getZ()) + "\t";
+#endif
+
+#if (MX)
+  dataString += String(mag.getX()) + "\t";
+#endif
+#if (MY)
+  dataString += String(mag.getY()) + "\t";
+#endif
+#if (MZ)
+  dataString += String(mag.getZ()) + "\t";
+#endif
+#if (GPS)
+  dataString += String(gps.location.lat(), 6) + "\t";
+  dataString += String(gps.location.lng(), 6) + "\t";
+  dataString += String(gps.satellites.value()) + "\t";
+  dataString += String(gps.hdop.hdop()) + "\t";
+  dataString += String(gps.location.age()) + "\t";
+  dataString += String(gps.altitude.meters()) + "\t";
+  dataString += String(gps.speed.mph()) + "\t";
+#endif
+}
+
+void writeAll() {
+  
+#if (SERIAL_PRINT)
+  Serial.println(dataString);
+#endif
+
+#if (LORA)
+  if (currentTime - previousMillisLora >= LoRaDelay) {
+    previousMillisLora = currentTime;
+    LoRa.println(dataString);
+  }
+#endif
+
+#if (RFREQ)
+
+
+  if (currentTime - previousMillisRFREQ >= interval) {
+    char msg[64];
+    dataString.toCharArray(msg, 64);
+    // salva o tempo atual como o último tempo de execução
+    previousMillisRFREQ = currentTime;
+
+    // Inverte o estado do LED
+    int ledState = digitalRead(LED_BUILTIN);
+    digitalWrite(LED_BUILTIN, !ledState);
+
+    // Envia os dados
+    if (rf_driver.send((uint8_t *)msg, strlen(msg))) {
+      rf_driver.waitPacketSent();
+    } else {
+      Serial.print("\tFailed to send message.");
+    }
+  }
+
+  // Desliga o LED
+  digitalWrite(LED_BUILTIN, LOW);
+#endif
+
+#if (SD_CARD)
+  File dataFile = SD.open(nomeSD, FILE_WRITE);
+  if (dataFile) {
+    dataFile.println(dataString);
+    dataFile.close();
+  } else {
+    Serial.print("Error opening ");
+    Serial.print(nomeSD);
+    Serial.println();
+  }
+#endif
+}
 
 void setup() {
   Serial.begin(115200);
@@ -373,7 +523,7 @@ void setup() {
 void loop() {
 
   currentTime = millis();
-  leituras();
+  readAll();
 
 #if (BAR)
   // Obtendo a média final filtrada
@@ -403,194 +553,5 @@ void loop() {
   p4.ativarParaquedas(filtroFinal, currentTime, apogeu.getEstaDescendo());
 #endif
 
-#if (GPS)
-  float latitude = gps.location.lat();
-  float longitude = gps.location.lng();
-  int satelites = gps.satellites.value();
-  float precisao = gps.hdop.hdop();
-  int age = gps.location.age();
-  float altitudeGPS = gps.altitude.meters();
-  float velocidade = gps.speed.mph();
-
-#endif
-
-  //String de dados
-  dataString = "";
-  dataString += String(currentTime / 1000.0) + "\t";
-
-#if (BAR)
-  dataString += String(bmp.getTemperatura()) + "\t";
-  dataString += String(bmp.getPressao()) + "\t";
-  dataString += String(altitude) + "\t";
-  dataString += String(f1.getMedia()) + "\t";
-  dataString += String(f2.getMedia()) + "\t";
-  dataString += String(f3.getMedia()) + "\t";
-  dataString += String(apogeu.getEstaDescendo()) + "\t";
-#endif
-
-#if (P1)
-  dataString += String(p1.getData()) + "\t";
-#endif
-
-#if (P2)
-  dataString += String(p2.getData()) + "\t";
-#endif
-
-#if (P3)
-  dataString += String(p3.getData()) + "\t";
-#endif
-
-#if (P4)
-  dataString += String(p4.getData()) + "\t";
-#endif
-
-#if (AX)
-  dataString += String(acelX) + "\t";
-#endif
-#if (AY)
-  dataString += String(acelY) + "\t";
-#endif
-#if (AZ)
-  dataString += String(acelZ) + "\t";
-#endif
-
-#if (GX)
-  dataString += String(gyroX) + "\t";
-#endif
-#if (GY)
-  dataString += String(gyroY) + "\t";
-#endif
-#if (GZ)
-  dataString += String(gyroZ) + "\t";
-#endif
-
-#if (MX)
-  dataString += String(magX) + "\t";
-#endif
-#if (MY)
-  dataString += String(magY) + "\t";
-#endif
-#if (MZ)
-  dataString += String(magZ) + "\t";
-#endif
-#if (GPS)
-  dataString += String(latitude, 6) + "\t";
-  dataString += String(longitude, 6) + "\t";
-  dataString += String(satelites) + "\t";
-  dataString += String(precisao) + "\t";
-  dataString += String(age) + "\t";
-  dataString += String(altitudeGPS) + "\t";
-  dataString += String(velocidade) + "\t";
-#endif
-
-#if (SERIAL_PRINT)
-  Serial.println(dataString);
-#endif
-
-#if (LORA)
-  if (currentTime - previousMillisLora >= LoRaDelay) {
-    previousMillisLora = currentTime;
-    LoRa.println(dataString);
-  }
-#endif
-
-#if (RFREQ)
-
-
-  if (currentTime - previousMillis >= interval) {
-    char msg[64];
-    dataString.toCharArray(msg, 64);
-    // salva o tempo atual como o último tempo de execução
-    previousMillis = currentTime;
-
-    // Inverte o estado do LED
-    int ledState = digitalRead(LED_BUILTIN);
-    digitalWrite(LED_BUILTIN, !ledState);
-
-    // Envia os dados
-    if (rf_driver.send((uint8_t *)msg, strlen(msg))) {
-      rf_driver.waitPacketSent();
-    } else {
-      Serial.print("\tFailed to send message.");
-    }
-  }
-
-
-
-  // Desliga o LED
-  digitalWrite(LED_BUILTIN, LOW);
-#endif
-
-#if (SD_CARD)
-  File dataFile = SD.open(nomeSD, FILE_WRITE);
-  if (dataFile) {
-    dataFile.println(dataString);
-    dataFile.close();
-  } else {
-    Serial.print("Error opening ");
-    Serial.print(nomeSD);
-    Serial.println();
-  }
-#endif
-}
-
-void leituras() {
-
-//Definindo variaveis acelerometro, giroscopio e magnetometro
-#if (ACEL)
-  acel.lerTudo();
-#if (AX)
-  float acelX = acel.getX();
-#endif
-#if (AY)
-  float acelY = acel.getY();
-#endif
-#if (AZ)
-  float acelZ = acel.getZ();
-#endif
-#endif
-
-#if (GYRO)
-  gyro.lerTudo();
-#if (GX)
- float gyroX = gyro.getX();
-#endif
-#if (GY)
- float gyroY = gyro.getY();
-#endif
-#if (GZ)
-  float gyroZ = gyro.getZ();
-#endif
-#endif
-
-#if (MAG)
-  mag.lerTudo();
-#if (MX)
-  float magX = mag.getX();
-#endif
-#if (MY)
- float magY = mag.getY();
-#endif
-#if (MZ)
-  float magZ = mag.getZ();
-#endif
-#endif
-
-#if (BAR)
-  //Filtros
-  bmp.lerTudo();
-  altitude = bmp.getAltitude() - alturaInicial;
-
-  f1.aplicarFiltro(altitude);
-  f2.aplicarFiltro(f1.getMedia());
-  f3.aplicarFiltro(f2.getMedia());
-
-#endif
-
-#if (GPS)
-  while (GPSSerial.available() > 0) {
-    gps.encode(GPSSerial.read());
-  }
-#endif
-
+  writeAll();
 }
