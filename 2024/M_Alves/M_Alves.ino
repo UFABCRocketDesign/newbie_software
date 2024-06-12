@@ -6,11 +6,12 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_HMC5883_U.h>
 #include <Adafruit_ADXL345_U.h>
+#include "./src/lib/Apogeu/Apogeu.h"
+#include "./src/lib/Filtro/Filtro.h"
+#include "./src/lib/Paraquedas/Paraquedas.h"
+
 //SDCard
 #define SDCARD (0)
-//Apogeu
-#include "./src/lib/Apogeu/Apogeu.h"
-Apogeu apogeu;
 //Paraquedas
 #define PARA (1)
 #define IGN_1 36  //Paraquedas 1
@@ -42,55 +43,6 @@ Apogeu apogeu;
 
 // ********** PARAQUEDAS ********** //
 #if PARA
-class Paraquedas {
-public:
-  const int ALT_PARAQUEDAS;
-  const int pino;
-  bool ativado = false;
-  const bool apogeuApenas;
-  unsigned long atraso;
-  unsigned long tempoAtivacao;
-  unsigned long futureMillis = 0;
-  bool paraquedasAtivado = false;
-  bool intervaloIniciado = false;
-
-  // Construtor
-  Paraquedas(int pino, int altParaquedas, unsigned long atraso, unsigned long tempoAtivacao)
-    : pino(pino), ALT_PARAQUEDAS(altParaquedas), apogeuApenas(altParaquedas == 0), atraso(atraso), tempoAtivacao(tempoAtivacao) {
-  }
-
-  // Método para inicializar o pino do paraquedas no setup
-  void iniciar() {
-    pinMode(pino, OUTPUT);
-    digitalWrite(pino, LOW);
-  }
-
-  // Método para gerenciar a ativação dos paraquedas
-  void gerenciar(bool apogeuAtingido, float mediaAltitudeFiltrada, unsigned long currentMillis) {
-    if (apogeuAtingido && !ativado && !paraquedasAtivado && (apogeuApenas || mediaAltitudeFiltrada < ALT_PARAQUEDAS)) {
-      if (!intervaloIniciado) {
-        futureMillis = currentMillis + atraso;
-        intervaloIniciado = true;
-      }
-      if (currentMillis >= futureMillis) {
-        digitalWrite(pino, HIGH);
-        ativado = true;
-        futureMillis = currentMillis + tempoAtivacao;
-      }
-    } else if (ativado && currentMillis >= futureMillis) {
-      digitalWrite(pino, LOW);
-      ativado = false;
-      paraquedasAtivado = true;
-    }
-  }
-
-  // Método para verificar o estado do paraquedas e printar
-  bool getParaquedas() {
-    return ativado;
-  }
-};
-
-// Variáveis globais
 #define NUM_PARAQUEDAS 4
 Paraquedas paraquedas[NUM_PARAQUEDAS] = {  //{pino, altitude paraquedas, atraso, intervalo que ficará acionado}
   Paraquedas(IGN_1, 0, 0, 5000),
@@ -113,76 +65,11 @@ float altInicial = 0;
 #define NUM_LEITURAS_INICIAL 25
 
 // *** Filtros **** //
-class Filtro {
-private:
-  const int NUM_LEITURAS = 10;
-  float *leituras = new float[NUM_LEITURAS];
-  float somaLeituras = 0;
-  int indiceLeitura = 0;
-
-public:
-  // Construtor
-  Filtro() {
-    for (int i = 0; i < NUM_LEITURAS; i++) {
-      leituras[i] = 0;
-    }
-  }
-
-  // Destrutor
-  ~Filtro() {
-    delete[] leituras;
-  }
-
-  float atualizarFiltro(float novaLeitura) {
-    somaLeituras -= leituras[indiceLeitura];
-    leituras[indiceLeitura] = novaLeitura;
-    somaLeituras += novaLeitura;
-    indiceLeitura = (indiceLeitura + 1) % NUM_LEITURAS;
-    return somaLeituras / NUM_LEITURAS;
-  }
-
-  float getFiltro() {
-    return somaLeituras / NUM_LEITURAS;
-  }
-};
 const int NUM_FILTROS = 3;
 Filtro filtros[NUM_FILTROS];
 
 // *** Apogeu **** //
-/*class Apogeu {
-private:
-  float alturaAnterior = -1;
-  int contador = 0;
-  int estado = 0;  // estado 0 -> subindo; estado 1 -> descendo
-  bool apogeu = false;
-
-public:
-  // Método para detectar o apogeu
-  bool detectar(float alturaAtual) {
-    if (alturaAnterior != -1 && alturaAtual < alturaAnterior) {
-      contador++;
-      if (contador >= 25) {
-        estado = 1;
-        if (estado == 1 && !apogeu) {
-          apogeu = true;
-        }
-      }
-    } else {
-      contador = 0;
-      estado = 0;
-    }
-
-    alturaAnterior = alturaAtual;  // Atualize a altitude anterior para a próxima iteração
-    return apogeu;
-  }
-
-  bool getApogeu() {
-    return apogeu;
-  }
-};
 Apogeu apogeu;
-*/
-
 #endif
 
 // ********** Gyro + Mag + Accel ********** //
