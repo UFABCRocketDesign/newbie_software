@@ -42,19 +42,18 @@
 class Paraquedas {
 public:
   const int ALT_PARAQUEDAS;
-  int pino;
-  bool ativado;
-  bool apogeuApenas;
-  unsigned long intervaloApogeu;
-  unsigned long intervaloAltitude;
+  const int pino;
+  bool ativado = false;
+  const bool apogeuApenas;
+  unsigned long atraso;
   unsigned long tempoAtivacao;
-  unsigned long futureMillis;
-  bool paraquedasAtivado;
-  bool intervaloIniciado;
+  unsigned long futureMillis = 0;
+  bool paraquedasAtivado = false;
+  bool intervaloIniciado = false;
 
   // Construtor
-  Paraquedas(int pino, int altParaquedas, unsigned long intervaloApogeu, unsigned long intervaloAltitude, unsigned long tempoAtivacao)
-    : pino(pino), ALT_PARAQUEDAS(altParaquedas), ativado(false), apogeuApenas(altParaquedas == 0), intervaloApogeu(intervaloApogeu), intervaloAltitude(intervaloAltitude), tempoAtivacao(tempoAtivacao), futureMillis(0), paraquedasAtivado(false), intervaloIniciado(false) {
+  Paraquedas(int pino, int altParaquedas, unsigned long atraso, unsigned long tempoAtivacao)
+    : pino(pino), ALT_PARAQUEDAS(altParaquedas), apogeuApenas(altParaquedas == 0), atraso(atraso), tempoAtivacao(tempoAtivacao) {
   }
 
   // Método para inicializar o pino do paraquedas no setup
@@ -67,7 +66,7 @@ public:
   void gerenciar(bool apogeuAtingido, float mediaAltitudeFiltrada, unsigned long currentMillis) {
     if (apogeuAtingido && !ativado && !paraquedasAtivado && (apogeuApenas || mediaAltitudeFiltrada < ALT_PARAQUEDAS)) {
       if (!intervaloIniciado) {
-        futureMillis = currentMillis + (apogeuApenas ? intervaloApogeu : intervaloAltitude);
+        futureMillis = currentMillis + atraso;
         intervaloIniciado = true;
       }
       if (currentMillis >= futureMillis) {
@@ -90,14 +89,13 @@ public:
 
 // Variáveis globais
 #define NUM_PARAQUEDAS 4
-Paraquedas paraquedas[NUM_PARAQUEDAS] = {  //{pino, altitude paraquedas, intervalo para acionar após o apogeu, intervalo para acionar após o apogeu+altura, intervalo que ficará acionado}
-  Paraquedas(IGN_1, 0, 0, 0, 5000),
-  Paraquedas(IGN_2, 0, 3000, 0, 5000),
-  Paraquedas(IGN_3, -2, 0, 0, 5000),
-  Paraquedas(IGN_4, -2, 0, 3000, 5000)
+Paraquedas paraquedas[NUM_PARAQUEDAS] = {  //{pino, altitude paraquedas, atraso, intervalo que ficará acionado}
+  Paraquedas(IGN_1, 0, 0, 5000),
+  Paraquedas(IGN_2, 0, 3000, 5000),
+  Paraquedas(IGN_3, -2, 0, 5000),
+  Paraquedas(IGN_4, -2, 3000, 5000)
 };
 #endif
-
 
 // ********** SD Card ********** //
 #define CHIP_SELECT 53
@@ -144,35 +142,44 @@ public:
     return somaLeituras / NUM_LEITURAS;
   }
 };
-
 const int NUM_FILTROS = 3;
 Filtro filtros[NUM_FILTROS];
 
-
 // *** Apogeu **** //
-bool apogeuAtingido = false;  // Variável global para rastrear se o apogeu foi atingido
-bool detectarApogeu(float alturaAtual) {
-  static float alturaAnterior = -1;
-  static int contador = 0;
-  static int estado = 0;  // estado 0 -> subindo; estado 1 -> descendo
-  static bool apogeu = false;
+class Apogeu {
+private:
+  float alturaAnterior = -1;
+  int contador = 0;
+  int estado = 0;  // estado 0 -> subindo; estado 1 -> descendo
+  bool apogeu = false;
 
-  if (alturaAnterior != -1 && alturaAtual < alturaAnterior) {
-    contador++;
-    if (contador >= 25) {
-      estado = 1;
-      if (estado == 1) {
-        apogeu = true;
+public:
+  // Método para detectar o apogeu
+  bool detectar(float alturaAtual) {
+    if (alturaAnterior != -1 && alturaAtual < alturaAnterior) {
+      contador++;
+      if (contador >= 25) {
+        estado = 1;
+        if (estado == 1 && !apogeu) {
+          apogeu = true;
+        }
       }
+    } else {
+      contador = 0;
+      estado = 0;
     }
-  } else {
-    contador = 0;
-    estado = 0;
+
+    alturaAnterior = alturaAtual;  // Atualize a altitude anterior para a próxima iteração
+    return apogeu;
   }
 
-  alturaAnterior = alturaAtual;  // Atualize a altitude anterior para a próxima iteração
-  return apogeu;
-}
+  bool getApogeu() {
+    return apogeu;
+  }
+};
+Apogeu apogeu;
+
+
 #endif
 
 // ********** Gyro + Mag + Accel ********** //
@@ -304,15 +311,15 @@ void loop() {
   }
 
   // ********** Apogeu ********** //
-  if (!apogeuAtingido) {  // Chamar detectarApogeu se o apogeu ainda não foi atingido
-    apogeuAtingido = detectarApogeu(filteredAltitude);
-  }
+if (!apogeu.getApogeu()) {  // Chamar detectar se o apogeu ainda não foi atingido
+  apogeu.detectar(filteredAltitude);
+}
 #endif
 
 // ********** Ativando os Paraquedas 1/2/3/4 ********** //
 #if PARA
   for (int i = 0; i < NUM_PARAQUEDAS; i++) {
-    paraquedas[i].gerenciar(apogeuAtingido, filteredAltitude, currentMillis);
+    paraquedas[i].gerenciar(apogeu.getApogeu(), filteredAltitude, currentMillis);
   }
 #endif
 
@@ -349,7 +356,7 @@ void loop() {
   }
 #endif
 #if APOGEE
-  dadosString += String(apogeuAtingido) + "\t";  //Bool indicando se o apogeu foi atingido (0 = não; 1 = sim)
+  dadosString += String(apogeu.getApogeu()) + "\t";  //Bool indicando se o apogeu foi atingido (0 = não; 1 = sim)
 #endif
 #endif
 #if PARA
