@@ -1,16 +1,18 @@
+//---------------------------------------------------------DEFINICOES---------------------------------------------------------
+
 #define SENSORES 1
 
-#define GYRO (SENSORES && 0)
+#define GYRO (SENSORES && 1)
 #define GX (GYRO && 1)
 #define GY (GYRO && 1)
 #define GZ (GYRO && 1)
 
-#define MAG (SENSORES && 0)
+#define MAG (SENSORES && 1)
 #define MX (MAG && 1)
 #define MY (MAG && 1)
 #define MZ (MAG && 1)
 
-#define ACEL (SENSORES && 0)
+#define ACEL (SENSORES && 1)
 #define AX (ACEL && 1)
 #define AY (ACEL && 1)
 #define AZ (ACEL && 1)
@@ -23,9 +25,9 @@
 #define P3 (PARAQUEDAS && 1)
 #define P4 (PARAQUEDAS && 1)
 
-#define SD_CARD 0
+#define SD_CARD 1
 
-#define RFREQ 0
+#define RFREQ 0 //Modulo de radio frequencia tradicional
 
 #define GPS 1
 
@@ -33,8 +35,12 @@
 
 #define SERIAL_PRINT 1
 
+#define WUF 1
+
 #include <SPI.h>
 #include <Wire.h>
+
+//---------------------------------------------------------INICIALIZACOES---------------------------------------------------------
 
 #if (SENSORES)
 #include <Adafruit_Sensor.h>
@@ -79,8 +85,9 @@ HMC5883L mag;
 
 #if (GYRO)
 //#include <L3G.h>
-#include "src/lib/Giroscopio/L3G4200D.h"
 //L3G gyro;
+
+#include "src/lib/Giroscopio/L3G4200D.h"
 L3G4200D gyro(100, 250);
 #endif
 
@@ -88,7 +95,7 @@ L3G4200D gyro(100, 250);
 #include <SD.h>
 //Definindo SD
 #define chipSelect 53
-String nomeBaseSD = "joao";  //setup
+String nomeBaseSD = "joao";  //setup (talvez um define?)
 String nomeSD;               //global
 #endif
 
@@ -125,18 +132,23 @@ TinyGPSPlus gps;
 HardwareSerial &GPSSerial = Serial1;
 #endif
 
-#if (LORA)
+#if (LORA) //Comunicacao por modulo LoRa
 #define LoRaDelay 3000
 #define LoRa LongRange
 HardwareSerial &LoRa(Serial3);
 unsigned long previousMillisLora = 0;
 #endif
 
-#if (RFREQ)
+#if (RFREQ) //Comunicacao por radio frequencia
 #include <RH_ASK.h>
 RH_ASK rf_driver;
 unsigned long previousMillisRFREQ = 0;
 const long interval = 200;
+#endif
+
+#if (WUF) //Wait Until Flight
+bool wuf = true;
+const float wufAltura = 50;
 #endif
 
 //Inicializando variavel de tempo
@@ -145,6 +157,9 @@ unsigned long currentTime = 0;
 String dataString = "";
 //Inicializando altitude
 float altitude = 0;
+
+//---------------------------------------------------------FUNCOES---------------------------------------------------------
+
 
 void readAll() {
 
@@ -298,6 +313,8 @@ void writeAll() {
   }
 #endif
 }
+
+//---------------------------------------------------------SETUP---------------------------------------------------------
 
 void setup() {
   Serial.begin(115200);
@@ -518,7 +535,18 @@ void setup() {
     iSD++;
   }
 #endif
+#if (WUF)
+  while((altitude <= wufAltura) && (altitude >= -1*wufAltura)) {
+      currentTime = millis();
+      readAll();
+      writeAll();
+  }
+  wuf = false;
+#endif
 }
+
+//---------------------------------------------------------LOOP---------------------------------------------------------
+
 
 void loop() {
 
@@ -530,7 +558,7 @@ void loop() {
   float filtroFinal = f3.getMedia();
 
   //Apogeu
-  apogeu.deteccaoApogeu(filtroFinal, 0);
+  apogeu.deteccaoApogeu(filtroFinal, 0); //0 para deteccao de apogeu comum || 1 para deteccao de apogeu personalizada
 #endif
 
   //Paraquedas 1
