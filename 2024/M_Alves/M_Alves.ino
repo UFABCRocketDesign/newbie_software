@@ -158,7 +158,7 @@ public:
   bool detectar(float alturaAtual) {
     if (alturaAnterior != -1 && alturaAtual < alturaAnterior) {
       contador++;
-      if (contador >= 25) {
+      if (contador >= 20) {
         estado = 1;
         if (estado == 1 && !apogeu) {
           apogeu = true;
