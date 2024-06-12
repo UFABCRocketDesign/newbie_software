@@ -6,8 +6,11 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_HMC5883_U.h>
 #include <Adafruit_ADXL345_U.h>
-
+//SDCard
 #define SDCARD (0)
+//Apogeu
+#include "./src/lib/Apogeu/Apogeu.h"
+Apogeu apogeu;
 //Paraquedas
 #define PARA (1)
 #define IGN_1 36  //Paraquedas 1
@@ -146,7 +149,7 @@ const int NUM_FILTROS = 3;
 Filtro filtros[NUM_FILTROS];
 
 // *** Apogeu **** //
-class Apogeu {
+/*class Apogeu {
 private:
   float alturaAnterior = -1;
   int contador = 0;
@@ -178,7 +181,7 @@ public:
   }
 };
 Apogeu apogeu;
-
+*/
 
 #endif
 
