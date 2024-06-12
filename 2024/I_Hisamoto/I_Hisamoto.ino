@@ -6,11 +6,11 @@ Adafruit_BMP085 bmp;
 #define SD_CS_PIN 53
 #else
 #define SD_CS_PIN 10
-#endif // ARDUINO_AVR_MEGA2560
-#define IGN_1 36	/*act1*/
-#define IGN_2 61	/*act2*/
-#define IGN_3 46	/*act3*/
-#define IGN_4 55	/*act4*/
+#endif           // ARDUINO_AVR_MEGA2560
+#define IGN_1 36 /*act1*/
+#define IGN_2 61 /*act2*/
+#define IGN_3 46 /*act3*/
+#define IGN_4 55 /*act4*/
 int chipSelect = 53;
 float altitudeInicial;
 float somaAltitude;
@@ -27,7 +27,7 @@ String tipoDeArquivo = ".txt";
 String header = "Temperature(C)\tPressure(Pa)\tHigh(meters)\tFiltered High 0(meters)\tFiltered High 1(meters)\tFallen(1)/ Not fallen (0)\tContador de Queda\tBlinking";
 float inicioBlink;
 int intervaloBlink = 1000;
-bool pinoBlinking = 0; // estado de piscar
+bool pinoBlinking = 0;  // estado de piscar
 
 
 float filtroSuavizarCurva_0(float dadosCurva_0) {
@@ -60,14 +60,14 @@ float filtroSuavizarCurva_1(float dadosCurva_1) {
 
 void setup() {
 
-Serial.begin(115200);
+  Serial.begin(115200);
   if (!bmp.begin()) {
     Serial.println("Não foi possível achar um sensor BMP085 válido, verifique os fios!");
     while (1) {}
   }
 
   //abrindo o SD
-  pinMode(chipSelect,OUTPUT);
+  pinMode(chipSelect, OUTPUT);
 
   if (!SD.begin(chipSelect)) {
     Serial.println("Falha ao inicializar o cartão SD");
@@ -75,11 +75,11 @@ Serial.begin(115200);
   }
   Serial.println("Cartão SD inicializado com sucesso");
 
-//verificando nome de arquivo
+  //verificando nome de arquivo
   do {
-    int tamArquivo = inicio.length() + String(numA).length(); 
+    int tamArquivo = inicio.length() + String(numA).length();
     String zerosAdicionais = "";
-    for (int i = tamArquivo; i < 8; i++){
+    for (int i = tamArquivo; i < 8; i++) {
       zerosAdicionais += "0";
     }
     nomeArquivo = inicio + zerosAdicionais + String(numA) + tipoDeArquivo;
@@ -89,7 +89,7 @@ Serial.begin(115200);
   Serial.println(nomeArquivo);
   arquivo = SD.open(nomeArquivo, FILE_WRITE);
   if (arquivo) {
-    
+
     arquivo.println(header);
     arquivo.close();
   } else {
@@ -98,24 +98,24 @@ Serial.begin(115200);
 
   Serial.println(header);
 
-// determinando altitude inicial
+  // determinando altitude inicial
   somaAltitude = 0;
   for (int posicaoListaAltitude = 0; posicaoListaAltitude < 10; posicaoListaAltitude++) {
     somaAltitude += bmp.readAltitude();
   }
   altitudeInicial = somaAltitude / 10;
 
-//definindo pino como porta de saída
+  //definindo pino como porta de saída
   pinMode(IGN_1, OUTPUT);
 }
 
 void loop() {
-//determinando o apogeu
+  //determinando o apogeu
   float altura = bmp.readAltitude() - altitudeInicial;
   float alturaFiltrada_0 = filtroSuavizarCurva_0(altura);
   float alturaFiltrada_1 = filtroSuavizarCurva_1(alturaFiltrada_0);
   int fallenCondition = 0;
-  
+
   if (alturaFiltrada_1 < alturaAnterior) {
     contador++;
   } else {
@@ -124,18 +124,20 @@ void loop() {
   alturaAnterior = alturaFiltrada_1;
   fallenCondition = (contador >= 5) ? 1 : 0;
 
-//acionando o primeiro paraquedas
-  if (fallenCondition == 1 && !pinoBlinking) { //verifica se esta caindo e se o led não esta piscando
+  //acionando o primeiro paraquedas
+  for (int i = 0; i < 1; i++){
+    if (fallenCondition == 1 && pinoBlinking) {  //verifica se esta caindo e se o led não esta piscando
+    pinoBlinking = 1;
     digitalWrite(IGN_1, pinoBlinking);
     inicioBlink = millis();
-    pinoBlinking = 1;
+    if (pinoBlinking && (millis() - inicioBlink >= intervaloBlink)) {
+      pinoBlinking = 0;
+      digitalWrite(IGN_1, pinoBlinking);
+    }
   }
-  if (pinoBlinking && (millis() - inicioBlink >= intervaloBlink)) {
-    digitalWrite(IGN_1, pinoBlinking);
-    pinoBlinking = 0;
   }
-  
-//salvando dados no sd
+
+  //salvando dados no sd
   String dataString = "";
   dataString += String(bmp.readTemperature()) + "\t";
   dataString += String(bmp.readPressure()) + "\t";
@@ -147,9 +149,8 @@ void loop() {
   dataString += String(pinoBlinking) + "\t";
   Serial.println(dataString);
   arquivo = SD.open(nomeArquivo, FILE_WRITE);
-  if(arquivo){
+  if (arquivo) {
     arquivo.println(dataString);
     arquivo.close();
   }
-
 }
