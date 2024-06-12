@@ -263,6 +263,36 @@ void readAll() {
 #endif
 }
 
+void doAll() {
+#if (BAR)
+  // Obtendo a média final filtrada
+  float filtroFinal = f3.getMedia();
+
+  //Apogeu
+  apogeu.deteccaoApogeu(filtroFinal, 0);  //0 para deteccao de apogeu comum || 1 para deteccao de apogeu personalizada
+#endif
+
+  //Paraquedas 1
+#if (P1)
+  p1.ativarParaquedas(filtroFinal, currentTime, apogeu.getEstaDescendo());
+#endif
+
+  //Paraquedas 2
+#if (P2)
+  p2.ativarParaquedas(filtroFinal, currentTime, apogeu.getEstaDescendo());
+#endif
+
+//Paraquedas 3
+#if (P3)
+  p3.ativarParaquedas(filtroFinal, currentTime, apogeu.getEstaDescendo());
+#endif
+
+//Paraquedas 4
+#if (P4)
+  p4.ativarParaquedas(filtroFinal, currentTime, apogeu.getEstaDescendo());
+#endif
+}
+
 void writeAll() {
   
 #if (SERIAL_PRINT)
@@ -553,33 +583,7 @@ void loop() {
   currentTime = millis();
   readAll();
 
-#if (BAR)
-  // Obtendo a média final filtrada
-  float filtroFinal = f3.getMedia();
-
-  //Apogeu
-  apogeu.deteccaoApogeu(filtroFinal, 0); //0 para deteccao de apogeu comum || 1 para deteccao de apogeu personalizada
-#endif
-
-  //Paraquedas 1
-#if (P1)
-  p1.ativarParaquedas(filtroFinal, currentTime, apogeu.getEstaDescendo());
-#endif
-
-  //Paraquedas 2
-#if (P2)
-  p2.ativarParaquedas(filtroFinal, currentTime, apogeu.getEstaDescendo());
-#endif
-
-//Paraquedas 3
-#if (P3)
-  p3.ativarParaquedas(filtroFinal, currentTime, apogeu.getEstaDescendo());
-#endif
-
-//Paraquedas 4
-#if (P4)
-  p4.ativarParaquedas(filtroFinal, currentTime, apogeu.getEstaDescendo());
-#endif
+  doAll();
 
   writeAll();
 }
