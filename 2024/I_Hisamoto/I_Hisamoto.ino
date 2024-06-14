@@ -25,10 +25,13 @@ String nomeArquivo;
 String inicio = "isa";
 String tipoDeArquivo = ".txt";
 String header = "Temperature(C)\tPressure(Pa)\tHigh(meters)\tFiltered High 0(meters)\tFiltered High 1(meters)\tFallen(1)/ Not fallen (0)\tContador de Queda\tBlinking";
-float inicioBlink;
-int intervaloBlink = 5000;
+float timerP1;
+float timerP1_P2;
+int intervaloP1 = 5000;
+int intervaloP1_P2 = 2000;
 bool pinoBlinking = 0;  // estado de piscar
-bool paraquedasAcionado;
+bool P1Acionado;
+bool P2Acionado;
 
 
 float filtroSuavizarCurva_0(float dadosCurva_0) {
@@ -126,17 +129,34 @@ void loop() {
   fallenCondition = (contador >= 5) ? 1 : 0;
 
   //acionando o primeiro paraquedas
-  bool inicioP1 = (fallenCondition == 1);
-  if (!paraquedasAcionado) {
-    if (inicioP1 && !pinoBlinking) {  //verifica se esta caindo e se o led não esta piscando
+  bool queda = (fallenCondition == 1);
+  if (!P1Acionado) {
+    if (queda && !pinoBlinking) {  //verifica se esta caindo e se o led não esta piscando
       pinoBlinking = 1;
       digitalWrite(IGN_1, pinoBlinking);
-      inicioBlink = millis();
+      timerP1 = millis();
     }
-    if (pinoBlinking && (millis() - inicioBlink >= intervaloBlink)) {
+    if (pinoBlinking && (millis() - timerP1 >= intervaloP1)) {
       pinoBlinking = 0;
       digitalWrite(IGN_1, pinoBlinking);
-      paraquedasAcionado = true;
+      P1Acionado = true;
+    }
+  }
+
+  //acionando segundo paraquedas
+  if (!P2Acionado) {
+    if (queda && !pinoBlinking) {
+      timerP1_P2 = millis();
+    }
+    if (!pinoBlinking && (millis() - timerP1_P2 >= intervaloP1_P2)) {
+      pinoBlinking = 1;
+      digitalWrite(IGN_1, pinoBlinking);
+      timerP1 = millis();
+    }
+    if (pinoBlinking && (millis() - timerP1 >= intervaloP1)) {
+      pinoBlinking = 0;
+      digitalWrite(IGN_1, pinoBlinking);
+      P2Acionado = true;
     }
   }
 
