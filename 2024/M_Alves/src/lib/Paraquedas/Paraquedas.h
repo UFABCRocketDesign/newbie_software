@@ -8,7 +8,7 @@
 #endif
 
 class Paraquedas {
-public:
+private:
   const int ALT_PARAQUEDAS;
   const int pino;
   bool ativado = false;
@@ -18,7 +18,7 @@ public:
   unsigned long futureMillis = 0;
   bool paraquedasAtivado = false;
   bool intervaloIniciado = false;
-
+public:
   // Construtor
   Paraquedas(int pino, int altParaquedas, unsigned long atraso, unsigned long tempoAtivacao);
 
