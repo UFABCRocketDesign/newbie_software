@@ -20,6 +20,7 @@
 #define BAR (SENSORES && 1)
 
 #define PARAQUEDAS (BAR && 1)
+#define SAUDE (PARAQUEDAS && 1)
 #define P1 (PARAQUEDAS && 1)
 #define P2 (PARAQUEDAS && 1)
 #define P3 (PARAQUEDAS && 1)
@@ -267,20 +268,35 @@ bool booleano;
 #if (WUF)
   dataString += String(wuf) + "\t";
 #endif
+
+#if (PARAQUEDAS)
 #if (P1)
   dataString += String(p1.getData()) + "\t";
+#if (SAUDE)
+  dataString += String(p1.getInfo()) + "\t";
+#endif
 #endif
 
 #if (P2)
   dataString += String(p2.getData()) + "\t";
+#if (SAUDE)
+  dataString += String(p2.getInfo()) + "\t";
+#endif
 #endif
 
 #if (P3)
   dataString += String(p3.getData()) + "\t";
+#if (SAUDE)
+  dataString += String(p3.getInfo()) + "\t";
+#endif
 #endif
 
 #if (P4)
   dataString += String(p4.getData()) + "\t";
+#if (SAUDE)
+  dataString += String(p4.getInfo()) + "\t";
+#endif
+#endif
 #endif
 
 #if (AX)
@@ -528,18 +544,30 @@ void setup() {
 
 #if (P1)
   dataStringInicial += "Paraquedas 1\t";
+#if (SAUDE)
+  dataStringInicial += "SaudeParaquedas 1 \t";
+#endif
 #endif
 
 #if (P2)
   dataStringInicial += "Paraquedas 2\t";
+#if (SAUDE)
+  dataStringInicial += "SaudeParaquedas 2 \t";
+#endif
 #endif
 
 #if (P3)
   dataStringInicial += "Paraquedas 3\t";
+#if (SAUDE)
+  dataStringInicial += "SaudeParaquedas 3 \t";
+#endif
 #endif
 
 #if (P4)
   dataStringInicial += "Paraquedas 4\t";
+#if (SAUDE)
+  dataStringInicial += "SaudeParaquedas 4 \t";
+#endif
 #endif
 
 #if (AX)

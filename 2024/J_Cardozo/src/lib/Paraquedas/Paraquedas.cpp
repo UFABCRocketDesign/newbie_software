@@ -1,8 +1,8 @@
 #include "Paraquedas.h"
 #include <Arduino.h>
 
-Paraquedas::Paraquedas(int tempoLigado, float tempoDelay, int portaIgn, int portaSaude, float alturaAtivacao)
-  : intervaloLigado(tempoLigado), delay(tempoDelay), ign(portaIgn), saude(portaSaude), altura(alturaAtivacao) {
+Paraquedas::Paraquedas(int tempoLigado, float tempoDelay, int portaIgn, int portaSaude, float alturaAtivacao, int sensibilidade = 100)
+  : intervaloLigado(tempoLigado), delay(tempoDelay), ign(portaIgn), saude(portaSaude), altura(alturaAtivacao), sensibilidadeSaude(sensibilidade) {
 }
 
 void Paraquedas::begin() {
@@ -71,5 +71,5 @@ bool Paraquedas::getData() const {
 }
 
 bool Paraquedas::getInfo() {
-  return digitalRead(saude);
+  return analogRead(saude) > sensibilidadeSaude;
 }
