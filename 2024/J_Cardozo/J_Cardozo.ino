@@ -157,7 +157,7 @@ const float wufAltura = 50;
 #include "src/lib/Buzzer/buzzer.h"
 #define BUZZ_PIN A0
 #define BUZZ_CMD LOW
-Buzzer BeepSistemas(BUZZ_PIN, 5000, 400);
+Buzzer BeepSistemas(BUZZ_PIN, 5000, 100);
 #endif
 
 //Inicializando variavel de tempo
