@@ -27,6 +27,7 @@ String tipoDeArquivo = ".txt";
 String header = "Temperature(C)\tPressure(Pa)\tHigh(meters)\tFiltered High 0(meters)\tFiltered High 1(meters)\tFallen(1)/ Not fallen (0)\tContador de Queda\tEstadoP1\tEstadoP2";
 float timerP1;
 float timerP1_P2;
+float timerP2;
 int intervaloP1 = 5000;
 int intervaloP1_P2 = 2000;
 bool estadoP1 = 0;  // estado de piscar
@@ -147,20 +148,18 @@ void loop() {
 
   //acionando segundo paraquedas
   if (!P2Acionado) {
-    if (!eventoP2Acionado) {
-      if (queda && !estadoP2) {
-        timerP1_P2 = millis();
-        eventoP2Acionado = true;
-      }
+    if (queda && !estadoP2 && !eventoP2Acionado) {
+      timerP1_P2 = millis();
+      eventoP2Acionado = true;
     }
     if (!estadoP2 && (millis() - timerP1_P2 >= intervaloP1_P2)) {
       estadoP2 = 1;
-      digitalWrite(IGN_1, estadoP2);
-      timerP1 = millis();
+      digitalWrite(IGN_2, estadoP2);
+      timerP2 = millis();
     }
-    if (estadoP2 && (millis() - timerP1 >= intervaloP1)) {
+    if (estadoP2 && (millis() - timerP2 >= intervaloP1)) {
       estadoP2 = 0;
-      digitalWrite(IGN_1, estadoP2);
+      digitalWrite(IGN_2, estadoP2);
       P2Acionado = true;
     }
   }
