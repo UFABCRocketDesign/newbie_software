@@ -1,4 +1,4 @@
-#include <Adafruit_BMP085.h>
+//#include <Adafruit_BMP085.h>
 #include <SPI.h>
 #include <SD.h>
 #include <Wire.h>
@@ -6,9 +6,11 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_HMC5883_U.h>
 #include <Adafruit_ADXL345_U.h>
+#include "./src/lib/Sensores/Sensores.h"
 #include "./src/lib/Apogeu/Apogeu.h"
 #include "./src/lib/Filtro/Filtro.h"
 #include "./src/lib/Paraquedas/Paraquedas.h"
+#include "./src/lib/Barometro/Barometro.h"
 
 //SDCard
 #define SDCARD (0)
@@ -60,7 +62,8 @@ String fileName;
 
 // ********** Altitude, Filtros e Apogeu ********** //
 #if BMP085
-Adafruit_BMP085 bmp;
+Barometro barometro;
+//Adafruit_BMP085 bmp;
 float altInicial = 0;
 #define NUM_LEITURAS_INICIAL 25
 
@@ -94,8 +97,10 @@ void setup() {
 // ********** Iniciando os Sensores ********** //
 //BME085
 #if BMP085
-  if (!bmp.begin()) {
-    Serial.println("No BMP085 detected");
+  if (barometro.begin()) {
+    Serial.println("BMP085 OK");
+  } else {
+    Serial.println("BMP085 not OK");
   }
   dadosString += "Temperature (*C)\tPressure (Pa)\tAltitude (m)\t";
   for (int i = 0; i < NUM_FILTROS; i++) {
@@ -150,7 +155,7 @@ void setup() {
   //Leituras iniciais
   float somaAltInicial = 0;
   for (int i = 0; i < NUM_LEITURAS_INICIAL; i++) {
-    somaAltInicial += bmp.readAltitude();
+    somaAltInicial += barometro.getAltitude();
   }
 
   altInicial = somaAltInicial / NUM_LEITURAS_INICIAL;  //Médias das leituras iniciais
@@ -190,9 +195,9 @@ void loop() {
 
 // ********** BME085 - Altura e Filtros ********** //
 #if BMP085
-  float temperature = bmp.readTemperature();
-  int pressure = bmp.readPressure();
-  float rawAltitude = bmp.readAltitude() - altInicial;
+  float temperature = barometro.getTemperatura();
+  int pressure = barometro.getPressao();
+  float rawAltitude = barometro.getAltitude() - altInicial;
 
   // *** Filtros **** //
   float filteredAltitude = rawAltitude;
@@ -201,9 +206,9 @@ void loop() {
   }
 
   // ********** Apogeu ********** //
-if (!apogeu.getApogeu()) {  // Chamar detectar se o apogeu ainda não foi atingido
-  apogeu.detectar(filteredAltitude);
-}
+  if (!apogeu.getApogeu()) {  // Chamar detectar se o apogeu ainda não foi atingido
+    apogeu.detectar(filteredAltitude);
+  }
 #endif
 
 // ********** Ativando os Paraquedas 1/2/3/4 ********** //
