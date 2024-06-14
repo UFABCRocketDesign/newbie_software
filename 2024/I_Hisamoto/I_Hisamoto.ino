@@ -24,14 +24,16 @@ File arquivo;
 String nomeArquivo;
 String inicio = "isa";
 String tipoDeArquivo = ".txt";
-String header = "Temperature(C)\tPressure(Pa)\tHigh(meters)\tFiltered High 0(meters)\tFiltered High 1(meters)\tFallen(1)/ Not fallen (0)\tContador de Queda\tBlinking";
+String header = "Temperature(C)\tPressure(Pa)\tHigh(meters)\tFiltered High 0(meters)\tFiltered High 1(meters)\tFallen(1)/ Not fallen (0)\tContador de Queda\tEstadoP1\tEstadoP2";
 float timerP1;
 float timerP1_P2;
 int intervaloP1 = 5000;
 int intervaloP1_P2 = 2000;
-bool pinoBlinking = 0;  // estado de piscar
+bool estadoP1 = 0;  // estado de piscar
+bool estadoP2 = 0;
 bool P1Acionado;
 bool P2Acionado;
+bool eventoP2Acionado;
 
 
 float filtroSuavizarCurva_0(float dadosCurva_0) {
@@ -131,31 +133,34 @@ void loop() {
   //acionando o primeiro paraquedas
   bool queda = (fallenCondition == 1);
   if (!P1Acionado) {
-    if (queda && !pinoBlinking) {  //verifica se esta caindo e se o led não esta piscando
-      pinoBlinking = 1;
-      digitalWrite(IGN_1, pinoBlinking);
+    if (queda && !estadoP1) {  //verifica se esta caindo e se o led não esta piscando
+      estadoP1 = 1;
+      digitalWrite(IGN_1, estadoP1);
       timerP1 = millis();
     }
-    if (pinoBlinking && (millis() - timerP1 >= intervaloP1)) {
-      pinoBlinking = 0;
-      digitalWrite(IGN_1, pinoBlinking);
+    if (estadoP1 && (millis() - timerP1 >= intervaloP1)) {
+      estadoP1 = 0;
+      digitalWrite(IGN_1, estadoP1);
       P1Acionado = true;
     }
   }
 
   //acionando segundo paraquedas
   if (!P2Acionado) {
-    if (queda && !pinoBlinking) {
-      timerP1_P2 = millis();
+    if (!eventoP2Acionado) {
+      if (queda && !estadoP2) {
+        timerP1_P2 = millis();
+        eventoP2Acionado = true;
+      }
     }
-    if (!pinoBlinking && (millis() - timerP1_P2 >= intervaloP1_P2)) {
-      pinoBlinking = 1;
-      digitalWrite(IGN_1, pinoBlinking);
+    if (!estadoP2 && (millis() - timerP1_P2 >= intervaloP1_P2)) {
+      estadoP2 = 1;
+      digitalWrite(IGN_1, estadoP2);
       timerP1 = millis();
     }
-    if (pinoBlinking && (millis() - timerP1 >= intervaloP1)) {
-      pinoBlinking = 0;
-      digitalWrite(IGN_1, pinoBlinking);
+    if (estadoP2 && (millis() - timerP1 >= intervaloP1)) {
+      estadoP2 = 0;
+      digitalWrite(IGN_1, estadoP2);
       P2Acionado = true;
     }
   }
@@ -169,7 +174,8 @@ void loop() {
   dataString += String(alturaFiltrada_1) + "\t";
   dataString += String(fallenCondition) + "\t";
   dataString += String(contador) + "\t";
-  dataString += String(pinoBlinking) + "\t";
+  dataString += String(estadoP1) + "\t";
+  dataString += String(estadoP2) + "\t";
   Serial.println(dataString);
   arquivo = SD.open(nomeArquivo, FILE_WRITE);
   if (arquivo) {
