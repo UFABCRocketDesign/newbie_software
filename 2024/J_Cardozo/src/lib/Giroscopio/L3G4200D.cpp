@@ -58,10 +58,13 @@ bool L3G4200D::begin() {
     return false;
 }
 
-void L3G4200D::lerTudo() {
+bool L3G4200D::lerTudo() {
+    bool verificador = true;
+
     Wire.beginTransmission(address);
     Wire.write(OUT_X_L | 0x80);
-    Wire.endTransmission();
+    verificador = verificador && (Wire.endTransmission() == 0);
+
     Wire.requestFrom((uint8_t)address, (uint8_t)6);
     if (Wire.available() == 6) {
         uint8_t xlo = Wire.read();
@@ -75,5 +78,6 @@ void L3G4200D::lerTudo() {
         y = (int16_t)(ylo | (yhi << 8));
         z = (int16_t)(zlo | (zhi << 8));
     }
+    return verificador;
 }
 

@@ -19,7 +19,7 @@ private:
 public:
     HMC5883L(uint8_t samples = 8, uint16_t gain = 1090, uint8_t mode = 0x00);
     bool begin();
-    void lerTudo();
+    bool lerTudo();
 };
 
 #endif

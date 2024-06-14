@@ -21,7 +21,7 @@ private:
 public:
   ADXL345(uint8_t range = 2);
   bool begin();
-  void lerTudo();
+  bool lerTudo();
 };
 
 #endif

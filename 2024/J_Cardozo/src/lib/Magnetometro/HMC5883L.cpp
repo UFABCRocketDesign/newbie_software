@@ -85,10 +85,13 @@ bool HMC5883L::begin() {
     return false;
 }
 
-void HMC5883L::lerTudo() {
+bool HMC5883L::lerTudo() {
+    bool verificador = true;
+
     Wire.beginTransmission(address);
     Wire.write(0x03); 
-    Wire.endTransmission();
+    verificador = verificador && (Wire.endTransmission() == 0);
+
     Wire.requestFrom((uint8_t)address, (uint8_t)6);
     if (Wire.available() == 6) {
         x = Wire.read() << 8 | Wire.read();   
@@ -96,5 +99,6 @@ void HMC5883L::lerTudo() {
         y = Wire.read() << 8 | Wire.read();   
          
     }
+    return verificador;
 }
 

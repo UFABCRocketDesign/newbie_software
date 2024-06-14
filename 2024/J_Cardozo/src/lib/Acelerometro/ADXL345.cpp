@@ -23,10 +23,13 @@ bool ADXL345::begin() {
   return (Wire.endTransmission() == 0);
 }
 
-void ADXL345::lerTudo() {
+bool ADXL345::lerTudo() {
+  bool verificador = true;
+
   Wire.beginTransmission(address);
   Wire.write(Reg_X0); 
-  Wire.endTransmission();
+  verificador = verificador && (Wire.endTransmission() == 0);
+
   Wire.requestFrom(address, (uint8_t)6); 
 
   if (Wire.available() == 6) { 
@@ -50,4 +53,6 @@ void ADXL345::lerTudo() {
   x = X_out / scale;
   y = Y_out / scale;
   z = Z_out / scale;
+
+  return verificador;
 }

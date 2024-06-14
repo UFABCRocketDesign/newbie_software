@@ -29,13 +29,15 @@
 
 #define RFREQ 0 //Modulo de radio frequencia tradicional
 
-#define GPS 1
+#define GPS 0
 
-#define LORA 1
+#define LORA 0
 
 #define SERIAL_PRINT 1
 
-#define WUF 1
+#define WUF 1 //Wait until flight
+
+#define BUZZER 1
 
 #include <SPI.h>
 #include <Wire.h>
@@ -151,6 +153,13 @@ bool wuf = true;
 const float wufAltura = 50;
 #endif
 
+#if (BUZZER)
+#include "src/lib/Buzzer/buzzer.h"
+#define BUZZ_PIN A0
+#define BUZZ_CMD LOW
+Buzzer BeepSistemas(BUZZ_PIN, 5000, 400);
+#endif
+
 //Inicializando variavel de tempo
 unsigned long currentTime = 0;
 //Inicializando a string
@@ -158,33 +167,46 @@ String dataString = "";
 //Inicializando altitude
 float altitude = 0;
 
+
 //---------------------------------------------------------FUNCOES---------------------------------------------------------
 
 
 void readAll() {
-
+bool booleano;
 //Definindo variaveis acelerometro, giroscopio e magnetometro
 #if (ACEL)
-  acel.lerTudo();
+  booleano = acel.lerTudo();
+#if (BUZZER)
+    BeepSistemas.addSystem(booleano);
+#endif
 #endif
 
 #if (GYRO)
-  gyro.lerTudo();
+  booleano = gyro.lerTudo();
+#if (BUZZER)
+    BeepSistemas.addSystem(booleano);
+#endif
 #endif
 
 #if (MAG)
-  mag.lerTudo();
+  booleano = mag.lerTudo();
+#if (BUZZER)
+    BeepSistemas.addSystem(booleano);
+#endif
 #endif
 
 #if (BAR)
   //Filtros
-  bmp.lerTudo();
+  booleano = bmp.lerTudo();
   altitude = bmp.getAltitude() - alturaInicial;
 
   f1.aplicarFiltro(altitude);
   f2.aplicarFiltro(f1.getMedia());
   f3.aplicarFiltro(f2.getMedia());
 
+#if (BUZZER)
+    BeepSistemas.addSystem(booleano);
+#endif
 #endif
 
 #if (GPS)
@@ -206,7 +228,9 @@ void readAll() {
   dataString += String(f3.getMedia()) + "\t";
   dataString += String(apogeu.getEstaDescendo()) + "\t";
 #endif
-
+#if (WUF)
+  dataString += String(wuf) + "\t";
+#endif
 #if (P1)
   dataString += String(p1.getData()) + "\t";
 #endif
@@ -416,21 +440,20 @@ void setup() {
   LoRa.begin(9600);
 #endif
 
-//Definindo pinos dos paraquedas
 #if (P1)
-  pinMode(IGN_1, OUTPUT);
+  p1.begin();
 #endif
 
 #if (P2)
-  pinMode(IGN_2, OUTPUT);
+  p2.begin();
 #endif
 
 #if (P3)
-  pinMode(IGN_3, OUTPUT);
+  p3.begin();
 #endif
 
 #if (P4)
-  pinMode(IGN_4, OUTPUT);
+  p4.begin();
 #endif
 
 #if (BAR)
@@ -461,6 +484,10 @@ void setup() {
     dataStringInicial += "(m)\t";
   }
   dataStringInicial += "Status\t";
+#endif
+
+#if (WUF)
+  dataStringInicial += "WUF\t";
 #endif
 
 #if (P1)
@@ -565,10 +592,13 @@ void setup() {
     iSD++;
   }
 #endif
+       
+
 #if (WUF)
-  while((altitude <= wufAltura) && (altitude >= -1*wufAltura)) {
+  while((wufAltura >= altitude) && (altitude >= -1*wufAltura)) {
       currentTime = millis();
       readAll();
+      BeepSistemas.beep(currentTime, false);
       writeAll();
   }
   wuf = false;

@@ -5,6 +5,10 @@ Paraquedas::Paraquedas(int tempoLigado, float tempoDelay, int portaIgn, float al
   : intervaloLigado(tempoLigado), delay(tempoDelay), ign(portaIgn), altura(alturaAtivacao) {
 }
 
+void Paraquedas::begin() {
+  pinMode(ign, OUTPUT);
+}
+
 void Paraquedas::ativarParaquedas(float alturaAtual, unsigned long currentTime, bool estaDescendo) {
   if (delay == 0) {
     if (altura == 0) {

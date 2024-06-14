@@ -13,7 +13,7 @@ protected:
 public:
     Sensor(uint8_t endereco);
     virtual bool begin() = 0; 
-    virtual void lerTudo() = 0; 
+    virtual bool lerTudo() = 0; 
 };
 
 #endif

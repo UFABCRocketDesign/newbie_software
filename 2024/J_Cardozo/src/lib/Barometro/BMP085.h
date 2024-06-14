@@ -27,8 +27,8 @@ private:
 public:
     BMP085();
     bool begin();
-    void lerTudo(float pressaoInicial);
-    void lerTudo();
+    bool lerTudo(float pressaoInicial);
+    bool lerTudo();
     float getTemperatura();
     long getPressao();
     float getAltitude();

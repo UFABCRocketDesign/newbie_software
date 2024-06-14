@@ -34,18 +34,22 @@ bool BMP085::begin() {
     return true; 
 }
 
+bool BMP085::lerTudo(float pressaoInicial) {
+    bool verificador = true;
 
-long BMP085::lerCalibracaoT() {
+    //Calibracao T
     Wire.beginTransmission(address);
     Wire.write(0xF4);
     Wire.write(0x2E);
-    Wire.endTransmission();
+    verificador = verificador && (Wire.endTransmission() == 0);
+    
 
     delayMicroseconds(4550);
 
     Wire.beginTransmission(address);
     Wire.write(0xF6);
-    Wire.endTransmission();
+    verificador = verificador && (Wire.endTransmission() == 0);
+
 
     Wire.requestFrom((uint8_t)address, (uint8_t)2);
     unsigned long tempo = micros();
@@ -54,35 +58,28 @@ long BMP085::lerCalibracaoT() {
         if (tempo + 10 < micros())break;
     }
     ut = Wire.read() << 8 | Wire.read();
-    return ut;
-}
 
-long BMP085::lerCalibracaoP() {
+    //Calibracao P
     Wire.beginTransmission(address);
     Wire.write(0xF4);
     Wire.write(0x34 + (oss << 6));
-    Wire.endTransmission();
+    verificador = verificador && (Wire.endTransmission() == 0);
 
     delay(2 + (3 << oss));
 
     Wire.beginTransmission(address);
     Wire.write(0xF6);
-    Wire.endTransmission();
+    verificador = verificador && (Wire.endTransmission() == 0);
+
 
     Wire.requestFrom((uint8_t)address, (uint8_t)3);
-    unsigned long tempo = micros();
+    tempo = micros();
     while (Wire.available() < 3)
     {
         if (tempo + 10 < micros())break;
     }
 
     up = (((unsigned long)Wire.read() << 16) | ((unsigned long)Wire.read() << 8) | (unsigned long)Wire.read()) >> (8 - oss);
-    return up;
-}
-
-void BMP085::lerTudo(float pressaoInicial) {
-    ut = lerCalibracaoT();
-    up = lerCalibracaoP();
 
     //Calculo temperatura verdadeira
     x1 = (ut - (long)ac6) * (long)ac5 >> 15;
@@ -116,9 +113,11 @@ void BMP085::lerTudo(float pressaoInicial) {
 
     //Calculo da altitude(absoluta ou relativa)
     altitude = 44330 * (1.0 - pow((pressao / (pressaoInicial/100)), (1/5.255)));
+
+    return verificador;
 }
 
-void BMP085::lerTudo() {
+bool BMP085::lerTudo() {
     this->lerTudo(101325.0);
 }
 
