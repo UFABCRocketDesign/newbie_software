@@ -1,12 +1,13 @@
 #include "Paraquedas.h"
 #include <Arduino.h>
 
-Paraquedas::Paraquedas(int tempoLigado, float tempoDelay, int portaIgn, float alturaAtivacao)
-  : intervaloLigado(tempoLigado), delay(tempoDelay), ign(portaIgn), altura(alturaAtivacao) {
+Paraquedas::Paraquedas(int tempoLigado, float tempoDelay, int portaIgn, int portaSaude, float alturaAtivacao)
+  : intervaloLigado(tempoLigado), delay(tempoDelay), ign(portaIgn), saude(portaSaude), altura(alturaAtivacao) {
 }
 
 void Paraquedas::begin() {
   pinMode(ign, OUTPUT);
+  pinMode(saude, INPUT);
 }
 
 void Paraquedas::ativarParaquedas(float alturaAtual, unsigned long currentTime, bool estaDescendo) {
@@ -67,4 +68,8 @@ void Paraquedas::ativarParaquedas(float alturaAtual, unsigned long currentTime, 
 
 bool Paraquedas::getData() const {
   return paraquedasData;
+}
+
+bool Paraquedas::getInfo() {
+  return digitalRead(saude);
 }

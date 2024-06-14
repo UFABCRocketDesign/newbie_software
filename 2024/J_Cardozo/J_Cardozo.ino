@@ -103,27 +103,32 @@ String nomeSD;               //global
 
 #if (PARAQUEDAS)
 #include "src/lib/Paraquedas/Paraquedas.h"
+
 #if (P1)
 #define IGN_1 36 /*act1*/
+#define HEAL_1 68	/*health 1*/
 #endif
 
 #if (P2)
 #define IGN_2 61 /*act2*/
+#define HEAL_2 62	/*health 2*/
 #endif
 
 #if (P3)
 #define IGN_3 46 /*act3*/
+#define HEAL_3 56	/*health 3*/
 #endif
 
 #if (P4)
 #define IGN_4 55 /*act4*/
+#define HEAL_4 58	/*health 4*/
 #endif
 
 //Inicializando paraquedas
-Paraquedas p1(10000, 0, IGN_1, 0);
-Paraquedas p2(10000, 5000, IGN_2, 0);
-Paraquedas p3(10000, 0, IGN_3, -3);
-Paraquedas p4(10000, 5000, IGN_4, -3);
+Paraquedas p1(10000, 0, IGN_1, HEAL_1, 0);
+Paraquedas p2(10000, 5000, IGN_2, HEAL_2, 0);
+Paraquedas p3(10000, 0, IGN_3, HEAL_3, -3);
+Paraquedas p4(10000, 5000, IGN_4, HEAL_4, -3);
 
 #endif
 
@@ -206,6 +211,37 @@ bool booleano;
 
 #if (BUZZER)
     BeepSistemas.addSystem(booleano);
+#endif
+#endif
+
+#if (PARAQUEDAS)
+
+#if (P1)
+  booleano = p1.getInfo();
+#if (BUZZER)
+    BeepSistemas.addSystem(booleano);
+#endif
+#endif
+
+#if (P2)
+  booleano = p2.getInfo();
+#if (BUZZER)
+    BeepSistemas.addSystem(booleano);
+#endif
+#endif
+
+#if (P3)
+  booleano = p3.getInfo();
+#if (BUZZER)
+    BeepSistemas.addSystem(booleano);
+#endif
+#endif
+
+#if (P4)
+  booleano = p4.getInfo();
+#if (BUZZER)
+    BeepSistemas.addSystem(booleano);
+#endif
 #endif
 #endif
 
