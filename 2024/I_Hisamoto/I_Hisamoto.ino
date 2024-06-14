@@ -28,6 +28,7 @@ String header = "Temperature(C)\tPressure(Pa)\tHigh(meters)\tFiltered High 0(met
 float inicioBlink;
 int intervaloBlink = 1000;
 bool pinoBlinking = 0;  // estado de piscar
+bool paraquedasAcionado;
 
 
 float filtroSuavizarCurva_0(float dadosCurva_0) {
@@ -125,16 +126,19 @@ void loop() {
   fallenCondition = (contador >= 5) ? 1 : 0;
 
   //acionando o primeiro paraquedas
-  for (int i = 0; i < 1; i++){
-    if (fallenCondition == 1 && pinoBlinking) {  //verifica se esta caindo e se o led não esta piscando
-    pinoBlinking = 1;
-    digitalWrite(IGN_1, pinoBlinking);
-    inicioBlink = millis();
-    if (pinoBlinking && (millis() - inicioBlink >= intervaloBlink)) {
-      pinoBlinking = 0;
+  bool inicioP1 = (fallenCondition == 1);
+
+  if (!paraquedasAcionado){
+    if (inicioP1 && !pinoBlinking) {  //verifica se esta caindo e se o led não esta piscando
+      pinoBlinking = 1;
       digitalWrite(IGN_1, pinoBlinking);
+      inicioBlink = millis();
+      if (pinoBlinking && (millis() - inicioBlink >= intervaloBlink)) {
+        pinoBlinking = 0;
+        digitalWrite(IGN_1, pinoBlinking);
+        paraquedasAcionado = true;
+      }
     }
-  }
   }
 
   //salvando dados no sd
