@@ -26,7 +26,7 @@ String inicio = "isa";
 String tipoDeArquivo = ".txt";
 String header = "Temperature(C)\tPressure(Pa)\tHigh(meters)\tFiltered High 0(meters)\tFiltered High 1(meters)\tFallen(1)/ Not fallen (0)\tContador de Queda\tBlinking";
 float inicioBlink;
-int intervaloBlink = 1000;
+int intervaloBlink = 5000;
 bool pinoBlinking = 0;  // estado de piscar
 bool paraquedasAcionado;
 
@@ -127,17 +127,16 @@ void loop() {
 
   //acionando o primeiro paraquedas
   bool inicioP1 = (fallenCondition == 1);
-
-  if (!paraquedasAcionado){
+  if (!paraquedasAcionado) {
     if (inicioP1 && !pinoBlinking) {  //verifica se esta caindo e se o led não esta piscando
       pinoBlinking = 1;
       digitalWrite(IGN_1, pinoBlinking);
       inicioBlink = millis();
-      if (pinoBlinking && (millis() - inicioBlink >= intervaloBlink)) {
-        pinoBlinking = 0;
-        digitalWrite(IGN_1, pinoBlinking);
-        paraquedasAcionado = true;
-      }
+    }
+    if (pinoBlinking && (millis() - inicioBlink >= intervaloBlink)) {
+      pinoBlinking = 0;
+      digitalWrite(IGN_1, pinoBlinking);
+      paraquedasAcionado = true;
     }
   }
 
