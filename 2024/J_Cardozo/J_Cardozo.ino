@@ -20,6 +20,7 @@
 #define BAR (SENSORES && 1)
 
 #define PARAQUEDAS (BAR && 1)
+#define SAUDE (PARAQUEDAS && 1)
 #define P1 (PARAQUEDAS && 1)
 #define P2 (PARAQUEDAS && 1)
 #define P3 (PARAQUEDAS && 1)
@@ -103,27 +104,32 @@ String nomeSD;               //global
 
 #if (PARAQUEDAS)
 #include "src/lib/Paraquedas/Paraquedas.h"
+
 #if (P1)
 #define IGN_1 36 /*act1*/
+#define HEAL_1 68	/*health 1*/
 #endif
 
 #if (P2)
 #define IGN_2 61 /*act2*/
+#define HEAL_2 62	/*health 2*/
 #endif
 
 #if (P3)
 #define IGN_3 46 /*act3*/
+#define HEAL_3 56	/*health 3*/
 #endif
 
 #if (P4)
 #define IGN_4 55 /*act4*/
+#define HEAL_4 58	/*health 4*/
 #endif
 
 //Inicializando paraquedas
-Paraquedas p1(10000, 0, IGN_1, 0);
-Paraquedas p2(10000, 5000, IGN_2, 0);
-Paraquedas p3(10000, 0, IGN_3, -3);
-Paraquedas p4(10000, 5000, IGN_4, -3);
+Paraquedas p1(10000, 0, IGN_1, HEAL_1, 0);
+Paraquedas p2(10000, 5000, IGN_2, HEAL_2, 0);
+Paraquedas p3(10000, 0, IGN_3, HEAL_3, -3);
+Paraquedas p4(10000, 5000, IGN_4, HEAL_4, -3);
 
 #endif
 
@@ -209,6 +215,37 @@ bool booleano;
 #endif
 #endif
 
+#if (PARAQUEDAS)
+
+#if (P1)
+  booleano = p1.getInfo();
+#if (BUZZER)
+    BeepSistemas.addSystem(booleano);
+#endif
+#endif
+
+#if (P2)
+  booleano = p2.getInfo();
+#if (BUZZER)
+    BeepSistemas.addSystem(booleano);
+#endif
+#endif
+
+#if (P3)
+  booleano = p3.getInfo();
+#if (BUZZER)
+    BeepSistemas.addSystem(booleano);
+#endif
+#endif
+
+#if (P4)
+  booleano = p4.getInfo();
+#if (BUZZER)
+    BeepSistemas.addSystem(booleano);
+#endif
+#endif
+#endif
+
 #if (GPS)
   while (GPSSerial.available() > 0) {
     gps.encode(GPSSerial.read());
@@ -231,20 +268,35 @@ bool booleano;
 #if (WUF)
   dataString += String(wuf) + "\t";
 #endif
+
+#if (PARAQUEDAS)
 #if (P1)
   dataString += String(p1.getData()) + "\t";
+#if (SAUDE)
+  dataString += String(p1.getInfo()) + "\t";
+#endif
 #endif
 
 #if (P2)
   dataString += String(p2.getData()) + "\t";
+#if (SAUDE)
+  dataString += String(p2.getInfo()) + "\t";
+#endif
 #endif
 
 #if (P3)
   dataString += String(p3.getData()) + "\t";
+#if (SAUDE)
+  dataString += String(p3.getInfo()) + "\t";
+#endif
 #endif
 
 #if (P4)
   dataString += String(p4.getData()) + "\t";
+#if (SAUDE)
+  dataString += String(p4.getInfo()) + "\t";
+#endif
+#endif
 #endif
 
 #if (AX)
@@ -492,18 +544,30 @@ void setup() {
 
 #if (P1)
   dataStringInicial += "Paraquedas 1\t";
+#if (SAUDE)
+  dataStringInicial += "SaudeParaquedas 1 \t";
+#endif
 #endif
 
 #if (P2)
   dataStringInicial += "Paraquedas 2\t";
+#if (SAUDE)
+  dataStringInicial += "SaudeParaquedas 2 \t";
+#endif
 #endif
 
 #if (P3)
   dataStringInicial += "Paraquedas 3\t";
+#if (SAUDE)
+  dataStringInicial += "SaudeParaquedas 3 \t";
+#endif
 #endif
 
 #if (P4)
   dataStringInicial += "Paraquedas 4\t";
+#if (SAUDE)
+  dataStringInicial += "SaudeParaquedas 4 \t";
+#endif
 #endif
 
 #if (AX)
