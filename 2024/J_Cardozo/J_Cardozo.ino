@@ -660,7 +660,9 @@ void setup() {
   while((wufAltura >= altitude) && (altitude >= -1*wufAltura)) {
       currentTime = millis();
       readAll();
-      BeepSistemas.beep(currentTime, true);
+#if (BUZZER)
+      BeepSistemas.beep(currentTime, false);
+#endif
       writeAll();
   }
   wuf = false;
