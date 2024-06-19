@@ -34,14 +34,18 @@ int r = 0;
 int y = 1;
 int apogeu = 0;
 int counter = 0;
-int estado = 0;
+int estado1 = 0;
+int estado2 = 0;
 String nome = "calvo";
 String nomearq = "";
-unsigned long tempo = 0;
+unsigned long tempo1 = 0;
+unsigned long tempo2 = 0;
+
 
 void setup() {
   Serial.begin(115200);
   pinMode(IGN_1, OUTPUT);
+  pinMode(IGN_2, OUTPUT);
   // erro de iniciar os sensores
 
   if (!bmp.begin()) {
@@ -134,15 +138,30 @@ void loop() {
     apogeu = 1;
   }
   
-  if (apogeu == 1 && estado == 0){
+  if (apogeu == 1 && estado1 == 0){
     digitalWrite(IGN_1, HIGH);
-    estado = 1;
-    tempo = atualMillis + 5000;
+    estado1 = 1;
+    tempo1 = atualMillis + 5000;
+  }
+  if(apogeu == 1 && estado2 == 0){
+    tempo2 = atualMillis + 8000;
+    estado2 = 1;
   }
     
-  if (estado == 1 && atualMillis >= tempo){
+  if (estado1 == 1 && atualMillis >= tempo1){
     digitalWrite(IGN_1, LOW);
-    estado = 2;
+    estado1 = 2;
+  }
+
+  if(estado2 == 1 && atualMillis >= tempo2){
+    digitalWrite(IGN_2, HIGH);
+    estado2 = 2;
+    tempo2 = tempo2+7000;
+  }
+  
+  if(estado2 == 2 && atualMillis >= tempo2){
+    digitalWrite(IGN_2, LOW);
+    estado2 = 3;
   }
 
   apojas = filtro;
@@ -159,9 +178,10 @@ void loop() {
   dataString += String(filtro) + "\t";
   dataString += String(n/10.0) + "\t";
   dataString += String(apogeu) + "\t";
-  dataString += String(estado) + "\t";
-  dataString += String(tempo) + "\t";
-
+  dataString += String(estado1) + "\t";
+  dataString += String(tempo1) + "\t";
+  dataString += String(estado2) + "\t";
+  dataString += String(tempo2) + "\t";
 
   Serial.println(dataString);
 
