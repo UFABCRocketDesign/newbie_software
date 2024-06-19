@@ -159,8 +159,9 @@ void loop() {
   dataString += String(filtro) + "\t";
   dataString += String(n/10.0) + "\t";
   dataString += String(apogeu) + "\t";
-  dataString += String(IGN_1) + "\t";
+  dataString += String(estado) + "\t";
   dataString += String(tempo) + "\t";
+
 
   Serial.println(dataString);
 
