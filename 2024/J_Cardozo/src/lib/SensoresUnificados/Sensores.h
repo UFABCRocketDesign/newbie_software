@@ -14,7 +14,7 @@ protected:
     unsigned long thisRead = 0;
     int recalTime;
     int timerTime;
-    bool estaDescendoTimer;
+    bool estaDescendoTimer = false;
     long getTime();
 
 public:

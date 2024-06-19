@@ -67,18 +67,25 @@ bool L3G4200D::lerTudo() {
     verificador = verificador && (Wire.endTransmission() == 0);
 
     Wire.requestFrom((uint8_t)address, (uint8_t)6);
-    if (Wire.available() == 6) {
-        uint8_t xlo = Wire.read();
-        uint8_t xhi = Wire.read();
-        uint8_t ylo = Wire.read();
-        uint8_t yhi = Wire.read();
-        uint8_t zlo = Wire.read();
-        uint8_t zhi = Wire.read();
-
-        x = (int16_t)(xlo | (xhi << 8));
-        y = (int16_t)(ylo | (yhi << 8));
-        z = (int16_t)(zlo | (zhi << 8));
+    unsigned long tempo = micros();
+    while (Wire.available() < 6)
+    {
+        if (tempo + 10 < micros()){
+            verificador = false;
+            break;
+        }
     }
+
+    uint8_t xlo = Wire.read();
+    uint8_t xhi = Wire.read();
+    uint8_t ylo = Wire.read();
+    uint8_t yhi = Wire.read();
+    uint8_t zlo = Wire.read();
+    uint8_t zhi = Wire.read();
+
+    x = (int16_t)(xlo | (xhi << 8));
+    y = (int16_t)(ylo | (yhi << 8));
+    z = (int16_t)(zlo | (zhi << 8));
 
     if (verificador) {
         lastRead = thisRead;

@@ -11,7 +11,7 @@ long Sensor::getTime() {
 void Sensor::recalibrar(String sensor) {
     if (getTime() > recalTime) {
         bool verificador = begin();
-        Serial.print("begin "); Serial.print(sensor); Serial.println(verificador);
+        Serial.print("begin "); Serial.print(sensor); Serial.print(" = "); Serial.println(verificador);
     }
 }
 
