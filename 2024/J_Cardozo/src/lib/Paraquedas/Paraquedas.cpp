@@ -10,10 +10,10 @@ void Paraquedas::begin() {
   pinMode(saude, INPUT);
 }
 
-void Paraquedas::ativarParaquedas(float alturaAtual, unsigned long currentTime, bool estaDescendo) {
+void Paraquedas::ativarParaquedas(float alturaAtual, unsigned long currentTime, bool estaDescendo, bool estaDescendoTimer) {
   if (delay == 0) {
     if (altura == 0) {
-      if (estaDescendo && !paraquedas) {
+      if ((estaDescendo || estaDescendoTimer) && !paraquedas) {
         paraquedas = true;
         paraquedasTempo = millis();
         paraquedasData = true;
@@ -23,7 +23,7 @@ void Paraquedas::ativarParaquedas(float alturaAtual, unsigned long currentTime, 
         paraquedasData = false;
       }
     } else {
-      if (estaDescendo && !paraquedas) {
+      if ((estaDescendo || estaDescendoTimer) && !paraquedas) {
         paraquedas = true;
       }
       if (paraquedas && alturaAtual <= altura && paraquedasTempo == 0) {
@@ -36,7 +36,7 @@ void Paraquedas::ativarParaquedas(float alturaAtual, unsigned long currentTime, 
     }
   } else {
     if (altura == 0) {
-      if (estaDescendo && !paraquedas) {
+      if ((estaDescendo || estaDescendoTimer) && !paraquedas) {
         paraquedas = true;
         paraquedasTempo = millis();
       }
@@ -46,7 +46,7 @@ void Paraquedas::ativarParaquedas(float alturaAtual, unsigned long currentTime, 
         paraquedasData = false;
       }
     } else {
-      if (estaDescendo && !paraquedas) {
+      if ((estaDescendo || estaDescendoTimer) && !paraquedas) {
         paraquedas = true;
       }
       if (paraquedas && alturaAtual <= altura && paraquedasTempo == 0) {

@@ -21,7 +21,7 @@ public:
     Sensor(uint8_t endereco, int recalibracao = 7000, int timer = 14000);
     virtual bool begin() = 0; 
     virtual bool lerTudo() = 0; 
-    void recalibrar();
+    void recalibrar(String sensor);
     void timer();
     bool getEstaDescendoTimer();
 };

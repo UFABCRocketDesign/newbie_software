@@ -58,7 +58,7 @@ bool ADXL345::lerTudo() {
   if (verificador) {
         lastRead = thisRead;
     }
-    recalibrar();
+  recalibrar("Acel");
 
   return verificador;
 }

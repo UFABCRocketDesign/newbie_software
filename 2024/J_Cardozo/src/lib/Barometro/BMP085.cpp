@@ -118,7 +118,7 @@ bool BMP085::lerTudo(float pressaoInicial) {
     if (verificador) {
         lastRead = thisRead;
     }
-    recalibrar();
+    recalibrar("BMP");
     return verificador;
 }
 

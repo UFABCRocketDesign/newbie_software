@@ -104,7 +104,7 @@ bool HMC5883L::lerTudo() {
     if (verificador) {
         lastRead = thisRead;
     }
-    recalibrar();
+    recalibrar("Mag");
 
     return verificador;
 }

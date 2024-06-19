@@ -16,7 +16,7 @@ public:
   Paraquedas(int tempoLigado, float tempoDelay, int portaIgn, int portaSaude, float alturaAtivacao, int sensibilidade = 100);
   
   void begin();
-  void ativarParaquedas(float alturaAtual, unsigned long currentTime, bool estaDescendo);
+  void ativarParaquedas(float alturaAtual, unsigned long currentTime, bool estaDescendo, bool estaDescendoTimer);
   bool getData() const;
   bool getInfo();
 };

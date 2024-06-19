@@ -8,10 +8,10 @@ long Sensor::getTime() {
     return (thisRead - lastRead);
 }
 
-void Sensor::recalibrar() {
+void Sensor::recalibrar(String sensor) {
     if (getTime() > recalTime) {
-        begin();
-        Serial.println("begin");
+        bool verificador = begin();
+        Serial.print("begin "); Serial.print(sensor); Serial.println(verificador);
     }
 }
 

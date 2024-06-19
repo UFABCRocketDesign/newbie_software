@@ -83,7 +83,7 @@ bool L3G4200D::lerTudo() {
     if (verificador) {
         lastRead = thisRead;
     }
-    recalibrar();
+    recalibrar("Gyro");
 
     return verificador;
 }
