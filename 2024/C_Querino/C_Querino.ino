@@ -151,10 +151,10 @@ void loop() {
     estado2 = 1;
   }
   // acionamento paraquedas 3
-  if(apogeu == 1 && estado3 == 0 && filtro == -3){
+  if(apogeu == 1 && estado3 == 0 && filtro <= -3){
     digitalWrite(IGN_3, HIGH);
     estado3 = 1;
-    tempo3 = atualMillis + 10000;
+    tempo3 = atualMillis + 5000;
   }
 
   // desligamento do paraquedas 1  
@@ -166,7 +166,7 @@ void loop() {
   if(estado2 == 1 && atualMillis >= tempo2){
     digitalWrite(IGN_2, HIGH);
     estado2 = 2;
-    tempo2 = atualMillis+7000;
+    tempo2 = atualMillis+5000;
   }
   // desligamento do paraquedas 2
   if(estado2 == 2 && atualMillis >= tempo2){
