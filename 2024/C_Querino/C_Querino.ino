@@ -5,6 +5,17 @@
 Adafruit_BMP085 bmp;
 const int chipSelect = 53;
 
+/*#ifdef ARDUINO_AVR_MEGA2560
+#define SD_CS_PIN 53
+#else
+#define SD_CS_PIN 10
+#endif // ARDUINO_AVR_MEGA2560*/
+
+#define IGN_1 36	/*act1*/
+#define IGN_2 61	/*act2*/
+#define IGN_3 46	/*act3*/
+#define IGN_4 55	/*act4*/
+
 float alturainicial;
 float altura = 0;
 float height[20];
@@ -23,9 +34,10 @@ int r = 0;
 int y = 1;
 int apogeu = 0;
 int counter = 0;
+int estado = 0;
 String nome = "calvo";
 String nomearq = "";
-
+unsigned long tempo = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -46,7 +58,7 @@ void setup() {
   Serial.println("card initialized.");
 
   String dataString = "";
-  dataString += String("Temperatura\tpressão\tAltitude\tpressão em relação ao mar\taltitude real") + "\t";
+  dataString += String("Temperatura\tpressão\tAltitude\tfiltro1\tfiltro2\tN\tapogeu\tparaquedas1\tempo\t") + "\t";
   
   Serial.println(dataString);
   
@@ -81,7 +93,7 @@ void setup() {
 }
 
 void loop() {
-
+  unsigned long atualMillis = millis();
 
   altitude = bmp.readAltitude() - altura;
   height[j] = altitude;
@@ -121,17 +133,22 @@ void loop() {
   if (n >= 20) {
     apogeu = 1;
   }
+  
+  if (apogeu == 1 && estado == 0){
+    IGN_1 = HIGH;
+    estado = 1;
+    unsigned long tempo = atualMillis + 5000;
+  }
+    
+  if (estado == 1 && atualMillis >= tempo){
+    IGN_1 = LOW;
+    estado = 2;
+  }
 
   apojas = filtro;
   temperatura = bmp.readTemperature();
   pressao = bmp.readPressure();
   
-  /*do {
-    nomearq = nome + String(counter) + ".txt";
-    counter += 1;
-  }
-  while(SD.exists(nomearq));*/
-
   File dataFile = SD.open(nomearq, FILE_WRITE);
   String dataString = "";
 
@@ -140,8 +157,10 @@ void loop() {
   dataString += String(altitude) + "\t";
   dataString += String(filtroA) + "\t";
   dataString += String(filtro) + "\t";
-  dataString += String(n) + "\t";
+  dataString += String(n/10.0) + "\t";
   dataString += String(apogeu) + "\t";
+  dataString += String(IGN_1) + "\t";
+  dataString += String(tempo) + "\t";
 
   Serial.println(dataString);
 
