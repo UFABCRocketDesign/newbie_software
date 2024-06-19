@@ -348,22 +348,22 @@ void doAll() {
 
   //Paraquedas 1
 #if (P1)
-  p1.ativarParaquedas(filtroFinal, currentTime, apogeu.getEstaDescendo());
+  p1.ativarParaquedas(filtroFinal, currentTime, apogeu.getEstaDescendo(), bmp.getEstaDescendoTimer());
 #endif
 
   //Paraquedas 2
 #if (P2)
-  p2.ativarParaquedas(filtroFinal, currentTime, apogeu.getEstaDescendo());
+  p2.ativarParaquedas(filtroFinal, currentTime, apogeu.getEstaDescendo(), bmp.getEstaDescendoTimer());
 #endif
 
 //Paraquedas 3
 #if (P3)
-  p3.ativarParaquedas(filtroFinal, currentTime, apogeu.getEstaDescendo());
+  p3.ativarParaquedas(filtroFinal, currentTime, apogeu.getEstaDescendo(), bmp.getEstaDescendoTimer());
 #endif
 
 //Paraquedas 4
 #if (P4)
-  p4.ativarParaquedas(filtroFinal, currentTime, apogeu.getEstaDescendo());
+  p4.ativarParaquedas(filtroFinal, currentTime, apogeu.getEstaDescendo(), bmp.getEstaDescendoTimer());
 #endif
 }
 
