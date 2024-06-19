@@ -84,18 +84,20 @@ bool L3G4200D::lerTudo()
         }
     }
     
-    if (Wire.avaible() == 6) {
+    if (Wire.available() == 6) {
     uint8_t xlo = Wire.read();
     uint8_t xhi = Wire.read();
     uint8_t ylo = Wire.read();
     uint8_t yhi = Wire.read();
     uint8_t zlo = Wire.read();
     uint8_t zhi = Wire.read();
-    }
 
     x = (int16_t)(xlo | (xhi << 8));
     y = (int16_t)(ylo | (yhi << 8));
     z = (int16_t)(zlo | (zhi << 8));
+    }
+
+    
 
     if (verificador)
     {

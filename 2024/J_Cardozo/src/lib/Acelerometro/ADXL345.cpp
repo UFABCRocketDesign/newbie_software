@@ -46,14 +46,13 @@ bool ADXL345::lerTudo()
     }
   }
 
-  if (Wire.avaible() == 6) {
+  if (Wire.available() == 6) {
   X0 = Wire.read();
   X1 = Wire.read();
   Y0 = Wire.read();
   Y1 = Wire.read();
   Z0 = Wire.read();
   Z1 = Wire.read();
-  }
 
   X1 = X1 << 8;
   X_out = X0 + X1;
@@ -67,6 +66,7 @@ bool ADXL345::lerTudo()
   x = X_out / scale;
   y = Y_out / scale;
   z = Z_out / scale;
+  }
 
   if (verificador)
   {

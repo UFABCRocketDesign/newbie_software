@@ -113,9 +113,12 @@ bool HMC5883L::lerTudo()
             break;
         }
     }
+
+    if (Wire.available() < 6) {
     x = Wire.read() << 8 | Wire.read();
     z = Wire.read() << 8 | Wire.read();
     y = Wire.read() << 8 | Wire.read();
+    }
 
     if (verificador)
     {
