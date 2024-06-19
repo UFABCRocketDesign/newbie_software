@@ -2,17 +2,17 @@
 
 #define SENSORES 1
 
-#define GYRO (SENSORES && 0)
+#define GYRO (SENSORES && 1)
 #define GX (GYRO && 1)
 #define GY (GYRO && 1)
 #define GZ (GYRO && 1)
 
-#define MAG (SENSORES && 0)
+#define MAG (SENSORES && 1)
 #define MX (MAG && 1)
 #define MY (MAG && 1)
 #define MZ (MAG && 1)
 
-#define ACEL (SENSORES && 0)
+#define ACEL (SENSORES && 1)
 #define AX (ACEL && 1)
 #define AY (ACEL && 1)
 #define AZ (ACEL && 1)
