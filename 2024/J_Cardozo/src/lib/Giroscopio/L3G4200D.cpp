@@ -1,6 +1,6 @@
 #include "L3G4200D.h"
 
-L3G4200D::L3G4200D(uint16_t odr, uint16_t scale) : odr(getODR(odr)), scale(getScale(scale)), Sensor(L3G4200D_Address) {}
+L3G4200D::L3G4200D(uint16_t odr, uint16_t scale, long recalibrationValue) : odr(getODR(odr)), scale(getScale(scale)), Sensor(L3G4200D_Address, recalibrationValue) {}
 
 uint8_t L3G4200D::getODR(uint16_t odr) {
     switch (odr) {

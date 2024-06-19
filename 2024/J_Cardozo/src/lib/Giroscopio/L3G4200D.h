@@ -18,7 +18,7 @@ private:
     uint8_t getScale(uint16_t scale);
 
 public:
-    L3G4200D(uint16_t odr = 100, uint16_t scale = 250);
+    L3G4200D(uint16_t odr = 100, uint16_t scale = 250, long recalibrationValue = 7000);
     bool begin();
     bool lerTudo();
 };

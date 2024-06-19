@@ -1,6 +1,6 @@
 #include "BMP085.h"
 
-BMP085::BMP085() : Sensor(BMP085_ADDRESS) {
+BMP085::BMP085(long recalibrationValue) : Sensor(BMP085_ADDRESS, recalibrationValue) {
 
 }
 
@@ -36,6 +36,7 @@ bool BMP085::begin() {
 
 bool BMP085::lerTudo(float pressaoInicial) {
     bool verificador = true;
+    thisRead = millis();
 
     //Calibracao T
     Wire.beginTransmission(address);
@@ -114,11 +115,15 @@ bool BMP085::lerTudo(float pressaoInicial) {
     //Calculo da altitude(absoluta ou relativa)
     altitude = 44330 * (1.0 - pow((pressao / (pressaoInicial/100)), (1/5.255)));
 
+    if (verificador) {
+        lastRead = thisRead;
+    }
+    recalibrar();
     return verificador;
 }
 
 bool BMP085::lerTudo() {
-    this->lerTudo(101325.0);
+    return this->lerTudo(101325.0);
 }
 
 float BMP085::getTemperatura() {

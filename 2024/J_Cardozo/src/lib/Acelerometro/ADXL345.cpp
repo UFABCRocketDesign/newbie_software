@@ -1,6 +1,6 @@
 #include "ADXL345.h"
 
-ADXL345::ADXL345(uint8_t range) : range(range), Sensor(ADXAddress) {
+ADXL345::ADXL345(uint8_t range, long recalibrationValue) : range(range), Sensor(ADXAddress, recalibrationValue) {
   switch (range) {
     case 2:
       scale = 256.0;

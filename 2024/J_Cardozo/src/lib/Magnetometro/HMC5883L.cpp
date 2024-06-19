@@ -1,6 +1,6 @@
 #include "HMC5883L.h"
 
-HMC5883L::HMC5883L(uint8_t samples, uint16_t gain, uint8_t mode) : Sensor(HMC5883L_Address) {
+HMC5883L::HMC5883L(uint8_t samples, uint16_t gain, uint8_t mode, long recalibrationValue) : Sensor(HMC5883L_Address, recalibrationValue) {
     configA = (getSamples(samples) << 5) | 0x18;
     configB = getGain(gain);
     this->mode = getMode(mode);

@@ -20,12 +20,9 @@ private:
     float temperatura;
     long pressao;
     float altitude;
-
-    long lerCalibracaoT();
-    long lerCalibracaoP();
     
 public:
-    BMP085();
+    BMP085(long recalibrationValue = 7000);
     bool begin();
     bool lerTudo(float pressaoInicial);
     bool lerTudo();

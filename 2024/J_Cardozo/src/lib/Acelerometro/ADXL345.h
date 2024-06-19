@@ -19,7 +19,7 @@ private:
   float scale;
 
 public:
-  ADXL345(uint8_t range = 2);
+  ADXL345(uint8_t range = 2, long recalibrationValue = 7000);
   bool begin();
   bool lerTudo();
 };
