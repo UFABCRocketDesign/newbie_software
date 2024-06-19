@@ -41,7 +41,7 @@ unsigned long tempo = 0;
 
 void setup() {
   Serial.begin(115200);
-
+  pinMode(IGN_1, OUTPUT);
   // erro de iniciar os sensores
 
   if (!bmp.begin()) {
