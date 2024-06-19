@@ -195,10 +195,8 @@ void loop() {
   dataString += String(n/10.0) + "\t";
   dataString += String(apogeu) + "\t";
   dataString += String(estado1) + "\t";
-  dataString += String(tempo1) + "\t";
   dataString += String(estado2) + "\t";
-  dataString += String(tempo2) + "\t";
-
+  dataString += String(estado3) + "\t";
   Serial.println(dataString);
 
   if (dataFile) {
