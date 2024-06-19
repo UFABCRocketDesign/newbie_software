@@ -25,6 +25,7 @@ bool ADXL345::begin() {
 
 bool ADXL345::lerTudo() {
   bool verificador = true;
+  thisRead = millis();
 
   Wire.beginTransmission(address);
   Wire.write(Reg_X0); 
@@ -53,6 +54,11 @@ bool ADXL345::lerTudo() {
   x = X_out / scale;
   y = Y_out / scale;
   z = Z_out / scale;
+
+  if (verificador) {
+        lastRead = thisRead;
+    }
+    recalibrar();
 
   return verificador;
 }

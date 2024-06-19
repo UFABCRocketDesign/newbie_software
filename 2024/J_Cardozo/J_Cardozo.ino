@@ -661,6 +661,7 @@ void setup() {
       currentTime = millis();
       readAll();
 #if (BUZZER)
+      BeepSistemas.addSystem(true);
       BeepSistemas.beep(currentTime, false);
 #endif
       writeAll();

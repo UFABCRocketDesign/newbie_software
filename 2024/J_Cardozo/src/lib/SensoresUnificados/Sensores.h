@@ -12,14 +12,18 @@ protected:
     const uint8_t address;
     unsigned long lastRead = 0;
     unsigned long thisRead = 0;
-    unsigned long recalTime;
+    int recalTime;
+    int timerTime;
+    bool estaDescendoTimer;
+    long getTime();
 
 public:
-    Sensor(uint8_t endereco, long recalibracao = 7000);
+    Sensor(uint8_t endereco, int recalibracao = 7000, int timer = 14000);
     virtual bool begin() = 0; 
     virtual bool lerTudo() = 0; 
-    long getTime();
     void recalibrar();
+    void timer();
+    bool getEstaDescendoTimer();
 };
 
 #endif

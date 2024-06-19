@@ -60,6 +60,7 @@ bool L3G4200D::begin() {
 
 bool L3G4200D::lerTudo() {
     bool verificador = true;
+    thisRead = millis();
 
     Wire.beginTransmission(address);
     Wire.write(OUT_X_L | 0x80);
@@ -78,6 +79,12 @@ bool L3G4200D::lerTudo() {
         y = (int16_t)(ylo | (yhi << 8));
         z = (int16_t)(zlo | (zhi << 8));
     }
+
+    if (verificador) {
+        lastRead = thisRead;
+    }
+    recalibrar();
+
     return verificador;
 }
 

@@ -87,6 +87,7 @@ bool HMC5883L::begin() {
 
 bool HMC5883L::lerTudo() {
     bool verificador = true;
+    thisRead = millis();
 
     Wire.beginTransmission(address);
     Wire.write(0x03); 
@@ -99,6 +100,12 @@ bool HMC5883L::lerTudo() {
         y = Wire.read() << 8 | Wire.read();   
          
     }
+
+    if (verificador) {
+        lastRead = thisRead;
+    }
+    recalibrar();
+
     return verificador;
 }
 
