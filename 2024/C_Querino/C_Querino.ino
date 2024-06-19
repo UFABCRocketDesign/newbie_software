@@ -137,7 +137,7 @@ void loop() {
   if (apogeu == 1 && estado == 0){
     digitalWrite(IGN_1, HIGH);
     estado = 1;
-    unsigned long tempo = atualMillis + 5000;
+    tempo = atualMillis + 5000;
   }
     
   if (estado == 1 && atualMillis >= tempo){
