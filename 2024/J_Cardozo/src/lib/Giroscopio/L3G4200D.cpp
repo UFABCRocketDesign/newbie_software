@@ -97,8 +97,6 @@ bool L3G4200D::lerTudo()
     z = (int16_t)(zlo | (zhi << 8));
     }
 
-    
-
     if (verificador)
     {
         lastRead = thisRead;

@@ -269,30 +269,30 @@ bool booleano;
 
 #if (PARAQUEDAS)
 #if (P1)
-  dataString += String(p1.getData()) + "\t";
+  dataString += String(p1.getData());
 #if (SAUDE)
-  dataString += String(p1.getInfo()) + "\t";
+  dataString += String(p1.getInfo());
 #endif
 #endif
 
 #if (P2)
-  dataString += String(p2.getData()) + "\t";
+  dataString += String(p2.getData());
 #if (SAUDE)
-  dataString += String(p2.getInfo()) + "\t";
+  dataString += String(p2.getInfo());
 #endif
 #endif
 
 #if (P3)
-  dataString += String(p3.getData()) + "\t";
+  dataString += String(p3.getData());
 #if (SAUDE)
-  dataString += String(p3.getInfo()) + "\t";
+  dataString += String(p3.getInfo());
 #endif
 #endif
 
 #if (P4)
-  dataString += String(p4.getData()) + "\t";
+  dataString += String(p4.getData());
 #if (SAUDE)
-  dataString += String(p4.getInfo()) + "\t";
+  dataString += String(p4.getInfo());
 #endif
 #endif
 #endif
