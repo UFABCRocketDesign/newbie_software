@@ -10,7 +10,7 @@ const int chipSelect = 53;
 #else
 #define SD_CS_PIN 10
 #endif // ARDUINO_AVR_MEGA2560*/
-
+//altura menos 3
 #define IGN_1 36	/*act1*/
 #define IGN_2 61	/*act2*/
 #define IGN_3 46	/*act3*/
@@ -36,16 +36,18 @@ int apogeu = 0;
 int counter = 0;
 int estado1 = 0;
 int estado2 = 0;
+int estado3 = 0;
 String nome = "calvo";
 String nomearq = "";
 unsigned long tempo1 = 0;
 unsigned long tempo2 = 0;
-
+unsigned long tempo3 = 0;
 
 void setup() {
   Serial.begin(115200);
   pinMode(IGN_1, OUTPUT);
   pinMode(IGN_2, OUTPUT);
+  pinMode(IGN_3, OUTPUT);
   // erro de iniciar os sensores
 
   if (!bmp.begin()) {
@@ -137,32 +139,46 @@ void loop() {
   if (n >= 20) {
     apogeu = 1;
   }
-  
+  // acionamento paraquedas 1
   if (apogeu == 1 && estado1 == 0){
     digitalWrite(IGN_1, HIGH);
     estado1 = 1;
     tempo1 = atualMillis + 5000;
   }
+  // acionamento do timer para o paraquedas 2
   if(apogeu == 1 && estado2 == 0){
     tempo2 = atualMillis + 8000;
     estado2 = 1;
   }
-    
+  // acionamento paraquedas 3
+  if(apogeu == 1 && estado3 == 0 && filtro == -3){
+    digitalWrite(IGN_3, HIGH);
+    estado3 = 1;
+    tempo3 = atualMillis + 10000;
+  }
+
+  // desligamento do paraquedas 1  
   if (estado1 == 1 && atualMillis >= tempo1){
     digitalWrite(IGN_1, LOW);
     estado1 = 2;
   }
-
+  // acionamento do paraquedas 2
   if(estado2 == 1 && atualMillis >= tempo2){
     digitalWrite(IGN_2, HIGH);
     estado2 = 2;
-    tempo2 = tempo2+7000;
+    tempo2 = atualMillis+7000;
   }
-  
+  // desligamento do paraquedas 2
   if(estado2 == 2 && atualMillis >= tempo2){
     digitalWrite(IGN_2, LOW);
     estado2 = 3;
   }
+  // desligamento do paraquedas 3
+  if(estado3 == 1 && atualMillis >= tempo3){
+    digitalWrite(IGN_3, LOW);
+    estado3 = 2;
+  }
+
 
   apojas = filtro;
   temperatura = bmp.readTemperature();
