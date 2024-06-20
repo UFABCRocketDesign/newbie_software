@@ -37,17 +37,20 @@ int counter = 0;
 int estado1 = 0;
 int estado2 = 0;
 int estado3 = 0;
+int estado4 = 0;
 String nome = "calvo";
 String nomearq = "";
 unsigned long tempo1 = 0;
 unsigned long tempo2 = 0;
 unsigned long tempo3 = 0;
+unsigned long tempo4 = 0;
 
 void setup() {
   Serial.begin(115200);
   pinMode(IGN_1, OUTPUT);
   pinMode(IGN_2, OUTPUT);
   pinMode(IGN_3, OUTPUT);
+  pinMode(IGN_4, OUTPUT);
   // erro de iniciar os sensores
 
   if (!bmp.begin()) {
@@ -156,6 +159,11 @@ void loop() {
     estado3 = 1;
     tempo3 = atualMillis + 5000;
   }
+  // acionamento do timer para o paraquedas 4
+  if(apogeu == 1 && estado4 == 0 && filtro <= -3){
+    tempo4 = atualMillis + 8000;
+    estado4 = 1;
+  }
 
   // desligamento do paraquedas 1  
   if (estado1 == 1 && atualMillis >= tempo1){
@@ -168,6 +176,13 @@ void loop() {
     estado2 = 2;
     tempo2 = atualMillis+5000;
   }
+  // acionamento do paraquedas 4
+  if(estado4 == 1 && atualMillis >= tempo4){
+    digitalWrite(IGN_4, HIGH);
+    estado4 = 2;
+    tempo4 = atualMillis+5000;
+  }
+
   // desligamento do paraquedas 2
   if(estado2 == 2 && atualMillis >= tempo2){
     digitalWrite(IGN_2, LOW);
@@ -177,6 +192,11 @@ void loop() {
   if(estado3 == 1 && atualMillis >= tempo3){
     digitalWrite(IGN_3, LOW);
     estado3 = 2;
+  }
+  // desligamento do paraquedas 4
+  if(estado4 == 2 && atualMillis >= tempo4){
+    digitalWrite(IGN_4, LOW);
+    estado4 = 3;
   }
 
 
@@ -197,6 +217,7 @@ void loop() {
   dataString += String(estado1) + "\t";
   dataString += String(estado2) + "\t";
   dataString += String(estado3) + "\t";
+  dataString += String(estado4) + "\t";
   Serial.println(dataString);
 
   if (dataFile) {
