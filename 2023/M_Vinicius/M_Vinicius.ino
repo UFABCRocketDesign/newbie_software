@@ -31,7 +31,7 @@
 #define IGN_2 61 /*act2*/
 #define IGN_3 46 /*act3*/
 #define IGN_4 55 /*act4*/
-int IGN[] = {IGN_1, IGN_2, IGN_3, IGN_4};
+int IGN[] = { IGN_1, IGN_2, IGN_3, IGN_4 };
 
 #ifdef ARDUINO_AVR_MEGA2560
 #define SD_CS_PIN 53
@@ -64,19 +64,13 @@ Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 
 // Declaração variaveis paraquedas:
 #if PARAQUEDAS
-//int paraquedas = LOW;
-//unsigned long previousMillis = 0;
-int paraquedas2 = LOW;
-//unsigned long previousMillis2 = 0;
-//bool verificar = false;
-int paraquedas3 = LOW;
-//unsigned long previousMillis3 = 0;
-bool verificar2 = false;
-bool verificar2_2 = false;
-int paraquedas4 = LOW;
-//unsigned long previousMillis4 = 0;
-bool verificar3 = false;
-bool verificar4 = false;
+
+int verificar[4];
+bool paraquedas[4];
+int alturaTarget[] = { 0, 0, -5, -5 };
+long atraso[] = { 0, 2000, 0, 2000 };
+long tempoLigado = 5000;
+long proxAcao;
 
 #endif
 
@@ -86,9 +80,7 @@ float alt_in = 0;  // fazer o sensor pro foguete cair, 1 --> ta caindo
 float apogeu[4];
 float filtro[2][10];
 int index[2];
-bool paraquedas[4];
-unsigned long previousMillis[4];
-bool verificar[4];
+//unsigned long tempo_anterior[4];
 
 String marcs = "marcs";
 String nome_do_arquivo;
@@ -125,39 +117,32 @@ bool det_apogeu(float altura) {  // DETECÇÃO DE APOGEU
 
 
 // PARAQUEDAS
-void acionar_paraquedas(bool queda, int pino, int qual, unsigned long currentMillis, float altura_sRuido2) {
-  if (queda) {
-    if (altura_sRuido2 > -5) {
-      if (qual == 0 || previousMillis[qual] + 5000 < currentMillis && paraquedas[qual] == LOW && verificar[qual] == false) {
-        paraquedas[qual] = HIGH;  // ligado
-        previousMillis[qual] = currentMillis;
+void acionar_paraquedas(bool queda, int qual, unsigned long TempoAtual, float alturaAtual) {
 
-        if (qual == 0) {
-          previousMillis[qual + 1] = previousMillis[qual];
-        }
-
-      } else if (currentMillis - previousMillis[qual] > 4000 && paraquedas[qual] == HIGH) {
-        paraquedas[qual] = LOW;  //desligado
-        verificar[qual] = true;
-      }
+  if (queda && ((alturaTarget[qual] == 0) || ((alturaTarget[qual] != 0) && (alturaAtual <= alturaTarget[qual])))) {
+    if (verificar[qual] == 0) {
+      proxAcao = TempoAtual + atraso;
+      verificar[qual] = 1;
     }
 
-    else if (qual == 2 || previousMillis[qual] + 5000 < currentMillis && paraquedas[qual] == LOW && verificar[qual] == false) {
+    // Atraso
+    if (verificar[qual] == 1 && TempoAtual >= proxAcao) {
       paraquedas[qual] = HIGH;
-      previousMillis[qual] = currentMillis;
-
-      if (qual == 2) {
-        previousMillis[qual + 1] = currentMillis;
-      }
-
-    } else if (currentMillis - previousMillis[qual] > 4000) {
-      paraquedas[qual] = LOW;
-      verificar[qual] = true;
+      verificar[qual] = 2;
+      proxAcao = TempoAtual + tempoLigado;
     }
 
-    digitalWrite(pino, paraquedas[qual]);
+    // Tempo Ligado
+    if (verificar[qual] == 2 && TempoAtual >= proxAcao) {
+      paraquedas[qual] = LOW;
+      verificar[qual] = 3;
+    }
   }
+
+  digitalWrite(IGN[qual], paraquedas[qual]);
 }
+
+
 
 
 void setup() {
@@ -365,12 +350,12 @@ void loop() {
 
 
 #endif
-  
+
 
 #if PARAQUEDAS
 
-for (int i = 0 ; i < 4 ; i++){
-  acionar_paraquedas(queda, IGN[i], i, currentMillis, altura_sRuido2);
+  for (int i = 0; i < 4; i++) {
+    acionar_paraquedas(queda, i, currentMillis, altura_sRuido2);
   }
 
 #endif
@@ -404,10 +389,10 @@ for (int i = 0 ; i < 4 ; i++){
 
 //PARAQUEDAS
 #if PARAQUEDAS
-for (int i = 0; i<4; i++){
-  dataString += String(paraquedas[i]);
-  dataString += "\t";
-}
+  for (int i = 0; i < 4; i++) {
+    dataString += String(paraquedas[i]);
+    dataString += "\t";
+  }
 
 #endif
 
