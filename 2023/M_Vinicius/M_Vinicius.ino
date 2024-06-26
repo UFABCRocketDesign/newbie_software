@@ -70,7 +70,7 @@ bool paraquedas[4];
 int alturaTarget[] = { 0, 0, -5, -5 };
 long atraso[] = { 0, 2000, 0, 2000 };
 long tempoLigado = 5000;
-long proxAcao;
+long proxAcao[4];
 
 #endif
 
@@ -140,7 +140,7 @@ void acionar_paraquedas(bool queda, int qual, unsigned long TempoAtual, float al
 
   if (queda && ((alturaTarget[qual] == 0) || ((alturaTarget[qual] != 0) && (alturaAtual <= alturaTarget[qual])))) {
     if (verificar[qual] == 0) {
-      proxAcao = TempoAtual + atraso[qual];
+      proxAcao[qual] = TempoAtual + atraso[qual];
       verificar[qual] = 1;
     }
 
@@ -148,7 +148,7 @@ void acionar_paraquedas(bool queda, int qual, unsigned long TempoAtual, float al
     if (verificar[qual] == 1 && TempoAtual >= proxAcao) {
       paraquedas[qual] = HIGH;
       verificar[qual] = 2;
-      proxAcao = TempoAtual + tempoLigado;
+      proxAcao[qual] = TempoAtual + tempoLigado;
     }
 
     // Tempo Ligado
