@@ -75,9 +75,11 @@ long proxAcao;
 #endif
 
 // Declaração De variaveis diversas
-bool queda;
+bool queda = false;
 float alt_in = 0;  // fazer o sensor pro foguete cair, 1 --> ta caindo
-float apogeu[4];
+
+#define LARGURA_APG 10
+float apogeu[LARGURA_APG];
 float filtro[2][10];
 int index[2];
 //unsigned long tempo_anterior[4];
@@ -102,7 +104,7 @@ float filtro_altura(float altura, int qual) {  //FILTRO ALTURA
   return altura_semRuido;
 }
 
-bool det_apogeu(float altura) {  // DETECÇÃO DE APOGEU
+/*bool det_apogeu(float altura) {  // DETECÇÃO DE APOGEU
   for (int i = 3; i > 0; i--) {
     apogeu[i] = apogeu[i - 1];
   }
@@ -113,6 +115,23 @@ bool det_apogeu(float altura) {  // DETECÇÃO DE APOGEU
   } else {
     return false;
   }
+}*/
+
+
+
+bool det_apogeu(float altura) {  // DETECÇÃO DE APOGEU
+  for (int i = LARGURA_APG ; i > 0; i--) {
+    apogeu[i] = apogeu[i - 1];
+  }
+  apogeu[0] = altura;
+  bool ret = true;
+  
+  for(int i = 1; (i< LARGURA_APG) && ret; i++){
+    ret = ret && (apogeu[i-1]<apogeu[i]);
+  }
+   
+   return ret;
+
 }
 
 
