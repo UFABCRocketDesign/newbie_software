@@ -140,7 +140,7 @@ void acionar_paraquedas(bool queda, int qual, unsigned long TempoAtual, float al
 
   if (queda && ((alturaTarget[qual] == 0) || ((alturaTarget[qual] != 0) && (alturaAtual <= alturaTarget[qual])))) {
     if (verificar[qual] == 0) {
-      proxAcao = TempoAtual + atraso;
+      proxAcao = TempoAtual + atraso[qual];
       verificar[qual] = 1;
     }
 
