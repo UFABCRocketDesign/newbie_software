@@ -145,14 +145,14 @@ void acionar_paraquedas(bool queda, int qual, unsigned long TempoAtual, float al
     }
 
     // Atraso
-    if (verificar[qual] == 1 && TempoAtual >= proxAcao) {
+    if (verificar[qual] == 1 && TempoAtual >= proxAcao[qual]) {
       paraquedas[qual] = HIGH;
       verificar[qual] = 2;
       proxAcao[qual] = TempoAtual + tempoLigado;
     }
 
     // Tempo Ligado
-    if (verificar[qual] == 2 && TempoAtual >= proxAcao) {
+    if (verificar[qual] == 2 && TempoAtual >= proxAcao[qual]) {
       paraquedas[qual] = LOW;
       verificar[qual] = 3;
     }
