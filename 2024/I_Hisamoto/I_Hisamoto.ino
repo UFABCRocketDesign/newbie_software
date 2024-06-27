@@ -149,7 +149,7 @@ void loop() {
 
   //acionando segundo paraquedas
   if (queda && estadoP2 == 0) {
-    timerP1_P2 = millis() + intervaloP1_P2;
+    timerP2 = millis() + intervaloP1_P2;
     estadoP2 = 1;
   }
   if (estadoP2 == 1 && (millis() >= timerP2)) {
