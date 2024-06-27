@@ -29,11 +29,9 @@ float timerP1;
 float timerP2;
 float timerP3;
 float timerP4;
-int intervaloP1 = 5000;
+int intervaloParaquedas = 5000;
 int atrasoP1_P2 = 2000;
-int intervaloP2 = 5000;
-int intervaloP3 = 5000;
-int intervaloP4 = 5000;
+int atrasoP1_P4 = 2000;
 int estadoP1 = 0;  // estado de piscar
 int estadoP2 = 0;
 int estadoP3 = 0;
@@ -143,7 +141,7 @@ void loop() {
   if (queda && estadoP1 == 0) {  //verifica se esta caindo e se o led não esta piscando
     estadoP1 = 1;
     digitalWrite(IGN_1, HIGH);
-    timerP1 = millis() + intervaloP1;
+    timerP1 = millis() + intervaloParaquedas;
   }
   if (estadoP1 == 1 && (millis() >= timerP1)) {
     estadoP1 = 2;
@@ -158,7 +156,7 @@ void loop() {
   if (estadoP2 == 1 && (millis() >= timerP2)) {
     estadoP2 = 2;
     digitalWrite(IGN_2, HIGH);
-    timerP2 = millis() + intervaloP2;
+    timerP2 = millis() + intervaloParaquedas;
   }
   if (estadoP2 == 2 && (millis() >= timerP2)) {
     estadoP2 = 3;
@@ -166,10 +164,10 @@ void loop() {
   }
 
   //acionando terceiro paraquedas
-  if (queda && estadoP3 == 0 && altura < -3) {  //verifica se esta caindo e se o led não esta piscando
+  if (queda && estadoP3 == 0 && alturaFiltrada_1 < -3) {  //verifica se esta caindo e se o led não esta piscando
     estadoP3 = 1;
     digitalWrite(IGN_1, HIGH);
-    timerP3 = millis() + intervaloP3;
+    timerP3 = millis() + intervaloParaquedas;
   }
   if (estadoP3 == 1 && (millis() >= timerP3)) {
     estadoP3 = 2;
@@ -177,14 +175,14 @@ void loop() {
   }
 
   //acionando quarto paraquedas
-  if (queda && estadoP4 == 0 && altura < -3) {
-    timerP4 = millis() + atrasoP1_P2;
+  if (queda && estadoP4 == 0 && alturaFiltrada_1 < -3) {
+    timerP4 = millis() + atrasoP1_P4;
     estadoP4 = 1;
   }
   if (estadoP4 == 1 && (millis() >= timerP4)) {
     estadoP4 = 2;
     digitalWrite(IGN_4, HIGH);
-    timerP4 = millis() + intervaloP4;
+    timerP4 = millis() + intervaloParaquedas;
   }
   if (estadoP4 == 2 && (millis() >= timerP4)) {
     estadoP4 = 3;
