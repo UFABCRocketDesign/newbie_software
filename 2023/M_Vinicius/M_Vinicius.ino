@@ -69,14 +69,14 @@ int verificar[4];
 bool paraquedas[4];
 int alturaTarget[] = { 0, 0, -5, -5 };
 long atraso[] = { 0, 2000, 0, 2000 };
-long tempoLigado = 5000;
+#define tempoLigado 5000
 long proxAcao[4];
 
 #endif
 
 // Declaração De variaveis diversas
 bool queda = false;
-float alt_in = 0;  // fazer o sensor pro foguete cair, 1 --> ta caindo
+float altIn = 0;  // fazer o sensor pro foguete cair, 1 --> ta caindo
 
 #define LARGURA_APG 10
 float apogeu[LARGURA_APG];
@@ -85,7 +85,7 @@ int index[2];
 //unsigned long tempo_anterior[4];
 
 String marcs = "marcs";
-String nome_do_arquivo;
+String nomeDoArquivo;
 
 const int chipSelect = 53;
 
@@ -100,24 +100,9 @@ float filtro_altura(float altura, int qual) {  //FILTRO ALTURA
   for (int i = 0; i < 10; i++) {
     total += filtro[qual][i];
   }
-  float altura_semRuido = total / 10;
-  return altura_semRuido;
+  float alturaSemRuido = total / 10;
+  return alturaSemRuido;
 }
-
-/*bool det_apogeu(float altura) {  // DETECÇÃO DE APOGEU
-  for (int i = 3; i > 0; i--) {
-    apogeu[i] = apogeu[i - 1];
-  }
-  apogeu[0] = altura;
-  if (apogeu[0] < apogeu[1] && apogeu[1] < apogeu[2] && apogeu[2] < apogeu[3]) {
-    //queda = 1;  //caindo
-    return true;
-  } else {
-    return false;
-  }
-}*/
-
-
 
 bool det_apogeu(float altura) {  // DETECÇÃO DE APOGEU
   for (int i = LARGURA_APG ; i > 0; i--) {
@@ -295,11 +280,11 @@ void setup() {
     for (int i = String(indicador).length() + String(marcs).length(); i < 8; i++) {
       qnt_zero += "0";
     }
-    nome_do_arquivo = marcs + qnt_zero + String(indicador) + ".txt";
+   nomeDoArquivo = marcs + qnt_zero + String(indicador) + ".txt";
     indicador++;
-  } while (SD.exists(nome_do_arquivo));
-  Serial.println(nome_do_arquivo);
-  File cabFile = SD.open(nome_do_arquivo, FILE_WRITE);
+  } while (SD.exists(nomeDoArquivo));
+  Serial.println(nomeDoArquivo);
+  File cabFile = SD.open(nomeDoArquivo, FILE_WRITE);
   // if the file is available, write to it:
   if (cabFile) {
     cabFile.println(cabString);
@@ -308,7 +293,7 @@ void setup() {
   }
   // if the file isn't open, pop up an error:
   else {
-    Serial.println("error opening" + nome_do_arquivo);
+    Serial.println("error opening" + nomeDoArquivo);
   }
 #endif
 
@@ -325,9 +310,9 @@ void setup() {
 #if BMP_ALT
   //LEITURA ALTITUDE
   for (int i = 0; i < 5; i++) {
-    alt_in = alt_in + bmp.readAltitude();
+    altIn = altIn + bmp.readAltitude();
   }
-  alt_in = alt_in / 5;
+  altIn = altIn / 5;
 
 #endif
 }
@@ -342,7 +327,7 @@ void loop() {
 
 // altura
 #if BMP_ALT
-  float altura = bmp.readAltitude() - alt_in;
+  float altura = bmp.readAltitude() - altIn;
 #endif
 
 //mag & acel & giro
@@ -364,12 +349,12 @@ void loop() {
 
 #if BMP_ALT
   // FILTRO ALTURA //     FUTURAMENTE POSSO ADD A IDEIA DE UM "for" PARA VARIOS FILTROS
-  float altura_semRuido = filtro_altura(altura, 0);
-  float altura_sRuido2 = filtro_altura(altura_semRuido, 1);
+  float alturaSemRuido = filtro_altura(altura, 0);
+  float alturaSRuido2 = filtro_altura(alturaSemRuido, 1);
 
 
   // DETECTAR APOGEU //
-  queda = queda || det_apogeu(altura_sRuido2);  // as duas barras (significam or), ou seja, se ja deu como queda verdadeiro uma vez, sempre mantera verdadeiro.
+  queda = queda || det_apogeu(alturaSRuido2);  // as duas barras (significam or), ou seja, se ja deu como queda verdadeiro uma vez, sempre mantera verdadeiro.
 
 
 #endif
@@ -378,7 +363,7 @@ void loop() {
 #if PARAQUEDAS
 
   for (int i = 0; i < 4; i++) {
-    acionar_paraquedas(queda, i, currentMillis, altura_sRuido2);
+    acionar_paraquedas(queda, i, currentMillis, alturaSRuido2);
   }
 
 #endif
@@ -402,9 +387,9 @@ void loop() {
 #if BMP_ALT
   dataString += String(altura);
   dataString += "\t";
-  dataString += String(altura_semRuido);
+  dataString += String(alturaSemRuido);
   dataString += "\t";
-  dataString += String(altura_sRuido2);
+  dataString += String(alturaSRuido2);
   dataString += "\t";
   dataString += String(queda);
   dataString += "\t";
@@ -464,13 +449,13 @@ void loop() {
 
 // SD CARD //
 #if SDD
-  File dataFile = SD.open(nome_do_arquivo, FILE_WRITE);
+  File dataFile = SD.open(nomeDoArquivo, FILE_WRITE);
   // escrever o arquivo
   if (dataFile) {
     dataFile.println(dataString);
     dataFile.close();
   } else {
-    Serial.println("error opening" + nome_do_arquivo);
+    Serial.println("error opening" + nomeDoArquivo);
   }
 #endif
 
