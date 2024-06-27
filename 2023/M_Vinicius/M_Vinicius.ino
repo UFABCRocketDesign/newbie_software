@@ -139,6 +139,13 @@ bool det_apogeu(float altura) {  // DETECÇÃO DE APOGEU
 void acionar_paraquedas(bool queda, int qual, unsigned long TempoAtual, float alturaAtual) {
 
   if (queda && ((alturaTarget[qual] == 0) || ((alturaTarget[qual] != 0) && (alturaAtual <= alturaTarget[qual])))) {
+
+    // criar variavel para o cas oda cond atendida 
+
+    if(alturaTarget[qual] == alturaTarget[2] || alturaTarget[qual] == alturaTarget[3]){
+      alturaTarget[qual] = 0;
+    }
+    
     if (verificar[qual] == 0) {
       proxAcao[qual] = TempoAtual + atraso[qual];
       verificar[qual] = 1;
