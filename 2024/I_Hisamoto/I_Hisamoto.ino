@@ -24,7 +24,7 @@ File arquivo;
 String nomeArquivo;
 String inicio = "isa";
 String tipoDeArquivo = ".txt";
-String header = "Temperature(C)\tPressure(Pa)\tHigh(meters)\tFiltered High 0(meters)\tFiltered High 1(meters)\tFallen(1)/ Not fallen (0)\tContador de Queda\tEstadoP1\tEstadoP2";
+String header = "Temperature(C)\tPressure(Pa)\tHigh(meters)\tFiltered High 0(meters)\tFiltered High 1(meters)\tFallen(1)/ Not fallen (0)\tContador de Queda\tEstadoP1\tEstadoP2\tEstadoP3\tEstadoP4";
 float timerP1;
 float timerP2;
 float timerP3;
@@ -166,7 +166,7 @@ void loop() {
   //acionando terceiro paraquedas
   if (queda && estadoP3 == 0 && alturaFiltrada_1 < -3) {  //verifica se esta caindo e se o led não esta piscando
     estadoP3 = 1;
-    digitalWrite(IGN_1, HIGH);
+    digitalWrite(IGN_3, HIGH);
     timerP3 = millis() + intervaloParaquedas;
   }
   if (estadoP3 == 1 && (millis() >= timerP3)) {
@@ -200,6 +200,8 @@ void loop() {
   dataString += String(contador) + "\t";
   dataString += String(estadoP1) + "\t";
   dataString += String(estadoP2) + "\t";
+  dataString += String(estadoP3) + "\t";
+  dataString += String(estadoP4) + "\t";
   Serial.println(dataString);
   arquivo = SD.open(nomeArquivo, FILE_WRITE);
   if (arquivo) {
