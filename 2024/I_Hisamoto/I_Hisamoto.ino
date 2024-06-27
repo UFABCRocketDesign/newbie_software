@@ -32,9 +32,9 @@ int intervaloP1 = 5000;
 int intervaloP1_P2 = 2000;
 int intervaloP2 = 5000;
 bool estadoP1 = 0;  // estado de piscar
-bool estadoP2 = 0;
-bool P1Acionado;
-bool P2Acionado;
+int estadoP2 = 0;
+bool P1Acionado = 0;
+bool P2Acionado = 0;
 bool eventoP2Acionado;
 
 
@@ -150,17 +150,17 @@ void loop() {
 
   //acionando segundo paraquedas
   if (!P2Acionado) {
-    if (queda && !estadoP2 && !eventoP2Acionado) {
+    if (queda && estadoP2 == 0 && !eventoP2Acionado) {
       timerP1_P2 = millis() + intervaloP1_P2;
       eventoP2Acionado = true;
     }
-    if (!estadoP2 && (millis() >= timerP1_P2)) {
+    if (estadoP2 == 0 && (millis() >= timerP1_P2)) {
       estadoP2 = 1;
       digitalWrite(IGN_2, estadoP2);
       timerP2 = millis() + intervaloP2;
     }
-    if (estadoP2 && (millis() >= timerP2)) {
-      estadoP2 = 0;
+    if (estadoP2 == 1 && (millis() >= timerP2)) {
+      estadoP2 = 2;
       digitalWrite(IGN_2, estadoP2);
       P2Acionado = true;
     }
