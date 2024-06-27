@@ -141,17 +141,18 @@ void loop() {
     digitalWrite(IGN_1, HIGH);
     timerP1 = millis() + intervaloP1;
   }
-  if (estadoP1 && (millis() >= timerP1)) {
+  if (estadoP1 == 1 && (millis() >= timerP1)) {
     estadoP1 = 2;
     digitalWrite(IGN_1, LOW);
   }
 
 
   //acionando segundo paraquedas
-  if (queda && estadoP2 == 1) {
+  if (queda && estadoP2 == 0) {
     timerP1_P2 = millis() + intervaloP1_P2;
+    estadoP2 = 1;
   }
-  if (estadoP2 == 1 && (millis() >= timerP1_P2)) {
+  if (estadoP2 == 1 && (millis() >= timerP2)) {
     estadoP2 = 2;
     digitalWrite(IGN_2, HIGH);
     timerP2 = millis() + intervaloP2;
