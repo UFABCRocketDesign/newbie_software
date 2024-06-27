@@ -26,16 +26,18 @@ String inicio = "isa";
 String tipoDeArquivo = ".txt";
 String header = "Temperature(C)\tPressure(Pa)\tHigh(meters)\tFiltered High 0(meters)\tFiltered High 1(meters)\tFallen(1)/ Not fallen (0)\tContador de Queda\tEstadoP1\tEstadoP2";
 float timerP1;
-float timerP1_P2;
 float timerP2;
+float timerP3;
+float timerP4;
 int intervaloP1 = 5000;
-int intervaloP1_P2 = 2000;
+int atrasoP1_P2 = 2000;
 int intervaloP2 = 5000;
+int intervaloP3 = 5000;
+int intervaloP4 = 5000;
 int estadoP1 = 0;  // estado de piscar
 int estadoP2 = 0;
-bool P1Acionado = 0;
-bool P2Acionado = 0;
-bool eventoP2Acionado;
+int estadoP3 = 0;
+int estadoP4 = 0;
 
 
 float filtroSuavizarCurva_0(float dadosCurva_0) {
@@ -116,6 +118,8 @@ void setup() {
   //definindo pino como porta de saída
   pinMode(IGN_1, OUTPUT);
   pinMode(IGN_2, OUTPUT);
+  pinMode(IGN_3, OUTPUT);
+  pinMode(IGN_4, OUTPUT);
 }
 
 void loop() {
@@ -146,10 +150,9 @@ void loop() {
     digitalWrite(IGN_1, LOW);
   }
 
-
   //acionando segundo paraquedas
   if (queda && estadoP2 == 0) {
-    timerP2 = millis() + intervaloP1_P2;
+    timerP2 = millis() + atrasoP1_P2;
     estadoP2 = 1;
   }
   if (estadoP2 == 1 && (millis() >= timerP2)) {
@@ -162,6 +165,31 @@ void loop() {
     digitalWrite(IGN_2, LOW);
   }
 
+  //acionando terceiro paraquedas
+  if (queda && estadoP3 == 0 && altura < -3) {  //verifica se esta caindo e se o led não esta piscando
+    estadoP3 = 1;
+    digitalWrite(IGN_1, HIGH);
+    timerP3 = millis() + intervaloP3;
+  }
+  if (estadoP3 == 1 && (millis() >= timerP3)) {
+    estadoP3 = 2;
+    digitalWrite(IGN_3, LOW);
+  }
+
+  //acionando quarto paraquedas
+  if (queda && estadoP4 == 0 && altura < -3) {
+    timerP4 = millis() + atrasoP1_P2;
+    estadoP4 = 1;
+  }
+  if (estadoP4 == 1 && (millis() >= timerP4)) {
+    estadoP4 = 2;
+    digitalWrite(IGN_4, HIGH);
+    timerP4 = millis() + intervaloP4;
+  }
+  if (estadoP4 == 2 && (millis() >= timerP4)) {
+    estadoP4 = 3;
+    digitalWrite(IGN_4, LOW);
+  }
 
   //salvando dados no sd
   String dataString = "";
