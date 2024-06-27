@@ -78,7 +78,7 @@ long proxAcao[4];
 bool queda = false;
 float altIn = 0;  // fazer o sensor pro foguete cair, 1 --> ta caindo
 
-#define LARGURA_APG 10
+#define LARGURA_APG 25
 float apogeu[LARGURA_APG];
 float filtro[2][10];
 int index[2];
@@ -92,7 +92,7 @@ const int chipSelect = 53;
 
 // FUNÇÕES
 
-float filtro_altura(float altura, int qual) {  //FILTRO ALTURA
+float filtroAltura(float altura, int qual) {  //FILTRO ALTURA
 
   filtro[qual][index[qual]] = altura;
   index[qual] = (index[qual] + 1) % 10;
@@ -104,7 +104,7 @@ float filtro_altura(float altura, int qual) {  //FILTRO ALTURA
   return alturaSemRuido;
 }
 
-bool det_apogeu(float altura) {  // DETECÇÃO DE APOGEU
+bool detApogeu(float altura) {  // DETECÇÃO DE APOGEU
   for (int i = LARGURA_APG ; i > 0; i--) {
     apogeu[i] = apogeu[i - 1];
   }
@@ -121,7 +121,7 @@ bool det_apogeu(float altura) {  // DETECÇÃO DE APOGEU
 
 
 // PARAQUEDAS
-void acionar_paraquedas(bool queda, int qual, unsigned long TempoAtual, float alturaAtual) {
+void acionarParaquedas(bool queda, int qual, unsigned long TempoAtual, float alturaAtual) {
 
   if (queda && ((alturaTarget[qual] == 0) || ((alturaTarget[qual] != 0) && (alturaAtual <= alturaTarget[qual])))) {
 
@@ -349,12 +349,12 @@ void loop() {
 
 #if BMP_ALT
   // FILTRO ALTURA //     FUTURAMENTE POSSO ADD A IDEIA DE UM "for" PARA VARIOS FILTROS
-  float alturaSemRuido = filtro_altura(altura, 0);
-  float alturaSRuido2 = filtro_altura(alturaSemRuido, 1);
+  float alturaSemRuido = filtroAltura(altura, 0);
+  float alturaSRuido2 = filtroAltura(alturaSemRuido, 1);
 
 
   // DETECTAR APOGEU //
-  queda = queda || det_apogeu(alturaSRuido2);  // as duas barras (significam or), ou seja, se ja deu como queda verdadeiro uma vez, sempre mantera verdadeiro.
+  queda = queda || detApogeu(alturaSRuido2);  // as duas barras (significam or), ou seja, se ja deu como queda verdadeiro uma vez, sempre mantera verdadeiro.
 
 
 #endif
@@ -363,7 +363,7 @@ void loop() {
 #if PARAQUEDAS
 
   for (int i = 0; i < 4; i++) {
-    acionar_paraquedas(queda, i, currentMillis, alturaSRuido2);
+    acionarParaquedas(queda, i, currentMillis, alturaSRuido2);
   }
 
 #endif
