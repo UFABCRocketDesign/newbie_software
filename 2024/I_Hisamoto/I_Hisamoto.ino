@@ -105,7 +105,7 @@ void setup() {
 
   Serial.println(header);
 
-  // determinando altitude inicial
+  //determinando altitude inicial
   somaAltitude = 0;
   for (int posicaoListaAltitude = 0; posicaoListaAltitude < 10; posicaoListaAltitude++) {
     somaAltitude += bmp.readAltitude();
@@ -114,6 +114,7 @@ void setup() {
 
   //definindo pino como porta de saída
   pinMode(IGN_1, OUTPUT);
+  pinMode(IGN_2, OUTPUT);
 }
 
 void loop() {
