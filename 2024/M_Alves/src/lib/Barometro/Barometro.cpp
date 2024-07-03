@@ -70,7 +70,7 @@ bool Barometro::getAll() {
 
   // Calculo de temperatura
   long x1, x2;
-  x1 = ((long)ut - (long)ac6)*(long)ac5 >> 15;
+  x1 = (ut - (long)ac6)*(long)ac5 >> 15;
   x2 = ((long)mc << 11)/(x1 + md);
   b5 = x1 + x2;
   temperatura = ((b5 + 8)>>4) / 10.0;
