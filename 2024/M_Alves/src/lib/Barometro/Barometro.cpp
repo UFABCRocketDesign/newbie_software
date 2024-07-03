@@ -1,8 +1,6 @@
 #include "Barometro.h"
 
 Barometro::Barometro() {
-  Wire.begin();
-  begin();
 }
 
 bool Barometro::begin() {

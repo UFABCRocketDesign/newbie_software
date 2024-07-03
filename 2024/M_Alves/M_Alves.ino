@@ -14,18 +14,18 @@
 //SDCard
 #define SDCARD (0)
 //Paraquedas
-#define PARA (0)
+#define PARA (1)
 #define IGN_1 36  //Paraquedas 1
 #define IGN_2 61  //Paraquedas 2
 #define IGN_3 46  //Paraquedas 3
 #define IGN_4 55  //Paraquedas 4
 //BMP085
-#define BMP085 (0)
-#define BMP085_TEMP (0)
-#define BMP085_PRESS (0)
-#define ALT_RAW (0)
-#define ALT_FILTER (0)
-#define APOGEE (0)
+#define BMP085 (1)
+#define BMP085_TEMP (1)
+#define BMP085_PRESS (1)
+#define ALT_RAW (1)
+#define ALT_FILTER (1)
+#define APOGEE (1)
 //Giroscopio
 #define GIRO (0)
 #define GIRO_X (0)
