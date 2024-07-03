@@ -91,6 +91,7 @@ String dadosString = "";
 
 void setup() {
   Serial.begin(115200);
+  Wire.begin();
   dadosString = "Time (s)\t";
 
 // ********** Iniciando os Sensores ********** //
@@ -118,7 +119,6 @@ void setup() {
 
 //Giroscópio
 #if GIRO
-  Wire.begin();
   if (!gyro.init()) {
     Serial.println("No Gyro detected");
   }
