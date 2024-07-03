@@ -1,5 +1,5 @@
-#ifndef _Barometro_H
-#define _Barometro_H
+#ifndef _BAROMETRO_H
+#define _BAROMETRO_H
 
 #include <Wire.h>
 #include "../Sensores/Sensores.h"

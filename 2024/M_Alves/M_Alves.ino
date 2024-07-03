@@ -6,7 +6,6 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_HMC5883_U.h>
 #include <Adafruit_ADXL345_U.h>
-#include "./src/lib/Sensores/Sensores.h"
 #include "./src/lib/Apogeu/Apogeu.h"
 #include "./src/lib/Filtro/Filtro.h"
 #include "./src/lib/Paraquedas/Paraquedas.h"
