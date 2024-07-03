@@ -11,7 +11,14 @@ bool Barometro::begin() {
   }
 
   Wire.requestFrom(BMP085_ADDRESS, 22);
-  while (Wire.available() < 22);
+
+  unsigned long intervalo = micros();
+  while (Wire.available() < 22) {
+    if (intervalo + 10 < micros()) {
+      return false; 
+      }
+  }
+
 
   ac1 = Wire.read() << 8 | Wire.read();
   ac2 = Wire.read() << 8 | Wire.read();
@@ -39,7 +46,10 @@ bool Barometro::getAll() {
   Wire.write(0xF6);
   Wire.endTransmission();
   Wire.requestFrom(BMP085_ADDRESS, 2);
-  while (Wire.available() < 2);
+  unsigned long intervalo = micros();
+  while (Wire.available() < 2) {
+    if (intervalo + 10 < micros())break;
+    }
   unsigned int ut = Wire.read() << 8 | Wire.read();
 
   // Leitura de pressao
@@ -52,7 +62,10 @@ bool Barometro::getAll() {
   Wire.write(0xF6);
   Wire.endTransmission();
   Wire.requestFrom(BMP085_ADDRESS, 3);
-  while (Wire.available() < 3);
+  intervalo = micros();
+  while (Wire.available() < 3) {
+    if (intervalo + 10 < micros())break;
+    }
   unsigned long up = (((unsigned long) Wire.read() << 16) | ((unsigned long) Wire.read() << 8) | (unsigned long) Wire.read()) >> (8-OSS);
 
   // Calculo de temperatura
