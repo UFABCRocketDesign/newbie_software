@@ -194,7 +194,7 @@ void loop() {
 
 // ********** BME085 - Altura e Filtros ********** //
 #if BMP085
-  bool getAll = barometro.getAll();
+  barometro.getAll();
   float temperature = barometro.getTemperatura();
   int pressure = barometro.getPressao();
   float rawAltitude = barometro.getAltitude() - altInicial;
