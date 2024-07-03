@@ -77,7 +77,7 @@ bool Barometro::getAll() {
 
   // Calculo de pressao
   long b6 = b5 - 4000;
-  x1 = (b2 * (b6 * b6)>>12)>>11;
+  x1 = (b2 * (b6 * b6>>12))>>11;
   x2 = (ac2 * b6)>>11;
   long x3 = x1 + x2;
   long b3 = (((((long)ac1)*4 + x3)<<OSS) + 2)>>2;
