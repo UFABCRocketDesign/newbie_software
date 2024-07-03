@@ -82,7 +82,7 @@ bool Barometro::getAll() {
   long x3 = x1 + x2;
   long b3 = (((((long)ac1)*4 + x3)<<OSS) + 2)>>2;
   x1 = (ac3 * b6)>>13;
-  x2 = (b1 * ((b6 * b6)>>12))>>16;
+  x2 = (b1 * (b6 * b6>>12))>>16;
   x3 = ((x1 + x2) + 2)>>2;
   unsigned long b4 = (ac4 * (unsigned long)(x3 + 32768))>>15;
   unsigned long b7 = ((unsigned long)(up - b3) * (50000>>OSS));
