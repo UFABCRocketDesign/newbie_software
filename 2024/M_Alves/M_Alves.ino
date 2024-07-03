@@ -14,33 +14,33 @@
 //SDCard
 #define SDCARD (0)
 //Paraquedas
-#define PARA (1)
+#define PARA (0)
 #define IGN_1 36  //Paraquedas 1
 #define IGN_2 61  //Paraquedas 2
 #define IGN_3 46  //Paraquedas 3
 #define IGN_4 55  //Paraquedas 4
 //BMP085
-#define BMP085 (1)
-#define BMP085_TEMP (1)
-#define BMP085_PRESS (1)
-#define ALT_RAW (1)
-#define ALT_FILTER (1)
-#define APOGEE (1)
+#define BMP085 (0)
+#define BMP085_TEMP (0)
+#define BMP085_PRESS (0)
+#define ALT_RAW (0)
+#define ALT_FILTER (0)
+#define APOGEE (0)
 //Giroscopio
-#define GIRO (1)
-#define GIRO_X (1)
-#define GIRO_Y (1)
-#define GIRO_Z (1)
+#define GIRO (0)
+#define GIRO_X (0)
+#define GIRO_Y (0)
+#define GIRO_Z (0)
 //Magnetometro
-#define MAGNETO (1)
-#define MAGNETO_X (1)
-#define MAGNETO_Y (1)
-#define MAGNETO_Z (1)
+#define MAGNETO (0)
+#define MAGNETO_X (0)
+#define MAGNETO_Y (0)
+#define MAGNETO_Z (0)
 //Acelerometro
-#define ACELERO (1)
-#define ACELERO_X (1)
-#define ACELERO_Y (1)
-#define ACELERO_Z (1)
+#define ACELERO (0)
+#define ACELERO_X (0)
+#define ACELERO_Y (0)
+#define ACELERO_Z (0)
 
 // ********** PARAQUEDAS ********** //
 #if PARA
