@@ -13,6 +13,7 @@ void setup() {
   Serial.print("Altitude/t");
   Serial.print("Pressão no Nível do Mar/t");
   Serial.print("Altitude Real/t");
+  Serial.println();
 }
 
 
