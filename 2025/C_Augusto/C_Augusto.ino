@@ -9,10 +9,10 @@ void setup() {
 	Serial.println("Nao foi possivel encontrar o bmp085, verificar as conexoes!");
 	while (1) {}
   }
+Serial.print("Temperatura \t Pressao \t Altitude \t Nivel do mar \t Altitude Real \n");
 }
   
 void loop() {
-    Serial.print("Temperatura \t Pressao \t Altitude \t Nivel do mar \t Altitude Real \n");
     Serial.print( bmp.readTemperature());
     Serial.print("\t");
     Serial.print(bmp.readAltitude());
