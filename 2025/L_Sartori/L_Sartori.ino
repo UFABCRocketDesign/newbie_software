@@ -1,3 +1,6 @@
+#include <Adafruit_BMP085.h>
+
+/*************************************************** 
 This is an example for the BMP085 Barometric Pressure & Temp Sensor
 
   Designed specifically to work with the Adafruit BMP085 Breakout 
