@@ -13,12 +13,12 @@ void setup() {
   
 void loop() {
     Serial.print("Temperatura \t Pressao \t Altitude \t Nivel do mar \t Altitude Real \n");
-    Serial.print( bmp.readTemperature())
+    Serial.print( bmp.readTemperature());
     Serial.print("\t");
     Serial.print(bmp.readPressure());
     Serial.print("\t");
     Serial.print(bmp.readSealevelPressure());
     Serial.print("\t");
     Serial.print(bmp.readAltitude());
-    Serial.print("\t")
+    Serial.print("\t");
 }
