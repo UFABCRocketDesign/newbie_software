@@ -57,6 +57,5 @@ void loop() {
     Serial.print(bmp.readAltitude(101500));
     Serial.println(";");
 
-    Serial.println();
     delay(300);
 }
