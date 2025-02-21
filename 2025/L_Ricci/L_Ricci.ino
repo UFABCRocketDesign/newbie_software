@@ -1,16 +1,47 @@
 // Aqui você designa o output do LED
 void setup() {
-  pinMode(13, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 // Tudo dentro desse statment ficará em loop
 void loop() {
-  // Liga o LED
-  digitalWrite(13, HIGH);
-  // "Dormir" por 1s
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(125);
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(125);
+
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(125);
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(125);
+
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(125);
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(125);
+
+  digitalWrite(LED_BUILTIN, HIGH);
   delay(1000);
-  // Desliga o LED
-  digitalWrite(13,LOW);
-  // "Dorme" por 1s
+  digitalWrite(LED_BUILTIN, LOW);
   delay(1000);
+
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(1000);
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(1000);
+
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(125);
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(125);
+
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(125);
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(125);
+
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(125);
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(125);
 }
