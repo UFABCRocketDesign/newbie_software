@@ -48,7 +48,7 @@ void loop() {
     Serial.print(";  ");
 
     Serial.print(bmp.readSealevelPressure());
-    Serial.println(";  ");
+    Serial.print(";  ");
 
   // you can get a more precise measurement of altitude
   // if you know the current sea level pressure which will
