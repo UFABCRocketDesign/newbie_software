@@ -28,7 +28,11 @@ void loop() {
    
     Serial.print(bmp.readPressure());
     Serial.print("\t");
+    float s1 = (c[0]+c[1]+c[2]+c[3]+c[4])/5;
+    
     c[k] = bmp.readAltitude()- med_alt;
+
+    float s2 = (c[0]+c[1]+c[2]+c[3]+c[4])/5;
     
     // Calculate altitude assuming 'standard' barometric
     // pressure of 1013.25 millibar = 101325 Pascal
@@ -47,6 +51,14 @@ void loop() {
   // that is equal to 101500 Pascals.
     Serial.print((bmp.readAltitude(101500)));
     Serial.println("\t");
+
+    if (s2-s1>= 0){
+      Serial.print(1);
+      Serial.print("\t");
+    } else {
+      Serial.print(0);
+      Serial.print("\t");  
+    }
 
 
 }
