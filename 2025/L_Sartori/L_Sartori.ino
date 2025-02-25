@@ -2,7 +2,7 @@
 
 
 Adafruit_BMP085 bmp;
-  
+int a = 0; 
 void setup() {
   Serial.begin(115200);
   pinMode(LED_BUILTIN, OUTPUT);
@@ -11,13 +11,17 @@ void setup() {
   while (1) {}
   }
   Serial.println("Temperature\tPressure\tAltitude\tPressure\tAltitude\t");
+  for(int i =0;i=10;i++){
+    a += bmp.readAltitude();
+  }
+  a /=10;
 }
-  
+
 void loop() {
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
     
-    Serial.print(bmp.readPressure());
+    Serial.print(bmp.readPressure()- a);
     Serial.print("\t");
     
     // Calculate altitude assuming 'standard' barometric
