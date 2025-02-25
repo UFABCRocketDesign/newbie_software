@@ -1,8 +1,8 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 float alt;
-float leiturafiltrada = 0;
-
+float leituras[5] = {0};
+int index = 0;
 void setup(){  
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
@@ -17,8 +17,13 @@ void setup(){
   alt = alt/100 ;
 }
 float filteredAltitude(){
-  leiturafiltrada = leiturafiltrada + (bmp.readAltitude() -  leiturafiltrada)/2;
-  return leiturafiltrada - alt;
+  if (index == 10) {
+  index = 0;
+  }
+  leituras[index] = bmp.readAltitude();
+  
+  leituras[index] = (leituras[0]+leituras[1]+leituras[2]+leituras[3]+leituras[4]+leituras[5])/5;
+  return leituras[index] - alt;
 }
 void loop(){
   Serial.print(bmp.readTemperature());
