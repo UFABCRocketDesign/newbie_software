@@ -22,7 +22,7 @@
 
     void loop() {
         
-        float altitudeNova = ((altitudeTarada*(1-suavizador))+(bmp.readAltitude()*suavizador));
+        float altitudeNova = ((altitudeNova*(1-suavizador))+(bmp.readAltitude()*suavizador));
         
         Serial.print(bmp.readTemperature());
         Serial.print("\t");
@@ -30,13 +30,13 @@
         Serial.print(bmp.readPressure());
         Serial.print("\t");
 
-        Serial.print(bmp.readAltitude());
+        Serial.print(bmp.readAltitude() - altitudeTarada);
         Serial.print("\t");
 
         Serial.print(bmp.readSealevelPressure());
         Serial.print("\t");
 
-        Serial.print(bmp.readAltitude() - altitudeNova);
+        Serial.print(altitudeNova);
         Serial.println();
 
     }
