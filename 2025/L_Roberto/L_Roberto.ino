@@ -22,7 +22,7 @@ float filteredAltitude(){
   }
   leituras[index] = bmp.readAltitude();
   index++;
-  float num = (leituras[0]+leituras[1]+leituras[2]+leituras[3]+leituras[4)/5;
+  float num = (leituras[0]+leituras[1]+leituras[2]+leituras[3]+leituras[4])/5;
   return num - alt;
 }
 void loop(){
