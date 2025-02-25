@@ -1,6 +1,8 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 
+float alt = 0;
+
 void setup() {
   Serial.begin(115200);
   if (!bmp.begin()) {
@@ -8,6 +10,9 @@ void setup() {
 	while (1) {}
   }
   Serial.println("T\tP\tA\tPMar\tAReal\tAReal2");
+  for (int i = 0; i < 10; i++) {
+    alt += bmp.readAltitude();
+  }
 }
 
 void loop() {
@@ -16,17 +21,11 @@ void loop() {
   Serial.print("\t");
   Serial.print(bmp.readPressure());
   Serial.print("\t");
-  Serial.print(bmp.readAltitude());
+  Serial.print(bmp.readAltitude()-alt);
   Serial.print("\t");
   Serial.print(bmp.readSealevelPressure());
   Serial.print("\t");
-
-  // Possibilidades: Pegar o valor de pressão e substituir em readAltitude e ver o que acontece 
-  // Serial.print(bmp.readAltitude(101500));
-  float pressure = bmp.readPressure();
-  Serial.print(bmp.readAltitude(pressure));
-  Serial.print(bmp.readAltitude(92765.2));
-  
+  Serial.print(bmp.readAltitude(101500));
   Serial.println();
   
 }
