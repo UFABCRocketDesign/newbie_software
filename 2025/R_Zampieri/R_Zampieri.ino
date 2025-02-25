@@ -2,7 +2,7 @@
 
 Adafruit_BMP085 bmp;
 
-float x = bmp.readAltitude();
+float x = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -10,6 +10,7 @@ void setup() {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
+  float x = bmp.readAltitude();
   Serial.print("Temperatura\t");
   Serial.print("Pressão\t");
   Serial.print("Altitude\t");
