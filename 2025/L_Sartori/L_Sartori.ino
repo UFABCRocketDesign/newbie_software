@@ -34,6 +34,8 @@ void loop() {
     
     // Calculate altitude assuming 'standard' barometric
     // pressure of 1013.25 millibar = 101325 Pascal
+    Serial.print(c[k]);
+    Serial.print("\t");
     Serial.print((c[0]+c[1]+c[2]+c[3]+c[4])/5);
     Serial.print("\t");
     
