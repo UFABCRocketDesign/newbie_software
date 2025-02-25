@@ -10,7 +10,10 @@ void setup() {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
-  x = bmp.readAltitude();
+  for (int i = 1; i <= 10; ++i) {
+    x = x + bmp.readAltitude();
+    }
+  x = x/10;
   Serial.print("Temperatura\t");
   Serial.print("Pressão\t");
   Serial.print("Altitude\t");
