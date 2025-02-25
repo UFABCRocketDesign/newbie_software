@@ -11,7 +11,7 @@ void setup() {
   }  
 
   for (int i = 0; i < 10; i++) { 
-    altitudeTarada += bmp.readAltitude(101500);
+    altitudeTarada += bmp.readAltitude();
 
   }
   altitudeTarada /= 10; 
@@ -26,13 +26,13 @@ void loop() {
     Serial.print(bmp.readPressure());
     Serial.print("\t");
 
-    Serial.print(bmp.readAltitude(101500));
+    Serial.print(bmp.readAltitude());
     Serial.print("\t");
 
     Serial.print(bmp.readSealevelPressure());
     Serial.print("\t");
 
-    Serial.print(bmp.readAltitude(101500) - altitudeTarada);
+    Serial.print(bmp.readAltitude() - altitudeTarada);
     Serial.println();
 
 }
