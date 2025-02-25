@@ -11,7 +11,7 @@ void setup() {
   while (1) {}
   }
   Serial.println("Temperature\tPressure\tAltitude\tPressure\tAltitude\t");
-  for(int i =0;i=10;i++){
+  for(int i =0;i<10;i++){
     med_alt += bmp.readAltitude();
   }
   med_alt /=10;
