@@ -12,11 +12,12 @@ void setup(){
   }
 }
 void loop(){
-  int alt = 0;
+  float alt = 0;
   for (int i = 0; i < 100; i++) 
     alt += bmp.readAltitude();
   alt = alt/100;
-
+  
+  while (1) {
   Serial.print(bmp.readTemperature());
     Serial.print("\t");
   Serial.print(bmp.readPressure());
@@ -26,6 +27,9 @@ void loop(){
   Serial.print(bmp.readSealevelPressure());
     Serial.print("\t");
   Serial.print(bmp.readAltitude(101500));
-  Serial.print("\n");
+    Serial.print("\n");
+
+  }
+  
 
 }
