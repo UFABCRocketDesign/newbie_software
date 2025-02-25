@@ -10,7 +10,7 @@ void setup() {
 	while (1) {}
   }
   Serial.println("T\tP\tA\tPMar\tAReal\tAReal2");
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 150; i++) {
     alt += bmp.readAltitude();
   }
 }
