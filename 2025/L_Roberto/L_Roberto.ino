@@ -12,39 +12,20 @@ void setup(){
   }
 }
 void loop(){
+  int alt = 0;
+  for (int i = 0; i < 100; i++) 
+    alt += bmp.readAltitude();
+  alt = alt/100;
 
   Serial.print(bmp.readTemperature());
     Serial.print("\t");
   Serial.print(bmp.readPressure());
     Serial.print("\t");
-  Serial.print(bmp.readAltitude());
+  Serial.print(bmp.readAltitude() - alt);
     Serial.print("\t");
   Serial.print(bmp.readSealevelPressure());
     Serial.print("\t");
   Serial.print(bmp.readAltitude(101500));
   Serial.print("\n");
- /*
-  Serial.print("Temperatura = ");
-  Serial.print(bmp.readTemperature());
-  Serial.println(" *C");
 
-  Serial.print("Pressão = ");
-  Serial.print(bmp.readPressure());
-  Serial.println(" Pa");
-
-  Serial.print("Altitude = ");
-  Serial.print(bmp.readAltitude());
-  Serial.println(" meters");
-
-  Serial.print("Pressão no nível do mar (calculada) = ");
-  Serial.print(bmp.readSealevelPressure());
-  Serial.println(" Pa");
-
-  Serial.print("Altitude real = ");
-  Serial.print(bmp.readAltitude(101500));
-  Serial.println(" meters");
-
-  Serial.println();
-  delay(500);
-*/
 }
