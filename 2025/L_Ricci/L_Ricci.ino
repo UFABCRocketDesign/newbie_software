@@ -39,6 +39,8 @@ void loop() {
   Serial.print(media);
 
   Serial.print("\t");
+  Serial.print(bmp.readAltitude() - alt);
+  Serial.print("\t");
   Serial.print(bmp.readSealevelPressure());
   Serial.print("\t");
   Serial.print(bmp.readAltitude(101500));
