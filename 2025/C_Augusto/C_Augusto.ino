@@ -2,7 +2,7 @@
 
     Adafruit_BMP085 bmp;
     float altitudeTarada = 0;  
-    float suavizador = 0.1;
+    float suavizador = 0.01;
 
     void setup() {
       Serial.begin(115200);
@@ -35,7 +35,7 @@
 
         Serial.print(bmp.readSealevelPressure());
         Serial.print("\t");
-  
+
         Serial.print(bmp.readAltitude() - altitudeNova);
         Serial.println();
 
