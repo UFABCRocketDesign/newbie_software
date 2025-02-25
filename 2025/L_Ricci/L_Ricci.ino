@@ -25,6 +25,7 @@ void setup() {
 }
 
 void loop() {
+  float altitudeReal = bmp.readAltitude() - alt;
 
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
@@ -32,14 +33,14 @@ void loop() {
   Serial.print("\t");
 
   total = total - leituras[indiceAtual];
-  leituras[indiceAtual] = (bmp.readAltitude() - alt);
+  leituras[indiceAtual] = (altitudeReal);
   total = total + leituras[indiceAtual];
   indiceAtual = (indiceAtual + 1) % numLeituras;
   float media = total / numLeituras;
   Serial.print(media);
 
   Serial.print("\t");
-  Serial.print(bmp.readAltitude() - alt);
+  Serial.print(altitudeReal);
   Serial.print("\t");
   Serial.print(bmp.readSealevelPressure());
   Serial.print("\t");
