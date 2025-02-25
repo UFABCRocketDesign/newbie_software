@@ -8,13 +8,13 @@ void setup(){
   Serial.begin(115200);
     Serial.println("\nTemperatura | Pressão | Altitude | Pressão Nivel do Mar | Altitude Real.");
   if (!bmp.begin()) {
-    alt = 0;
-    for (int i = 0; i < 100; i++) 
-      alt += bmp.readAltitude();
-    alt = alt/100 ;
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
+  alt = 0;
+  for (int i = 0; i < 100; i++) 
+    alt += bmp.readAltitude();
+  alt = alt/100 ;
 }
 void loop(){
   Serial.print(bmp.readTemperature());
