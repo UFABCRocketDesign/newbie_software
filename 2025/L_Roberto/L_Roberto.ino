@@ -17,13 +17,13 @@ void setup(){
   alt = alt/100 ;
 }
 float filteredAltitude(){
-  if (index == 10) {
+  if (index == 5) {
   index = 0;
   }
   leituras[index] = bmp.readAltitude();
-  
-  leituras[index] = (leituras[0]+leituras[1]+leituras[2]+leituras[3]+leituras[4]+leituras[5])/5;
-  return leituras[index] - alt;
+  index++;
+  float num = (leituras[0]+leituras[1]+leituras[2]+leituras[3]+leituras[4)/5;
+  return num - alt;
 }
 void loop(){
   Serial.print(bmp.readTemperature());
