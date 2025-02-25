@@ -16,13 +16,14 @@
 
       }
       altitudeTarada /= 10; 
+      float altitudeNova = bmp.readAltitude();
 
       Serial.println("Temperatura \t Pressao \t Altitude \t Nivel do mar \t Altitude Relativa");
     }
 
     void loop() {
         
-        float altitudeNova = ((altitudeNova*(1-suavizador))+(bmp.readAltitude()*suavizador));
+      altitudeNova = ((altitudeNova*(1-suavizador))+(bmp.readAltitude()*suavizador));
         
         Serial.print(bmp.readTemperature());
         Serial.print("\t");
@@ -30,7 +31,7 @@
         Serial.print(bmp.readPressure());
         Serial.print("\t");
 
-        Serial.print(bmp.readAltitude() - altitudeTarada);
+        Serial.print(bmp.readAltitude());
         Serial.print("\t");
 
         Serial.print(bmp.readSealevelPressure());
