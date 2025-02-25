@@ -2,7 +2,7 @@
 
 Adafruit_BMP085 bmp;
 
-int x = bmp.readAltitude();
+float x = bmp.readAltitude();
 
 void setup() {
   Serial.begin(115200);
