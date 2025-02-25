@@ -1,7 +1,11 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 
+const int numLeituras = 10;
 float alt = 0;
+float total = 0;
+float leituras[numLeituras];
+int indiceAtual = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -14,6 +18,10 @@ void setup() {
     alt += bmp.readAltitude();
   }
   alt = alt / 150;
+
+  for (int i = 0; i < numLeituras; i++) {
+    leituras[i] = 0;
+  }
 }
 
 void loop() {
@@ -23,14 +31,12 @@ void loop() {
   Serial.print(bmp.readPressure());
   Serial.print("\t");
 
-  int numReads = 10;
-  int senseSum = 0;
-  for(int k = 0; k < numReads; k++) {
-    senseSum += (bmp.readAltitude() - alt);
-    delay(1);
-  }
-  int senseAve = senseSum / numReads;
-  Serial.print(senseAve);
+  total = total - leituras[indiceAtual];
+  leituras[indiceAtual] = (bmp.readAltitude() - alt);
+  total = total + leituras[indiceAtual];
+  indiceAtual = (indiceAtual + 1) % numLeituras;
+  float media = total / numLeituras;
+  Serial.print(media)
 
   Serial.print("\t");
   Serial.print(bmp.readSealevelPressure());
