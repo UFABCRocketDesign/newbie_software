@@ -2,6 +2,8 @@
 
 Adafruit_BMP085 bmp;
 
+int x = bmp.readAltitude();
+
 void setup() {
   Serial.begin(115200);
   if (!bmp.begin()) {
@@ -22,7 +24,7 @@ void loop() {
   Serial.print("\t");
   Serial.print(bmp.readPressure());
   Serial.print("\t");
-  Serial.print(bmp.readAltitude());
+  Serial.print(bmp.readAltitude()-x);
   Serial.print("\t");
   Serial.print(bmp.readSealevelPressure());
   Serial.print("\t");
