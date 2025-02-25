@@ -13,6 +13,7 @@ void setup() {
   for (int i = 0; i < 150; i++) {
     alt += bmp.readAltitude();
   }
+  alt = alt / 150;
 }
 
 void loop() {
