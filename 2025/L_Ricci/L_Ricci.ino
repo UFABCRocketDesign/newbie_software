@@ -36,7 +36,7 @@ void loop() {
   total = total + leituras[indiceAtual];
   indiceAtual = (indiceAtual + 1) % numLeituras;
   float media = total / numLeituras;
-  Serial.print(media)
+  Serial.print(media);
 
   Serial.print("\t");
   Serial.print(bmp.readSealevelPressure());
