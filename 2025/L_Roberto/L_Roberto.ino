@@ -1,9 +1,14 @@
 #include <Adafruit_BMP085.h>
 
 Adafruit_BMP085 bmp;
+float alt;
 
-void setup(){
+void setup(){  
   pinMode(LED_BUILTIN, OUTPUT);
+  alt = 0;
+  for (int i = 0; i < 100; i++) 
+    alt += bmp.readAltitude();
+  alt = alt/100 ;
   Serial.begin(115200);
     Serial.println("\nTemperatura | Pressão | Altitude | Pressão Nivel do Mar | Altitude Real.");
   if (!bmp.begin()) {
@@ -12,12 +17,6 @@ void setup(){
   }
 }
 void loop(){
-  float alt = 0;
-  for (int i = 0; i < 100; i++) 
-    alt += bmp.readAltitude();
-  alt = alt/100;
-  
-  while (1) {
   Serial.print(bmp.readTemperature());
     Serial.print("\t");
   Serial.print(bmp.readPressure());
@@ -28,8 +27,6 @@ void loop(){
     Serial.print("\t");
   Serial.print(bmp.readAltitude(101500));
     Serial.print("\n");
-
-  }
   
 
 }
