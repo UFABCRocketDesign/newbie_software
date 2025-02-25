@@ -22,7 +22,16 @@ void loop() {
   Serial.print("\t");
   Serial.print(bmp.readPressure());
   Serial.print("\t");
-  Serial.print(bmp.readAltitude()-alt);
+
+  int numReads = 10;
+  int senseSum = 0;
+  for(int k = 0; k < numReads; k++) {
+    senseSum += (bmp.readAltitude() - alt);
+    delay(1);
+  }
+  int senseAve = senseSum / numReads;
+  Serial.print(senseAve);
+
   Serial.print("\t");
   Serial.print(bmp.readSealevelPressure());
   Serial.print("\t");
