@@ -5,12 +5,12 @@ float alt;
 
 void setup(){  
   pinMode(LED_BUILTIN, OUTPUT);
-  alt = 0;
+  Serial.begin(115200);
+    Serial.println("\nTemperatura | Pressão | Altitude | Pressão Nivel do Mar | Altitude Real.");
+    alt = 0;
   for (int i = 0; i < 100; i++) 
     alt += bmp.readAltitude();
   alt = alt/100 ;
-  Serial.begin(115200);
-    Serial.println("\nTemperatura | Pressão | Altitude | Pressão Nivel do Mar | Altitude Real.");
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
