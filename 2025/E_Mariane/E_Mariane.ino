@@ -1,13 +1,13 @@
 //projeto LED
 
 void setup() {
-  pinMode(6, OUTPUT);
+  pinMode(13, OUTPUT); //pino 13 como saída
 }
 
 void loop() {
-  digitalWrite(6, HIGH); 
+  digitalWrite(13, HIGH); 
   delay(1500);            
-  digitalWrite(6, LOW);  
+  digitalWrite(13, LOW);  
   delay(500);            
 }
 
@@ -21,19 +21,4 @@ void loop() {
 //  delay(500);                      
 //  digitalWrite(LED_BUILTIN, LOW);   
 //  delay(2500);                      
-//}
-
-
-
-
-
-//void setup() {
-//  pinMode(13, OUTPUT); // Define o pino 13 como saída
-//}
-
-//void loop() {
-//  digitalWrite(13, HIGH); 
-//  delay(1500);            
-//  digitalWrite(13, LOW);  
-//  delay(500);            
 //}
