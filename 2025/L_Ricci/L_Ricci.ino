@@ -3,10 +3,17 @@ Adafruit_BMP085 bmp;
 
 const int numLeituras = 15;
 float alt = 0;
+
 float total = 0;
+float total2 = 0;
+
 float leituras[numLeituras];
-float altitudeAnterior = 0;
+float leituras2[numLeituras];
+
 int indiceAtual = 0;
+int indiceAtual2 = 0;
+
+float altitudeAnterior = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -22,6 +29,7 @@ void setup() {
 
   for (int i = 0; i < numLeituras; i++) {
     leituras[i] = 0;
+    leituras2[i] = 0;
   }
 }
 
@@ -38,7 +46,13 @@ void loop() {
   total = total + leituras[indiceAtual];
   indiceAtual = (indiceAtual + 1) % numLeituras;
   float media = total / numLeituras;
-  Serial.print(media);
+
+  total2 = total2 - leituras2[indiceAtual2];
+  leituras2[indiceAtual2] = (media);
+  total2 = total2 + leituras2[indiceAtual2];
+  indiceAtual2 = (indiceAtual2 + 1) % numLeituras;
+  float mediaNova = total2 / numLeituras;
+  Serial.print(mediaNova);
 
   Serial.print("\t");
   Serial.print(altitudeReal);
