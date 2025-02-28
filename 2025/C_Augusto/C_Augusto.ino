@@ -36,7 +36,7 @@ void loop() {
   indice = (indice + 1) % AMOSTRAS;
 
   float altitudeFiltrada = soma / AMOSTRAS;
-  float altitudeRelativa = altitudeFiltrada - altitudeTarada;
+  float altitudeRelativa = altitudeFiltrada - bmp.readAltitude();
 
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
