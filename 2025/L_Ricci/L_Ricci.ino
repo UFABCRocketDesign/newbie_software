@@ -48,12 +48,12 @@ void loop() {
   Serial.print(bmp.readAltitude(101500));
   Serial.print("\t");
 
-  if (altitudeReal < altitudeAnterior) {
+  if (media < altitudeAnterior) {
     Serial.print(0);
   } else {
     Serial.print(1);
   }
-  altitudeReal = altitudeAnterior;
+  altitudeAnterior = media;
 
   Serial.println();
 }
