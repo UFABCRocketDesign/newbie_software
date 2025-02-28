@@ -31,9 +31,8 @@ void loop() {
     Serial.print(bmp.readPressure());
     Serial.print("\t");
 
-    
+    c[0][k]=  bmp.readAltitude()- med_alt;
     for (int i =0 ; i<2;i++){
-      c[0][k]=  bmp.readAltitude()- med_alt;
       for(int j =0;j<5;j++){
         c[i+1][k]+= c[i][j];
       }
