@@ -3,7 +3,8 @@
 Adafruit_BMP085 bmp;
 
 float x = 0;
-
+float filtro = 0;
+float filtro_final = 0;
 void setup() {
   Serial.begin(115200);
   if (!bmp.begin()) {
@@ -22,13 +23,14 @@ void setup() {
   Serial.println();
 }
 
-
 void loop() {
+  for (int i = 1; i <= 5; ++i) {filtro = filtro + bmp.readAltitude();}
+  filtro_final = filtro*5;
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
   Serial.print(bmp.readPressure());
   Serial.print("\t");
-  Serial.print(bmp.readAltitude()-x);
+  Serial.print(filtro_final-x);
   Serial.print("\t");
   Serial.print(bmp.readSealevelPressure());
   Serial.print("\t");
