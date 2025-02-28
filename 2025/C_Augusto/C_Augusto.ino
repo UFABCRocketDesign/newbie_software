@@ -26,25 +26,27 @@ void setup() {
     soma += valor;
   }
 
-  Serial.println("Temperatura\tPressao\tAltitude\tNivel do mar\tAltitude Filtrada\tAltitude Relativa");
+  Serial.println("Temperatura\tPressao\tAltitude\tNivel do mar\tAltitude Filtrada\tAltura");
 }
 
 void loop() {
   float valor = bmp.readAltitude();
+  float altura = valor - altitudeTarada;
   soma = soma - leituras[indice] + valor;
   leituras[indice] = valor;
   indice = (indice + 1) % AMOSTRAS;
 
   float altitudeFiltrada = soma / AMOSTRAS;
-  float altitudeRelativa = altitudeFiltrada - bmp.readAltitude();
 
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
   Serial.print(bmp.readPressure());
   Serial.print("\t");
+  Serial.print(valor);
+  Serial.print("\t");
   Serial.print(bmp.readSealevelPressure());
   Serial.print("\t");
   Serial.print(altitudeFiltrada);
   Serial.print("\t");
-  Serial.println(altitudeRelativa);
+  Serial.println(altura);
 }
