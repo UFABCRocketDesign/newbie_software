@@ -5,6 +5,7 @@ const int numLeituras = 10;
 float alt = 0;
 float total = 0;
 float leituras[numLeituras];
+float altitudeAnterior = 0
 int indiceAtual = 0;
 
 void setup() {
@@ -13,7 +14,7 @@ void setup() {
 	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
 	while (1) {}
   }
-  Serial.println("T\tP\tA\tPMar\tAReal\tAReal2");
+  Serial.println("Temperatura\tPressão\tAltitude Filtrada\tAltitude Raw\tPressão Mar\tPressão Local (hPa)\tQueda");
   for (int i = 0; i < 150; i++) {
     alt += bmp.readAltitude();
   }
@@ -45,6 +46,14 @@ void loop() {
   Serial.print(bmp.readSealevelPressure());
   Serial.print("\t");
   Serial.print(bmp.readAltitude(101500));
+  Serial.print("\t")
+
+  if altitudeReal < altitudeAnterior{
+    Serial.print("Queda")
+  } else {
+    Serial.print("Subida")
+  }
+  altitudeReal = altitudeAnterior
+
   Serial.println();
-  
 }
