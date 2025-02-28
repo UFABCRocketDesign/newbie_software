@@ -4,11 +4,8 @@
 Adafruit_BMP085 bmp;
 bool h = false;
 float med_alt = 0; 
-float c[2][5];
-float f1;
-float ff1;
-int k;
-int i;
+float c[3][5];
+int k=0;
 void setup() {
   Serial.begin(115200);
  
@@ -24,11 +21,7 @@ void setup() {
   }
  
   med_alt /=10; 
-  
-  for(int i=0;i<5;i++){
-    c[0][i]=0;
-    c[1][i]=0; 
-  }
+
 }
 
 void loop() {
@@ -39,33 +32,30 @@ void loop() {
     Serial.print("\t");
 
     
-    for (i =0 ; i<5;i++){
-      c[0][i]=  bmp.readAltitude()- med_alt;
+    for (int i =0 ; i<2;i++){
+      c[0][k]=  bmp.readAltitude()- med_alt;
       for(int j =0;j<5;j++){
-        c[1][i]+= c[0][j];
+        c[i+1][k]+= c[i][j];
       }
-      c[0][i]/=5;
-      for(int j =0;j<5;j++){
-        ff1+= c[1][j];
-      }
-      ff1/=5;
+      c[i+1][k]/=5;
     }
     
-    // Calculate altitude assuming 'standard' barometric
-    // pressure of 1013.25 millibar = 101325 Pascal
-    Serial.print(c[0][i]);
+    k+=1;
+    k%=5;
+
+    Serial.print(c[0][k]);
     Serial.print("\t");
     
-    Serial.print(ff1);
+    Serial.print(c[3][k]);
     Serial.print("\t");
    
     
     Serial.print(bmp.readSealevelPressure());
     Serial.print("\t");
-    if (i==0){  
-      h = c[1][5]>c[1][i];
+    if (k==0){  
+      h = c[1][4]>c[1][k];
     } else {
-      h = c[1][i-1]>c[1][i];
+      h = c[1][k-1]>c[1][k];
     }
     Serial.print(h);
     Serial.print("\t"); 
