@@ -2,9 +2,12 @@
 
 
 Adafruit_BMP085 bmp;
+bool h = false;
 float med_alt = 0; 
-float c[5];
-int j =0;
+float c[5][2];
+float ss1;
+int j =1;
+int jr =0;
 float s1;
 int k;
 void setup() {
@@ -20,9 +23,10 @@ void setup() {
   }
   med_alt /=10; 
   for(int i=0;i<5;i++){
-    c[i]= bmp.readAltitude()- med_alt; 
+    c[i][0]= bmp.readAltitude()- med_alt; 
+    c[i][1]= 0;
   }
-  s1 = (c[0]+c[1]+c[2]+c[3]+c[4])/5;
+  s1 = (c[0][0]+c[1][0]+c[2][0]+c[3][0]+c[4][0])/5;
 }
 
 void loop() {
@@ -34,30 +38,34 @@ void loop() {
 
     
     
-    c[j] = bmp.readAltitude()- med_alt;
-    float s2 = (c[0]+c[1]+c[2]+c[3]+c[4])/5;
-    
+    c[j][0] = bmp.readAltitude()- med_alt;
+    s1 = (c[0][0]+c[1][0]+c[2][0]+c[3][0]+c[4][0])/5;
+    c[j][1] = s1;
+    ss1 = (c[0][1]+c[1][1]+c[2][1]+c[3][1]+c[4][1])/5;
     // Calculate altitude assuming 'standard' barometric
     // pressure of 1013.25 millibar = 101325 Pascal
-    Serial.print(c[j]);
+    Serial.print(c[j][0]);
     Serial.print("\t");
     
-    Serial.print(s2);
+    Serial.print(c[j][1]);
     Serial.print("\t");
     
     j +=1;
     j%=5;
+    jr +=1;
+    jr%=5;    
     
     Serial.print(bmp.readSealevelPressure());
     Serial.print("\t");
       
-    if (s2-s1>= 0){
-      Serial.print(0);
+    if (c[jr][1]>c[j][1]){
+      h = true;
     } else {
-      Serial.print(1); 
+      h = false; 
     }
+    Serial.print(h);
     Serial.print("\t"); 
-    s1 = s2;
+    
   // you can get a more precise measurement of altitude
   // if you know the current sea level pressure which will
   // vary with weather and such. If it is 1015 millibars
