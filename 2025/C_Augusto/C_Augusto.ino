@@ -30,10 +30,10 @@ void setup() {
 }
 
 void loop() {
-  float valor = bmp.readAltitude();
-  float altura = valor - altitudeTarada;
-  soma = soma - leituras[indice] + valor;
-  leituras[indice] = valor;
+  float altitude = bmp.readAltitude();
+  float altura = altitude - altitudeTarada ;
+  soma = soma - leituras[indice] + altitude;
+  leituras[indice] = altitude;
   indice = (indice + 1) % AMOSTRAS;
 
   float altitudeFiltrada = soma / AMOSTRAS;
@@ -42,7 +42,7 @@ void loop() {
   Serial.print("\t");
   Serial.print(bmp.readPressure());
   Serial.print("\t");
-  Serial.print(valor);
+  Serial.print(altitude);
   Serial.print("\t");
   Serial.print(bmp.readSealevelPressure());
   Serial.print("\t");
