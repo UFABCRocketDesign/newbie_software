@@ -33,6 +33,8 @@ void loop() {
   float altitude = bmp.readAltitude();
   float altura = altitude - altitudeTarada ;
   soma = soma - leituras[indice] + altura;
+  leituras[indice] = altura;;
+  soma = soma - leituras[indice] + altura;
   leituras[indice] = altura;
   indice = (indice + 1) % AMOSTRAS;
 
