@@ -46,14 +46,17 @@ void loop() {
   total = total + leituras[indiceAtual];
   indiceAtual = (indiceAtual + 1) % numLeituras;
   float media = total / numLeituras;
+  
+  Serial.print(media);
+  Serial.print("\t");
 
   total2 = total2 - leituras2[indiceAtual2];
   leituras2[indiceAtual2] = (media);
   total2 = total2 + leituras2[indiceAtual2];
   indiceAtual2 = (indiceAtual2 + 1) % numLeituras;
   float mediaNova = total2 / numLeituras;
+  
   Serial.print(mediaNova);
-
   Serial.print("\t");
   Serial.print(altitudeReal);
   Serial.print("\t");
@@ -62,12 +65,12 @@ void loop() {
   Serial.print(bmp.readAltitude(101500));
   Serial.print("\t");
 
-  if (media < altitudeAnterior) {
+  if (mediaNova < altitudeAnterior) {
     Serial.print(0);
   } else {
     Serial.print(1);
   }
-  altitudeAnterior = media;
+  altitudeAnterior = mediaNova;
 
   Serial.println();
 }
