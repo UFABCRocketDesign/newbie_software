@@ -55,5 +55,7 @@ void loop() {
   Serial.print("\t");
   Serial.print(altitudeFiltrada2);
   Serial.print("\t");
+  Serial.print(altitudeFiltrada);
+  Serial.print("\t");
   Serial.println(altura);
 }
