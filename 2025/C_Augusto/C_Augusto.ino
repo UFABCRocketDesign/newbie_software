@@ -6,6 +6,7 @@ Adafruit_BMP085 bmp;
 float leituras[AMOSTRAS];
 float leituras2[AMOSTRAS];
 float soma = 0;
+float soma2 = 0;
 int indice = 0;
 int indice1 = 0; 
 float altitudeTarada = 0;
@@ -22,11 +23,6 @@ void setup() {
   }
   altitudeTarada /= 10.0;
 
-  for (int i = 0; i < AMOSTRAS; i++) {
-    float valor = bmp.readAltitude();
-    leituras[i] = valor;
-    soma += valor;
-  }
 
   Serial.println("Temperatura\tPressao\tAltitude\tNivel do mar\tAltitude Filtrada\tAltura");
 }
@@ -40,7 +36,7 @@ void loop() {
 
   float altitudeFiltrada = soma / AMOSTRAS;
   
-  float soma2 = soma2 - leituras2[indice1] + altitudeFiltrada;
+  soma2 = soma2 - leituras2[indice1] + altitudeFiltrada;
   leituras2[indice1] = altitudeFiltrada;
   indice1 = (indice1 + 1) % AMOSTRAS;
   float altitudeFiltrada2 = soma2/AMOSTRAS;
