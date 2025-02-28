@@ -1,11 +1,11 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 
-const int numLeituras = 10;
+const int numLeituras = 15;
 float alt = 0;
 float total = 0;
 float leituras[numLeituras];
-float altitudeAnterior = 0
+float altitudeAnterior = 0;
 int indiceAtual = 0;
 
 void setup() {
@@ -46,14 +46,14 @@ void loop() {
   Serial.print(bmp.readSealevelPressure());
   Serial.print("\t");
   Serial.print(bmp.readAltitude(101500));
-  Serial.print("\t")
+  Serial.print("\t");
 
-  if altitudeReal < altitudeAnterior{
-    Serial.print("Queda")
+  if (altitudeReal < altitudeAnterior) {
+    Serial.print(0);
   } else {
-    Serial.print("Subida")
+    Serial.print(1);
   }
-  altitudeReal = altitudeAnterior
+  altitudeReal = altitudeAnterior;
 
   Serial.println();
 }
