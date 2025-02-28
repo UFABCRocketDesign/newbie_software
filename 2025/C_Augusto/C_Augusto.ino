@@ -4,6 +4,7 @@ Adafruit_BMP085 bmp;
 
 #define AMOSTRAS 20
 float leituras[AMOSTRAS];
+float leituras2[AMOSTRAS];
 float soma = 0;
 int indice = 0;
 int indice1 = 0; 
@@ -39,8 +40,8 @@ void loop() {
 
   float altitudeFiltrada = soma / AMOSTRAS;
   
-  float soma2 = soma2 - leituras[indice1] + altitudeFiltrada;
-  leituras[indice1] = altitudeFiltrada;
+  float soma2 = soma2 - leituras2[indice1] + altitudeFiltrada;
+  leituras2[indice1] = altitudeFiltrada;
   indice1 = (indice1 + 1) % AMOSTRAS;
   float altitudeFiltrada2 = soma2/AMOSTRAS;
 
