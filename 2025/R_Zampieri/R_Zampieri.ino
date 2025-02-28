@@ -53,7 +53,7 @@ void loop() {
 
   //atualização dos valores gravados
   vetor[guia] = bmp.readAltitude() - tara;
-  if (guia < 5) {
+  if (guia < 4) {
     guia += 1;
   } else {
     guia = 0;
