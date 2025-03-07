@@ -36,13 +36,15 @@ float altitude_filtrada = (vetor[0] + vetor[1] + vetor[2] + vetor[3] + vetor[4])
 
 void loop() {
 
-   //atualização dos valores gravados
+  //atualização dos valores gravados
   vetor[guia] = bmp.readAltitude() - tara;
   if (guia < 4) {
     guia += 1;
   } else {
     guia = 0;
   }
+  
+  float altitude_filtrada = (vetor[0] + vetor[1] + vetor[2] + vetor[3] + vetor[4]) / 5;
 
   //print dos valores medidos
   Serial.print(bmp.readTemperature());
