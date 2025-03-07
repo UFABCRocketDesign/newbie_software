@@ -14,6 +14,7 @@ float soma2 = 0;
 int indice = 0;
 int indice1 = 0; 
 float altitudeTarada = 0;
+String dataString = "";
 
 void setup() {
   Serial.begin(115200);
@@ -41,6 +42,16 @@ void setup() {
     Serial.println("Note: press reset button on the board and reopen this Serial Monitor after fixing your issue!");
     while (true);
   }
+  
+  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  if (dataFile) {
+    dataFile.println(dataString);
+    dataFile.println("Temperatura\tPressao\tAltitude\tNivel do mar\tAltitude Filtrada\tAltura");
+    dataFile.close();
+  } else {
+    Serial.println("error opening datalog.txt");
+  }
+
 
   Serial.println("initialization done.");
 }
@@ -73,7 +84,6 @@ void loop() {
   Serial.print("\t");
   Serial.println(altura);
 
-  String dataString = "";
   dataString += String(bmp.readTemperature()) + "\t";
   dataString += String(bmp.readPressure()) + "\t";
   dataString += String(altitude) + "\t";
