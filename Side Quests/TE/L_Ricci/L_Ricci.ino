@@ -5,10 +5,10 @@ void setup() {
   Serial.begin(115200);
   pinMode(A0, OUTPUT);
 
-  Serial.println("Transdutor\tPressao");
+  Serial.println("Transdutor\tTensão\tPressão");
 }
 
-float adcTensao(float adc) {
+float adcTensao(int adc) {
   tensao = (1023.0/5.0) * adc;
   return tensao;
 }
@@ -20,13 +20,13 @@ float tensaoPressao(float tensao) {
 
 void loop() {
  
-  float transdutor = analogRead(A0);
+  int transdutor = analogRead(A0);
+  tensao = adcTensao(transdutor);
 
   Serial.print(transdutor);
   Serial.print("\t");
-  
-  tensao = adcTensao(transdutor);
+  Serial.print(tensao)
+  Serial.print(\t)
   Serial.print(tensaoPressao(tensao));
-
   Serial.println();
 }
