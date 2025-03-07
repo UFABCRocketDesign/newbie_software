@@ -4,6 +4,7 @@ Adafruit_BMP085 bmp;
 
 const int numLeituras = 10;
 const int chipSelect = 53;
+const int numeroQuedas = 5;
 float alt = 0;
 
 float total = 0;
@@ -11,10 +12,12 @@ float total2 = 0;
 
 float leituras[numLeituras];
 float leituras2[numLeituras];
+float altitudes[numeroQuedas];
 
 int indiceAtual = 0;
 int indiceAtual2 = 0;
-int queda;
+int contadorQueda = 0;
+int queda = 0;
 
 String zeros;
 String filename;
@@ -93,25 +96,30 @@ void loop() {
   indiceAtual2 = (indiceAtual2 + 1) % numLeituras;
   float mediaNova = total2 / numLeituras;
 
+  if (mediaNova < altitudeAnterior) {
+    contadorQueda++;
+  } else {
+    contadorQueda = 0;
+  }
+  altitudeAnterior = mediaNova;
+
+  if (contadorQueda >= 10) {
+    queda = 1;
+  } else {
+    queda = 0;
+  }
+
   String dataString = "";
   dataString += String(temperatura) + "\t";
   dataString += String(pressao) + "\t";
   dataString += String(media) + "\t";
+  dataString += String(mediaNova) + "\t";
   dataString += String(altitudeReal) + "\t";
   dataString += String(pressaoNivelMar) + "\t";
   dataString += String(altitude) + "\t";
   dataString += String(queda);
   
   Serial.println(dataString);
-
-  if (mediaNova < altitudeAnterior) {
-    Serial.print(1);
-    queda = 1;
-  } else {
-    Serial.print(0);
-    queda = 0;
-  }
-  altitudeAnterior = mediaNova;
 
   File dataFile = SD.open(filename, FILE_WRITE);
   if (dataFile) {
