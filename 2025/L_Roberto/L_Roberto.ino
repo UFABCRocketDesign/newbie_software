@@ -6,7 +6,7 @@ int index = 0;
 void setup(){  
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
-    Serial.println("\nTemperatura | Pressão | Altitude | Pressão Nivel do Mar | Altitude Real.");
+    Serial.println("\nTemperatura | Pressão | Altitude | Altitude Filtrada | Pressão Nivel do Mar | Altitude Real.");
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
@@ -30,6 +30,8 @@ void loop(){
     Serial.print("\t");
   Serial.print(bmp.readPressure());
     Serial.print("\t");
+  Serial.print(leituras[index-1]);
+  Serial.print("\t");
   Serial.print(filteredAltitude());
     Serial.print("\t");
   Serial.print(bmp.readSealevelPressure());
