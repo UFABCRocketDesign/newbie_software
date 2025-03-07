@@ -85,6 +85,7 @@ void loop() {
   File dataFile = SD.open("datalog.txt", FILE_WRITE);
   if (dataFile) {
     dataFile.println(dataString);
+    dataFile.println("Temperatura\tPressao\tAltitude\tNivel do mar\tAltitude Filtrada\tAltura");
     dataFile.close();
   } else {
     Serial.println("error opening datalog.txt");
