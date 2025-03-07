@@ -5,8 +5,7 @@ Adafruit_BMP085 bmp;
 #define N 3
 #define L 5
 #define H 4
-bool ar;
-bool h = false;
+bool h;
 float med_alt = 0; 
 float c[N][L];
 float s[N+1];
