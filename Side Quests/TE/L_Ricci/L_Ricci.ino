@@ -25,8 +25,8 @@ void loop() {
 
   Serial.print(transdutor);
   Serial.print("\t");
-  Serial.print(tensao)
-  Serial.print(\t)
+  Serial.print(tensao);
+  Serial.print("\t");
   Serial.print(tensaoPressao(tensao));
   Serial.println();
 }
