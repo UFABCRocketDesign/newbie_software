@@ -1,5 +1,4 @@
 #include <Adafruit_BMP085.h>
-#include <SPI.h>
 #include <SD.h>
 Adafruit_BMP085 bmp;
 
@@ -77,10 +76,10 @@ void setup() {
 void loop() {
   float altitudeReal = bmp.readAltitude() - alt;
 
-  Serial.print(bmp.readTemperature());
-  Serial.print("\t");
-  Serial.print(bmp.readPressure());
-  Serial.print("\t");
+  float temperatura = bmp.readTemperature();
+  float pressao = bmp.readPressure();
+  float pressaoNivelMar = bmp.readSealevelPressure();
+  float altitude = bmp.readAltitude(101500);
 
   total = total - leituras[indiceAtual];
   leituras[indiceAtual] = (altitudeReal);
@@ -88,23 +87,22 @@ void loop() {
   indiceAtual = (indiceAtual + 1) % numLeituras;
   float media = total / numLeituras;
 
-  Serial.print(media);
-  Serial.print("\t");
-
   total2 = total2 - leituras2[indiceAtual2];
   leituras2[indiceAtual2] = (media);
   total2 = total2 + leituras2[indiceAtual2];
   indiceAtual2 = (indiceAtual2 + 1) % numLeituras;
   float mediaNova = total2 / numLeituras;
 
-  Serial.print(mediaNova);
-  Serial.print("\t");
-  Serial.print(altitudeReal);
-  Serial.print("\t");
-  Serial.print(bmp.readSealevelPressure());
-  Serial.print("\t");
-  Serial.print(bmp.readAltitude(101500));
-  Serial.print("\t");
+  String dataString = "";
+  dataString += String(temperatura) + "\t";
+  dataString += String(pressao) + "\t";
+  dataString += String(media) + "\t";
+  dataString += String(altitudeReal) + "\t";
+  dataString += String(pressaoNivelMar) + "\t";
+  dataString += String(altitude) + "\t";
+  dataString += String(queda);
+  
+  Serial.println(dataString);
 
   if (mediaNova < altitudeAnterior) {
     Serial.print(1);
@@ -114,10 +112,6 @@ void loop() {
     queda = 0;
   }
   altitudeAnterior = mediaNova;
-
-  Serial.println();
-
-  String dataString = String(bmp.readTemperature()) + "\t" + String(bmp.readPressure()) + "\t" + String(media) + "\t" + String(altitudeReal) + "\t" + String(bmp.readSealevelPressure()) + "\t" + String(bmp.readAltitude(101500)) + "\t" + String(queda);
 
   File dataFile = SD.open(filename, FILE_WRITE);
   if (dataFile) {
