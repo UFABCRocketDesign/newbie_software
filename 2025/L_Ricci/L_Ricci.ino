@@ -18,7 +18,7 @@ int indiceAtual2 = 0;
 int queda;
 
 String filename;
-int incremento = 0
+int incremento = 0;
 
 float altitudeAnterior = 0;
 
@@ -28,17 +28,18 @@ void setup() {
   Serial.print("Inicializando cartão SD...");
   if (!SD.begin(chipSelect)) {
     Serial.println("Falha na inicialização do cartão SD!");
-    while (1);
+    while (1)
+      ;
   }
   Serial.println("Cartão SD inicializado com sucesso.");
 
   if (!bmp.begin()) {
-	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-	while (1) {}
+    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+    while (1) {}
   }
 
   Serial.println("Temperatura\tPressão\tAltitude Filtrada\tAltitude Raw\tPressão Mar\tPressão Local (hPa)\tQueda");
-  
+
   for (int i = 0; i < 150; i++) {
     alt += bmp.readAltitude();
   }
@@ -50,16 +51,11 @@ void setup() {
   }
 
   do {
-    filename = "LUCAS" + String(i) + ".txt";
-  }
-  } while (SD.exists(filename));
-
-  do {
     filename = 'LUCAS' + String(incremento) + ".txt";
     incremento++;
-  } while (SD.exit(filename))
+  } while (SD.exists(filename));
 
-  Serial.println(filename)
+  Serial.println(filename);
 
   File dataFile = SD.open(filename, FILE_WRITE);
   if (dataFile) {
@@ -68,7 +64,6 @@ void setup() {
   } else {
     Serial.println("Erro ao abrir o arquivo");
   }
-
 }
 
 void loop() {
@@ -84,7 +79,7 @@ void loop() {
   total = total + leituras[indiceAtual];
   indiceAtual = (indiceAtual + 1) % numLeituras;
   float media = total / numLeituras;
-  
+
   Serial.print(media);
   Serial.print("\t");
 
@@ -93,7 +88,7 @@ void loop() {
   total2 = total2 + leituras2[indiceAtual2];
   indiceAtual2 = (indiceAtual2 + 1) % numLeituras;
   float mediaNova = total2 / numLeituras;
-  
+
   Serial.print(mediaNova);
   Serial.print("\t");
   Serial.print(altitudeReal);
@@ -114,13 +109,7 @@ void loop() {
 
   Serial.println();
 
-  String dataString = String(bmp.readTemperature()) + "\t" +
-                      String(bmp.readPressure()) + "\t" +
-                      String(media) + "\t" +
-                      String(altitudeReal) + "\t" +
-                      String(bmp.readSealevelPressure()) + "\t" +
-                      String(bmp.readAltitude(101500)) + "\t" +
-                      String(queda);
+  String dataString = String(bmp.readTemperature()) + "\t" + String(bmp.readPressure()) + "\t" + String(media) + "\t" + String(altitudeReal) + "\t" + String(bmp.readSealevelPressure()) + "\t" + String(bmp.readAltitude(101500)) + "\t" + String(queda);
 
   File dataFile = SD.open(filename, FILE_WRITE);
   if (dataFile) {
