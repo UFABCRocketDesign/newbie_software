@@ -1,10 +1,13 @@
 #include <Adafruit_BMP085.h>
 
+#define tamanho 10
+
 Adafruit_BMP085 bmp;
 //Declarando variáveis e array
 float tara = 0;
-float vetor[5];
+float vetor[tamanho];
 int guia = 0;
+float altitude_filtrada = 0;
 //
 
 void setup() {
@@ -36,13 +39,16 @@ void loop() {
 
   //atualização dos valores gravados
   vetor[guia] = bmp.readAltitude() - tara;
-  if (guia < 4) {
+  if (guia < tamanho-1) {
     guia += 1;
   } else {
     guia = 0;
   }
 
-  float altitude_filtrada = (vetor[0] + vetor[1] + vetor[2] + vetor[3] + vetor[4]) / 5;
+  for (int i = 0; i < tamanho; i+=1) {
+    altitude_filtrada += vetor[i];
+  }
+altitude_filtrada /= tamanho;
 
   //print dos valores medidos
   Serial.print(bmp.readTemperature());
