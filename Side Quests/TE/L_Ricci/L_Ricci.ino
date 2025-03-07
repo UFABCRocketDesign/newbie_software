@@ -3,11 +3,13 @@ float tensao = 0.0;
 
 void setup() {
   Serial.begin(9600);
+  pinMode(A0, OUTPUT);
+  
   Serial.println("Transdutor\tPressao");
 }
 
 float adcTensao(float adc) {
-  tensao = (1023/5) * adc;
+  tensao = (1023.0/5.0) * adc;
   return tensao;
 }
 
