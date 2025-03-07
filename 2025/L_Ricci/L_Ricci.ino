@@ -3,7 +3,7 @@
 #include <SD.h>
 Adafruit_BMP085 bmp;
 
-const int numLeituras = 15;
+const int numLeituras = 10;
 const int chipSelect = 53;
 float alt = 0;
 
@@ -17,9 +17,9 @@ int indiceAtual = 0;
 int indiceAtual2 = 0;
 int queda;
 
-String nome;
-String filename;
 String zeros;
+String filename;
+String nome = "LUCAS";
 int incremento = 0;
 int tamanho = 0;
 
@@ -43,10 +43,10 @@ void setup() {
 
   Serial.println("Temperatura\tPressão\tAltitude Filtrada\tAltitude Raw\tPressão Mar\tPressão Local (hPa)\tQueda");
 
-  for (int i = 0; i < 15; i++) {
+  for (int i = 0; i < 10; i++) {
     alt += bmp.readAltitude();
   }
-  alt = alt / 15;
+  alt = alt / 10;
 
   for (int i = 0; i < numLeituras; i++) {
     leituras[i] = 0;
