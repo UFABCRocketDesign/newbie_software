@@ -17,8 +17,11 @@ int indiceAtual = 0;
 int indiceAtual2 = 0;
 int queda;
 
+String nome;
 String filename;
+String zeros;
 int incremento = 0;
+int tamanho = 0;
 
 float altitudeAnterior = 0;
 
@@ -40,10 +43,10 @@ void setup() {
 
   Serial.println("Temperatura\tPressão\tAltitude Filtrada\tAltitude Raw\tPressão Mar\tPressão Local (hPa)\tQueda");
 
-  for (int i = 0; i < 150; i++) {
+  for (int i = 0; i < 15; i++) {
     alt += bmp.readAltitude();
   }
-  alt = alt / 150;
+  alt = alt / 15;
 
   for (int i = 0; i < numLeituras; i++) {
     leituras[i] = 0;
@@ -51,7 +54,11 @@ void setup() {
   }
 
   do {
-    filename = "LUCAS" + String(incremento) + ".txt";
+    tamanho = nome.length() + String(incremento).length();
+    for (int i = tamanho; i < 8; i++) {
+      zeros += "0";
+    }
+    filename = nome + zeros + String(incremento) + ".txt";
     incremento++;
   } while (SD.exists(filename));
 
