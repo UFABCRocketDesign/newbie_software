@@ -45,7 +45,7 @@ void setup() {
   
   File dataFile = SD.open("datalog.txt", FILE_WRITE);
   if (dataFile) {
-    dataFile.println("Temperatura\tPressao\tAltitude\tNivel do mar\tAltitude Filtrada\tAltura");
+    dataFile.println("Temperatura\tPressao\tAltitude\tNivel do mar\tAltitude Filtrada\tAltura\t");
     dataFile.close();
   } else {
     Serial.println("error opening datalog.txt");
@@ -83,6 +83,8 @@ void loop() {
   Serial.print("\t");
   Serial.println(altura);
 
+
+  String dataString = "";
   dataString += String(bmp.readTemperature()) + "\t";
   dataString += String(bmp.readPressure()) + "\t";
   dataString += String(altitude) + "\t";
