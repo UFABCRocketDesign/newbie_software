@@ -15,25 +15,25 @@ void setup(){
     alt += bmp.readAltitude();
   alt = alt/100 ;
 }
-
-float filteredAltitude(){
+float filteredAltitude(float altura_atual){
   if (index == 5) {
   index = 0;
   }
-  leituras[index] = bmp.readAltitude();
+  leituras[index] = altura_atual;
   index++;
   float num = (leituras[0]+leituras[1]+leituras[2]+leituras[3]+leituras[4])/5;
   return num;
 }
 void loop(){
- 
+ float altura_atual = bmp.readAltitude();
+
   Serial.print(bmp.readTemperature());
     Serial.print("\t");
   Serial.print(bmp.readPressure());
     Serial.print("\t");
-  Serial.print(leituras[index-1] - alt);
+  Serial.print(altura_atual - alt);
   Serial.print("\t");
-  Serial.print(filteredAltitude() - alt);
+  Serial.print(filteredAltitude(altura_atual) - alt);
     Serial.print("\t");
   Serial.print(bmp.readSealevelPressure());
     Serial.print("\t");
