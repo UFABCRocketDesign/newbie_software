@@ -6,7 +6,7 @@ Adafruit_BMP085 bmp;
 
 #define AMOSTRAS 20
 
-const int chipSelect = 10;
+const int chipSelect = 53;
 float leituras[AMOSTRAS];
 float leituras2[AMOSTRAS];
 float soma = 0;
