@@ -37,7 +37,7 @@ void loop() {
     s[0] = bmp.readAltitude()- med_alt;
     
     for (int i =0 ; i<N;i++){
-      c[i][k]= s[0];
+      c[i][k]= s[i];
       s[i+1] =0;
       for(int j =0;j<L;j++){
         s[i+1]+= c[i][j];
