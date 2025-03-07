@@ -5,7 +5,7 @@ Adafruit_BMP085 bmp;
 #define N 3
 #define L 5
 #define H 4
-bool ar= true;
+bool ar;
 bool h = false;
 float med_alt = 0; 
 float c[N][L];
@@ -61,11 +61,12 @@ void loop() {
        ss[i] = s[i-1];
     }
     ss[0] = s[3];
+    ar = true;
     for(int i=0;i<H-1;i++){
-      ar && ss[i]<ss[i+1];
+      ar = ar && ss[i]<ss[i+1];
       
     }
-    h  = h or ar;
+    h  = h || ar;
     
     Serial.print(h);
     Serial.print("\t"); 
