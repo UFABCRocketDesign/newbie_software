@@ -23,12 +23,6 @@ void setup() {
   tara /= 10;
   //
 
-  //Vetor inicial de suavização
-  for (int i = 0; i < 5; i = i + 1) {
-    vetor[i] = bmp.readAltitude() - tara;
-  }
-  //
-
   Serial.print("Temperatura\t");
   Serial.print("Pressão\t");
   Serial.print("Altitude Filtrada\t");
@@ -38,27 +32,29 @@ void setup() {
   Serial.println();
 }
 
-void loop() {
-  //print dos valores medidos
-  Serial.print(bmp.readTemperature());
-  Serial.print("\t");
-  Serial.print(bmp.readPressure());
-  Serial.print("\t");
-  Serial.print((vetor[0] + vetor[1] + vetor[2] + vetor[3] + vetor[4]) / 5);
-  Serial.print("\t");
-  Serial.print(bmp.readSealevelPressure());
-  Serial.print("\t");
-  Serial.print(bmp.readAltitude(101500));
-  Serial.print("\t");
+float altitude_filtrada = (vetor[0] + vetor[1] + vetor[2] + vetor[3] + vetor[4]) / 5;
 
-  //atualização dos valores gravados
+void loop() {
+
+   //atualização dos valores gravados
   vetor[guia] = bmp.readAltitude() - tara;
   if (guia < 4) {
     guia += 1;
   } else {
     guia = 0;
   }
-  
+
+  //print dos valores medidos
+  Serial.print(bmp.readTemperature());
+  Serial.print("\t");
+  Serial.print(bmp.readPressure());
+  Serial.print("\t");
+  Serial.print(altitude_filtrada);
+  Serial.print("\t");
+  Serial.print(bmp.readSealevelPressure());
+  Serial.print("\t");
+  Serial.print(bmp.readAltitude(101500));
+  Serial.print("\t");
   Serial.print(vetor[guia]);
   Serial.print("\t");
   Serial.println();
