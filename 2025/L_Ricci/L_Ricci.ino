@@ -51,7 +51,7 @@ void setup() {
   }
 
   do {
-    filename = 'LUCAS' + String(incremento) + ".txt";
+    filename = "LUCAS" + String(incremento) + ".txt";
     incremento++;
   } while (SD.exists(filename));
 
