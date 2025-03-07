@@ -9,12 +9,12 @@ void setup() {
 }
 
 float adcTensao(int adc) {
-  tensao = (1023.0/5.0) * adc;
+  tensao = (5.0/1023.0) * adc;
   return tensao;
 }
 
 float tensaoPressao(float tensao) {
-  pressao = 125 * tensao;
+  pressao = (125 * tensao) - 62.5;
   return pressao;
 }
 
