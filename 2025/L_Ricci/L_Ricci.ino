@@ -18,6 +18,7 @@ int indiceAtual2 = 0;
 int queda;
 
 String filename;
+int incremento = 0
 
 float altitudeAnterior = 0;
 
@@ -49,10 +50,16 @@ void setup() {
   }
 
   do {
-    for (int i = 0; i < 10; i++) {
-      filename = "LUCAS" + String(i) + ".txt";
-    }
+    filename = "LUCAS" + String(i) + ".txt";
+  }
   } while (SD.exists(filename));
+
+  do {
+    filename = 'LUCAS' + String(incremento) + ".txt";
+    incremento++;
+  } while (SD.exit(filename))
+
+  Serial.println(filename)
 
   File dataFile = SD.open(filename, FILE_WRITE);
   if (dataFile) {
