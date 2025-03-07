@@ -57,16 +57,15 @@ void loop() {
     Serial.print(bmp.readSealevelPressure());
     Serial.print("\t");
 
-    for(int i=H-1;i>1;i--){
+    for(int i=H-1;i>0;i--){
        ss[i] = s[i-1];
     }
     ss[0] = s[3];
-    ar = true;
+    h = true;
     for(int i=0;i<H-1;i++){
-      ar = ar && ss[i]<ss[i+1];
+      h = h && ss[i]<ss[i+1];
       
     }
-    h  = h || ar;
     
     Serial.print(h);
     Serial.print("\t"); 
