@@ -48,7 +48,7 @@ void loop(){
 
 
 float filteredAltitude(const float altura_atual){
-  num = 0;
+
   leituras[index] = altura_atual;
   index++;
   
