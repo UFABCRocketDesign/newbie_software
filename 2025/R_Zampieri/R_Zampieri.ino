@@ -8,6 +8,7 @@ float tara = 0;
 float vetor[tamanho];
 float vetor2[tamanho];
 int guia = 0;
+int guia2 = 0;
 float altitude_filtrada = 0;
 float altitude_filtrada2 = 0;
 //
@@ -55,11 +56,11 @@ void loop() {
 
   altitude_filtrada /= tamanho;
 
-  vetor2[guia] = altitude_filtrada;
-  if (guia < tamanho - 1) {
-    guia += 1;
+  vetor2[guia2] = altitude_filtrada;
+  if (guia2 < tamanho - 1) {
+    guia2 += 1;
   } else {
-    guia = 0;
+    guia2 = 0;
   }
 
   altitude_filtrada2 = 0;
