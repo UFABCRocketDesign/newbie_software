@@ -17,6 +17,8 @@ int indiceAtual = 0;
 int indiceAtual2 = 0;
 int queda;
 
+String filename;
+
 float altitudeAnterior = 0;
 
 void setup() {
@@ -46,7 +48,14 @@ void setup() {
     leituras2[i] = 0;
   }
 
-  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  do {
+    for (int i = 0; i < 10; i++) {
+      filename = "LUCAS" + String(i) + ".txt";
+      SD.open(filename, FILE_WRITE);
+    }
+  } while (SD.exists(filename));
+
+  File dataFile = SD.open(filename, FILE_WRITE);
   if (dataFile) {
     dataFile.println("Temperatura\tPressão\tAltitudeFiltrada\tAltitudeRaw\tPressãoMar\tPressãoLocal(hPa)\tQueda");
     dataFile.close();
@@ -107,7 +116,7 @@ void loop() {
                       String(bmp.readAltitude(101500)) + "\t" +
                       String(queda);
 
-  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  File dataFile = SD.open(filename, FILE_WRITE);
   if (dataFile) {
     dataFile.println(dataString);
     dataFile.close();
