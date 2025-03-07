@@ -1,8 +1,8 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
-
+#define AMOSTRAS 10
 float alt = 0;
-float leituras[10] = {0};
+float leituras[AMOSTRAS] = {0};
 int index = 0;
 float filteredAltitude(const float);
 
@@ -14,13 +14,18 @@ void setup(){
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
-  for (int i = 0; i < 100; i++) 
+  
+  for (int i = 0; i < 100; i++)
     alt += bmp.readAltitude();
-  alt = alt/100 ;
+  alt = alt/100;  
+  
+  for (int i = 0; i < 10; i++)
+    leituras[i] = bmp.readAltitude() - alt;
+
 }
 
 void loop(){
- float altura_atual = bmp.readAltitude() - alt;
+  float altura_atual = bmp.readAltitude() - alt;
 
   Serial.print(bmp.readTemperature());
     Serial.print("\t");
@@ -43,14 +48,19 @@ void loop(){
 
 
 float filteredAltitude(const float altura_atual){
-  if (index == 10) {
-  index = 0;
-  }
+  num = 0;
   leituras[index] = altura_atual;
   index++;
-  float num = 0;
-  for (int i = 0; i < index; i++) {
-  num += leituras[i];
+  
+  if (index == AMOSTRAS) {
+  index = 0;
   }
-  return num/index;
+  float num = 0;
+  
+  for (int i = 0; i < AMOSTRAS; i++) {
+    num += leituras[i];
+    leituras[i] = leituras[i-1];
+  
+  }
+  return num/AMOSTRAS;
 }
