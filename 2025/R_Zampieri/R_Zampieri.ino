@@ -50,9 +50,6 @@ void loop() {
   Serial.print("\t");
   Serial.print(bmp.readAltitude(101500));
   Serial.print("\t");
-  Serial.print(vetor[guia]);
-  Serial.print("\t");
-  Serial.println();
 
   //atualização dos valores gravados
   vetor[guia] = bmp.readAltitude() - tara;
@@ -61,4 +58,8 @@ void loop() {
   } else {
     guia = 0;
   }
+  
+  Serial.print(vetor[guia]);
+  Serial.print("\t");
+  Serial.println();
 }
