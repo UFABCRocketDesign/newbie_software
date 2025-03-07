@@ -2,10 +2,12 @@
 
 
 Adafruit_BMP085 bmp;
+#define N 3
+#define L 5
 bool h = false;
 float med_alt = 0; 
-float c[3][5];
-float s[4];
+float c[N][L];
+float s[N+1];
 float ss=0;
 int k=0;
 void setup() {
@@ -34,10 +36,10 @@ void loop() {
     Serial.print("\t");
     s[0] = bmp.readAltitude()- med_alt;
     
-    for (int i =0 ; i<2;i++){
+    for (int i =0 ; i<N;i++){
       c[i][k]= s[0];
       s[i+1] =0;
-      for(int j =0;j<5;j++){
+      for(int j =0;j<L;j++){
         s[i+1]+= c[i][j];
       }
       s[i+1]/=5;
@@ -45,13 +47,10 @@ void loop() {
     
     k+=1;
     k%=5;
-
-    Serial.print(s[0]);
-    Serial.print("\t");
-    
-    Serial.print(s[3]);
-    Serial.print("\t");
-   
+    for(int i=0; i<N+1; i++){
+      Serial.print(s[i]);
+      Serial.print("\t");
+    }
     
     Serial.print(bmp.readSealevelPressure());
     Serial.print("\t");
