@@ -31,9 +31,10 @@ void setup() {
 
   Serial.print("Temperatura\t");
   Serial.print("Pressão\t");
-  Serial.print("Altitude\t");
+  Serial.print("Altitude Filtrada\t");
   Serial.print("Pressão no Nível do Mar\t");
   Serial.print("Altitude Real\t");
+  Serial.print("Altitude Sem Filtro\t");
   Serial.println();
 }
 
@@ -48,6 +49,8 @@ void loop() {
   Serial.print(bmp.readSealevelPressure());
   Serial.print("\t");
   Serial.print(bmp.readAltitude(101500));
+  Serial.print("\t");
+  Serial.print(vetor[guia]);
   Serial.print("\t");
   Serial.println();
 
