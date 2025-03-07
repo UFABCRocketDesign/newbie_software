@@ -51,7 +51,6 @@ void setup() {
   do {
     for (int i = 0; i < 10; i++) {
       filename = "LUCAS" + String(i) + ".txt";
-      SD.open(filename, FILE_WRITE);
     }
   } while (SD.exists(filename));
 
