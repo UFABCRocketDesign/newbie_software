@@ -55,6 +55,7 @@ void setup() {
 
   do {
     tamanho = nome.length() + String(incremento).length();
+    zeros = ""
     for (int i = tamanho; i < 8; i++) {
       zeros += "0";
     }
