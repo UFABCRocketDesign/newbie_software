@@ -2,9 +2,9 @@ float pressao = 0.0;
 float tensao = 0.0;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   pinMode(A0, OUTPUT);
-  
+
   Serial.println("Transdutor\tPressao");
 }
 
@@ -27,4 +27,6 @@ void loop() {
   
   tensao = adcTensao(transdutor);
   Serial.print(tensaoPressao(tensao));
+
+  Serial.println();
 }
