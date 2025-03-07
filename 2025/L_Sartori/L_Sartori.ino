@@ -45,7 +45,7 @@ void loop() {
     Serial.print(c[0][k]);
     Serial.print("\t");
     
-    Serial.print(c[3][k]);
+    Serial.print(c[2][k]);
     Serial.print("\t");
    
     
