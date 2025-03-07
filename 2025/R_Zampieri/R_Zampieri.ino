@@ -48,6 +48,7 @@ void loop() {
     guia = 0;
   }
 
+  altitude_filtrada = 0;
   for (int i = 0; i < tamanho; i += 1) {
     altitude_filtrada += vetor[i];
   }
@@ -61,6 +62,7 @@ void loop() {
     guia = 0;
   }
 
+  altitude_filtrada2 = 0;
   for (int i = 0; i < tamanho; i += 1) {
     altitude_filtrada2 += vetor2[i];
   }
