@@ -34,7 +34,7 @@ int queda = 0;
 String zeros;
 String filename;
 String nome = "LUCAS";
-String heading = "Tempo\tTemperatura\tPressão\tAltitudeFiltrada\tAltitudeRaw\tPressãoMar\tPressãoLocal(hPa)\tQueda\tParaquedas_1\tParaquedas_2\tAccelX\tAccelY\tAccelZ\tGyroX\tGyroY\tGyroZ\tMagX\tMagY\tMagZ";
+String heading = "Tempo\tTemperatura\tPressão\tAltitudeFiltrada\tAltitudeRaw\tQueda\tParaquedas_1\tParaquedas_2\tAccelX\tAccelY\tAccelZ\tGyroX\tGyroY\tGyroZ\tMagX\tMagY\tMagZ";
 int incremento = 0;
 int tamanho = 0;
 
@@ -236,7 +236,10 @@ void loop() {
   dataString += String(accel_z) + "\t";
   dataString += String(gyro_x) + "\t";
   dataString += String(gyro_y) + "\t";
-  dataString += String(gyro_z);
+  dataString += String(gyro_z) + "\t";
+  dataString += String(mag_x) + "\t";
+  dataString += String(mag_y) + "\t";
+  dataString += String(mag_z);
 
   Serial.println(dataString);
 
