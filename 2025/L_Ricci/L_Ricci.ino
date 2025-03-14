@@ -2,17 +2,21 @@
 #include <SD.h>
 Adafruit_BMP085 bmp;
 
-const int numLeituras = 10;
-const int chipSelect = 53;
-const int numeroQuedas = 5;
-float alt = 0;
+#define IGN_1 36
+#define IGN_2 61
+#define IGN_3 46
+#define IGN_4 55
+#define LEITURAS 10
+#define CHIP_SELECT 53
+#define NUMERO_QUEDAS 5
 
+float alt = 0;
 float total = 0;
 float total2 = 0;
 
-float leituras[numLeituras];
-float leituras2[numLeituras];
-float altitudes[numeroQuedas];
+float leituras[LEITURAS];
+float leituras2[LEITURAS];
+float altitudes[NUMERO_QUEDAS];
 
 int indiceAtual = 0;
 int indiceAtual2 = 0;
@@ -27,11 +31,14 @@ int tamanho = 0;
 
 float altitudeAnterior = 0;
 
+int paraquedas_1 = 0
+unsigned long timer_p1 = millis()
+
 void setup() {
   Serial.begin(115200);
 
   Serial.print("Inicializando cartão SD...");
-  if (!SD.begin(chipSelect)) {
+  if (!SD.begin(CHIP_SELECT)) {
     Serial.println("Falha na inicialização do cartão SD!");
     while (1)
       ;
@@ -50,7 +57,7 @@ void setup() {
   }
   alt = alt / 10;
 
-  for (int i = 0; i < numLeituras; i++) {
+  for (int i = 0; i < LEITURAS; i++) {
     leituras[i] = 0;
     leituras2[i] = 0;
   }
@@ -69,11 +76,13 @@ void setup() {
 
   File dataFile = SD.open(filename, FILE_WRITE);
   if (dataFile) {
-    dataFile.println("Temperatura\tPressão\tAltitudeFiltrada\tAltitudeRaw\tPressãoMar\tPressãoLocal(hPa)\tQueda");
+    dataFile.println("Temperatura\tPressão\tAltitudeFiltrada\tAltitudeRaw\tPressãoMar\tPressãoLocal(hPa)\tQueda]tParaquedas");
     dataFile.close();
   } else {
     Serial.println("Erro ao abrir o arquivo");
   }
+
+  pinMode(IGN_1, OUTPUT);
 }
 
 void loop() {
@@ -87,14 +96,14 @@ void loop() {
   total = total - leituras[indiceAtual];
   leituras[indiceAtual] = (altitudeReal);
   total = total + leituras[indiceAtual];
-  indiceAtual = (indiceAtual + 1) % numLeituras;
-  float media = total / numLeituras;
+  indiceAtual = (indiceAtual + 1) % LEITURAS;
+  float media = total / LEITURAS;
 
   total2 = total2 - leituras2[indiceAtual2];
   leituras2[indiceAtual2] = (media);
   total2 = total2 + leituras2[indiceAtual2];
-  indiceAtual2 = (indiceAtual2 + 1) % numLeituras;
-  float mediaNova = total2 / numLeituras;
+  indiceAtual2 = (indiceAtual2 + 1) % LEITURAS;
+  float mediaNova = total2 / LEITURAS;
 
   if (mediaNova < altitudeAnterior) {
     contadorQueda++;
@@ -109,6 +118,16 @@ void loop() {
     queda = 0;
   }
 
+  if (queda == 1 && paraquedas_1 == 0) {
+    paraquedas_1 = 1
+    digitalWrite(IGN_1, HIGH)
+  }
+
+  if (paraquedas_1 == 1 && (millis() - timer_p1) < 1000) {
+    paraquedas_1 = 0
+    digitalWrite(IGN_1, LOW)
+  }
+
   String dataString = "";
   dataString += String(temperatura) + "\t";
   dataString += String(pressao) + "\t";
@@ -117,7 +136,8 @@ void loop() {
   dataString += String(altitudeReal) + "\t";
   dataString += String(pressaoNivelMar) + "\t";
   dataString += String(altitude) + "\t";
-  dataString += String(queda);
+  dataString += String(queda) + "\t";
+  dataString += String(paraquedas_1);
   
   Serial.println(dataString);
 
