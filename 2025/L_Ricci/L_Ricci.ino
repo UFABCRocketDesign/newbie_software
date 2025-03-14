@@ -3,9 +3,11 @@
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_ADXL345_U.h>
+#include <Adafruit_HMC5883_U.h>
 #include <L3G.h>
 Adafruit_BMP085 bmp;
 Adafruit_ADXL345_Unified accel;
+Adafruit_HMC5883_Unified mag;
 L3G gyro;
 
 #define IGN_1 36
@@ -32,7 +34,7 @@ int queda = 0;
 String zeros;
 String filename;
 String nome = "LUCAS";
-String heading = "Tempo\tTemperatura\tPressão\tAltitudeFiltrada\tAltitudeRaw\tPressãoMar\tPressãoLocal(hPa)\tQueda]tParaquedas_1\tParaquedas_2\tAccel. X\tAccel. Y\tAccel. Z\tGyro X\tGyro Y\tGyro Z";
+String heading = "Tempo\tTemperatura\tPressão\tAltitudeFiltrada\tAltitudeRaw\tPressãoMar\tPressãoLocal(hPa)\tQueda\tParaquedas_1\tParaquedas_2\tAccelX\tAccelY\tAccelZ\tGyroX\tGyroY\tGyroZ\tMagX\tMagY\tMagZ";
 int incremento = 0;
 int tamanho = 0;
 
@@ -119,6 +121,7 @@ void setup() {
 void loop() {
   sensors_event_t event;
   accel.getEvent(&event);
+  mag.getEvent(&event);
   gyro.read();
 
   float tempo = millis() / 1000.0;
@@ -131,6 +134,9 @@ void loop() {
   int gyro_x = gyro.g.x;
   int gyro_y = gyro.g.y;
   int gyro_z = gyro.g.z;
+  float mag_x = event.magnetic.x;
+  float mag_y = event.magnetic.y;
+  float mag_z = event.magnetic.z;
 
   total = total - leituras[indiceAtual];
   leituras[indiceAtual] = (altitudeReal);
