@@ -14,6 +14,8 @@ float soma2 = 0;
 int indice = 0;
 int indice1 = 0; 
 float altitudeTarada = 0;
+char nomeSD[15];
+int contagemSD = 0;
 String dataString = "";
 
 void setup() {
@@ -44,15 +46,32 @@ void setup() {
   }
   
   File dataFile = SD.open("datalog.txt", FILE_WRITE);
-  if (dataFile) {
-    dataFile.println("Temperatura\tPressao\tAltitude\tNivel do mar\tAltitude Filtrada\tAltura\t");
-    dataFile.close();
+  if (SD.exists("datalog.txt")) {
+ ;
   } else {
-    Serial.println("error opening datalog.txt");
+    Serial.println("example.txt doesn't exist.");
   }
+  
+do {
+  if (contagemSD == 0) {
+    sprintf(nomeSD, "datalog.txt");
+  } else {
+    sprintf(nomeSD, "datalog%03d.txt", contagemSD);
+  }
+  contagemSD++;
+} while (SD.exists(nomeSD));
 
+dataFile = SD.open(nomeSD, FILE_WRITE);
 
-  Serial.println("initialization done.");
+if (dataFile) {
+  dataFile.println("Temperatura\tPressao\tAltitude\tNivel do mar\tAltitude Filtrada\tAltura\t");
+  dataFile.close();
+} else {
+  Serial.print("Erro ao abrir o arquivo: ");
+  Serial.println(nomeSD);
+}
+
+Serial.println("initialization done.");
 }
 
 void loop() {
@@ -93,11 +112,12 @@ void loop() {
   dataString += String(altitudeFiltrada) + "\t";
   dataString += String(altura);
 
-  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  File dataFile = SD.open(nomeSD, FILE_WRITE);
   if (dataFile) {
     dataFile.println(dataString);
     dataFile.close();
   } else {
     Serial.println("error opening datalog.txt");
   }
+  
 }
