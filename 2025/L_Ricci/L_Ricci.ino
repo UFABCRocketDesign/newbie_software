@@ -3,8 +3,10 @@
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_ADXL345_U.h>
+#include <L3G.h>
 Adafruit_BMP085 bmp;
 Adafruit_ADXL345_Unified accel;
+L3G gyro;
 
 #define IGN_1 36
 #define IGN_2 61
@@ -30,7 +32,7 @@ int queda = 0;
 String zeros;
 String filename;
 String nome = "LUCAS";
-String heading = "Tempo\tTemperatura\tPressão\tAltitudeFiltrada\tAltitudeRaw\tPressãoMar\tPressãoLocal(hPa)\tQueda]tParaquedas_1\tParaquedas_2\tAccel. X\tAccel. Y\tAccel. Z";
+String heading = "Tempo\tTemperatura\tPressão\tAltitudeFiltrada\tAltitudeRaw\tPressãoMar\tPressãoLocal(hPa)\tQueda]tParaquedas_1\tParaquedas_2\tAccel. X\tAccel. Y\tAccel. Z\tGyro X\tGyro Y\tGyro Z";
 int incremento = 0;
 int tamanho = 0;
 
@@ -68,6 +70,13 @@ void setup() {
     Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
     while (1) {}
   }
+
+  if (!gyro.init()) {
+    Serial.println("Failed to autodetect gyro type!");
+    while (1) {}
+  }
+
+  gyro.enableDefault();
 
   Serial.println(heading);
 
@@ -110,6 +119,8 @@ void setup() {
 void loop() {
   sensors_event_t event;
   accel.getEvent(&event);
+  gyro.read();
+
   float tempo = millis() / 1000.0;
   float altitudeReal = bmp.readAltitude() - alt;
   float temperatura = bmp.readTemperature();
@@ -117,6 +128,9 @@ void loop() {
   float accel_x = event.acceleration.x;
   float accel_y = event.acceleration.y;
   float accel_z = event.acceleration.z;
+  int gyro_x = gyro.g.x;
+  int gyro_y = gyro.g.y;
+  int gyro_z = gyro.g.z;
 
   total = total - leituras[indiceAtual];
   leituras[indiceAtual] = (altitudeReal);
@@ -213,7 +227,10 @@ void loop() {
   dataString += String(paraquedas_4) + "\t";
   dataString += String(accel_x) + "\t";
   dataString += String(accel_y) + "\t";
-  dataString += String(accel_z);
+  dataString += String(accel_z) + "\t";
+  dataString += String(gyro_x) + "\t";
+  dataString += String(gyro_y) + "\t";
+  dataString += String(gyro_z);
 
   Serial.println(dataString);
 
