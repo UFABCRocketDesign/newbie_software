@@ -98,8 +98,9 @@ void setup() {
 }
 
 void loop() {
-  float altitudeReal = bmp.readAltitude() - alt;
+  float tempo = millis() / 1000.0;
 
+  float altitudeReal = bmp.readAltitude() - alt;
   float temperatura = bmp.readTemperature();
   float pressao = bmp.readPressure();
   float pressaoNivelMar = bmp.readSealevelPressure();
@@ -187,9 +188,8 @@ void loop() {
     digitalWrite(IGN_4, LOW);
   }
 
-
-
   String dataString = "";
+  dataString += String(tempo) + "\t";
   dataString += String(temperatura) + "\t";
   dataString += String(pressao) + "\t";
   dataString += String(media) + "\t";
