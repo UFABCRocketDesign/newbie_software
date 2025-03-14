@@ -73,6 +73,15 @@ void loop() {
   }
   altitude_filtrada2 /= tamanho;
 
+  //SEGUNDA TENTATIVA DE DETECTOR DE QUEDA AQUI
+  if (altitude_filtrada2 < guiaqueda) { //AQUI ELE COMPARA A ALTITUDE ATUAL COM A ANTERIOR
+    detectorqueda = 1;
+  } else {
+    detectorqueda = 0;
+  }
+  guiaqueda = altitude_filtrada2; //AQUI ELE ARMAZENA A ALTITUDE ATUAL PRA USAR NO PRÓXIMO LOOP COMO GUIAQUEDA
+
+/*
   vetorqueda[guiaqueda] = altitude_filtrada2;
   if (guiaqueda < 1) {
     guiaqueda += 1;
@@ -80,11 +89,12 @@ void loop() {
     guiaqueda = 0;
   }
 
-  if (vetorqueda[0] < vetorqueda[1] || vetorqueda[1] < vetorqueda[0]) {
+  if (vetorqueda[0] < vetorqueda[1]) {
     detectorqueda = 1;
   } else {
     detectorqueda = 0;
   }
+*/
 
   //print dos valores medidos
   //Serial.print(bmp.readTemperature());
