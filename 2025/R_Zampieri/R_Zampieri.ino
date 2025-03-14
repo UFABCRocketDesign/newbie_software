@@ -32,6 +32,7 @@ void setup() {
   tara /= 10;
   //
 
+  Serial.print("guiaqueda\t");
   //Serial.print("Temperatura\t");
   //Serial.print("Pressão\t");
   Serial.print("Altitude Sem Filtro\t");
@@ -101,6 +102,8 @@ void loop() {
   //Serial.print("\t");
   //Serial.print(bmp.readPressure());
   //Serial.print("\t");
+  Serial.print(guiaqueda);
+  Serial.print("\t");  
   Serial.print(vetor[guia]);
   Serial.print("\t");
   Serial.print(altitude_filtrada);
