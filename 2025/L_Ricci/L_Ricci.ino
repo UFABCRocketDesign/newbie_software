@@ -119,24 +119,25 @@ void setup() {
 }
 
 void loop() {
-  sensors_event_t event;
-  accel.getEvent(&event);
-  mag.getEvent(&event);
+  sensors_event_t event_accel;
+  sensors_event_t event_mag;
+  accel.getEvent(&event_accel);
+  mag.getEvent(&event_mag);
   gyro.read();
 
   float tempo = millis() / 1000.0;
   float altitudeReal = bmp.readAltitude() - alt;
   float temperatura = bmp.readTemperature();
   float pressao = bmp.readPressure();
-  float accel_x = event.acceleration.x;
-  float accel_y = event.acceleration.y;
-  float accel_z = event.acceleration.z;
+  float accel_x = event_accel.acceleration.x;
+  float accel_y = event_accel.acceleration.y;
+  float accel_z = event_accel.acceleration.z;
   int gyro_x = gyro.g.x;
   int gyro_y = gyro.g.y;
   int gyro_z = gyro.g.z;
-  float mag_x = event.magnetic.x;
-  float mag_y = event.magnetic.y;
-  float mag_z = event.magnetic.z;
+  float mag_x = event_mag.magnetic.x;
+  float mag_y = event_mag.magnetic.y;
+  float mag_z = event_mag.magnetic.z;
 
   total = total - leituras[indiceAtual];
   leituras[indiceAtual] = (altitudeReal);
