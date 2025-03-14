@@ -13,16 +13,21 @@ float c[N][L];
 float vFiltro[N+1];
 float ordH[H];
 int k=0;
+float troca=0;
 void setup() {
   Serial.begin(115200);
- 
+  
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for native USB port only
+  }
+  
   if (!bmp.begin()) {
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   
   Serial.print("Initializing SD card...");
   if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present");
-  while (1) {}
+  while (1);
   }
   Serial.println("card initialized.");
 
@@ -40,17 +45,19 @@ void setup() {
 void loop() {
 
     String dataString = "";
-    
-    Serial.print(bmp.readTemperature());
+
+    troca= bmp.readTemperature();
+    Serial.print(troca);
     Serial.print("\t");
 
-    dataString += String(bmp.readTemperature());
+    dataString += String(troca);
     dataString += "\t";
-   
-    Serial.print(bmp.readPressure());
+
+    troca = bmp.readPressure();
+    Serial.print(troca);
     Serial.print("\t");
 
-    dataString += String(bmp.readPressure());
+    dataString += String(troca);
     dataString += "\t";
     
     vFiltro[0] = bmp.readAltitude()- med_alt;
@@ -73,10 +80,11 @@ void loop() {
       dataString += "\t";
     }
 
-    Serial.print(bmp.readSealevelPressure());
+    troca = bmp.readSealevelPressure();
+    Serial.print(troca);
     Serial.print("\t");
 
-    dataString += String(bmp.readSealevelPressure());
+    dataString += String(troca);
     dataString += "\t";
 
     for(int i=H-1;i>0;i--){
@@ -98,10 +106,11 @@ void loop() {
   // if you know the current sea level pressure which will
   // vary with weather and such. If it is 1015 millibars
   // that is equal to 101500 Pascals.
-    Serial.print((bmp.readAltitude(101500)));
+    troca = bmp.readAltitude(101500);
+    Serial.print(troca);
     Serial.println("\t");
 
-    dataString += String((bmp.readAltitude(101500)));
+    dataString += String(troca);
     dataString += "\t";
     
     
@@ -109,6 +118,7 @@ void loop() {
     if (dataFile) {
       dataFile.println(dataString);
       dataFile.close();
+      Serial.println(dataString);
     }
     else {
       Serial.println("error opening datalog.txt");
