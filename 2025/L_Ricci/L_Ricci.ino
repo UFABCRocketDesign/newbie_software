@@ -30,7 +30,7 @@ int incremento = 0;
 int tamanho = 0;
 
 float altitudeAnterior = 0;
-int altitudeTeto = 0;
+int altitudeTeto = -3;
 
 int paraquedas_1 = 0;
 int paraquedas_2 = 0;
