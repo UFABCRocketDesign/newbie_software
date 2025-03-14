@@ -31,8 +31,8 @@ int tamanho = 0;
 
 float altitudeAnterior = 0;
 
-int paraquedas_1 = 0
-unsigned long timer_p1 = millis()
+int paraquedas_1 = 0;
+unsigned long timer_p1 = millis();
 
 void setup() {
   Serial.begin(115200);
@@ -119,13 +119,13 @@ void loop() {
   }
 
   if (queda == 1 && paraquedas_1 == 0) {
-    paraquedas_1 = 1
-    digitalWrite(IGN_1, HIGH)
+    paraquedas_1 = 1;
+    digitalWrite(IGN_1, HIGH);
   }
 
   if (paraquedas_1 == 1 && (millis() - timer_p1) < 1000) {
-    paraquedas_1 = 0
-    digitalWrite(IGN_1, LOW)
+    paraquedas_1 = 2;
+    digitalWrite(IGN_1, LOW);
   }
 
   String dataString = "";
