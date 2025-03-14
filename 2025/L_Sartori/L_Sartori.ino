@@ -8,8 +8,8 @@ Adafruit_BMP085 bmp;
 bool h;
 float med_alt = 0; 
 float c[N][L];
-float s[N+1];
-float ss[3];
+float vFiltro[N+1];
+float ordH[3];
 int k=0;
 void setup() {
   Serial.begin(115200);
@@ -35,21 +35,21 @@ void loop() {
    
     Serial.print(bmp.readPressure());
     Serial.print("\t");
-    s[0] = bmp.readAltitude()- med_alt;
+    vFiltro[0] = bmp.readAltitude()- med_alt;
     
     for (int i =0 ; i<N;i++){
-      c[i][k]= s[i];
-      s[i+1] =0;
+      c[i][k]= vFiltro[i];
+      vFiltro[i+1] =0;
       for(int j =0;j<L;j++){
-        s[i+1]+= c[i][j];
+        vFiltro[i+1]+= c[i][j];
       }
-      s[i+1]/=5;
+      vFiltro[i+1]/=5;
     }
     
     k+=1;
     k%=5;
     for(int i=0; i<N+1; i++){
-      Serial.print(s[i]);
+      Serial.print(vFiltro[i]);
       Serial.print("\t");
     }
     
@@ -57,12 +57,12 @@ void loop() {
     Serial.print("\t");
 
     for(int i=H-1;i>0;i--){
-       ss[i] = s[i-1];
+       ordH[i] = vFiltro[i-1];
     }
-    ss[0] = s[3];
+    ordH[0] = vFiltro[3];
     h = true;
     for(int i=0;i<H-1;i++){
-      h = h && ss[i]<ss[i+1];
+      h = h && ordH[i]<ordH[i+1];
       
     }
     
