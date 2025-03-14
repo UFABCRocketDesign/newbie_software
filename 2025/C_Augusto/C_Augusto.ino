@@ -45,12 +45,7 @@ void setup() {
     while (true);
   }
   
-  File dataFile = SD.open("dataC.txt", FILE_WRITE);
-  if (SD.exists("dataC.txt")) {
- ;
-  } else {
-    Serial.println("example.txt doesn't exist.");
-  }
+  File dataFile = SD.open(nomeSD, FILE_WRITE);
   
 do {
   if (contagemSD == 0) {
@@ -59,7 +54,7 @@ do {
     sprintf(nomeSD, "dataC%03d.txt", contagemSD);
   }
   contagemSD++;
-  printf(nomeSD);
+  Serial.println(nomeSD);
 } while (SD.exists(nomeSD));
 
 dataFile = SD.open(nomeSD, FILE_WRITE);
@@ -118,7 +113,8 @@ void loop() {
     dataFile.println(dataString);
     dataFile.close();
   } else {
-    Serial.println("error opening dataC.txt");
+    Serial.println("error opening:");
+    Serial.println(nomeSD);
   }
   
 }
