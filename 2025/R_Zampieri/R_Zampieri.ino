@@ -7,8 +7,11 @@ Adafruit_BMP085 bmp;
 float tara = 0;
 float vetor[tamanho];
 float vetor2[tamanho];
+float vetorqueda[2];
 int guia = 0;
 int guia2 = 0;
+int guiaqueda = 0;
+int detectorqueda = 0;
 float altitude_filtrada = 0;
 float altitude_filtrada2 = 0;
 //
@@ -36,6 +39,7 @@ void setup() {
   //Serial.print("Pressão no Nível do Mar\t");
   //Serial.print("Altitude Real\t");
   Serial.print("Altitude Sem Filtro\t");
+  Serial.print("Detector de Queda\t");
   Serial.println();
 }
 
@@ -69,6 +73,19 @@ void loop() {
   }
   altitude_filtrada2 /= tamanho;
 
+  vetorqueda[guiaqueda] = altitude_filtrada2;
+  if (guiaqueda < 1) {
+    guiaqueda += 1;
+  } else {
+    guiaqueda = 0;
+  }
+
+  if (vetorqueda[0] < vetorqueda[1] || vetorqueda[1] < vetorqueda[0]) {
+    detectorqueda = 1;
+  } else {
+    detectorqueda = 0;
+  }
+
   //print dos valores medidos
   //Serial.print(bmp.readTemperature());
   //Serial.print("\t");
@@ -83,6 +100,8 @@ void loop() {
   //Serial.print(bmp.readAltitude(101500));
   //Serial.print("\t");
   Serial.print(vetor[guia]);
+  Serial.print("\t");
+  Serial.print(detectorqueda);
   Serial.print("\t");
   Serial.println();
 }
