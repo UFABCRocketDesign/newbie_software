@@ -32,7 +32,10 @@ int tamanho = 0;
 float altitudeAnterior = 0;
 
 int paraquedas_1 = 0;
+int paraquedas_2 = 0;
 unsigned long timer_p1;
+unsigned long desativacao_p1;
+unsigned long timer_p2;
 
 void setup() {
   Serial.begin(115200);
@@ -76,7 +79,7 @@ void setup() {
 
   File dataFile = SD.open(filename, FILE_WRITE);
   if (dataFile) {
-    dataFile.println("Temperatura\tPressão\tAltitudeFiltrada\tAltitudeRaw\tPressãoMar\tPressãoLocal(hPa)\tQueda]tParaquedas");
+    dataFile.println("Temperatura\tPressão\tAltitudeFiltrada\tAltitudeRaw\tPressãoMar\tPressãoLocal(hPa)\tQueda]tParaquedas_1\tParaquedas_2");
     dataFile.close();
   } else {
     Serial.println("Erro ao abrir o arquivo");
@@ -121,12 +124,24 @@ void loop() {
   if (queda == 1 && paraquedas_1 == 0) {
     paraquedas_1 = 1;
     digitalWrite(IGN_1, HIGH);
-    timer_p1 = millis() + 2000;
+    timer_p1 = millis();
   }
 
-  if (paraquedas_1 == 1 && (millis() - timer_p1) < 1000) {
+  if (paraquedas_1 == 1 && (millis() - timer_p1) >= 2000) {
     paraquedas_1 = 2;
     digitalWrite(IGN_1, LOW);
+    desativacao_p1 = millis();
+  }
+
+  if (queda == 1 && paraquedas_2 == 0 && (millis() - desativacao_p1) >= 1500) {
+    paraquedas_1 = 1;
+    digitalWrite(IGN_2, HIGH);
+    timer_p2 = millis();
+  }
+
+  if (paraquedas_2 == 1 && (millis() - timer_p2) >= 2000) {
+    paraquedas_1 = 2;
+    digitalWrite(IGN_2, LOW);
   }
 
   String dataString = "";
@@ -138,7 +153,8 @@ void loop() {
   dataString += String(pressaoNivelMar) + "\t";
   dataString += String(altitude) + "\t";
   dataString += String(queda) + "\t";
-  dataString += String(paraquedas_1);
+  dataString += String(paraquedas_1) + "\t";
+  dataString += String(paraquedas_2);
   
   Serial.println(dataString);
 
