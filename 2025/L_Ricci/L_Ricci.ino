@@ -1,6 +1,10 @@
 #include <Adafruit_BMP085.h>
 #include <SD.h>
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_ADXL345_U.h>
 Adafruit_BMP085 bmp;
+Adafruit_ADXL345_Unified accel;
 
 #define IGN_1 36
 #define IGN_2 61
@@ -26,6 +30,7 @@ int queda = 0;
 String zeros;
 String filename;
 String nome = "LUCAS";
+String heading = "Tempo\tTemperatura\tPressão\tAltitudeFiltrada\tAltitudeRaw\tPressãoMar\tPressãoLocal(hPa)\tQueda]tParaquedas_1\tParaquedas_2\tAccel. X\tAccel. Y\tAccel. Z";
 int incremento = 0;
 int tamanho = 0;
 
@@ -49,8 +54,7 @@ void setup() {
   Serial.print("Inicializando cartão SD...");
   if (!SD.begin(CHIP_SELECT)) {
     Serial.println("Falha na inicialização do cartão SD!");
-    while (1)
-      ;
+    while (1) {}
   }
   Serial.println("Cartão SD inicializado com sucesso.");
 
@@ -59,7 +63,13 @@ void setup() {
     while (1) {}
   }
 
-  Serial.println("Temperatura\tPressão\tAltitude Filtrada\tAltitude Raw\tPressão Mar\tPressão Local (hPa)\tQueda");
+  if (!accel.begin()) {
+    /* There was a problem detecting the ADXL345 ... check your connections */
+    Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
+    while (1) {}
+  }
+
+  Serial.println(heading);
 
   for (int i = 0; i < 10; i++) {
     alt += bmp.readAltitude();
@@ -85,7 +95,7 @@ void setup() {
 
   File dataFile = SD.open(filename, FILE_WRITE);
   if (dataFile) {
-    dataFile.println("Temperatura\tPressão\tAltitudeFiltrada\tAltitudeRaw\tPressãoMar\tPressãoLocal(hPa)\tQueda]tParaquedas_1\tParaquedas_2");
+    dataFile.println(heading);
     dataFile.close();
   } else {
     Serial.println("Erro ao abrir o arquivo");
@@ -98,13 +108,15 @@ void setup() {
 }
 
 void loop() {
+  sensors_event_t event;
+  accel.getEvent(&event);
   float tempo = millis() / 1000.0;
-
   float altitudeReal = bmp.readAltitude() - alt;
   float temperatura = bmp.readTemperature();
   float pressao = bmp.readPressure();
-  float pressaoNivelMar = bmp.readSealevelPressure();
-  float altitude = bmp.readAltitude(101500);
+  float accel_x = event.acceleration.x;
+  float accel_y = event.acceleration.y;
+  float accel_z = event.acceleration.z;
 
   total = total - leituras[indiceAtual];
   leituras[indiceAtual] = (altitudeReal);
@@ -130,7 +142,6 @@ void loop() {
   } else {
     queda = 0;
   }
-
 
   /* Paraquedas 1 e 2 */
   if (queda == 1 && paraquedas_1 == 0) {
@@ -195,13 +206,14 @@ void loop() {
   dataString += String(media) + "\t";
   dataString += String(mediaNova) + "\t";
   dataString += String(altitudeReal) + "\t";
-  dataString += String(pressaoNivelMar) + "\t";
-  dataString += String(altitude) + "\t";
   dataString += String(queda) + "\t";
   dataString += String(paraquedas_1) + "\t";
   dataString += String(paraquedas_2) + "\t";
   dataString += String(paraquedas_3) + "\t";
-  dataString += String(paraquedas_4);
+  dataString += String(paraquedas_4) + "\t";
+  dataString += String(accel_x) + "\t";
+  dataString += String(accel_y) + "\t";
+  dataString += String(accel_z);
 
   Serial.println(dataString);
 
