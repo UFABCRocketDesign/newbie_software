@@ -36,9 +36,8 @@ int paraquedas_1 = 0;
 int paraquedas_2 = 0;
 int paraquedas_3 = 0;
 int paraquedas_4 = 0;
-unsigned long desativacao_p1 = 0;
 unsigned long desativacao_p2 = 0;
-unsigned long desativacao_p3 = 0;
+unsigned long desativacao_p4 = 0;
 unsigned long timer_p1;
 unsigned long timer_p2;
 unsigned long timer_p3;
@@ -155,7 +154,7 @@ void loop() {
     desativacao_p2 = millis();
   }
 
-  if (paraquedas_2 == 2 && (millis() - desativacao_p2) >= 2000) {
+  if (paraquedas_2 == 2 && (millis() - desativacao_p2) >= 1500) {
     paraquedas_2 = 3;
     digitalWrite(IGN_2, LOW);
   }
@@ -171,6 +170,24 @@ void loop() {
     paraquedas_3 = 2;
     digitalWrite(IGN_3, LOW);
   }
+
+  if (queda == 1 && paraquedas_4 == 0) {
+    paraquedas_4 = 1;
+    timer_p4 = millis();
+  }
+
+  if (paraquedas_4 == 1 && (millis() - timer_p4) >= 2000) {
+    paraquedas_4 = 2;
+    digitalWrite(IGN_4, HIGH);
+    desativacao_p4 = millis();
+  }
+
+  if (paraquedas_4 == 2 && (millis() - desativacao_p4) >= 1500) {
+    paraquedas_4 = 3;
+    digitalWrite(IGN_4, LOW);
+  }
+
+
 
   String dataString = "";
   dataString += String(temperatura) + "\t";
