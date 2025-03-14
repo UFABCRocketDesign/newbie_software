@@ -33,8 +33,9 @@ float altitudeAnterior = 0;
 
 int paraquedas_1 = 0;
 int paraquedas_2 = 0;
+unsigned long desativacao_p1 = 0;
+unsigned long desativacao_p2 = 0;
 unsigned long timer_p1;
-unsigned long desativacao_p1;
 unsigned long timer_p2;
 
 void setup() {
@@ -86,6 +87,9 @@ void setup() {
   }
 
   pinMode(IGN_1, OUTPUT);
+  pinMode(IGN_2, OUTPUT);
+  pinMode(IGN_3, OUTPUT);
+  pinMode(IGN_4, OUTPUT);
 }
 
 void loop() {
@@ -138,12 +142,16 @@ void loop() {
 
   if (queda == 1 && paraquedas_2 == 0) {
     paraquedas_2 = 1;
-    digitalWrite(IGN_2, HIGH);
     timer_p2 = millis();
   }
 
   if (paraquedas_2 == 1 && (millis() - timer_p2) >= 2000) {
     paraquedas_2 = 2;
+    digitalWrite(IGN_2, HIGH);
+    desativacao_p2 = millis();
+  }
+
+  if (paraquedas_2 == 2 && (millis() - desativacao_p2) >= 2000) {
     digitalWrite(IGN_2, LOW);
   }
 
@@ -158,7 +166,7 @@ void loop() {
   dataString += String(queda) + "\t";
   dataString += String(paraquedas_1) + "\t";
   dataString += String(paraquedas_2);
-  
+
   Serial.println(dataString);
 
   File dataFile = SD.open(filename, FILE_WRITE);
