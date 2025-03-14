@@ -172,22 +172,6 @@ void loop() {
     digitalWrite(IGN_3, LOW);
   }
 
-  if (queda == 1 && paraquedas_3 == 0) {
-    paraquedas_3 = 2;
-    timer_p3 = millis();
-  }
-
-  if (paraquedas_3 == 1 && (millis() - timer_p2) >= 2000) {
-    paraquedas_3 = 1;
-    digitalWrite(IGN_3, HIGH);
-    desativacao_p3 = millis();
-  }
-
-  if (paraquedas_3 == 2 && (millis() - desativacao_p3) >= 2000) {
-    paraquedas_3 = 3;
-    digitalWrite(IGN_3, LOW);
-  }
-
   String dataString = "";
   dataString += String(temperatura) + "\t";
   dataString += String(pressao) + "\t";
