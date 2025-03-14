@@ -1,10 +1,12 @@
 #include <Adafruit_BMP085.h>
-
+#include <SPI.h>
+#include <SD.h>
 
 Adafruit_BMP085 bmp;
 #define N 3
 #define L 5
 #define H 4
+const int chipSelect = 53;
 bool h;
 float med_alt = 0; 
 float c[N][L];
@@ -17,24 +19,40 @@ void setup() {
   if (!bmp.begin()) {
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   
+  Serial.print("Initializing SD card...");
+  if (!SD.begin(chipSelect)) {
+    Serial.println("Card failed, or not present");
   while (1) {}
   }
-  Serial.println("Temperature\tPressure\tAltitude\tPressure\tAltitude\t");
+  Serial.println("card initialized.");
+
   
+  Serial.println("Temperature\tPressure\tAltitude\tPressure\tAltitude\t");
   for(int i =0;i<10;i++){
     med_alt += bmp.readAltitude();
   }
  
   med_alt /=10; 
 
+  }
 }
 
 void loop() {
+
+    String dataString = "";
+    
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
+
+    dataString += String(bmp.readTemperature());
+    dataString += "\t";
    
     Serial.print(bmp.readPressure());
     Serial.print("\t");
+
+    dataString += String(bmp.readPressure());
+    dataString += "\t";
+    
     vFiltro[0] = bmp.readAltitude()- med_alt;
     
     for (int i =0 ; i<N;i++){
@@ -51,10 +69,15 @@ void loop() {
     for(int i=0; i<N+1; i++){
       Serial.print(vFiltro[i]);
       Serial.print("\t");
+      dataString += String(vFiltro[i]);
+      dataString += "\t";
     }
-    
+
     Serial.print(bmp.readSealevelPressure());
     Serial.print("\t");
+
+    dataString += String(bmp.readSealevelPressure());
+    dataString += "\t";
 
     for(int i=H-1;i>0;i--){
        ordH[i] = ordH[i-1];
@@ -68,6 +91,9 @@ void loop() {
     
     Serial.print(h);
     Serial.print("\t"); 
+
+    dataString += String(h);
+    dataString += "\t";
   // you can get a more precise measurement of altitude
   // if you know the current sea level pressure which will
   // vary with weather and such. If it is 1015 millibars
@@ -75,7 +101,19 @@ void loop() {
     Serial.print((bmp.readAltitude(101500)));
     Serial.println("\t");
 
-
+    dataString += String((bmp.readAltitude(101500)));
+    dataString += "\t";
+    
+    
+    File dataFile = SD.open("datalog.txt", FILE_WRITE);
+    if (dataFile) {
+      dataFile.println(dataString);
+      dataFile.close();
+      Serial.println(dataString);
+    }
+    else {
+      Serial.println("error opening datalog.txt");
+    }
 
 
 }
