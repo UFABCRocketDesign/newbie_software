@@ -32,7 +32,7 @@ int tamanho = 0;
 float altitudeAnterior = 0;
 
 int paraquedas_1 = 0;
-unsigned long timer_p1 = millis();
+unsigned long timer_p1;
 
 void setup() {
   Serial.begin(115200);
@@ -121,6 +121,7 @@ void loop() {
   if (queda == 1 && paraquedas_1 == 0) {
     paraquedas_1 = 1;
     digitalWrite(IGN_1, HIGH);
+    timer_p1 = millis() + 2000;
   }
 
   if (paraquedas_1 == 1 && (millis() - timer_p1) < 1000) {
