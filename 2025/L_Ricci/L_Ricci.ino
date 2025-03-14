@@ -30,13 +30,19 @@ int incremento = 0;
 int tamanho = 0;
 
 float altitudeAnterior = 0;
+int altitudeTeto = 0;
 
 int paraquedas_1 = 0;
 int paraquedas_2 = 0;
+int paraquedas_3 = 0;
+int paraquedas_4 = 0;
 unsigned long desativacao_p1 = 0;
 unsigned long desativacao_p2 = 0;
+unsigned long desativacao_p3 = 0;
 unsigned long timer_p1;
 unsigned long timer_p2;
+unsigned long timer_p3;
+unsigned long timer_p4;
 
 void setup() {
   Serial.begin(115200);
@@ -125,6 +131,8 @@ void loop() {
     queda = 0;
   }
 
+
+  /* Paraquedas 1 e 2 */
   if (queda == 1 && paraquedas_1 == 0) {
     paraquedas_1 = 1;
     digitalWrite(IGN_1, HIGH);
@@ -136,23 +144,48 @@ void loop() {
     digitalWrite(IGN_1, LOW);
   }
 
-  if (paraquedas_1 == 2 || paraquedas_1 == 0) {
-    desativacao_p1 = millis();
-  }
-
   if (queda == 1 && paraquedas_2 == 0) {
-    paraquedas_2 = 1;
+    paraquedas_2 = 2;
     timer_p2 = millis();
   }
 
   if (paraquedas_2 == 1 && (millis() - timer_p2) >= 2000) {
-    paraquedas_2 = 2;
+    paraquedas_2 = 1;
     digitalWrite(IGN_2, HIGH);
     desativacao_p2 = millis();
   }
 
   if (paraquedas_2 == 2 && (millis() - desativacao_p2) >= 2000) {
+    paraquedas_2 = 3;
     digitalWrite(IGN_2, LOW);
+  }
+
+  /* Paraquedas 3 e 4 */
+  if (queda == 1 && paraquedas_3 == 0 && altitudeTeto < mediaNova) {
+    paraquedas_3 = 1;
+    digitalWrite(IGN_3, HIGH);
+    timer_p3 = millis();
+  }
+
+  if (paraquedas_3 == 1 && (millis() - timer_p3) >= 2000) {
+    paraquedas_3 = 2;
+    digitalWrite(IGN_3, LOW);
+  }
+
+  if (queda == 1 && paraquedas_3 == 0) {
+    paraquedas_3 = 2;
+    timer_p3 = millis();
+  }
+
+  if (paraquedas_3 == 1 && (millis() - timer_p2) >= 2000) {
+    paraquedas_3 = 1;
+    digitalWrite(IGN_3, HIGH);
+    desativacao_p3 = millis();
+  }
+
+  if (paraquedas_3 == 2 && (millis() - desativacao_p3) >= 2000) {
+    paraquedas_3 = 3;
+    digitalWrite(IGN_3, LOW);
   }
 
   String dataString = "";
