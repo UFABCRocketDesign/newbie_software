@@ -161,7 +161,7 @@ void loop() {
   }
 
   /* Paraquedas 3 e 4 */
-  if (queda == 1 && paraquedas_3 == 0 && altitudeTeto < mediaNova) {
+  if (queda == 1 && paraquedas_3 == 0 && mediaNova < altitudeTeto) {
     paraquedas_3 = 1;
     digitalWrite(IGN_3, HIGH);
     timer_p3 = millis();
@@ -198,7 +198,8 @@ void loop() {
   dataString += String(altitude) + "\t";
   dataString += String(queda) + "\t";
   dataString += String(paraquedas_1) + "\t";
-  dataString += String(paraquedas_2);
+  dataString += String(paraquedas_2) + "\t";
+  dataString += String(paraquedas_3);
 
   Serial.println(dataString);
 
