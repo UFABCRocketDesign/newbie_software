@@ -9,7 +9,7 @@ bool h;
 float med_alt = 0; 
 float c[N][L];
 float vFiltro[N+1];
-float ordH[3];
+float ordH[H];
 int k=0;
 void setup() {
   Serial.begin(115200);
@@ -57,9 +57,9 @@ void loop() {
     Serial.print("\t");
 
     for(int i=H-1;i>0;i--){
-       ordH[i] = vFiltro[i-1];
+       ordH[i] = ordH[i-1];
     }
-    ordH[0] = vFiltro[3];
+    ordH[0] = vFiltro[N];
     h = true;
     for(int i=0;i<H-1;i++){
       h = h && ordH[i]<ordH[i+1];
