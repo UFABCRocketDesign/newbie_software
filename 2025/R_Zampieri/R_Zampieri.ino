@@ -10,8 +10,8 @@ float vetor2[tamanho];
 //float vetorqueda[2];
 int guia = 0;
 int guia2 = 0;
-int guiaqueda = 0;
 int detectorqueda = 0;
+float alturapassada = 0;
 float altitude_filtrada = 0;
 float altitude_filtrada2 = 0;
 //
@@ -32,7 +32,7 @@ void setup() {
   tara /= 10;
   //
 
-  Serial.print("guiaqueda\t");
+  Serial.print("alturapassada\t");
   //Serial.print("Temperatura\t");
   //Serial.print("Pressão\t");
   Serial.print("Altitude Sem Filtro\t");
@@ -75,19 +75,19 @@ void loop() {
   altitude_filtrada2 /= tamanho;
 
   //SEGUNDA TENTATIVA DE DETECTOR DE QUEDA AQUI
-  if (altitude_filtrada2 < guiaqueda) {  //AQUI ELE COMPARA A ALTITUDE ATUAL COM A ANTERIOR
+  if (altitude_filtrada2 < alturapassada) {  //AQUI ELE COMPARA A ALTITUDE ATUAL COM A ANTERIOR
     detectorqueda = 1;
   } else {
     detectorqueda = 0;
   }
-  guiaqueda = altitude_filtrada2;  //AQUI ELE ARMAZENA A ALTITUDE ATUAL PRA USAR NO PRÓXIMO LOOP COMO GUIAQUEDA
+  alturapassada = altitude_filtrada2;  //AQUI ELE ARMAZENA A ALTITUDE ATUAL PRA USAR NO PRÓXIMO LOOP COMO alturapassada
 
   /*
-  vetorqueda[guiaqueda] = altitude_filtrada2;
-  if (guiaqueda < 1) {
-    guiaqueda += 1;
+  vetorqueda[alturapassada] = altitude_filtrada2;
+  if (alturapassada < 1) {
+    alturapassada += 1;
   } else {
-    guiaqueda = 0;
+    alturapassada = 0;
   }
 
   if (vetorqueda[0] < vetorqueda[1]) {
@@ -102,7 +102,7 @@ void loop() {
   //Serial.print("\t");
   //Serial.print(bmp.readPressure());
   //Serial.print("\t");
-  Serial.print(guiaqueda);
+  Serial.print(alturapassada);
   Serial.print("\t");  
   Serial.print(vetor[guia]);
   Serial.print("\t");
