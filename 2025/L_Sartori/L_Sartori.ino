@@ -109,7 +109,6 @@ void loop() {
     if (dataFile) {
       dataFile.println(dataString);
       dataFile.close();
-      Serial.println(dataString);
     }
     else {
       Serial.println("error opening datalog.txt");
