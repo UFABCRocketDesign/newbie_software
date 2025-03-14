@@ -145,12 +145,12 @@ void loop() {
   }
 
   if (queda == 1 && paraquedas_2 == 0) {
-    paraquedas_2 = 2;
+    paraquedas_2 = 1;
     timer_p2 = millis();
   }
 
   if (paraquedas_2 == 1 && (millis() - timer_p2) >= 2000) {
-    paraquedas_2 = 1;
+    paraquedas_2 = 2;
     digitalWrite(IGN_2, HIGH);
     desativacao_p2 = millis();
   }
