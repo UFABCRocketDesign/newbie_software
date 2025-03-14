@@ -80,6 +80,12 @@ void setup() {
 
   gyro.enableDefault();
 
+  if (!mag.begin()) {
+    /* There was a problem detecting the HMC5883 ... check your connections */
+    Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
+    while (1) {}
+  }
+
   Serial.println(heading);
 
   for (int i = 0; i < 10; i++) {
