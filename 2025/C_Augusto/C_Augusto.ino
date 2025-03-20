@@ -94,10 +94,10 @@ void loop() {
     altitudeMAX = altitude;
   }
 
-  for (int i = 0; i<=5; i++){
+  for (int i = 0; i<=10; i++){
     if(altitude < altitudeMAX){
       contagemQUEDA++;
-  } if(contagemQUEDA == 5){
+  } if(contagemQUEDA == 10){
     Serial.println("Abertura do Paraquedas!!!");
     
   }
