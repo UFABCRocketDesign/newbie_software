@@ -16,3 +16,6 @@
 
 #define BUZZ_PIN A0
 #define BUZZ_CMD LOW
+
+HardwareSerial &LoRa(Serial3);
+HardwareSerial &GPS(Serial1);
