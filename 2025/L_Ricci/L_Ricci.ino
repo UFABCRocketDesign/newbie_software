@@ -5,6 +5,7 @@
 #include <Adafruit_ADXL345_U.h>
 #include <Adafruit_HMC5883_U.h>
 #include <L3G.h>
+HardwareSerial &LoRa = Serial3;
 Adafruit_BMP085 bmp;
 Adafruit_ADXL345_Unified accel;
 Adafruit_HMC5883_Unified mag;
@@ -17,13 +18,13 @@ L3G gyro;
 #define LEITURAS 10
 #define CHIP_SELECT 53
 #define NUMERO_QUEDAS 5
-
+  
 float alt = 0;
 float total = 0;
 float total2 = 0;
 
-float leituras[LEITURAS];
-float leituras2[LEITURAS];
+float leituras[LEITURAS] = {};
+float leituras2[LEITURAS] = {};
 float altitudes[NUMERO_QUEDAS];
 
 int indiceAtual = 0;
@@ -54,6 +55,7 @@ unsigned long timer_p4;
 
 void setup() {
   Serial.begin(115200);
+  LoRa.begin(9600);
 
   /* Inicializar os Sensores */
 
@@ -82,7 +84,6 @@ void setup() {
   gyro.enableDefault();
 
   if (!mag.begin()) {
-    /* There was a problem detecting the HMC5883 ... check your connections */
     Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
     while (1) {}
   }
@@ -95,11 +96,6 @@ void setup() {
     alt += bmp.readAltitude();
   }
   alt = alt / 10;
-
-  for (int i = 0; i < LEITURAS; i++) {
-    leituras[i] = 0;
-    leituras2[i] = 0;
-  }
 
   /* Criar ou Abrir Arquivo */
 
@@ -269,5 +265,9 @@ void loop() {
     dataFile.close();
   } else {
     Serial.println("Erro ao abrir o arquivo para escrita.");
+  }
+
+  if (int(tempo) % 3 == 0) {
+    LoRa.println(dataString);
   }
 }
