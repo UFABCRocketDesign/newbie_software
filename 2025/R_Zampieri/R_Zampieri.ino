@@ -43,6 +43,10 @@ void setup() {
   }
 
   Serial.println("initialization done.");
+  // open the file. note that only one file can be open at a time,
+  // so you have to close this one before opening another.
+  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+
   //FIM DO SETUP DATALOGGER
 
   //COMEÇO DO SETUP BMP
@@ -70,9 +74,28 @@ void setup() {
   Serial.print("Pressão\t");
   Serial.println();
   //FIM DO SETUP BMP
+
+  if (dataFile) {
+  dataFile.print("alturapassada\t");
+  dataFile.print("Altitude Sem Filtro\t");
+  dataFile.print("Altitude Filtrada\t");
+  dataFile.print("Altitude Filtrada 2\t");
+  dataFile.print("Detector de Queda\t");
+  dataFile.print("Temperatura\t");
+  dataFile.print("Pressão\t");
+  dataFile.println();
+  dataFile.close();
+  }
+  // if the file isn't open, pop up an error:
+  else {
+    Serial.println("error opening datalog.txt");
+  }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////
 void loop() {
+  // open the file. note that only one file can be open at a time,
+  // so you have to close this one before opening another.
+  File dataFile = SD.open("datalog.txt", FILE_WRITE);
 
   //COMEÇO DA SEÇÃO DO SENSOR BMP
   //FILTROS
@@ -123,16 +146,12 @@ void loop() {
 
   //Print da dataString
   Serial.println(dataString);
-  
+
   //FIM DA SEÇÃO DO SENSOR BMP
 
   //----------------------------------------------------------------------------------------------------
 
   //COMEÇO DA SEÇÃO DO DATALOGGER
-
-  // open the file. note that only one file can be open at a time,
-  // so you have to close this one before opening another.
-  File dataFile = SD.open("datalog.txt", FILE_WRITE);
 
   // if the file is available, write to it:
   if (dataFile) {
