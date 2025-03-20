@@ -6,6 +6,7 @@ Adafruit_BMP085 bmp;
 #define N 3
 #define L 5
 #define H 4
+File myFile;
 const int chipSelect = 53;
 bool h;
 float med_alt = 0;
@@ -14,8 +15,10 @@ float vFiltro[N + 1];
 float ordH[H];
 int k = 0;
 float troca = 0;
-String nome[] = "leo";
+String nome = "leo";
+String docName ="";
 int valSd=0;
+int tamN;
 void setup() {
   String cabe = "";
   Serial.begin(115200);
@@ -31,22 +34,26 @@ void setup() {
   }
   Serial.println("card initialized.");
 
+
   if (nome.length()> 7){
     Serial.println("Nome muito grande");
   } else{
-    int tamN = 8 - nome.length();
+    tamN = 8 - nome.length();
   }
+
+  
   int maxSd = 1;
-  for (int i=0;i<n;i++){
+  for (int i=0;i<tamN;i++){
     maxSd *= 10;
   }
-  String svalSd = Integer.toString(valSd);
-  while(SD.exists(nome+svalSd+".txt")==1 && valSd < maxSd){
+  
+  docName = nome + String(valSd)+".txt";
+  while(SD.exists(docName)==1 && valSd < maxSd){
     valSd+=1;
-    svalSd = Integer.toString(valSd);
+    docName = nome + String(valSd)+".txt";;
   }
   Serial.println("Creating example.txt...");
-  myFile = SD.open(nome+valSd+".txt", FILE_WRITE);
+  myFile = SD.open(docName, FILE_WRITE);
   myFile.close();
   
 
