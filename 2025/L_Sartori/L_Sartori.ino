@@ -49,7 +49,7 @@ void setup() {
   }
 
   docName = nome + String(valSd) + ".txt";
-  while (SD.exists(docName) == 1 && valSd < maxSd) {
+  do {
     valSd += 1;
     int tamVal = String(valSd).length();
     docName = nome;
@@ -57,7 +57,8 @@ void setup() {
       docName += String(0);
     }
     docName += String(valSd) + ".txt";
-  }
+    Serial.println(docName);
+  } while((SD.exists(docName)) );
   Serial.println("Creating "+docName+"...");
   dataFile = SD.open(docName, FILE_WRITE);
   cabe += String("Temperature\tPressure\tAltitude\tPressure\tAltitude\t");
@@ -127,7 +128,7 @@ void loop() {
 
   Serial.println(dataString);
 
-  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  File dataFile = SD.open(docName, FILE_WRITE);
   if (dataFile) {
     dataFile.println(dataString);
     dataFile.close();
