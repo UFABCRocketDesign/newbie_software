@@ -25,7 +25,7 @@ const int chipSelect = 53;
 void setup() {
   //COMEÇO DO SETUP DATALOGGER
   // Open serial communications and wait for port to open:
-  Serial.begin(9600);
+  Serial.begin(115200);
   // wait for Serial Monitor to connect. Needed for native USB port boards only:
   while (!Serial)
     ;
@@ -51,7 +51,6 @@ void setup() {
 
   //COMEÇO DO SETUP BMP
   //Inicialização do sensor
-  Serial.begin(115200);
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
