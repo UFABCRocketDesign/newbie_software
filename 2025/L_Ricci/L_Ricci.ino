@@ -55,6 +55,8 @@ unsigned long timer_p4;
 void setup() {
   Serial.begin(115200);
 
+  /* Inicializar os Sensores */
+
   Serial.print("Inicializando cartão SD...");
   if (!SD.begin(CHIP_SELECT)) {
     Serial.println("Falha na inicialização do cartão SD!");
@@ -68,7 +70,6 @@ void setup() {
   }
 
   if (!accel.begin()) {
-    /* There was a problem detecting the ADXL345 ... check your connections */
     Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
     while (1) {}
   }
@@ -88,6 +89,8 @@ void setup() {
 
   Serial.println(heading);
 
+  /* Média de Alturas */
+
   for (int i = 0; i < 10; i++) {
     alt += bmp.readAltitude();
   }
@@ -97,6 +100,8 @@ void setup() {
     leituras[i] = 0;
     leituras2[i] = 0;
   }
+
+  /* Criar ou Abrir Arquivo */
 
   do {
     tamanho = nome.length() + String(incremento).length();
@@ -118,6 +123,8 @@ void setup() {
     Serial.println("Erro ao abrir o arquivo");
   }
 
+  /* Setar o pinmode dos sensores */
+
   pinMode(IGN_1, OUTPUT);
   pinMode(IGN_2, OUTPUT);
   pinMode(IGN_3, OUTPUT);
@@ -125,6 +132,8 @@ void setup() {
 }
 
 void loop() {
+  /* Dados Sensores */
+
   sensors_event_t event_accel;
   sensors_event_t event_mag;
   accel.getEvent(&event_accel);
@@ -144,6 +153,8 @@ void loop() {
   float mag_x = event_mag.magnetic.x;
   float mag_y = event_mag.magnetic.y;
   float mag_z = event_mag.magnetic.z;
+
+  /* Tratamento de Dados */
 
   total = total - leituras[indiceAtual];
   leituras[indiceAtual] = (altitudeReal);
@@ -170,7 +181,6 @@ void loop() {
     queda = 0;
   }
 
-  /* Paraquedas 1 e 2 */
   if (queda == 1 && paraquedas_1 == 0) {
     paraquedas_1 = 1;
     digitalWrite(IGN_1, HIGH);
@@ -198,7 +208,6 @@ void loop() {
     digitalWrite(IGN_2, LOW);
   }
 
-  /* Paraquedas 3 e 4 */
   if (queda == 1 && paraquedas_3 == 0 && mediaNova < altitudeTeto) {
     paraquedas_3 = 1;
     digitalWrite(IGN_3, HIGH);
@@ -226,6 +235,8 @@ void loop() {
     digitalWrite(IGN_4, LOW);
   }
 
+  /* Imprimindo Dados */
+
   String dataString = "";
   dataString += String(tempo) + "\t";
   dataString += String(temperatura) + "\t";
@@ -249,6 +260,8 @@ void loop() {
   dataString += String(mag_z);
 
   Serial.println(dataString);
+
+  /* Salvando no Cartão SD */
 
   File dataFile = SD.open(filename, FILE_WRITE);
   if (dataFile) {
