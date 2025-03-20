@@ -6,6 +6,7 @@ Adafruit_BMP085 bmp;
 
 #define AMOSTRAS 20
 
+
 const int chipSelect = 53;
 float leituras[AMOSTRAS];
 float leituras2[AMOSTRAS];
@@ -17,7 +18,7 @@ float altitudeTarada = 0;
 char nomeSD[15];
 int contagemSD = 0;
 int contagemQUEDA = 0;
-float altitudeMAX = 0;
+float alturaMAX = 0;
 String dataString = "";
 int altitude0ou1 = 0;
 
@@ -89,23 +90,23 @@ void loop() {
   indice1 = (indice1 + 1) % AMOSTRAS;
   float altitudeFiltrada2 = soma2 / AMOSTRAS;
 
-  if (altitudeTarada < altitudeMAX){
+  if (altura < alturaMAX){
     altitude0ou1 = 0; 
-  }else if(altitudeTarada > altitudeMAX){
+  }else if(altura > alturaMAX){
     altitude0ou1 = 1;
   }
 
   
-  if(altitude < altitudeMAX){
+  if(altura < alturaMAX){
       contagemQUEDA++;
   }else if(contagemQUEDA == 10){
     Serial.println("Abertura do Paraquedas!!!");  
-  }else if(altitude > altitudeMAX){
+  }else if(altura > alturaMAX){
     contagemQUEDA = 0;
   }
   
-  if(altitude > altitudeMAX){
-    altitudeMAX = altitude;
+  if(altura > alturaMAX){
+    alturaMAX = altura;
   }
 
 
