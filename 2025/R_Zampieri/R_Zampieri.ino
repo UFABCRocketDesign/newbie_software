@@ -53,7 +53,7 @@ do {
 
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
-  File dataFile = SD.open(nomearquivo);
+  File dataFile = SD.open(nomearquivo, FILE_WRITE);
 
   //FIM DO SETUP DATALOGGER
 
