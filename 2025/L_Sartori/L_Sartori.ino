@@ -36,8 +36,8 @@ void setup() {
   Serial.println("card initialized.");
 
   if(nome.length()>maxTamSD){
-    while(1){
-      Serial.println("diminua o tamanho do nome");
+    for(int i=0;i<maxTamSD;i++){
+      nome[i] =nome[i+1];
     }
   }
 
