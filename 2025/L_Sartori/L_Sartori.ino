@@ -51,7 +51,12 @@ void setup() {
   docName = nome + String(valSd) + ".txt";
   while (SD.exists(docName) == 1 && valSd < maxSd) {
     valSd += 1;
-    docName = nome + String(valSd) + ".txt";;
+    int tamVal = String(valSd).length();
+    docName = nome;
+    for(int i=0;i<tamN-tamVal;i++){
+      docName += String(0);
+    }
+    docName += String(valSd) + ".txt";
   }
   Serial.println("Creating "+docName+"...");
   dataFile = SD.open(docName, FILE_WRITE);
