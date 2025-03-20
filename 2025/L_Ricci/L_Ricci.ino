@@ -23,7 +23,7 @@ L3G gyro;
 HardwareSerial &LoRa = Serial3;
 unsigned long transmissao_lora = 0;
 
-HardwareSerial &GPS = Serial2;
+HardwareSerial &GPS = Serial1;
 float flat;
 float flon;
 
