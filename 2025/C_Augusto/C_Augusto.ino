@@ -19,6 +19,7 @@ int contagemSD = 0;
 int contagemQUEDA = 0;
 float altitudeMAX = 0;
 String dataString = "";
+int altitude0ou1 = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -71,8 +72,6 @@ if (dataFile) {
 
 Serial.println("initialization done.");
 
-
-
 }
 
 void loop() {
@@ -90,6 +89,12 @@ void loop() {
   indice1 = (indice1 + 1) % AMOSTRAS;
   float altitudeFiltrada2 = soma2 / AMOSTRAS;
 
+  if (altitudeTarada < altitudeMAX){
+    altitude0ou1 = 0; 
+  }else if(altitudeTarada > altitudeMAX){
+    altitude0ou1 = 1;
+  }
+
   if(altitude > altitudeMAX){
     altitudeMAX = altitude;
   }
@@ -98,24 +103,10 @@ void loop() {
     if(altitude < altitudeMAX){
       contagemQUEDA++;
   } if(contagemQUEDA == 10){
-    Serial.println("Abertura do Paraquedas!!!");
-    
+    Serial.println("Abertura do Paraquedas!!!");  
   }
   }
 
-  Serial.print(bmp.readTemperature());
-  Serial.print("\t");
-  Serial.print(bmp.readPressure());
-  Serial.print("\t");
-  Serial.print(altitude);
-  Serial.print("\t");
-  Serial.print(bmp.readSealevelPressure());
-  Serial.print("\t");
-  Serial.print(altitudeFiltrada2);
-  Serial.print("\t");
-  Serial.print(altitudeFiltrada);
-  Serial.print("\t");
-  Serial.println(altura);
 
 
   String dataString = "";
@@ -126,6 +117,9 @@ void loop() {
   dataString += String(altitudeFiltrada2) + "\t";
   dataString += String(altitudeFiltrada) + "\t";
   dataString += String(altura);
+  dataString += String(altitude0ou1);
+
+  Serial.println(dataString);
 
   File dataFile = SD.open(nomeSD, FILE_WRITE);
   if (dataFile) {
