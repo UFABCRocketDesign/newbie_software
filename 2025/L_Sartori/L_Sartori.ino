@@ -6,7 +6,8 @@ Adafruit_BMP085 bmp;
 #define N 3
 #define L 5
 #define H 4
-File myFile;
+File dataFile;
+String nome = "leo";
 const int chipSelect = 53;
 bool h;
 float med_alt = 0;
@@ -15,12 +16,12 @@ float vFiltro[N + 1];
 float ordH[H];
 int k = 0;
 float troca = 0;
-String nome = "leo";
-String docName ="";
-int valSd=0;
+String docName = "";
+int valSd = 0;
 int tamN;
 void setup() {
   String cabe = "";
+
   Serial.begin(115200);
 
   while (!Serial) {
@@ -35,33 +36,35 @@ void setup() {
   Serial.println("card initialized.");
 
 
-  if (nome.length()> 7){
+  if (nome.length() > 7) {
     Serial.println("Nome muito grande");
-  } else{
+  } else {
     tamN = 8 - nome.length();
   }
 
-  
+
   int maxSd = 1;
-  for (int i=0;i<tamN;i++){
+  for (int i = 0; i < tamN; i++) {
     maxSd *= 10;
   }
-  
-  docName = nome + String(valSd)+".txt";
-  while(SD.exists(docName)==1 && valSd < maxSd){
-    valSd+=1;
-    docName = nome + String(valSd)+".txt";;
+
+  docName = nome + String(valSd) + ".txt";
+  while (SD.exists(docName) == 1 && valSd < maxSd) {
+    valSd += 1;
+    docName = nome + String(valSd) + ".txt";;
   }
   Serial.println("Creating example.txt...");
-  myFile = SD.open(docName, FILE_WRITE);
-  myFile.close();
-  
+  dataFile = SD.open(docName, FILE_WRITE);
+  cabe += String("Temperature\tPressure\tAltitude\tPressure\tAltitude\t");
+  dataFile.println(cabe);
+  dataFile.close();
+
 
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
-  cabe += String("Temperature\tPressure\tAltitude\tPressure\tAltitude\t");
+
   Serial.println(cabe);
   for (int i = 0; i < 10; i++) {
     med_alt += bmp.readAltitude();
