@@ -15,8 +15,8 @@ int guia = 0;
 int guia2 = 0;
 int detectorqueda = 0;
 float alturapassada = 0;
-float altitude_filtrada = 0;
-float altitude_filtrada2 = 0;
+float altura_filtrada = 0;
+float altura_filtrada2 = 0;
 
 //Declarações pro SD DataLogger
 const int chipSelect = 53;
@@ -57,7 +57,7 @@ void setup() {
   }
   //
 
-  //Reset de altitude
+  //Reset de altura
   for (int i = 1; i <= 10; ++i) {
     tara += bmp.readAltitude();
   }
@@ -65,9 +65,9 @@ void setup() {
   //
 
   Serial.print("alturapassada\t");
-  Serial.print("Altitude Sem Filtro\t");
-  Serial.print("Altitude Filtrada\t");
-  Serial.print("Altitude Filtrada 2\t");
+  Serial.print("Altura Sem Filtro\t");
+  Serial.print("Altura Filtrada\t");
+  Serial.print("Altura Filtrada 2\t");
   Serial.print("Detector de Queda\t");
   Serial.print("Temperatura\t");
   Serial.print("Pressão\t");
@@ -76,9 +76,9 @@ void setup() {
 
   if (dataFile) {
   dataFile.print("alturapassada\t");
-  dataFile.print("Altitude Sem Filtro\t");
-  dataFile.print("Altitude Filtrada\t");
-  dataFile.print("Altitude Filtrada 2\t");
+  dataFile.print("Altura Sem Filtro\t");
+  dataFile.print("Altura Filtrada\t");
+  dataFile.print("Altura Filtrada 2\t");
   dataFile.print("Detector de Queda\t");
   dataFile.print("Temperatura\t");
   dataFile.print("Pressão\t");
@@ -105,40 +105,40 @@ void loop() {
     guia = 0;
   }
 
-  altitude_filtrada = 0;                  //reset da altitude pra usar no filtro 1
+  altura_filtrada = 0;                  //reset da altura pra usar no filtro 1
   for (int i = 0; i < tamanho; i += 1) {  //cálculo do filtro 1
-    altitude_filtrada += vetor[i];
+    altura_filtrada += vetor[i];
   }
 
-  altitude_filtrada /= tamanho;  //output do filtro 1
+  altura_filtrada /= tamanho;  //output do filtro 1
 
-  vetor2[guia2] = altitude_filtrada;  //setup do filtro 2
+  vetor2[guia2] = altura_filtrada;  //setup do filtro 2
   if (guia2 < tamanho - 1) {
     guia2 += 1;
   } else {
     guia2 = 0;
   }
 
-  altitude_filtrada2 = 0;                 //reset da altitude pra usar no filtro 2
+  altura_filtrada2 = 0;                 //reset da altura pra usar no filtro 2
   for (int i = 0; i < tamanho; i += 1) {  //cálculo do filtro 2
-    altitude_filtrada2 += vetor2[i];
+    altura_filtrada2 += vetor2[i];
   }
-  altitude_filtrada2 /= tamanho;  //output do filtro 2
+  altura_filtrada2 /= tamanho;  //output do filtro 2
 
   //DETECTOR DE QUEDA
-  if (altitude_filtrada2 < alturapassada) {  //Comparação da altitude atual pós-filtros com a altitude anterior ("alturapassada")
+  if (altura_filtrada2 < alturapassada) {  //Comparação da altura atual pós-filtros com a altura anterior ("alturapassada")
     detectorqueda = 1;
   } else {
     detectorqueda = 0;
   }
-  alturapassada = altitude_filtrada2;  //Armazenamento da altitude atual para usar como "alturapassada" no próximo loop
+  alturapassada = altura_filtrada2;  //Armazenamento da altura atual para usar como "alturapassada" no próximo loop
 
   // Armazenamento dos valores na dataString
   String dataString = "";
   dataString += String(alturapassada) + "\t";
   dataString += String(vetor[guia]) + "\t";
-  dataString += String(altitude_filtrada) + "\t";
-  dataString += String(altitude_filtrada2) + "\t";
+  dataString += String(altura_filtrada) + "\t";
+  dataString += String(altura_filtrada2) + "\t";
   dataString += String(detectorqueda) + "\t";
   dataString += String(bmp.readTemperature()) + "\t";
   dataString += String(bmp.readPressure()) + "\t";
