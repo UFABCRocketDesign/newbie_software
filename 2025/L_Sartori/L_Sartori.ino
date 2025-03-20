@@ -53,7 +53,7 @@ void setup() {
     valSd += 1;
     docName = nome + String(valSd) + ".txt";;
   }
-  Serial.println("Creating example.txt...");
+  Serial.println("Creating "+docName+"...");
   dataFile = SD.open(docName, FILE_WRITE);
   cabe += String("Temperature\tPressure\tAltitude\tPressure\tAltitude\t");
   dataFile.println(cabe);
