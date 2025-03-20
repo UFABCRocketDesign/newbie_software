@@ -5,7 +5,6 @@
 #include <Adafruit_ADXL345_U.h>
 #include <Adafruit_HMC5883_U.h>
 #include <L3G.h>
-HardwareSerial &LoRa = Serial3;
 Adafruit_BMP085 bmp;
 Adafruit_ADXL345_Unified accel;
 Adafruit_HMC5883_Unified mag;
@@ -18,7 +17,10 @@ L3G gyro;
 #define LEITURAS 10
 #define CHIP_SELECT 53
 #define NUMERO_QUEDAS 5
-  
+
+HardwareSerial &LoRa = Serial3;
+unsigned long transmissao_lora = 0;
+
 float alt = 0;
 float total = 0;
 float total2 = 0;
@@ -128,6 +130,9 @@ void setup() {
 }
 
 void loop() {
+
+  unsigned long timer_lora = millis();
+
   /* Dados Sensores */
 
   sensors_event_t event_accel;
@@ -267,7 +272,8 @@ void loop() {
     Serial.println("Erro ao abrir o arquivo para escrita.");
   }
 
-  if (int(tempo) % 3 == 0) {
+  if (timer_lora - transmissao_lora >= 3000) {
+    transmissao_lora = timer_lora;
     LoRa.println(dataString);
   }
 }
