@@ -118,7 +118,8 @@ void loop() {
   dataString += String(altitudeFiltrada2) + "\t";
   dataString += String(altitudeFiltrada) + "\t";
   dataString += String(altura) + "\t";
-  dataString += String(altitude0ou1);
+  dataString += String(altitude0ou1) + "\t";
+  dataString += String(alturaMAX);
 
   Serial.println(dataString);
 
