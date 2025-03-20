@@ -20,8 +20,10 @@ float altura_filtrada2 = 0;
 
 //Declarações pro SD DataLogger
 const int chipSelect = 53;
+int lognumber = 0;
+String nomearquivo;
 
-/////////////////////////////////////////////////////////////////////////////////////////////
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void setup() {
   //COMEÇO DO SETUP DATALOGGER
   // Open serial communications and wait for port to open:
@@ -43,9 +45,15 @@ void setup() {
   }
 
   Serial.println("initialization done.");
+
+do {
+    nomearquivo = "NomeLog" + String(lognumber) + ".txt"; //<<<<<<<<<<<<<<<PAREI AQUI>>>>>>>>>>>>>>>
+    lognumber += 1;
+} while (SD.exists(nomearquivo));
+
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
-  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  File dataFile = SD.open(nomearquivo);
 
   //FIM DO SETUP DATALOGGER
 
@@ -87,14 +95,14 @@ void setup() {
   }
   // if the file isn't open, pop up an error:
   else {
-    Serial.println("error opening datalog.txt");
+    Serial.println("Erro ao abrir" + nomearquivo);
   }
 }
-/////////////////////////////////////////////////////////////////////////////////////////////
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void loop() {
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
-  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  File dataFile = SD.open(nomearquivo, FILE_WRITE);
 
   //COMEÇO DA SEÇÃO DO SENSOR BMP
   //FILTROS
@@ -148,7 +156,7 @@ void loop() {
 
   //FIM DA SEÇÃO DO SENSOR BMP
 
-  //----------------------------------------------------------------------------------------------------
+  //----------------------------------------------------------------
 
   //COMEÇO DA SEÇÃO DO DATALOGGER
 
@@ -159,7 +167,7 @@ void loop() {
   }
   // if the file isn't open, pop up an error:
   else {
-    Serial.println("error opening datalog.txt");
+    Serial.println("Erro ao abrir" + nomearquivo);
   }
   //FIM DA SEÇÃO DO DATALOGGER
 }
