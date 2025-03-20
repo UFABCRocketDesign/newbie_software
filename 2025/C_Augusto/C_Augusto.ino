@@ -16,6 +16,8 @@ int indice1 = 0;
 float altitudeTarada = 0;
 char nomeSD[15];
 int contagemSD = 0;
+int contagemQUEDA = 0;
+float altitudeMAX = 0;
 String dataString = "";
 
 void setup() {
@@ -68,9 +70,13 @@ if (dataFile) {
 }
 
 Serial.println("initialization done.");
+
+
+
 }
 
 void loop() {
+
   float altitude = bmp.readAltitude();
   float altura = altitude - altitudeTarada;
   soma = soma - leituras[indice] + altura;
@@ -83,6 +89,19 @@ void loop() {
   leituras2[indice1] = altitudeFiltrada;
   indice1 = (indice1 + 1) % AMOSTRAS;
   float altitudeFiltrada2 = soma2 / AMOSTRAS;
+
+  if(altitude > altitudeMAX){
+    altitudeMAX = altitude;
+  }
+
+  for (int i = 0; i<=5; i++){
+    if(altitude < altitudeMAX){
+      contagemQUEDA++;
+  } if(contagemQUEDA == 5){
+    Serial.println("Abertura do Paraquedas!!!");
+    
+  }
+  }
 
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
