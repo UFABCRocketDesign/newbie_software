@@ -58,6 +58,7 @@ unsigned long timer_p4;
 void setup() {
   Serial.begin(115200);
   LoRa.begin(9600);
+  LoRa.println("Olá LoRa!");
 
   /* Inicializar os Sensores */
 
