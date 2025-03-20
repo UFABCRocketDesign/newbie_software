@@ -1,10 +1,13 @@
-#include <Adafruit_BMP085.h>
+#include <Adafruit_BMP085.h>  //Sensor BMP
 
-#define tamanho 10
+#define tamanho 10  //Usado pro filtro de dados do BMP
 
-Adafruit_BMP085 bmp;
+Adafruit_BMP085 bmp;  //Sensor BMP
 
-//Declarando variáveis e arrays
+#include <SPI.h>  //Usado no DataLogger
+#include <SD.h>   //Usado no DataLogger
+
+//Declarando variáveis e arrays pro BMP
 float tara = 0;
 float vetor[tamanho];
 float vetor2[tamanho];
@@ -14,9 +17,35 @@ int detectorqueda = 0;
 float alturapassada = 0;
 float altitude_filtrada = 0;
 float altitude_filtrada2 = 0;
-//
 
+//Declarações pro SD DataLogger
+const int chipSelect = 10;
+
+/////////////////////////////////////////////////////////////////////////////////////////////
 void setup() {
+  //COMEÇO DO SETUP DATALOGGER
+  // Open serial communications and wait for port to open:
+  Serial.begin(9600);
+  // wait for Serial Monitor to connect. Needed for native USB port boards only:
+  while (!Serial)
+    ;
+
+  Serial.print("Initializing SD card...");
+
+  if (!SD.begin(chipSelect)) {
+    Serial.println("initialization failed. Things to check:");
+    Serial.println("1. is a card inserted?");
+    Serial.println("2. is your wiring correct?");
+    Serial.println("3. did you change the chipSelect pin to match your shield or module?");
+    Serial.println("Note: press reset button on the board and reopen this Serial Monitor after fixing your issue!");
+    while (true)
+      ;
+  }
+
+  Serial.println("initialization done.");
+  //FIM DO SETUP DATALOGGER
+
+  //COMEÇO DO SETUP BMP
   //Inicialização do sensor
   Serial.begin(115200);
   if (!bmp.begin()) {
@@ -39,13 +68,13 @@ void setup() {
   Serial.print("Detector de Queda\t");
   Serial.print("Temperatura\t");
   Serial.print("Pressão\t");
-  Serial.print("Pressão no Nível do Mar\t");
-  Serial.print("Altitude Real\t");
   Serial.println();
+  //FIM DO SETUP BMP
 }
-
+/////////////////////////////////////////////////////////////////////////////////////////////
 void loop() {
 
+  //COMEÇO DA SEÇÃO DO SENSOR BMP
   //FILTROS
   vetor[guia] = bmp.readAltitude() - tara;  //setup do filtro 1
   if (guia < tamanho - 1) {
@@ -82,24 +111,39 @@ void loop() {
   }
   alturapassada = altitude_filtrada2;  //Armazenamento da altitude atual para usar como "alturapassada" no próximo loop
 
-  //print dos valores medidos
-  Serial.print(alturapassada);
-  Serial.print("\t");
-  Serial.print(vetor[guia]);
-  Serial.print("\t");
-  Serial.print(altitude_filtrada);
-  Serial.print("\t");
-  Serial.print(altitude_filtrada2);
-  Serial.print("\t");
-  Serial.print(detectorqueda);
-  Serial.print("\t");
-  Serial.print(bmp.readTemperature());
-  Serial.print("\t");
-  Serial.print(bmp.readPressure());
-  Serial.print("\t");
-  Serial.print(bmp.readSealevelPressure());
-  Serial.print("\t");
-  Serial.print(bmp.readAltitude(101500));
-  Serial.print("\t");
+  // Armazenamento dos valores na dataString
+  String dataString = "";
+  dataString += String(alturapassada) + "\t";
+  dataString += String(vetor[guia]) + "\t";
+  dataString += String(altitude_filtrada) + "\t";
+  dataString += String(altitude_filtrada2) + "\t";
+  dataString += String(detectorqueda) + "\t";
+  dataString += String(bmp.readTemperature()) + "\t";
+  dataString += String(bmp.readPressure()) + "\t";
+
+  //Print da dataString
+  Serial.print(dataString);
   Serial.println();
+  //FIM DA SEÇÃO DO SENSOR BMP
+
+  //----------------------------------------------------------------------------------------------------
+
+  //COMEÇO DA SEÇÃO DO DATALOGGER
+
+  // open the file. note that only one file can be open at a time,
+  // so you have to close this one before opening another.
+  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+
+  // if the file is available, write to it:
+  if (dataFile) {
+    dataFile.println(dataString);
+    dataFile.close();
+    // print to the serial port too:
+    Serial.println(dataString);
+  }
+  // if the file isn't open, pop up an error:
+  else {
+    Serial.println("error opening datalog.txt");
+  }
+  //FIM DA SEÇÃO DO DATALOGGER
 }
