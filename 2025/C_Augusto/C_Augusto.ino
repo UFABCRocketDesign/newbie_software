@@ -95,18 +95,18 @@ void loop() {
     altitude0ou1 = 1;
   }
 
+  
+  if(altitude < altitudeMAX){
+      contagemQUEDA++;
+  }else if(contagemQUEDA == 10){
+    Serial.println("Abertura do Paraquedas!!!");  
+  }else if(altitude > altitudeMAX){
+    contagemQUEDA = 0;
+  }
+  
   if(altitude > altitudeMAX){
     altitudeMAX = altitude;
   }
-
-  for (int i = 0; i<=10; i++){
-    if(altitude < altitudeMAX){
-      contagemQUEDA++;
-  } if(contagemQUEDA == 10){
-    Serial.println("Abertura do Paraquedas!!!");  
-  }
-  }
-
 
 
   String dataString = "";
@@ -116,7 +116,7 @@ void loop() {
   dataString += String(bmp.readSealevelPressure()) + "\t";
   dataString += String(altitudeFiltrada2) + "\t";
   dataString += String(altitudeFiltrada) + "\t";
-  dataString += String(altura);
+  dataString += String(altura) + "\t";
   dataString += String(altitude0ou1);
 
   Serial.println(dataString);
