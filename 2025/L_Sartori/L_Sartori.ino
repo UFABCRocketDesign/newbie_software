@@ -6,6 +6,7 @@ Adafruit_BMP085 bmp;
 #define N 3
 #define L 5
 #define H 4
+#define maxTamSD 8
 File dataFile;
 String nome = "leo";
 const int chipSelect = 53;
@@ -18,7 +19,6 @@ int k = 0;
 float troca = 0;
 String docName = "";
 int valSd = 0;
-int tamN;
 void setup() {
   String cabe = "";
 
@@ -35,30 +35,27 @@ void setup() {
   }
   Serial.println("card initialized.");
 
-
-  if (nome.length() > 7) {
-    Serial.println("Nome muito grande");
-  } else {
-    tamN = 8 - nome.length();
-  }
-
-
-  int maxSd = 1;
-  for (int i = 0; i < tamN; i++) {
-    maxSd *= 10;
+  if(nome.length()>maxTamSD){
+    while(1){
+      Serial.println("diminua o tamanho do nome");
+    }
   }
 
   docName = nome + String(valSd) + ".txt";
   do {
     valSd += 1;
-    int tamVal = String(valSd).length();
     docName = nome;
+    
+    int tamN= maxTamSD - nome.length();
+    int tamVal = String(valSd).length();
+    
     for(int i=0;i<tamN-tamVal;i++){
       docName += String(0);
     }
+    
     docName += String(valSd) + ".txt";
-    Serial.println(docName);
-  } while((SD.exists(docName)) );
+  } while(SD.exists(docName));
+  
   Serial.println("Creating "+docName+"...");
   dataFile = SD.open(docName, FILE_WRITE);
   cabe += String("Temperature\tPressure\tAltitude\tPressure\tAltitude\t");
