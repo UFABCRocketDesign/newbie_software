@@ -19,7 +19,7 @@ float altitude_filtrada = 0;
 float altitude_filtrada2 = 0;
 
 //Declarações pro SD DataLogger
-const int chipSelect = 10;
+const int chipSelect = 53;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 void setup() {
@@ -122,8 +122,8 @@ void loop() {
   dataString += String(bmp.readPressure()) + "\t";
 
   //Print da dataString
-  Serial.print(dataString);
-  Serial.println();
+  Serial.println(dataString);
+  
   //FIM DA SEÇÃO DO SENSOR BMP
 
   //----------------------------------------------------------------------------------------------------
@@ -138,8 +138,6 @@ void loop() {
   if (dataFile) {
     dataFile.println(dataString);
     dataFile.close();
-    // print to the serial port too:
-    Serial.println(dataString);
   }
   // if the file isn't open, pop up an error:
   else {
