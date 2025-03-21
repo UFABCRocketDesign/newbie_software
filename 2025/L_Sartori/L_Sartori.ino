@@ -135,7 +135,7 @@ void loop() {
   dataString += "\t";
 
   
-  if(h && t-t1<=intervalo && paraQued1==0){
+  if(h && paraQued1==0){
     t1 = t;
     paraQued1 = 1;
     digitalWrite(IGN_1,HIGH);
