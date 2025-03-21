@@ -22,6 +22,9 @@ float altura_filtrada2 = 0;
 const int chipSelect = 53;
 int lognumber = 0;
 String nomearquivo;
+String nomelog = "ZAMP";
+String zerospacetext;
+int zerospacelength;
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void setup() {
@@ -46,12 +49,16 @@ void setup() {
 
   Serial.println("initialization done.");
 
-do {
-    nomearquivo = "NomeLog" + String(lognumber) + ".txt"; //<<<<<<<<<<<<<<<PAREI AQUI>>>>>>>>>>>>>>>
+  do {
+    zerospacelength = 8 - nomelog.length() - String(lognumber).length();
+    for (int i = 1; i <= zerospacelength; ++i) {
+      zerospacetext += "0";
+    }
+    nomearquivo = nomelog + zerospacetext + String(lognumber) + ".txt"; 
     lognumber += 1;
-} while (SD.exists(nomearquivo));
+  } while (SD.exists(nomearquivo));
 
-Serial.println(nomearquivo);
+  Serial.println(nomearquivo);
 
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
@@ -85,15 +92,15 @@ Serial.println(nomearquivo);
   //FIM DO SETUP BMP
 
   if (dataFile) {
-  dataFile.print("alturapassada\t");
-  dataFile.print("Altura Sem Filtro\t");
-  dataFile.print("Altura Filtrada\t");
-  dataFile.print("Altura Filtrada 2\t");
-  dataFile.print("Detector de Queda\t");
-  dataFile.print("Temperatura\t");
-  dataFile.print("Pressão\t");
-  dataFile.println();
-  dataFile.close();
+    dataFile.print("alturapassada\t");
+    dataFile.print("Altura Sem Filtro\t");
+    dataFile.print("Altura Filtrada\t");
+    dataFile.print("Altura Filtrada 2\t");
+    dataFile.print("Detector de Queda\t");
+    dataFile.print("Temperatura\t");
+    dataFile.print("Pressão\t");
+    dataFile.println();
+    dataFile.close();
   }
   // if the file isn't open, pop up an error:
   else {
@@ -115,7 +122,7 @@ void loop() {
     guia = 0;
   }
 
-  altura_filtrada = 0;                  //reset da altura pra usar no filtro 1
+  altura_filtrada = 0;                    //reset da altura pra usar no filtro 1
   for (int i = 0; i < tamanho; i += 1) {  //cálculo do filtro 1
     altura_filtrada += vetor[i];
   }
@@ -129,7 +136,7 @@ void loop() {
     guia2 = 0;
   }
 
-  altura_filtrada2 = 0;                 //reset da altura pra usar no filtro 2
+  altura_filtrada2 = 0;                   //reset da altura pra usar no filtro 2
   for (int i = 0; i < tamanho; i += 1) {  //cálculo do filtro 2
     altura_filtrada2 += vetor2[i];
   }
