@@ -24,11 +24,15 @@ const int chipSelect = 53;
 int inter1 = 5000;
 int inter12 = 2000;
 int inter2 = 5000;
+int inter3 = 5000;
+int apoH =-3;
 long int t = 0;
 long int t1 = 0;
 long int t2 = 0;
+long int t3 = 0;
 int pQued1 = 0;
 int pQued2 = -1;
+int pQued3 = 0;
 bool h;
 float med_alt = 0;
 float c[N][L];
@@ -160,6 +164,16 @@ void loop() {
     digitalWrite(IGN_2, LOW);
     pQued2 = 2;
   }
+
+    if (h && pQued3 == 0 && apoH<=ordH[0]) {
+    t3 = t;
+    pQued3 = 1;
+    digitalWrite(IGN_3, HIGH);
+  } else if (pQued3 == 1 && t - t3 >= inter3) {
+    digitalWrite(IGN_3, LOW);
+    pQued3 = 2;
+  }
+
 
 
   dataString += String(pQued1);
