@@ -97,12 +97,6 @@ void setup() {
     while (1) {}
   }
 
-  unsigned long start = millis();
-  do {
-    while (GPS.available())
-      gps.encode(GPS.read());
-  } while (millis() - start < 1000);
-
   Serial.println(heading);
 
   /* Média de Alturas */
@@ -146,13 +140,18 @@ void loop() {
 
   unsigned long timer_lora = millis();
 
-  /* Dados Sensores */
+  /* Leitura dados do GPS */
+  while (GPS.available()) {
+    gps.encode(GPS.read());
+  }
 
+  /* Dados Sensores */
   sensors_event_t event_accel;
   sensors_event_t event_mag;
   accel.getEvent(&event_accel);
   mag.getEvent(&event_mag);
   gyro.read();
+
 
   float tempo = millis() / 1000.0;
   float altitudeReal = bmp.readAltitude() - alt;
