@@ -152,7 +152,7 @@ void loop() {
   if (h && pQued2 == -1) {
     t2 = t;
     pQued2 = 0;
-  } else if (pQued2 == 0 && t - t2 >= inter1 + inter12) {
+  } else if (pQued2 == 0 && t - t2 >= inter12) {
     digitalWrite(IGN_2, HIGH);
     pQued2 = 1;
     t2 = t;
