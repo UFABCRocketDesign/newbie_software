@@ -37,6 +37,7 @@ int pQued2 = -1;
 int pQued3 = 0;
 int pQued4 = -1;
 bool h;
+bool ocoAp = 0;
 float med_alt = 0;
 float c[N][L];
 float vFiltro[N + 1];
@@ -147,9 +148,13 @@ void loop() {
 
   dataString += String(h);
   dataString += "\t";
-
+  if (h){
+    ocoAp = 1;
+  }
+ 
+    
   t = millis();
-  if (h && pQued1 == 0) {
+  if (ocoAp && pQued1 == 0) {
     t1 = t;
     pQued1 = 1;
     digitalWrite(IGN_1, HIGH);
@@ -158,7 +163,7 @@ void loop() {
     pQued1 = 2;
   }
 
-  if (h && pQued2 == -1) {
+  if (ocoAp && pQued2 == -1) {
     t2 = t;
     pQued2 = 0;
   } else if (pQued2 == 0 && t - t2 >= interEsp) {
@@ -170,7 +175,7 @@ void loop() {
     pQued2 = 2;
   }
 
-    if (h && pQued3 == 0 && apoH>=ordH[0]) {
+    if (ocoAp && pQued3 == 0 && apoH>=ordH[0]) {
     t3 = t;
     pQued3 = 1;
     digitalWrite(IGN_3, HIGH);
@@ -180,7 +185,7 @@ void loop() {
   }
 
   
-  if (h && pQued4 == -1 && apoH>=ordH[0]) {
+  if (ocoAp && pQued4 == -1 && apoH>=ordH[0]) {
     t4 = t;
     pQued4 = 0;
   } else if (pQued4 == 0 && t - t4 >= interEsp) {
