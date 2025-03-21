@@ -16,23 +16,26 @@
 Adafruit_BMP085 bmp;
 #define N 3
 #define L 5
-#define H 12
+#define H 20
 #define maxTamSD 8
 File dataFile;
 String nome = "leo";
 const int chipSelect = 53;
 int inter1 = 5000;
-int inter12 = 2000;
+int interEsp = 2000;
 int inter2 = 5000;
 int inter3 = 5000;
+int inter4 = 5000;
 int apoH =-3;
 long int t = 0;
 long int t1 = 0;
 long int t2 = 0;
 long int t3 = 0;
+long int t4 = 0;
 int pQued1 = 0;
 int pQued2 = -1;
 int pQued3 = 0;
+int pQued4 = -1;
 bool h;
 float med_alt = 0;
 float c[N][L];
@@ -100,6 +103,7 @@ void setup() {
   pinMode(IGN_1, OUTPUT);
   pinMode(IGN_2, OUTPUT);
   pinMode(IGN_3, OUTPUT);
+  pinMode(IGN_4, OUTPUT);
 }
 
 
@@ -157,7 +161,7 @@ void loop() {
   if (h && pQued2 == -1) {
     t2 = t;
     pQued2 = 0;
-  } else if (pQued2 == 0 && t - t2 >= inter12) {
+  } else if (pQued2 == 0 && t - t2 >= interEsp) {
     digitalWrite(IGN_2, HIGH);
     pQued2 = 1;
     t2 = t;
@@ -173,6 +177,19 @@ void loop() {
   } else if (pQued3 == 1 && t - t3 >= inter3) {
     digitalWrite(IGN_3, LOW);
     pQued3 = 2;
+  }
+
+  
+  if (h && pQued4 == -1 && apoH>=ordH[0]) {
+    t4 = t;
+    pQued4 = 0;
+  } else if (pQued4 == 0 && t - t4 >= interEsp) {
+    digitalWrite(IGN_4, HIGH);
+    pQued4 = 1;
+    t4 = t;
+  } else if (pQued4 == 1 && t - t4 >= inter4) {
+    digitalWrite(IGN_4, LOW);
+    pQued4 = 2;
   }
 
 
