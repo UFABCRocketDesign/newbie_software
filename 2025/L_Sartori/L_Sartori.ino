@@ -166,7 +166,7 @@ void loop() {
     pQued2 = 2;
   }
 
-    if (h && pQued3 == 0 && apoH<=ordH[0]) {
+    if (h && pQued3 == 0 && apoH>=ordH[0]) {
     t3 = t;
     pQued3 = 1;
     digitalWrite(IGN_3, HIGH);
