@@ -165,7 +165,7 @@ void loop() {
   dataString += String(pQued1);
   dataString += "\t";
 
-  dataString += String((pQued2==-1)?0:pQued2);
+  dataString += String(((pQued2 == -1) ? 0 : pQued2));
   dataString += "\t";
   Serial.println(dataString);
 
