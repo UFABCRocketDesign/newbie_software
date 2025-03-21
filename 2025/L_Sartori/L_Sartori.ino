@@ -3,12 +3,15 @@
 #include <SPI.h>
 #include <SD.h>
 #include <Wire.h>
+#include <L3G.h>
+
 
 #include <Adafruit_Sensor.h>
 #include <Adafruit_ADXL345_U.h>
 
 #include <Adafruit_BMP085.h>
 
+L3G gyro;
 
 #ifdef ARDUINO_AVR_MEGA2560
 #define SD_CS_PIN 53
@@ -35,7 +38,7 @@ int interEsp = 2000;
 int inter2 = 5000;
 int inter3 = 5000;
 int inter4 = 5000;
-int apoH =-3;
+int apoH = -3;
 long int t = 0;
 long int t1 = 0;
 long int t2 = 0;
@@ -60,7 +63,7 @@ void setup() {
   String cabe = "";
 
   Serial.begin(115200);
-
+  Wire.begin();
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
   }
@@ -104,14 +107,20 @@ void setup() {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
-  if(!accel.begin())
+  if (!accel.begin())
   {
     /* There was a problem detecting the ADXL345 ... check your connections */
     Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
-    while(1);
+    while (1);
   }
   accel.setRange(ADXL345_RANGE_16_G);
 
+  if (!gyro.init())
+  {
+    Serial.println("Failed to autodetect gyro type!");
+    while (1);
+  }
+  gyro.enableDefault();
   Serial.println(cabe);
   for (int i = 0; i < 10; i++) {
     med_alt += bmp.readAltitude();
@@ -127,13 +136,13 @@ void setup() {
 
 
 void loop() {
-  
+
   t = millis();
   String dataString = "";
 
-  dataString += String(t/1000.0);
+  dataString += String(t / 1000.0);
   dataString += "\t";
-  
+
   dataString += String(bmp.readTemperature());
   dataString += "\t";
 
@@ -170,11 +179,11 @@ void loop() {
 
   dataString += String(h);
   dataString += "\t";
-  if (h){
+  if (h) {
     ocoAp = 1;
   }
- 
-    
+
+
 
   if (ocoAp && pQued1 == 0) {
     t1 = t;
@@ -197,7 +206,7 @@ void loop() {
     pQued2 = 2;
   }
 
-    if (ocoAp && pQued3 == 0 && apoH>=ordH[0]) {
+  if (ocoAp && pQued3 == 0 && apoH >= ordH[0]) {
     t3 = t;
     pQued3 = 1;
     digitalWrite(IGN_3, HIGH);
@@ -206,8 +215,8 @@ void loop() {
     pQued3 = 2;
   }
 
-  
-  if (ocoAp && pQued4 == -1 && apoH>=ordH[0]) {
+
+  if (ocoAp && pQued4 == -1 && apoH >= ordH[0]) {
     t4 = t;
     pQued4 = 0;
   } else if (pQued4 == 0 && t - t4 >= interEsp) {
@@ -234,7 +243,7 @@ void loop() {
   dataString += "\t";
 
 
-  sensors_event_t event; 
+  sensors_event_t event;
   accel.getEvent(&event);
 
   dataString += String(event.acceleration.x);
@@ -244,9 +253,20 @@ void loop() {
   dataString += "\t";
 
   dataString += String(event.acceleration.z);
-  dataString += "\t";  
+  dataString += "\t";
 
-  
+  gyro.read();
+
+  dataString += String((int)gyro.g.x);
+  dataString += "\t";
+
+  dataString += String((int)gyro.g.y);
+  dataString += "\t";
+
+  dataString += String((int)gyro.g.z);
+  dataString += "\t";
+
+
   Serial.println(dataString);
 
   File dataFile = SD.open(docName, FILE_WRITE);
