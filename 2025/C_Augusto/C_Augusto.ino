@@ -92,14 +92,18 @@ void loop() {
 
   
   if(altura < alturaMAX){
-      contagemQUEDA++;
-      altitude0ou1 = 1; 
+      contagemQUEDA++; 
   }
   else if(altura > alturaMAX){
     contagemQUEDA = 0;
     alturaMAX = altura;
-    altitude0ou1 = 0;
   }
+  
+    if(contagemQUEDA == 10){
+      altitude0ou1 = 1;  
+    }else if (contagemQUEDA > 10 || contagemQUEDA < 10{
+      altitude0ou1 = 0;
+    }
   
 
   
@@ -111,13 +115,7 @@ void loop() {
   dataString += String(altitudeFiltrada2) + "\t";
   dataString += String(altitudeFiltrada) + "\t";
   dataString += String(altura) + "\t";
-  while (altitude0ou1 == 0){
-    dataString += String(altitude0ou1); 
-  }
-  if(contagemQUEDA == 10){
-      dataString += String(altitude0ou1) + "\t";  
-    }
-  
+  dataString += String(altitude0ou1) + "\t";
   dataString += String(alturaMAX);
 
   Serial.println(dataString);
