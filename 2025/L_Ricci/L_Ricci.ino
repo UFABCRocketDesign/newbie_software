@@ -210,6 +210,22 @@ void setup() {
   pinMode(IGN_4, OUTPUT);
 }
 
+float filtro(float altitudeReal) {
+  total = total - leituras[indiceAtual];
+  leituras[indiceAtual] = (altitudeReal);
+  total = total + leituras[indiceAtual];
+  indiceAtual = (indiceAtual + 1) % LEITURAS;
+  float media = total / LEITURAS;
+
+  total2 = total2 - leituras2[indiceAtual2];
+  leituras2[indiceAtual2] = (media);
+  total2 = total2 + leituras2[indiceAtual2];
+  indiceAtual2 = (indiceAtual2 + 1) % LEITURAS;
+  float mediaNova = total2 / LEITURAS;
+
+  return mediaNova;
+}
+
 void loop() {
   unsigned long timer_lora = millis();
   float tempo = millis() / 1000.0;
@@ -280,18 +296,7 @@ void loop() {
   /* Tratamento de Dados */
 #if USANDO_BAROMETRO
 
-
-  total = total - leituras[indiceAtual];
-  leituras[indiceAtual] = (altitudeReal);
-  total = total + leituras[indiceAtual];
-  indiceAtual = (indiceAtual + 1) % LEITURAS;
-  float media = total / LEITURAS;
-
-  total2 = total2 - leituras2[indiceAtual2];
-  leituras2[indiceAtual2] = (media);
-  total2 = total2 + leituras2[indiceAtual2];
-  indiceAtual2 = (indiceAtual2 + 1) % LEITURAS;
-  float mediaNova = total2 / LEITURAS;
+  float mediaNova = filtro(altitudeReal);
 
   float altitudeAnterior = 0;
   if (mediaNova < altitudeAnterior) {
@@ -299,6 +304,7 @@ void loop() {
   } else {
     contadorQueda = 0;
   }
+
   altitudeAnterior = mediaNova;
 
   if (contadorQueda >= 10) {
@@ -374,7 +380,6 @@ void loop() {
 #if PRESSAO
   dataString += String(pressao) + "\t";
 #endif  // PRESSAO
-  dataString += String(media) + "\t";
   dataString += String(mediaNova) + "\t";
   dataString += String(altitudeReal) + "\t";
   dataString += String(queda) + "\t";
