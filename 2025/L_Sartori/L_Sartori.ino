@@ -99,6 +99,7 @@ void setup() {
 
   pinMode(IGN_1, OUTPUT);
   pinMode(IGN_2, OUTPUT);
+  pinMode(IGN_3, OUTPUT);
 }
 
 
@@ -181,6 +182,10 @@ void loop() {
 
   dataString += String(((pQued2 == -1) ? 0 : pQued2));
   dataString += "\t";
+
+  dataString += String(pQued3);
+  dataString += "\t";
+  
   Serial.println(dataString);
 
   File dataFile = SD.open(docName, FILE_WRITE);
