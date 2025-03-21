@@ -103,7 +103,7 @@ void loop() {
   
 
   if(contagemQUEDA == 10){
-    Serial.println("Abertura do Paraquedas!!!");  
+    Serial.println(altitude0ou1);  
   }
   
   String dataString = "";
