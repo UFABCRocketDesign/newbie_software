@@ -109,10 +109,10 @@ void setup() {
 
 
 void loop() {
-
+  t = millis();
   String dataString = "";
 
-  dataString += String(t/1000);
+  dataString += String(t/1000.0);
   dataString += "\t";
   
   dataString += String(bmp.readTemperature());
@@ -156,7 +156,7 @@ void loop() {
   }
  
     
-  t = millis();
+
   if (ocoAp && pQued1 == 0) {
     t1 = t;
     pQued1 = 1;
