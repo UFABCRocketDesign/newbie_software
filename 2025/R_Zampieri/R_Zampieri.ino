@@ -56,6 +56,7 @@ void setup() {
     }
     nomearquivo = nomelog + zerospacetext + String(lognumber) + ".txt"; 
     lognumber += 1;
+    zerospacetext = "";
   } while (SD.exists(nomearquivo));
 
   Serial.println(nomearquivo);
