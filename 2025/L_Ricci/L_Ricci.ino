@@ -13,79 +13,49 @@ TinyGPSPlus gps;
 L3G gyro;
 
 #define USANDO_BAROMETRO 1
-#define TERMOMETRO 0
-#define PRESSAO 0
+#define TERMOMETRO 1
+#define PRESSAO 1
 
 #define USANDO_ACELEROMETRO 1
-#define ACELEROMETRO_X 0
-#define ACELEROMETRO_Y 0
-#define ACELEROMETRO_Z 0
-
+#define AX 1
+#define AY 1
+#define AZ 1
 
 #define USANDO_MAGNETOMETRO 1
-#define MAGNETOMETRO_X 0
-#define MAGNETOMETRO_Y 0
-#define MAGNETOMETRO_Z 0
+#define MX 1
+#define MY 1
+#define MZ 1
 
 #define USANDO_GIROSCOPIO 1
-#define GIROSCOPIO_X 0
-#define GIROSCOPIO_Y 0
-#define GIROSCOPIO_Z 0
+#define GX 1
+#define GY 1
+#define GZ 1
 
 #define USANDO_GPS 1
-#define GPS_LAT 0
-#define GPS_LNG 0
+#define GPS_LAT 1
+#define GPS_LNG 1
 
-#define USANDO_LORA 0
-#define USANDO_CARTAO 0
-#define USANDO_CABECALHO 0
+#define USANDO_LORA 1
+#define USANDO_CARTAO 1
+#define USANDO_CABECALHO 1
 
 #define IGN_1 36
 #define IGN_2 61
 #define IGN_3 46
 #define IGN_4 55
+
 #define LEITURAS 10
 #define CHIP_SELECT 53
 #define NUMERO_QUEDAS 5
 
 HardwareSerial &LoRa = Serial3;
-unsigned long transmissao_lora = 0;
-
 HardwareSerial &GPS = Serial1;
 
-float alt = 0;
-float total = 0;
-float total2 = 0;
-
-float leituras[LEITURAS] = {};
-float leituras2[LEITURAS] = {};
-float altitudes[NUMERO_QUEDAS];
-
-int indiceAtual = 0;
-int indiceAtual2 = 0;
-int contadorQueda = 0;
-int queda = 0;
-
-String zeros;
-String filename;
-String nome = "LUCAS";
 String heading = "Tempo\tTemperatura\tPressão\tAltitudeFiltrada\tAltitudeRaw\tQueda\tParaquedas_1\tParaquedas_2\tAccelX\tAccelY\tAccelZ\tGyroX\tGyroY\tGyroZ\tMagX\tMagY\tMagZ\tLat\tLon";
-int incremento = 0;
-int tamanho = 0;
+String filename;
 
-float altitudeAnterior = 0;
+float alt = 0;
 int altitudeTeto = -3;
-
-int paraquedas_1 = 0;
-int paraquedas_2 = 0;
-int paraquedas_3 = 0;
-int paraquedas_4 = 0;
-unsigned long desativacao_p2 = 0;
-unsigned long desativacao_p4 = 0;
-unsigned long timer_p1;
-unsigned long timer_p2;
-unsigned long timer_p3;
-unsigned long timer_p4;
 
 void setup() {
   Serial.begin(115200);
@@ -129,15 +99,19 @@ void setup() {
 
   /* Média de Alturas */
 
+
   for (int i = 0; i < 10; i++) {
     alt += bmp.readAltitude();
   }
   alt = alt / 10;
 
   /* Criar ou Abrir Arquivo */
+  String nome = "LUCAS";
+  String zeros;
+  int incremento = 0;
 
   do {
-    tamanho = nome.length() + String(incremento).length();
+    int tamanho = nome.length() + String(incremento).length();
     zeros = "";
     for (int i = tamanho; i < 8; i++) {
       zeros += "0";
@@ -165,7 +139,6 @@ void setup() {
 }
 
 void loop() {
-
   unsigned long timer_lora = millis();
   float tempo = millis() / 1000.0;
 
@@ -182,28 +155,28 @@ void loop() {
 #if USANDO_ACELEROMETRO
   sensors_event_t event_accel;
   accel.getEvent(&event_accel);
-#if ACELEROMETRO_X
+#if AX
   float accel_x = event_accel.acceleration.x;
-#endif  //ACELEROMETRO_X
-#if ACELEROMETRO_Y
+#endif  //AX
+#if AY
   float accel_y = event_accel.acceleration.y;
-#endif  // ACELEROMETRO_Y
-#if ACELEROMETRO_Z
+#endif  // AY
+#if AZ
   float accel_z = event_accel.acceleration.z;
-#endif  // ACELEROMETRO_Z
+#endif  // AZ
 #endif  // USANDO_ACELEROMETRO
 
 #if USANDO_GIROSCOPIO
   gyro.read();
-#if GIROSCOPIO_X
+#if GX
   int gyro_x = gyro.g.x;
-#endif  // GIROSCOPIO_X
-#if GIROSCOPIO_Y
+#endif  // GX
+#if GY
   int gyro_y = gyro.g.y;
-#endif  // GIROSCOPIO_Y
-#if GIROSCOPIO_Z
+#endif  // GY
+#if GZ
   int gyro_z = gyro.g.z;
-#endif  // GIROSCOPIO_X
+#endif  // GX
 #endif  // USANDO_GIROSCOPIO
 
 #if USANDO_GPS
@@ -221,19 +194,28 @@ void loop() {
 #if USANDO_MAGNETOMETRO
   sensors_event_t event_mag;
   mag.getEvent(&event_mag);
-#if MAGNETOMETRO_X
+#if MX
   float mag_x = event_mag.magnetic.x;
-#endif  // MAGNETOMETRO_X
-#if MAGNETOMETRO_Y
+#endif  // MX
+#if MY
   float mag_y = event_mag.magnetic.y;
-#endif  // MAGNETOMETRO_Y
-#if MAGNETOMETRO_Z
+#endif  // MY
+#if MZ
   float mag_z = event_mag.magnetic.z;
-#endif  // MAGNETOMETRO_Z
+#endif  // MZ
 #endif  // USANDO_MAGNETROMETRO
 
   /* Tratamento de Dados */
 #if USANDO_BAROMETRO
+  int indiceAtual = 0, indiceAtual2 = 0, contadorQueda = 0, queda = 0;
+  int paraquedas_1 = 0, paraquedas_2 = 0, paraquedas_3 = 0, paraquedas_4 = 0;
+  unsigned long desativacao_p2 = 0, desativacao_p4 = 0;
+  unsigned long timer_p1, timer_p2, timer_p3, timer_p4;
+  float total = 0, total2 = 0;
+  float leituras[LEITURAS] = {};
+  float leituras2[LEITURAS] = {};
+  float altitudes[NUMERO_QUEDAS];
+
   total = total - leituras[indiceAtual];
   leituras[indiceAtual] = (altitudeReal);
   total = total + leituras[indiceAtual];
@@ -246,6 +228,7 @@ void loop() {
   indiceAtual2 = (indiceAtual2 + 1) % LEITURAS;
   float mediaNova = total2 / LEITURAS;
 
+  float altitudeAnterior = 0;
   if (mediaNova < altitudeAnterior) {
     contadorQueda++;
   } else {
@@ -337,39 +320,39 @@ void loop() {
 #endif  // USANDO_BAROMETRO
 
 #if USANDO_ACELEROMETRO
-#if ACELEROMETRO_X
+#if AX
   dataString += String(accel_x) + "\t";
-#endif  // ACELEROMETRO_X
-#if ACELEROMETRO_Y
+#endif  // AX
+#if AY
   dataString += String(accel_y) + "\t";
-#endif  // ACELEROMETRO_Y
-#if ACELEROMETRO_Z
+#endif  // AY
+#if AZ
   dataString += String(accel_z) + "\t";
-#endif  // ACELEROMETRO_Zz
+#endif  // AZz
 #endif  // USANDO ACELEROMETRO
 
 #if USANDO_GIROSCOPIO
-#if GIROSCOPIO_X
+#if GX
   dataString += String(gyro_x) + "\t";
-#endif  // GIROSCOPIO_X
-#if GIROSCOPIO_Y
+#endif  // GX
+#if GY
   dataString += String(gyro_y) + "\t";
-#endif  // GIROSCOPIO_Y
-#if GIROSCOPIO_Z
+#endif  // GY
+#if GZ
   dataString += String(gyro_z) + "\t";
-#endif  // GIROSCOPIO_Z
+#endif  // GZ
 #endif  // USANDO_GIROSCOPIO
 
 #if USANDO_MAGNETOMETRO
-#if MAGNETOMETRO_X
+#if MX
   dataString += String(mag_x) + "\t";
-#endif  // MAGNETOMETRO_X
-#if MAGNETOMETRO_Y
+#endif  // MX
+#if MY
   dataString += String(mag_y) + "\t";
-#endif  // MAGNETOMETRO_Y
-#if MAGNETOMETRO_Z
+#endif  // MY
+#if MZ
   dataString += String(mag_z) + "\t";
-#endif  // MAGNETOMETRO_Z
+#endif  // MZ
 #endif  // USANDO_MAGNETOMETRO
 
 #if USANDO_GPS
@@ -396,6 +379,7 @@ void loop() {
 #endif  // USANDO_CARTAO
 
 #if USANDO_LORA
+  unsigned long transmissao_lora = 0;
   if (timer_lora - transmissao_lora >= 3000) {
     transmissao_lora = timer_lora;
     LoRa.println(dataString);
