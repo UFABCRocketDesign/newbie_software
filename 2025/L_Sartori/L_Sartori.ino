@@ -1,6 +1,10 @@
-#include <Adafruit_BMP085.h>
 #include <SPI.h>
 #include <SD.h>]
+#include <Wire.h>
+
+#include <Adafruit_BMP085.h>
+#include <ADXL345.h>
+
 #ifdef ARDUINO_AVR_MEGA2560
 #define SD_CS_PIN 53
 #else
@@ -12,7 +16,7 @@
 #define IGN_3 46  /*act3*/
 #define IGN_4 55  /*act4*/
 
-
+ADXL345 adxl;
 Adafruit_BMP085 bmp;
 #define N 3
 #define L 5
@@ -46,6 +50,7 @@ int k = 0;
 float troca = 0;
 String docName = "";
 int valSd = 0;
+
 void setup() {
   String cabe = "";
 
@@ -105,10 +110,63 @@ void setup() {
   pinMode(IGN_2, OUTPUT);
   pinMode(IGN_3, OUTPUT);
   pinMode(IGN_4, OUTPUT);
+
+  adxl.powerOn();
+
+  //set activity/ inactivity thresholds (0-255)
+  adxl.setActivityThreshold(75); //62.5mg per increment
+  adxl.setInactivityThreshold(75); //62.5mg per increment
+  adxl.setTimeInactivity(10); // how many seconds of no activity is inactive?
+ 
+  //look of activity movement on this axes - 1 == on; 0 == off 
+  adxl.setActivityX(1);
+  adxl.setActivityY(1);
+  adxl.setActivityZ(1);
+ 
+  //look of inactivity movement on this axes - 1 == on; 0 == off
+  adxl.setInactivityX(1);
+  adxl.setInactivityY(1);
+  adxl.setInactivityZ(1);
+ 
+  //look of tap movement on this axes - 1 == on; 0 == off
+  adxl.setTapDetectionOnX(0);
+  adxl.setTapDetectionOnY(0);
+  adxl.setTapDetectionOnZ(1);
+ 
+  //set values for what is a tap, and what is a double tap (0-255)
+  adxl.setTapThreshold(50); //62.5mg per increment
+  adxl.setTapDuration(15); //625us per increment
+  adxl.setDoubleTapLatency(80); //1.25ms per increment
+  adxl.setDoubleTapWindow(200); //1.25ms per increment
+ 
+  //set values for what is considered freefall (0-255)
+  adxl.setFreeFallThreshold(7); //(5 - 9) recommended - 62.5mg per increment
+  adxl.setFreeFallDuration(45); //(20 - 70) recommended - 5ms per increment
+ 
+  //setting all interrupts to take place on int pin 1
+  //I had issues with int pin 2, was unable to reset it
+  adxl.setInterruptMapping( ADXL345_INT_SINGLE_TAP_BIT,   ADXL345_INT1_PIN );
+  adxl.setInterruptMapping( ADXL345_INT_DOUBLE_TAP_BIT,   ADXL345_INT1_PIN );
+  adxl.setInterruptMapping( ADXL345_INT_FREE_FALL_BIT,    ADXL345_INT1_PIN );
+  adxl.setInterruptMapping( ADXL345_INT_ACTIVITY_BIT,     ADXL345_INT1_PIN );
+  adxl.setInterruptMapping( ADXL345_INT_INACTIVITY_BIT,   ADXL345_INT1_PIN );
+ 
+  //register interrupt actions - 1 == on; 0 == off  
+  adxl.setInterrupt( ADXL345_INT_SINGLE_TAP_BIT, 1);
+  adxl.setInterrupt( ADXL345_INT_DOUBLE_TAP_BIT, 1);
+  adxl.setInterrupt( ADXL345_INT_FREE_FALL_BIT,  1);
+  adxl.setInterrupt( ADXL345_INT_ACTIVITY_BIT,   1);
+  adxl.setInterrupt( ADXL345_INT_INACTIVITY_BIT, 1);
 }
 
 
 void loop() {
+  int x,y,z;
+  double xyz[3];
+  double ax,ay,az;
+  adxl.readXYZ(&x, &y, &z);
+  adxl.getAcceleration(xyz);
+  
   t = millis();
   String dataString = "";
 
@@ -213,7 +271,32 @@ void loop() {
 
   dataString += String(pQued4);
   dataString += "\t";
+
+  dataString += String(pQued4);
+  dataString += "\t";  
   
+  dataString += String(x);
+  dataString += "\t"; 
+
+  dataString += String(y);
+  dataString += "\t"; 
+
+  dataString += String(z);
+  dataString += "\t"; 
+
+  ax = xyz[0];
+  ay = xyz[1];
+  az = xyz[2];
+
+  dataString += String(ax);
+  dataString += "\t"; 
+
+  dataString += String(ay);
+  dataString += "\t"; 
+
+  dataString += String(az);
+  dataString += "\t"; 
+
   Serial.println(dataString);
 
   File dataFile = SD.open(docName, FILE_WRITE);
