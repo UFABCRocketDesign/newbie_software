@@ -13,6 +13,12 @@ TinyGPSPlus gps;
 L3G gyro;
 
 #define USANDO_MAGNETOMETRO 0
+#define USANDO_GIROSCOPIO 0
+#define USANDO_ACELEROMETRO 0
+#define USANDO_BAROMETRO 0
+#define USANDO_GPS 0
+#define USANDO_LORA 0
+#define USANDO_CARTAO 0
 
 #define IGN_1 36
 #define IGN_2 61
@@ -141,30 +147,36 @@ void setup() {
 void loop() {
 
   unsigned long timer_lora = millis();
-
-  /* Leitura dados do GPS */
-  while (GPS.available()) {
-    gps.encode(GPS.read());
-  }
-
-  /* Dados Sensores */
-  sensors_event_t event_accel;
-  accel.getEvent(&event_accel);
-  gyro.read();
-
-
   float tempo = millis() / 1000.0;
+
+#if USANDO_BAROMETRO
   float altitudeReal = bmp.readAltitude() - alt;
   float temperatura = bmp.readTemperature();
   float pressao = bmp.readPressure();
+#endif  // USANDO_BAROMETRO
+
+#if USANDO_ACELEROMETRO
+  sensors_event_t event_accel;
+  accel.getEvent(&event_accel);
   float accel_x = event_accel.acceleration.x;
   float accel_y = event_accel.acceleration.y;
   float accel_z = event_accel.acceleration.z;
+#endif  // USANDO_ACELEROMETRO
+
+#if USANDO_GIROSCOPIO
+  gyro.read();
   int gyro_x = gyro.g.x;
   int gyro_y = gyro.g.y;
   int gyro_z = gyro.g.z;
+#endif  // USANDO_GIROSCOPIO
+
+#if USANDO_GPS
+  while (GPS.available()) {
+    gps.encode(GPS.read());
+  }
   float lat = gps.location.lat();
   float lng = gps.location.lng();
+#endif  // USANDO_GPS
 
 #if USANDO_MAGNETOMETRO
   sensors_event_t event_mag;
@@ -175,7 +187,7 @@ void loop() {
 #endif  // USANDO_MAGNETROMETRO
 
   /* Tratamento de Dados */
-
+#if USANDO_BAROMETRO
   total = total - leituras[indiceAtual];
   leituras[indiceAtual] = (altitudeReal);
   total = total + leituras[indiceAtual];
@@ -254,39 +266,55 @@ void loop() {
     paraquedas_4 = 3;
     digitalWrite(IGN_4, LOW);
   }
+#endif  // USANDO_BAROMETRO
 
   /* Imprimindo Dados */
 
   String dataString = "";
+
+#if USANDO_BAROMETRO
   dataString += String(tempo) + "\t";
   dataString += String(temperatura) + "\t";
   dataString += String(pressao) + "\t";
   dataString += String(media) + "\t";
   dataString += String(mediaNova) + "\t";
   dataString += String(altitudeReal) + "\t";
+#endif  // USANDO_BAROMETRO
+
   dataString += String(queda) + "\t";
   dataString += String(paraquedas_1) + "\t";
   dataString += String(paraquedas_2) + "\t";
   dataString += String(paraquedas_3) + "\t";
   dataString += String(paraquedas_4) + "\t";
+
+#if USANDO_ACELEROMETRO
   dataString += String(accel_x) + "\t";
   dataString += String(accel_y) + "\t";
   dataString += String(accel_z) + "\t";
+#endif  // USANDO ACELEROMETRO
+
+#if USANDO_GIROSCOPIO
   dataString += String(gyro_x) + "\t";
   dataString += String(gyro_y) + "\t";
   dataString += String(gyro_z) + "\t";
+#endif  // USANDO_GIROSCOPIO
+
 #if USANDO_MAGNETOMETRO
   dataString += String(mag_x) + "\t";
   dataString += String(mag_y) + "\t";
   dataString += String(mag_z) + "\t";
 #endif  // USANDO_MAGNETOMETRO
+
+#if USANDO_GPS
   dataString += String(lat, 6) + "\t";
   dataString += String(lng, 6);
+#endif  // USANDO_GPS
 
   Serial.println(dataString);
 
   /* Salvando no Cartão SD */
 
+#if USANDO_CARTAO
   File dataFile = SD.open(filename, FILE_WRITE);
   if (dataFile) {
     dataFile.println(dataString);
@@ -294,9 +322,12 @@ void loop() {
   } else {
     Serial.println("Erro ao abrir o arquivo para escrita.");
   }
+#endif  // USANDO_CARTAO
 
+#if USANDO_LORA
   if (timer_lora - transmissao_lora >= 3000) {
     transmissao_lora = timer_lora;
     LoRa.println(dataString);
   }
+#endif  // USANDO_LORA
 }
