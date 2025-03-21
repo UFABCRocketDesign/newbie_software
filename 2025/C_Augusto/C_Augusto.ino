@@ -34,7 +34,7 @@ void setup() {
   }
   altitudeTarada /= 10.0;
 
-  Serial.println("Temperatura\tPressao\tAltitude\tNivel do mar\tAltitude Filtrada\tAltura");
+  Serial.println("Temperatura\tPressao\tAltitude\tNivel do mar\tAltitude Filtrada\tAltura\tParaquedas");
 
   while (!Serial);
 
@@ -93,12 +93,12 @@ void loop() {
   
   if(altura < alturaMAX){
       contagemQUEDA++;
-      altitude0ou1 = 0; 
+      altitude0ou1 = 1; 
   }
   else if(altura > alturaMAX){
     contagemQUEDA = 0;
     alturaMAX = altura;
-    altitude0ou1 = 1;
+    altitude0ou1 = 0;
   }
   
 
@@ -111,9 +111,13 @@ void loop() {
   dataString += String(altitudeFiltrada2) + "\t";
   dataString += String(altitudeFiltrada) + "\t";
   dataString += String(altura) + "\t";
-  if(contagemQUEDA == 10){
-    dataString += String(altitude0ou1) + "\t";;  
+  while (altitude0ou1 == 0){
+    dataString += String(altitude0ou1); 
   }
+  if(contagemQUEDA == 10){
+      dataString += String(altitude0ou1) + "\t";  
+    }
+  
   dataString += String(alturaMAX);
 
   Serial.println(dataString);
