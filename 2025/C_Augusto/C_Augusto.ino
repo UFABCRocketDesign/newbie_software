@@ -102,9 +102,6 @@ void loop() {
   }
   
 
-  if(contagemQUEDA == 10){
-    Serial.println(altitude0ou1);  
-  }
   
   String dataString = "";
   dataString += String(bmp.readTemperature()) + "\t";
@@ -114,7 +111,9 @@ void loop() {
   dataString += String(altitudeFiltrada2) + "\t";
   dataString += String(altitudeFiltrada) + "\t";
   dataString += String(altura) + "\t";
-  dataString += String(altitude0ou1) + "\t";
+  if(contagemQUEDA == 10){
+    dataString += String(altitude0ou1) + "\t";;  
+  }
   dataString += String(alturaMAX);
 
   Serial.println(dataString);
