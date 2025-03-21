@@ -91,12 +91,12 @@ void loop() {
   float altitudeFiltrada2 = soma2 / AMOSTRAS;
 
   
-  if(altura < alturaMAX){
+  if(altitudeFiltrada2 < alturaMAX){
       contagemQUEDA++; 
   }
-  else if(altura > alturaMAX){
+  else if(altitudeFiltrada2 > alturaMAX){
     contagemQUEDA = 0;
-    alturaMAX = altura;
+    alturaMAX = altitudeFiltrada2;
   }
   
     if(contagemQUEDA == 10){
@@ -111,7 +111,6 @@ void loop() {
   dataString += String(bmp.readTemperature()) + "\t";
   dataString += String(bmp.readPressure()) + "\t";
   dataString += String(altitude) + "\t";
-  dataString += String(bmp.readSealevelPressure()) + "\t";
   dataString += String(altitudeFiltrada2) + "\t";
   dataString += String(altitudeFiltrada) + "\t";
   dataString += String(altura) + "\t";
