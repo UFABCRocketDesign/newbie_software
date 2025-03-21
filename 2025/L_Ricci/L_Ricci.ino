@@ -47,15 +47,21 @@ L3G gyro;
 #define LEITURAS 10
 #define CHIP_SELECT 53
 #define NUMERO_QUEDAS 5
+#define ALTITUDE_TETO -3
 
 HardwareSerial &LoRa = Serial3;
 HardwareSerial &GPS = Serial1;
 
-String heading = "Tempo\tTemperatura\tPressão\tAltitudeFiltrada\tAltitudeRaw\tQueda\tParaquedas_1\tParaquedas_2\tAccelX\tAccelY\tAccelZ\tGyroX\tGyroY\tGyroZ\tMagX\tMagY\tMagZ\tLat\tLon";
 String filename;
 
-float alt = 0;
-int altitudeTeto = -3;
+int indiceAtual = 0, indiceAtual2 = 0, contadorQueda = 0, queda = 0;
+int paraquedas_1 = 0, paraquedas_2 = 0, paraquedas_3 = 0, paraquedas_4 = 0;
+unsigned long desativacao_p2 = 0, desativacao_p4 = 0;
+unsigned long timer_p1, timer_p2, timer_p3, timer_p4;
+float total = 0, total2 = 0, alt = 0;
+float leituras[LEITURAS] = {};
+float leituras2[LEITURAS] = {};
+float altitudes[NUMERO_QUEDAS];
 
 void setup() {
   Serial.begin(115200);
@@ -92,6 +98,72 @@ void setup() {
     Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
     while (1) {}
   }
+
+  String heading = "";
+
+  heading += "Tempo\t";
+#if TERMOMETRO
+  heading += "Temperatura\t";
+#endif
+
+#if PRESSAO
+  heading += "Pressão\t";
+#endif
+
+#if USANDO_BAROMETRO
+  heading += "Altitude Filtrada\t";
+  heading += "Altitude Raw\t";
+  heading += "Queda\t";
+  heading += "Paraquedas 1\t";
+  heading += "Paraquedas 2\t";
+  heading += "Paraquedas 3\t";
+  heading += "Paraquedas 4\t";
+#endif
+
+#if USANDO_ACELEROMETRO
+#if AX
+  heading += "Acel X\t";
+#endif
+#if AY
+  heading += "Acel Y\t";
+#endif
+#if AZ
+  heading += "Acel Z\t";
+#endif
+#endif
+
+#if USANDO_GIROSCOPIO
+#if GX
+  heading += "Gyro X\t";
+#endif
+#if GY
+  heading += "Gyro Y\t";
+#endif
+#if GZ
+  heading += "Gyro Z\t";
+#endif
+#endif
+
+#if USANDO_MAGNETOMETRO
+#if MX
+  heading += "Mag X\t";
+#endif
+#if MY
+  heading += "Mag Y\t";
+#endif
+#if MZ
+  heading += "Mag Z\t";
+#endif
+#endif
+
+#if USANDO_GPS
+#if GPS_LAT
+  heading += "Lat\t";
+#endif
+#if GPS_LNG
+  heading += "Lng\t";
+#endif
+#endif
 
 #if USANDO_CABECALHO
   Serial.println(heading);
@@ -207,14 +279,7 @@ void loop() {
 
   /* Tratamento de Dados */
 #if USANDO_BAROMETRO
-  int indiceAtual = 0, indiceAtual2 = 0, contadorQueda = 0, queda = 0;
-  int paraquedas_1 = 0, paraquedas_2 = 0, paraquedas_3 = 0, paraquedas_4 = 0;
-  unsigned long desativacao_p2 = 0, desativacao_p4 = 0;
-  unsigned long timer_p1, timer_p2, timer_p3, timer_p4;
-  float total = 0, total2 = 0;
-  float leituras[LEITURAS] = {};
-  float leituras2[LEITURAS] = {};
-  float altitudes[NUMERO_QUEDAS];
+
 
   total = total - leituras[indiceAtual];
   leituras[indiceAtual] = (altitudeReal);
@@ -269,7 +334,7 @@ void loop() {
     digitalWrite(IGN_2, LOW);
   }
 
-  if (queda == 1 && paraquedas_3 == 0 && mediaNova < altitudeTeto) {
+  if (queda == 1 && paraquedas_3 == 0 && mediaNova < ALTITUDE_TETO) {
     paraquedas_3 = 1;
     digitalWrite(IGN_3, HIGH);
     timer_p3 = millis();
@@ -280,7 +345,7 @@ void loop() {
     digitalWrite(IGN_3, LOW);
   }
 
-  if (queda == 1 && paraquedas_4 == 0 && mediaNova < altitudeTeto) {
+  if (queda == 1 && paraquedas_4 == 0 && mediaNova < ALTITUDE_TETO) {
     paraquedas_4 = 1;
     timer_p4 = millis();
   }
