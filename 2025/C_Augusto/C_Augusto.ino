@@ -95,7 +95,7 @@ void loop() {
       contagemQUEDA++;
       altitude0ou1 = 0; 
   }
-  }else if(altura > alturaMAX){
+  else if(altura > alturaMAX){
     contagemQUEDA = 0;
     alturaMAX = altura;
     altitude0ou1 = 1;
