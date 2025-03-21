@@ -51,6 +51,8 @@ do {
     lognumber += 1;
 } while (SD.exists(nomearquivo));
 
+Serial.println(nomearquivo);
+
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
   File dataFile = SD.open(nomearquivo, FILE_WRITE);
