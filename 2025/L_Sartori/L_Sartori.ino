@@ -24,6 +24,7 @@ const int chipSelect = 53;
 int intervalo = 5000;
 int t1=0;
 bool paraQued1;
+bool paraQued11;
 bool h;
 float med_alt = 0;
 float c[N][L];
@@ -143,11 +144,13 @@ void loop() {
     t1 = millis();
     paraQued1 = h;
     digitalWrite(IGN_1,HIGH);
+    paraQued11=0;
   } else if(paraQued1 && t1>=intervalo){
     digitalWrite(IGN_1,LOW);
+    paraQued11=0;
   }
 
-  dataString += String(paraQued1);
+  dataString += String(paraQued11);
   dataString += "\t";
 
   Serial.println(dataString);
