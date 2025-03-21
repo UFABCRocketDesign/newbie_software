@@ -202,6 +202,9 @@ void loop() {
 
   dataString += String(pQued3);
   dataString += "\t";
+
+  dataString += String(pQued4);
+  dataString += "\t";
   
   Serial.println(dataString);
 
