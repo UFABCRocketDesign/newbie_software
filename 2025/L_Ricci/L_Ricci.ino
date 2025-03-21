@@ -12,7 +12,7 @@ Adafruit_HMC5883_Unified mag;
 TinyGPSPlus gps;
 L3G gyro;
 
-#define USANDO_MAGNETOMETRO 1
+#define USANDO_MAGNETOMETRO 0
 
 #define IGN_1 36
 #define IGN_2 61
@@ -275,9 +275,11 @@ void loop() {
   dataString += String(gyro_x) + "\t";
   dataString += String(gyro_y) + "\t";
   dataString += String(gyro_z) + "\t";
+#if USANDO_MAGNETOMETRO
   dataString += String(mag_x) + "\t";
   dataString += String(mag_y) + "\t";
   dataString += String(mag_z) + "\t";
+#endif  // USANDO_MAGNETOMETRO
   dataString += String(lat, 6) + "\t";
   dataString += String(lng, 6);
 
