@@ -5,11 +5,11 @@
 #include <Adafruit_ADXL345_U.h>
 #include <Adafruit_HMC5883_U.h>
 #include <L3G.h>
-#include <TinyGPS.h>
+#include <TinyGPSPlus.h>
 Adafruit_BMP085 bmp;
 Adafruit_ADXL345_Unified accel;
 Adafruit_HMC5883_Unified mag;
-TinyGPS gps;
+TinyGPSPlus gps;
 L3G gyro;
 
 #define IGN_1 36
@@ -146,7 +146,6 @@ void loop() {
   sensors_event_t event_mag;
   accel.getEvent(&event_accel);
   mag.getEvent(&event_mag);
-  gps.f_get_position(&flat, &flon);
   gyro.read();
 
   float tempo = millis() / 1000.0;
@@ -161,7 +160,9 @@ void loop() {
   int gyro_z = gyro.g.z;
   float mag_x = event_mag.magnetic.x;
   float mag_y = event_mag.magnetic.y;
-  float mag_z = event_mag.magnetic.z; 
+  float mag_z = event_mag.magnetic.z;
+  float lat = gps.location.lat();
+  float lng = gps.location.lng();
 
   /* Tratamento de Dados */
 
@@ -267,8 +268,8 @@ void loop() {
   dataString += String(mag_x) + "\t";
   dataString += String(mag_y) + "\t";
   dataString += String(mag_z) + "\t";
-  dataString += String(flat, 6) + "\t";
-  dataString += String(flon, 6);
+  dataString += String(lat, 6) + "\t";
+  dataString += String(lng, 6);
 
   Serial.println(dataString);
 
