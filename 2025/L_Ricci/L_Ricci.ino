@@ -12,13 +12,33 @@ Adafruit_HMC5883_Unified mag;
 TinyGPSPlus gps;
 L3G gyro;
 
-#define USANDO_MAGNETOMETRO 0
-#define USANDO_GIROSCOPIO 0
-#define USANDO_ACELEROMETRO 0
-#define USANDO_BAROMETRO 0
-#define USANDO_GPS 0
+#define USANDO_BAROMETRO 1
+#define TERMOMETRO 0
+#define PRESSAO 0
+
+#define USANDO_ACELEROMETRO 1
+#define ACELEROMETRO_X 0
+#define ACELEROMETRO_Y 0
+#define ACELEROMETRO_Z 0
+
+
+#define USANDO_MAGNETOMETRO 1
+#define MAGNETOMETRO_X 0
+#define MAGNETOMETRO_Y 0
+#define MAGNETOMETRO_Z 0
+
+#define USANDO_GIROSCOPIO 1
+#define GIROSCOPIO_X 0
+#define GIROSCOPIO_Y 0
+#define GIROSCOPIO_Z 0
+
+#define USANDO_GPS 1
+#define GPS_LAT 0
+#define GPS_LNG 0
+
 #define USANDO_LORA 0
 #define USANDO_CARTAO 0
+#define USANDO_CABECALHO 0
 
 #define IGN_1 36
 #define IGN_2 61
@@ -32,8 +52,6 @@ HardwareSerial &LoRa = Serial3;
 unsigned long transmissao_lora = 0;
 
 HardwareSerial &GPS = Serial1;
-float flat;
-float flon;
 
 float alt = 0;
 float total = 0;
@@ -105,7 +123,9 @@ void setup() {
     while (1) {}
   }
 
+#if USANDO_CABECALHO
   Serial.println(heading);
+#endif  // USANDO_CABECALHO
 
   /* Média de Alturas */
 
@@ -151,39 +171,65 @@ void loop() {
 
 #if USANDO_BAROMETRO
   float altitudeReal = bmp.readAltitude() - alt;
+#if TERMOMETRO
   float temperatura = bmp.readTemperature();
+#endif  // TERMOMETRO'
+#if PRESSAO
   float pressao = bmp.readPressure();
+#endif  // PRESSAO
 #endif  // USANDO_BAROMETRO
 
 #if USANDO_ACELEROMETRO
   sensors_event_t event_accel;
   accel.getEvent(&event_accel);
+#if ACELEROMETRO_X
   float accel_x = event_accel.acceleration.x;
+#endif  //ACELEROMETRO_X
+#if ACELEROMETRO_Y
   float accel_y = event_accel.acceleration.y;
+#endif  // ACELEROMETRO_Y
+#if ACELEROMETRO_Z
   float accel_z = event_accel.acceleration.z;
+#endif  // ACELEROMETRO_Z
 #endif  // USANDO_ACELEROMETRO
 
 #if USANDO_GIROSCOPIO
   gyro.read();
+#if GIROSCOPIO_X
   int gyro_x = gyro.g.x;
+#endif  // GIROSCOPIO_X
+#if GIROSCOPIO_Y
   int gyro_y = gyro.g.y;
+#endif  // GIROSCOPIO_Y
+#if GIROSCOPIO_Z
   int gyro_z = gyro.g.z;
+#endif  // GIROSCOPIO_X
 #endif  // USANDO_GIROSCOPIO
 
 #if USANDO_GPS
   while (GPS.available()) {
     gps.encode(GPS.read());
   }
+#if GPS_LAT
   float lat = gps.location.lat();
+#endif  // GPS_LAT
+#if GPS_LNG
   float lng = gps.location.lng();
+#endif  // GPS_LNG
 #endif  // USANDO_GPS
 
 #if USANDO_MAGNETOMETRO
   sensors_event_t event_mag;
   mag.getEvent(&event_mag);
+#if MAGNETOMETRO_X
   float mag_x = event_mag.magnetic.x;
+#endif  // MAGNETOMETRO_X
+#if MAGNETOMETRO_Y
   float mag_y = event_mag.magnetic.y;
+#endif  // MAGNETOMETRO_Y
+#if MAGNETOMETRO_Z
   float mag_z = event_mag.magnetic.z;
+#endif  // MAGNETOMETRO_Z
 #endif  // USANDO_MAGNETROMETRO
 
   /* Tratamento de Dados */
@@ -274,40 +320,65 @@ void loop() {
 
 #if USANDO_BAROMETRO
   dataString += String(tempo) + "\t";
+#if TERMOMETRO
   dataString += String(temperatura) + "\t";
+#endif  // TERMOMETRO
+#if PRESSAO
   dataString += String(pressao) + "\t";
+#endif  // PRESSAO
   dataString += String(media) + "\t";
   dataString += String(mediaNova) + "\t";
   dataString += String(altitudeReal) + "\t";
-#endif  // USANDO_BAROMETRO
-
   dataString += String(queda) + "\t";
   dataString += String(paraquedas_1) + "\t";
   dataString += String(paraquedas_2) + "\t";
   dataString += String(paraquedas_3) + "\t";
   dataString += String(paraquedas_4) + "\t";
+#endif  // USANDO_BAROMETRO
 
 #if USANDO_ACELEROMETRO
+#if ACELEROMETRO_X
   dataString += String(accel_x) + "\t";
+#endif  // ACELEROMETRO_X
+#if ACELEROMETRO_Y
   dataString += String(accel_y) + "\t";
+#endif  // ACELEROMETRO_Y
+#if ACELEROMETRO_Z
   dataString += String(accel_z) + "\t";
+#endif  // ACELEROMETRO_Zz
 #endif  // USANDO ACELEROMETRO
 
 #if USANDO_GIROSCOPIO
+#if GIROSCOPIO_X
   dataString += String(gyro_x) + "\t";
+#endif  // GIROSCOPIO_X
+#if GIROSCOPIO_Y
   dataString += String(gyro_y) + "\t";
+#endif  // GIROSCOPIO_Y
+#if GIROSCOPIO_Z
   dataString += String(gyro_z) + "\t";
+#endif  // GIROSCOPIO_Z
 #endif  // USANDO_GIROSCOPIO
 
 #if USANDO_MAGNETOMETRO
+#if MAGNETOMETRO_X
   dataString += String(mag_x) + "\t";
+#endif  // MAGNETOMETRO_X
+#if MAGNETOMETRO_Y
   dataString += String(mag_y) + "\t";
+#endif  // MAGNETOMETRO_Y
+#if MAGNETOMETRO_Z
   dataString += String(mag_z) + "\t";
+#endif  // MAGNETOMETRO_Z
 #endif  // USANDO_MAGNETOMETRO
 
 #if USANDO_GPS
+#if GPS_LAT
   dataString += String(lat, 6) + "\t";
+#endif  // GPS_LAT
+#if GPS_LNG
   dataString += String(lng, 6);
+#endif  // GPS_LNG
 #endif  // USANDO_GPS
 
   Serial.println(dataString);
