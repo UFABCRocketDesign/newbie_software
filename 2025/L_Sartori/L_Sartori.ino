@@ -144,7 +144,7 @@ void loop() {
     t1 = millis();
     paraQued1 = h;
     digitalWrite(IGN_1,HIGH);
-    paraQued11=0;
+    paraQued11=1;
   } else if(paraQued1 && t1>=intervalo){
     digitalWrite(IGN_1,LOW);
     paraQued11=0;
