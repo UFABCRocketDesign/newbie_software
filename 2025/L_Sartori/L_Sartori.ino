@@ -21,10 +21,14 @@ Adafruit_BMP085 bmp;
 File dataFile;
 String nome = "leo";
 const int chipSelect = 53;
-int intervalo = 5000;
+int inter1 = 5000;
+int inter12 = 2000;
+int inter2 = 5000;
 long int t = 0;
-long int t1=0;
-int paraQued1=0;
+long int t1 = 0;
+long int t2 = 0;
+int pQued1 = 0;
+int pQued2 = -1;
 bool h;
 float med_alt = 0;
 float c[N][L];
@@ -50,9 +54,9 @@ void setup() {
   }
   Serial.println("card initialized.");
 
-  if(nome.length()>maxTamSD){
-    for(int i=0;i<maxTamSD;i++){
-      nome[i] =nome[i+1];
+  if (nome.length() > maxTamSD) {
+    for (int i = 0; i < maxTamSD; i++) {
+      nome[i] = nome[i + 1];
     }
   }
 
@@ -60,18 +64,18 @@ void setup() {
   do {
     valSd += 1;
     docName = nome;
-    
-    int tamN= maxTamSD - nome.length();
+
+    int tamN = maxTamSD - nome.length();
     int tamVal = String(valSd).length();
-    
-    for(int i=0;i<tamN-tamVal;i++){
+
+    for (int i = 0; i < tamN - tamVal; i++) {
       docName += String(0);
     }
-    
+
     docName += String(valSd) + ".txt";
-  } while(SD.exists(docName));
-  
-  Serial.println("Creating "+docName+"...");
+  } while (SD.exists(docName));
+
+  Serial.println("Creating " + docName + "...");
   dataFile = SD.open(docName, FILE_WRITE);
   cabe += String("Temperature\tPressure\tAltitude\tPressure\tAltitude\t");
   dataFile.println(cabe);
@@ -90,6 +94,7 @@ void setup() {
   med_alt /= 10;
 
   pinMode(IGN_1, OUTPUT);
+  pinMode(IGN_2, OUTPUT);
 }
 
 
@@ -120,7 +125,7 @@ void loop() {
     dataString += String(vFiltro[i]);
     dataString += "\t";
   }
-  
+
   for (int i = H - 1; i > 0; i--) {
     ordH[i] = ordH[i - 1];
   }
@@ -134,19 +139,34 @@ void loop() {
   dataString += String(h);
   dataString += "\t";
 
-  t = millis();  
-  if(h && paraQued1==0){
+  t = millis();
+  if (h && pQued1 == 0) {
     t1 = t;
-    paraQued1 = 1;
-    digitalWrite(IGN_1,HIGH);
-  } else if(paraQued1 == 1 && t -t1>=intervalo){
-    digitalWrite(IGN_1,LOW);
-    paraQued1=2;
+    pQued1 = 1;
+    digitalWrite(IGN_1, HIGH);
+  } else if (pQued1 == 1 && t - t1 >= inter1) {
+    digitalWrite(IGN_1, LOW);
+    pQued1 = 2;
   }
 
-  dataString += String(paraQued1);
+  if (h && pQued2 == -1) {
+    t2 = t;
+    pQued2 = 0;
+  } else if (pQued2 == 0 && t - t2 >= inter1 + inter12) {
+    digitalWrite(IGN_2, HIGH);
+    pQued2 = 1;
+    t2 = t;
+  } else if (pQued2 == 1 && t - t2 >= inter2) {
+    digitalWrite(IGN_2, LOW);
+    pQued2 = 2;
+  }
+
+
+  dataString += String(pQued1);
   dataString += "\t";
 
+  dataString += String((pQued2==-1)?0:pQued2);
+  dataString += "\t";
   Serial.println(dataString);
 
   File dataFile = SD.open(docName, FILE_WRITE);
