@@ -97,6 +97,12 @@ void setup() {
     while (1) {}
   }
 
+  unsigned long start = millis();
+  do {
+    while (GPS.available())
+      gps.encode(GPS.read());
+  } while (millis() - start < 1000);
+
   Serial.println(heading);
 
   /* Média de Alturas */
@@ -128,7 +134,7 @@ void setup() {
     Serial.println("Erro ao abrir o arquivo");
   }
 
-  /* Setar o pinmode dos sensores */
+  /* Setar o pinmode dos paraquedas */
 
   pinMode(IGN_1, OUTPUT);
   pinMode(IGN_2, OUTPUT);
