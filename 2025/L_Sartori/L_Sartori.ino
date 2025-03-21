@@ -147,6 +147,9 @@ void loop() {
     digitalWrite(IGN_1,LOW);
   }
 
+  dataString += String(paraQued1);
+  dataString += "\t";
+
   Serial.println(dataString);
 
   File dataFile = SD.open(docName, FILE_WRITE);
