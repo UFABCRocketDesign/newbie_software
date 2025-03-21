@@ -8,10 +8,11 @@
 
 #include <Adafruit_Sensor.h>
 #include <Adafruit_ADXL345_U.h>
-
+#include <Adafruit_HMC5883_U.h>
 #include <Adafruit_BMP085.h>
 
 L3G gyro;
+Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 
 #ifdef ARDUINO_AVR_MEGA2560
 #define SD_CS_PIN 53
@@ -121,6 +122,14 @@ void setup() {
     while (1);
   }
   gyro.enableDefault();
+
+  if(!mag.begin())
+  {
+    /* There was a problem detecting the HMC5883 ... check your connections */
+    Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
+    while(1);
+  }
+  
   Serial.println(cabe);
   for (int i = 0; i < 10; i++) {
     med_alt += bmp.readAltitude();
@@ -243,16 +252,16 @@ void loop() {
   dataString += "\t";
 
 
-  sensors_event_t event;
-  accel.getEvent(&event);
+  sensors_event_t eventac;
+  accel.getEvent(&eventac);
 
-  dataString += String(event.acceleration.x);
+  dataString += String(eventac.acceleration.x);
   dataString += "\t";
 
-  dataString += String(event.acceleration.y);
+  dataString += String(eventac.acceleration.y);
   dataString += "\t";
 
-  dataString += String(event.acceleration.z);
+  dataString += String(eventac.acceleration.z);
   dataString += "\t";
 
   gyro.read();
@@ -266,6 +275,17 @@ void loop() {
   dataString += String((int)gyro.g.z);
   dataString += "\t";
 
+  sensors_event_t eventmag; 
+  mag.getEvent(&eventmag);
+  
+  dataString += String(eventmag.magnetic.x);
+  dataString += "\t";
+
+  dataString += String(eventmag.magnetic.y);
+  dataString += "\t";
+
+  dataString += String(eventmag.magnetic.z);
+  dataString += "\t";
 
   Serial.println(dataString);
 
