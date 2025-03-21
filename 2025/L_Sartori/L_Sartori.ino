@@ -16,7 +16,7 @@
 Adafruit_BMP085 bmp;
 #define N 3
 #define L 5
-#define H 20
+#define H 14
 #define maxTamSD 8
 File dataFile;
 String nome = "leo";
