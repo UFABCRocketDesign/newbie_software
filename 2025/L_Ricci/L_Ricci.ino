@@ -12,6 +12,8 @@ Adafruit_HMC5883_Unified mag;
 TinyGPSPlus gps;
 L3G gyro;
 
+#define USANDO_MAGNETOMETRO 1
+
 #define IGN_1 36
 #define IGN_2 61
 #define IGN_3 46
@@ -147,9 +149,7 @@ void loop() {
 
   /* Dados Sensores */
   sensors_event_t event_accel;
-  sensors_event_t event_mag;
   accel.getEvent(&event_accel);
-  mag.getEvent(&event_mag);
   gyro.read();
 
 
@@ -163,11 +163,16 @@ void loop() {
   int gyro_x = gyro.g.x;
   int gyro_y = gyro.g.y;
   int gyro_z = gyro.g.z;
+  float lat = gps.location.lat();
+  float lng = gps.location.lng();
+
+#if USANDO_MAGNETOMETRO
+  sensors_event_t event_mag;
+  mag.getEvent(&event_mag);
   float mag_x = event_mag.magnetic.x;
   float mag_y = event_mag.magnetic.y;
   float mag_z = event_mag.magnetic.z;
-  float lat = gps.location.lat();
-  float lng = gps.location.lng();
+#endif  // USANDO_MAGNETROMETRO
 
   /* Tratamento de Dados */
 
