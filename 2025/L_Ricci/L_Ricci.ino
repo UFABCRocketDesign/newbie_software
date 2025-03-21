@@ -210,15 +210,19 @@ void setup() {
   pinMode(IGN_4, OUTPUT);
 }
 
-float filtro(float altitudeReal) {
+float filtro1(float altitudeReal) {
   total = total - leituras[indiceAtual];
   leituras[indiceAtual] = (altitudeReal);
   total = total + leituras[indiceAtual];
   indiceAtual = (indiceAtual + 1) % LEITURAS;
   float media = total / LEITURAS;
 
+  return media;
+}
+
+float filtro2(float altitudeReal) {
   total2 = total2 - leituras2[indiceAtual2];
-  leituras2[indiceAtual2] = (media);
+  leituras2[indiceAtual2] = (altitudeReal);
   total2 = total2 + leituras2[indiceAtual2];
   indiceAtual2 = (indiceAtual2 + 1) % LEITURAS;
   float mediaNova = total2 / LEITURAS;
@@ -296,7 +300,8 @@ void loop() {
   /* Tratamento de Dados */
 #if USANDO_BAROMETRO
 
-  float mediaNova = filtro(altitudeReal);
+  float media = filtro1(altitudeReal);
+  float mediaNova = filtro2(media);
 
   float altitudeAnterior = 0;
   if (mediaNova < altitudeAnterior) {
