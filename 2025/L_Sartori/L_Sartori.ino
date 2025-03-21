@@ -23,7 +23,7 @@ String nome = "leo";
 const int chipSelect = 53;
 int intervalo = 5000;
 int t1=0;
-bool paraQued1;
+int paraQued1;
 bool h;
 float med_alt = 0;
 float c[N][L];
@@ -136,11 +136,11 @@ void loop() {
   
   if(h && t1<=intervalo){
     t1 = millis();
-    paraQued1 = h;
+    paraQued1 = 1;
     digitalWrite(IGN_1,HIGH);
-  } else if(paraQued1 && t1>=intervalo){
+  } else if(paraQued1 == 1 && t1>=intervalo){
     digitalWrite(IGN_1,LOW);
-    paraQued1=0;
+    paraQued1=2;
   }
 
   dataString += String(paraQued1);
