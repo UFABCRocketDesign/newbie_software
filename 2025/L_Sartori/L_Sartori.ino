@@ -16,7 +16,7 @@
 Adafruit_BMP085 bmp;
 #define N 3
 #define L 5
-#define H 7
+#define H 12
 #define maxTamSD 8
 File dataFile;
 String nome = "leo";
@@ -126,7 +126,7 @@ void loop() {
   ordH[0] = vFiltro[N];
   h = true;
   for (int i = 0; i < H - 1; i++) {
-    h = h && ordH[i] < ordH[i + 1];
+    h = h && (ordH[i] < ordH[i + 1]);
 
   }
 
