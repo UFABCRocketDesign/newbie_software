@@ -21,6 +21,9 @@ Adafruit_BMP085 bmp;
 File dataFile;
 String nome = "leo";
 const int chipSelect = 53;
+int intervalo = 5000;
+int t1=0;
+bool paraQued1;
 bool h;
 float med_alt = 0;
 float c[N][L];
@@ -84,6 +87,8 @@ void setup() {
     med_alt += bmp.readAltitude();
   }
   med_alt /= 10;
+
+  pinMode(IGN_1, OUTPUT);
 }
 
 
@@ -117,7 +122,7 @@ void loop() {
 
   dataString += String(bmp.readSealevelPressure());
   dataString += "\t";
-
+  
   for (int i = H - 1; i > 0; i--) {
     ordH[i] = ordH[i - 1];
   }
@@ -133,6 +138,14 @@ void loop() {
 
   dataString += String(bmp.readAltitude(101500));
   dataString += "\t";
+  
+  if(h && t1<=intervalo){
+    t1 = millis();
+    paraQued1 = h;
+    digitalWrite(IGN_1,HIGH);
+  } else if(paraQued1 && t1>=intervalo){
+    digitalWrite(IGN_1,LOW);
+  }
 
   Serial.println(dataString);
 
