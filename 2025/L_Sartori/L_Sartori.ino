@@ -22,8 +22,8 @@ File dataFile;
 String nome = "leo";
 const int chipSelect = 53;
 int intervalo = 5000;
-int t = millis();
-int t1=0;
+long int t = 0;
+long int t1=0;
 int paraQued1=0;
 bool h;
 float med_alt = 0;
@@ -134,7 +134,7 @@ void loop() {
   dataString += String(h);
   dataString += "\t";
 
-  
+  t = millis();  
   if(h && paraQued1==0){
     t1 = t;
     paraQued1 = 1;
