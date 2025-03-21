@@ -90,26 +90,22 @@ void loop() {
   indice1 = (indice1 + 1) % AMOSTRAS;
   float altitudeFiltrada2 = soma2 / AMOSTRAS;
 
-  if (altura < alturaMAX){
-    altitude0ou1 = 0; 
-  }else if(altura > alturaMAX){
-    altitude0ou1 = 1;
-  }
-
   
   if(altura < alturaMAX){
       contagemQUEDA++;
-  }else if(contagemQUEDA == 10){
-    Serial.println("Abertura do Paraquedas!!!");  
+      altitude0ou1 = 0; 
+  }
   }else if(altura > alturaMAX){
     contagemQUEDA = 0;
+    alturaMAX = altura;
+    altitude0ou1 = 1;
   }
   
-  if(altura > alturaMAX){
-    alturaMAX = altura;
+
+  if(contagemQUEDA == 10){
+    Serial.println("Abertura do Paraquedas!!!");  
   }
-
-
+  
   String dataString = "";
   dataString += String(bmp.readTemperature()) + "\t";
   dataString += String(bmp.readPressure()) + "\t";
