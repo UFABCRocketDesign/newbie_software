@@ -119,9 +119,6 @@ void loop() {
     dataString += String(vFiltro[i]);
     dataString += "\t";
   }
-
-  dataString += String(bmp.readSealevelPressure());
-  dataString += "\t";
   
   for (int i = H - 1; i > 0; i--) {
     ordH[i] = ordH[i - 1];
@@ -136,8 +133,6 @@ void loop() {
   dataString += String(h);
   dataString += "\t";
 
-  dataString += String(bmp.readAltitude(101500));
-  dataString += "\t";
   
   if(h && t1<=intervalo){
     t1 = millis();
