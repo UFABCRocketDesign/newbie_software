@@ -112,6 +112,9 @@ void loop() {
 
   String dataString = "";
 
+  dataString += String(t/1000);
+  dataString += "\t";
+  
   dataString += String(bmp.readTemperature());
   dataString += "\t";
 
