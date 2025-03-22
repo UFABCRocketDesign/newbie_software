@@ -1,45 +1,42 @@
-#include <Adafruit_ADXL345_U.h>
-
 #include <SPI.h>
 #include <SD.h>
 #include <Wire.h>
 #include <L3G.h>
-
 
 #include <Adafruit_Sensor.h>
 #include <Adafruit_ADXL345_U.h>
 #include <Adafruit_HMC5883_U.h>
 #include <Adafruit_BMP085.h>
 
-L3G gyro;
-Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
+
 
 #ifdef ARDUINO_AVR_MEGA2560
 #define SD_CS_PIN 53
 #else
 #define SD_CS_PIN 10
-#endif // ARDUINO_AVR_MEGA2560
+#endif  // ARDUINO_AVR_MEGA2560
 
-#define IGN_1 36  /*act1*/
-#define IGN_2 61  /*act2*/
-#define IGN_3 46  /*act3*/
-#define IGN_4 55  /*act4*/
+#define IGN_1 36 /*act1*/
+#define IGN_2 61 /*act2*/
+#define IGN_3 46 /*act3*/
+#define IGN_4 55 /*act4*/
 
-Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
-Adafruit_BMP085 bmp;
+#define chipSelect = 53
+
 #define N 3
 #define L 5
 #define H 14
 #define maxTamSD 8
+
+#define inter1 = 5000;
+#define interEsp = 2000;
+#define inter2 = 5000;
+#define inter3 = 5000;
+#define inter4 = 5000;
+#define apoH = -3;
+
 File dataFile;
 String nome = "leo";
-const int chipSelect = 53;
-int inter1 = 5000;
-int interEsp = 2000;
-int inter2 = 5000;
-int inter3 = 5000;
-int inter4 = 5000;
-int apoH = -3;
 long int t = 0;
 long int t1 = 0;
 long int t2 = 0;
@@ -60,20 +57,51 @@ float troca = 0;
 String docName = "";
 int valSd = 0;
 
+Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
+Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
+Adafruit_BMP085 bmp;
+L3G gyro;
+
 void setup() {
   String cabe = "";
+  int tamN = maxTamSD - nome.length();
+  int tamVal = String(valSd).length();
+  docName = nome + String(valSd) + ".txt";
 
   Serial.begin(115200);
   Wire.begin();
   while (!Serial) {
-    ; // wait for serial port to connect. Needed for native USB port only
+    ;  // wait for serial port to connect. Needed for native USB port only
   }
 
   Serial.print("Initializing SD card...");
   if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present");
-    while (1);
+    while (1)
+      ;
   }
+  if (!bmp.begin()) {
+    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+    while (1) {}
+  }
+  if (!accel.begin()) {
+    /* There was a problem detecting the ADXL345 ... check your connections */
+    Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
+    while (1)
+      ;
+  }
+    if (!gyro.init()) {
+    Serial.println("Failed to autodetect gyro type!");
+    while (1)
+      ;
+  }
+    if (!mag.begin()) {
+    /* There was a problem detecting the HMC5883 ... check your connections */
+    Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
+    while (1)
+      ;
+  }
+
   Serial.println("card initialized.");
 
   if (nome.length() > maxTamSD) {
@@ -82,13 +110,11 @@ void setup() {
     }
   }
 
-  docName = nome + String(valSd) + ".txt";
+  
   do {
     valSd += 1;
     docName = nome;
 
-    int tamN = maxTamSD - nome.length();
-    int tamVal = String(valSd).length();
 
     for (int i = 0; i < tamN - tamVal; i++) {
       docName += String(0);
@@ -103,33 +129,6 @@ void setup() {
   dataFile.println(cabe);
   dataFile.close();
 
-
-  if (!bmp.begin()) {
-    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-    while (1) {}
-  }
-  if (!accel.begin())
-  {
-    /* There was a problem detecting the ADXL345 ... check your connections */
-    Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
-    while (1);
-  }
-  accel.setRange(ADXL345_RANGE_16_G);
-
-  if (!gyro.init())
-  {
-    Serial.println("Failed to autodetect gyro type!");
-    while (1);
-  }
-  gyro.enableDefault();
-
-  if(!mag.begin())
-  {
-    /* There was a problem detecting the HMC5883 ... check your connections */
-    Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
-    while(1);
-  }
-  
   Serial.println(cabe);
   for (int i = 0; i < 10; i++) {
     med_alt += bmp.readAltitude();
@@ -141,6 +140,8 @@ void setup() {
   pinMode(IGN_3, OUTPUT);
   pinMode(IGN_4, OUTPUT);
 
+  accel.setRange(ADXL345_RANGE_16_G);
+  gyro.enableDefault();
 }
 
 
@@ -148,33 +149,25 @@ void loop() {
 
   t = millis();
   String dataString = "";
-
-  dataString += String(t / 1000.0);
-  dataString += "\t";
-
-  dataString += String(bmp.readTemperature());
-  dataString += "\t";
-
-  dataString += String(bmp.readPressure());
-  dataString += "\t";
-
+  sensors_event_t eventac;
+  accel.getEvent(&eventac);
+  gyro.read();
+  sensors_event_t eventmag;
+  mag.getEvent(&eventmag);
   vFiltro[0] = bmp.readAltitude() - med_alt;
 
-  for (int i = 0 ; i < N; i++) {
+  for (int i = 0; i < N; i++) {
     c[i][k] = vFiltro[i];
     vFiltro[i + 1] = 0;
     for (int j = 0; j < L; j++) {
       vFiltro[i + 1] += c[i][j];
     }
-    vFiltro[i + 1] /= 5;
+    vFiltro[i + 1] /= L;
   }
 
   k += 1;
-  k %= 5;
-  for (int i = 0; i < N + 1; i++) {
-    dataString += String(vFiltro[i]);
-    dataString += "\t";
-  }
+  k %= L;
+
 
   for (int i = H - 1; i > 0; i--) {
     ordH[i] = ordH[i - 1];
@@ -183,16 +176,12 @@ void loop() {
   h = true;
   for (int i = 0; i < H - 1; i++) {
     h = h && (ordH[i] < ordH[i + 1]);
-
   }
 
-  dataString += String(h);
-  dataString += "\t";
+
   if (h) {
     ocoAp = 1;
   }
-
-
 
   if (ocoAp && pQued1 == 0) {
     t1 = t;
@@ -239,10 +228,27 @@ void loop() {
 
 
 
+  dataString += String(t / 1000.0);
+  dataString += "\t";
+
+  dataString += String(bmp.readTemperature());
+  dataString += "\t";
+
+  dataString += String(bmp.readPressure());
+  dataString += "\t";
+
+  for (int i = 0; i < N + 1; i++) {
+    dataString += String(vFiltro[i]);
+    dataString += "\t";
+  }
+
+  dataString += String(h);
+  dataString += "\t";
+
   dataString += String(pQued1);
   dataString += "\t";
 
-  dataString += String(((pQued2 == -1) ? 0 : pQued2));
+  dataString += String(pQued2);
   dataString += "\t";
 
   dataString += String(pQued3);
@@ -250,10 +256,6 @@ void loop() {
 
   dataString += String(pQued4);
   dataString += "\t";
-
-
-  sensors_event_t eventac;
-  accel.getEvent(&eventac);
 
   dataString += String(eventac.acceleration.x);
   dataString += "\t";
@@ -264,8 +266,6 @@ void loop() {
   dataString += String(eventac.acceleration.z);
   dataString += "\t";
 
-  gyro.read();
-
   dataString += String((int)gyro.g.x);
   dataString += "\t";
 
@@ -275,9 +275,6 @@ void loop() {
   dataString += String((int)gyro.g.z);
   dataString += "\t";
 
-  sensors_event_t eventmag; 
-  mag.getEvent(&eventmag);
-  
   dataString += String(eventmag.magnetic.x);
   dataString += "\t";
 
@@ -293,10 +290,7 @@ void loop() {
   if (dataFile) {
     dataFile.println(dataString);
     dataFile.close();
-  }
-  else {
+  } else {
     Serial.println("error opening datalog.txt");
   }
-
-
 }
