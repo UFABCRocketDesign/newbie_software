@@ -21,19 +21,19 @@
 #define IGN_3 46 /*act3*/
 #define IGN_4 55 /*act4*/
 
-#define chipSelect = 53
+#define chipSelect  53
 
 #define N 3
 #define L 5
 #define H 14
 #define maxTamSD 8
 
-#define inter1 = 5000;
-#define interEsp = 2000;
-#define inter2 = 5000;
-#define inter3 = 5000;
-#define inter4 = 5000;
-#define apoH = -3;
+int inter1 = 5000;
+int interEsp = 2000;
+int inter2 = 5000;
+int inter3 = 5000;
+int inter4 = 5000;
+int apoH = -3;
 
 File dataFile;
 String nome = "leo";
