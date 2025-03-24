@@ -44,12 +44,12 @@
 #define H 14
 #define maxTamSD 8
 
-int inter1 = 5000;
-int interEsp = 2000;
-int inter2 = 5000;
-int inter3 = 5000;
-int inter4 = 5000;
-int apoH = -3;
+#define inter1 = 5000;
+#define interEsp = 2000;
+#define inter2 = 5000;
+#define inter3 = 5000;
+#define inter4 = 5000;
+#define apoH = -3;
 
 File dataFile;
 String nome = "leo";
@@ -177,8 +177,8 @@ void setup() {
 #endif
   dataFile.println(cabe);
   dataFile.close();
-#if BMP_HABILITAR
   Serial.println(cabe);
+#if BMP_HABILITAR
   for (int i = 0; i < 10; i++) {
     med_alt += bmp.readAltitude();
   }
