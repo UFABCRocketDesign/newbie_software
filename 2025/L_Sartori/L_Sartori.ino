@@ -64,9 +64,6 @@ L3G gyro;
 
 void setup() {
   String cabe = "";
-  int tamN = maxTamSD - nome.length();
-  int tamVal = String(valSd).length();
-  docName = nome + String(valSd) + ".txt";
 
   Serial.begin(115200);
   Wire.begin();
@@ -114,13 +111,13 @@ void setup() {
   do {
     docName = nome;
 
-
-    for (int i = 0; i < tamN - tamVal; i++) {
+    for (int i = 0; i < (maxTamSD - nome.length()) - (String(valSd).length()); i++) {
       docName += String(0);
     }
-    valSd += 1;
 
     docName += String(valSd) + ".txt";
+
+    valSd += 1;
   } while (SD.exists(docName));
 
   Serial.println("Creating " + docName + "...");
