@@ -1,10 +1,10 @@
 #include <SPI.h>
 #include <SD.h>
 #include <Wire.h>
-#include <L3G.h>
 
 #define ACCEL_HA 0
 #define MAG_HA 0
+#define GYRO_HA 0
 
 #include <Adafruit_Sensor.h>
 #if ACCEL_HA
@@ -14,8 +14,9 @@
 #include <Adafruit_HMC5883_U.h>
 #endif
 #include <Adafruit_BMP085.h>
-
-
+#if GYRO_HA
+#include <L3G.h>
+#endif
 
 #ifdef ARDUINO_AVR_MEGA2560
 #define SD_CS_PIN 53
@@ -71,7 +72,9 @@ Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
 #endif
 Adafruit_BMP085 bmp;
+#if GYRO_HA
 L3G gyro;
+#endif 
 
 void setup() {
   String cabe = "";
@@ -100,11 +103,13 @@ void setup() {
       ;
   }
 #endif
+#if GYRO_HA
   if (!gyro.init()) {
     Serial.println("Failed to autodetect gyro type!");
     while (1)
       ;
   }
+#endif
 #if MAG_HA
   if (!mag.begin()) {
     /* There was a problem detecting the HMC5883 ... check your connections */
@@ -153,7 +158,9 @@ void setup() {
 #if ACCEL_HA
   accel.setRange(ADXL345_RANGE_16_G);
 #endif
+#if GYRO_HA
   gyro.enableDefault();
+#endif
 }
 
 
@@ -165,7 +172,9 @@ void loop() {
   sensors_event_t eventac;
   accel.getEvent(&eventac);
 #endif
+#if GYRO_HA
   gyro.read();
+#endif
 #if MAG_HA
   sensors_event_t eventmag;
   mag.getEvent(&eventmag);
@@ -282,6 +291,7 @@ void loop() {
   dataString += String(eventac.acceleration.z);
   dataString += "\t";
 #endif
+#if GYRO_HA
   dataString += String((int)gyro.g.x);
   dataString += "\t";
 
@@ -290,6 +300,7 @@ void loop() {
 
   dataString += String((int)gyro.g.z);
   dataString += "\t";
+#endif 
 #if MAG_HA
   dataString += String(eventmag.magnetic.x);
   dataString += "\t";
