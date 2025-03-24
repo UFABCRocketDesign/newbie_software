@@ -28,6 +28,7 @@ String zerospacetext;
 int zerospacelength;
 
 //Declarações pro Paraquedas
+int relogio = 0;
 int paraquedasarmado = 0;
 int paraquedasativo= 0;
 // Generally, you should use "unsigned long" for variables that hold time
@@ -195,9 +196,12 @@ void loop() {
     paraquedasarmado = 1;
     paraquedasativo = 1;
     Serial.println("Teste paraquedas");
-    currentMillis = millis();
+    relogio = 1;
   }
 
+if (relogio == 1){
+  currentMillis = millis();
+}
   if (currentMillis - previousMillis >= interval) {
     digitalWrite(IGN_1, LOW);
     paraquedasativo = 0;
