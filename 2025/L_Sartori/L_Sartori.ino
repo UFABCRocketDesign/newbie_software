@@ -3,8 +3,12 @@
 #include <Wire.h>
 #include <L3G.h>
 
+#define accel 0
+
 #include <Adafruit_Sensor.h>
+#if accel
 #include <Adafruit_ADXL345_U.h>
+#endif
 #include <Adafruit_HMC5883_U.h>
 #include <Adafruit_BMP085.h>
 
@@ -58,7 +62,9 @@ String docName = "";
 int valSd = 0;
 
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
+#if accel
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
+#endif
 Adafruit_BMP085 bmp;
 L3G gyro;
 
@@ -81,12 +87,14 @@ void setup() {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
+#if accel
   if (!accel.begin()) {
     /* There was a problem detecting the ADXL345 ... check your connections */
     Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
     while (1)
       ;
   }
+#endif
   if (!gyro.init()) {
     Serial.println("Failed to autodetect gyro type!");
     while (1)
@@ -136,8 +144,9 @@ void setup() {
   pinMode(IGN_2, OUTPUT);
   pinMode(IGN_3, OUTPUT);
   pinMode(IGN_4, OUTPUT);
-
+#if accel
   accel.setRange(ADXL345_RANGE_16_G);
+#endif
   gyro.enableDefault();
 }
 
@@ -146,8 +155,10 @@ void loop() {
 
   t = millis();
   String dataString = "";
+#if accel
   sensors_event_t eventac;
   accel.getEvent(&eventac);
+#endif
   gyro.read();
   sensors_event_t eventmag;
   mag.getEvent(&eventmag);
@@ -253,7 +264,7 @@ void loop() {
 
   dataString += String(pQued4);
   dataString += "\t";
-
+#if accel
   dataString += String(eventac.acceleration.x);
   dataString += "\t";
 
@@ -262,7 +273,7 @@ void loop() {
 
   dataString += String(eventac.acceleration.z);
   dataString += "\t";
-
+#endif
   dataString += String((int)gyro.g.x);
   dataString += "\t";
 
