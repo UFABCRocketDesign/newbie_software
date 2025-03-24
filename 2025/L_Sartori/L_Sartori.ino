@@ -3,14 +3,14 @@
 #include <Wire.h>
 #include <L3G.h>
 
-#define accel 0
-#define mag 0
+#define ACCEL_HA 0
+#define MAG_HA 0
 
 #include <Adafruit_Sensor.h>
-#if accel
+#if ACCEL_HA
 #include <Adafruit_ADXL345_U.h>
 #endif
-#if mag
+#if MAG_HA
 #include <Adafruit_HMC5883_U.h>
 #endif
 #include <Adafruit_BMP085.h>
@@ -64,10 +64,10 @@ float troca = 0;
 String docName = "";
 int valSd = 0;
 
-#if mag
+#if MAG_HA
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 #endif
-#if accel
+#if ACCEL_HA
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
 #endif
 Adafruit_BMP085 bmp;
@@ -92,7 +92,7 @@ void setup() {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
-#if accel
+#if ACCEL_HA
   if (!accel.begin()) {
     /* There was a problem detecting the ADXL345 ... check your connections */
     Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
@@ -105,7 +105,7 @@ void setup() {
     while (1)
       ;
   }
-#if mag
+#if MAG_HA
   if (!mag.begin()) {
     /* There was a problem detecting the HMC5883 ... check your connections */
     Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
@@ -150,7 +150,7 @@ void setup() {
   pinMode(IGN_2, OUTPUT);
   pinMode(IGN_3, OUTPUT);
   pinMode(IGN_4, OUTPUT);
-#if accel
+#if ACCEL_HA
   accel.setRange(ADXL345_RANGE_16_G);
 #endif
   gyro.enableDefault();
@@ -161,12 +161,12 @@ void loop() {
 
   t = millis();
   String dataString = "";
-#if accel
+#if ACCEL_HA
   sensors_event_t eventac;
   accel.getEvent(&eventac);
 #endif
   gyro.read();
-#if mag
+#if MAG_HA
   sensors_event_t eventmag;
   mag.getEvent(&eventmag);
 #endif
@@ -272,7 +272,7 @@ void loop() {
 
   dataString += String(pQued4);
   dataString += "\t";
-#if accel
+#if ACCEL_HA
   dataString += String(eventac.acceleration.x);
   dataString += "\t";
 
@@ -290,7 +290,7 @@ void loop() {
 
   dataString += String((int)gyro.g.z);
   dataString += "\t";
-#if mag
+#if MAG_HA
   dataString += String(eventmag.magnetic.x);
   dataString += "\t";
 
