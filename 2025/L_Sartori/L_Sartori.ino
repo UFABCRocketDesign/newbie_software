@@ -4,12 +4,15 @@
 #include <L3G.h>
 
 #define accel 0
+#define mag 0
 
 #include <Adafruit_Sensor.h>
 #if accel
 #include <Adafruit_ADXL345_U.h>
 #endif
+#if mag
 #include <Adafruit_HMC5883_U.h>
+#endif
 #include <Adafruit_BMP085.h>
 
 
@@ -61,7 +64,9 @@ float troca = 0;
 String docName = "";
 int valSd = 0;
 
+#if mag
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
+#endif
 #if accel
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
 #endif
@@ -100,13 +105,14 @@ void setup() {
     while (1)
       ;
   }
+#if mag
   if (!mag.begin()) {
     /* There was a problem detecting the HMC5883 ... check your connections */
     Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
     while (1)
       ;
   }
-
+#endif
   Serial.println("card initialized.");
 
   if (nome.length() > maxTamSD) {
@@ -160,8 +166,10 @@ void loop() {
   accel.getEvent(&eventac);
 #endif
   gyro.read();
+#if mag
   sensors_event_t eventmag;
   mag.getEvent(&eventmag);
+#endif
   vFiltro[0] = bmp.readAltitude() - med_alt;
 
   for (int i = 0; i < N; i++) {
@@ -282,7 +290,7 @@ void loop() {
 
   dataString += String((int)gyro.g.z);
   dataString += "\t";
-
+#if mag
   dataString += String(eventmag.magnetic.x);
   dataString += "\t";
 
@@ -291,7 +299,7 @@ void loop() {
 
   dataString += String(eventmag.magnetic.z);
   dataString += "\t";
-
+#endif
   Serial.println(dataString);
 
   File dataFile = SD.open(docName, FILE_WRITE);
