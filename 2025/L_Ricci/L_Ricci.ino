@@ -247,8 +247,77 @@ int detector_queda(float media) {
   } else {
     queda = 0;
   }
-
   return queda;
+#endif
+}
+
+int paraquedas1(float media, int queda) {
+#if BARO
+  if (queda == 1 && paraquedas_1 == 0) {
+    paraquedas_1 = 1;
+    digitalWrite(IGN_1, HIGH);
+    timer_p1 = millis();
+  }
+
+  if (paraquedas_1 == 1 && (millis() - timer_p1) >= 2000) {
+    paraquedas_1 = 2;
+    digitalWrite(IGN_1, LOW);
+  }
+#endif
+}
+
+int paraquedas2(float media, int queda) {
+#if BARO
+  if (queda == 1 && paraquedas_2 == 0) {
+    paraquedas_2 = 1;
+    timer_p2 = millis();
+  }
+
+  if (paraquedas_2 == 1 && (millis() - timer_p2) >= 2000) {
+    paraquedas_2 = 2;
+    digitalWrite(IGN_2, HIGH);
+    desativacao_p2 = millis();
+  }
+
+  if (paraquedas_2 == 2 && (millis() - desativacao_p2) >= 1500) {
+    paraquedas_2 = 3;
+    digitalWrite(IGN_2, LOW);
+  }
+#endif
+}
+
+int paraquedas3(float media, int queda) {
+#if BARO
+  if (queda == 1 && paraquedas_3 == 0 && media < ALTITUDE_TETO) {
+    paraquedas_3 = 1;
+    digitalWrite(IGN_3, HIGH);
+    timer_p3 = millis();
+  }
+
+  if (paraquedas_3 == 1 && (millis() - timer_p3) >= 2000) {
+    paraquedas_3 = 2;
+    digitalWrite(IGN_3, LOW);
+  }
+#endif
+}
+
+int paraquedas4(float media, int queda) {
+#if BARO
+  if (queda == 1 && paraquedas_4 == 0 && media < ALTITUDE_TETO) {
+    paraquedas_4 = 1;
+    timer_p4 = millis();
+  }
+
+  if (paraquedas_4 == 1 && (millis() - timer_p4) >= 2000) {
+    paraquedas_4 = 2;
+    digitalWrite(IGN_4, HIGH);
+    desativacao_p4 = millis();
+  }
+
+  if (paraquedas_4 == 2 && (millis() - desativacao_p4) >= 1500) {
+    paraquedas_4 = 3;
+    digitalWrite(IGN_4, LOW);
+  }
 #endif
 }
 
@@ -324,60 +393,11 @@ void loop() {
 
   float media = filtros(altitudeReal, 1);
   int queda = detector_queda(media);
+  int paraquedas_1 = paraquedas1(media, queda);
+  int paraquedas_2 = paraquedas2(media, queda);
+  int paraquedas_3 = paraquedas3(media, queda);
+  int paraquedas_4 = paraquedas4(media, queda);
 
-  if (queda == 1 && paraquedas_1 == 0) {
-    paraquedas_1 = 1;
-    digitalWrite(IGN_1, HIGH);
-    timer_p1 = millis();
-  }
-
-  if (paraquedas_1 == 1 && (millis() - timer_p1) >= 2000) {
-    paraquedas_1 = 2;
-    digitalWrite(IGN_1, LOW);
-  }
-
-  if (queda == 1 && paraquedas_2 == 0) {
-    paraquedas_2 = 1;
-    timer_p2 = millis();
-  }
-
-  if (paraquedas_2 == 1 && (millis() - timer_p2) >= 2000) {
-    paraquedas_2 = 2;
-    digitalWrite(IGN_2, HIGH);
-    desativacao_p2 = millis();
-  }
-
-  if (paraquedas_2 == 2 && (millis() - desativacao_p2) >= 1500) {
-    paraquedas_2 = 3;
-    digitalWrite(IGN_2, LOW);
-  }
-
-  if (queda == 1 && paraquedas_3 == 0 && media < ALTITUDE_TETO) {
-    paraquedas_3 = 1;
-    digitalWrite(IGN_3, HIGH);
-    timer_p3 = millis();
-  }
-
-  if (paraquedas_3 == 1 && (millis() - timer_p3) >= 2000) {
-    paraquedas_3 = 2;
-    digitalWrite(IGN_3, LOW);
-  }
-
-  if (queda == 1 && paraquedas_4 == 0 && media < ALTITUDE_TETO) {
-    paraquedas_4 = 1;
-    timer_p4 = millis();
-  }
-
-  if (paraquedas_4 == 1 && (millis() - timer_p4) >= 2000) {
-    paraquedas_4 = 2;
-    digitalWrite(IGN_4, HIGH);
-    desativacao_p4 = millis();
-  }
-
-  if (paraquedas_4 == 2 && (millis() - desativacao_p4) >= 1500) {
-    paraquedas_4 = 3;
-    digitalWrite(IGN_4, LOW);
-  }
 #endif
 
   /* Imprimindo Dados */
