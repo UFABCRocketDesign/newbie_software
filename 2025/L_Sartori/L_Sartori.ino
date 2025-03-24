@@ -7,6 +7,7 @@
 #define GYRO_HABILITAR 0
 #define BMP_HABILITAR 0
 #define PQUEDAS_HABILITAR (BMP_HABILITAR && 0)
+#define CHIP_HABILITAR 0
 
 #include <Adafruit_Sensor.h>
 
@@ -44,15 +45,17 @@
 #define H 14
 #define maxTamSD 8
 
-#define inter1 = 5000;
-#define interEsp = 2000;
-#define inter2 = 5000;
-#define inter3 = 5000;
-#define inter4 = 5000;
-#define apoH = -3;
-
+#define inter1 5000
+#define interEsp 2000
+#define inter2 5000
+#define inter3 5000
+#define inter4 5000
+#define apoH -3
+#if CHIP_HABILITAR
 File dataFile;
 String nome = "leo";
+#endif
+#if PQUEDAS_HABILITAR
 long int t = 0;
 long int t1 = 0;
 long int t2 = 0;
@@ -62,6 +65,8 @@ int pQued1 = 0;
 int pQued2 = -1;
 int pQued3 = 0;
 int pQued4 = -1;
+#endif
+
 bool h;
 bool ocoAp = 0;
 float med_alt = 0;
@@ -69,6 +74,7 @@ float c[N][L];
 float vFiltro[N + 1];
 float ordH[H];
 int k = 0;
+
 float troca = 0;
 String docName = "";
 int valSd = 0;
@@ -94,13 +100,14 @@ void setup() {
   while (!Serial) {
     ;  // wait for serial port to connect. Needed for native USB port only
   }
-
+#if CHIP_HABILITAR
   Serial.print("Initializing SD card...");
   if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present");
     while (1)
       ;
   }
+#endif
 #if BMP_HABILITAR
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
@@ -130,6 +137,7 @@ void setup() {
       ;
   }
 #endif
+#if CHIP_HABILITAR
   Serial.println("card initialized.");
 
   if (nome.length() > maxTamSD) {
@@ -153,7 +161,7 @@ void setup() {
 
   Serial.println("Creating " + docName + "...");
   dataFile = SD.open(docName, FILE_WRITE);
-
+#endif 
   cabe += String("tempo\t");
 #if BMP_HABILITAR
   cabe += String("Temperature\tPressure\t");
@@ -175,6 +183,7 @@ void setup() {
 #if BMP_HABILITAR
   cabe += String("mag_x\tmag_y\tmag_z\t");
 #endif
+
   dataFile.println(cabe);
   dataFile.close();
   Serial.println(cabe);
@@ -350,6 +359,8 @@ void loop() {
   dataString += "\t";
 #endif
   Serial.println(dataString);
+#if CHIP_HABILITAR
+  
 
   File dataFile = SD.open(docName, FILE_WRITE);
   if (dataFile) {
@@ -358,4 +369,5 @@ void loop() {
   } else {
     Serial.println("error opening datalog.txt");
   }
+#endif
 }
