@@ -1,6 +1,7 @@
 #include <Adafruit_BMP085.h>  //Sensor BMP
 
 #define tamanho 10  //Usado pro filtro de dados do BMP
+#define IGN_1 36    /*act1*/
 
 Adafruit_BMP085 bmp;  //Sensor BMP
 
@@ -26,6 +27,16 @@ String nomelog = "ZAMP";
 String zerospacetext;
 int zerospacelength;
 
+//Declarações pro Paraquedas
+int paraquedasarmado = 0;
+// Generally, you should use "unsigned long" for variables that hold time
+// The value will quickly become too large for an int to store
+unsigned long previousMillis = 0;  // will store last time LED was updated
+
+// constants won't change:
+const long interval = 5000;  // interval at which to blink (milliseconds)
+
+unsigned long currentMillis;
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void setup() {
   //COMEÇO DO SETUP DATALOGGER
@@ -54,7 +65,7 @@ void setup() {
     for (int i = 1; i <= zerospacelength; ++i) {
       zerospacetext += "0";
     }
-    nomearquivo = nomelog + zerospacetext + String(lognumber) + ".txt"; 
+    nomearquivo = nomelog + zerospacetext + String(lognumber) + ".txt";
     lognumber += 1;
     zerospacetext = "";
   } while (SD.exists(nomearquivo));
@@ -89,6 +100,7 @@ void setup() {
   Serial.print("Detector de Queda\t");
   Serial.print("Temperatura\t");
   Serial.print("Pressão\t");
+  Serial.print("paraquedasarmado\t");
   Serial.println();
   //FIM DO SETUP BMP
 
@@ -100,6 +112,7 @@ void setup() {
     dataFile.print("Detector de Queda\t");
     dataFile.print("Temperatura\t");
     dataFile.print("Pressão\t");
+    dataFile.print("paraquedasarmado\t");
     dataFile.println();
     dataFile.close();
   }
@@ -107,6 +120,8 @@ void setup() {
   else {
     Serial.println("Erro ao abrir" + nomearquivo);
   }
+
+  pinMode(IGN_1, OUTPUT);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void loop() {
@@ -160,11 +175,32 @@ void loop() {
   dataString += String(detectorqueda) + "\t";
   dataString += String(bmp.readTemperature()) + "\t";
   dataString += String(bmp.readPressure()) + "\t";
+  dataString += String(paraquedasarmado) + "\t";
 
   //Print da dataString
   Serial.println(dataString);
 
   //FIM DA SEÇÃO DO SENSOR BMP
+
+  //----------------------------------------------------------------
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //COMEÇO DA SEÇÃO DO PARAQUEDAS
+
+  // check to see if it's time to blink the LED; that is, if the difference
+  // between the current time and last time you blinked the LED is bigger than
+  // the interval at which you want to blink the LED.
+  if ((detectorqueda == 1) && (paraquedasarmado != 1)) {
+    currentMillis = millis();
+  }
+
+  if (currentMillis - previousMillis >= interval) {
+    digitalWrite(IGN_1, HIGH);
+    paraquedasarmado = 1;
+    Serial.println("Teste paraquedas");
+
+  }
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //FIM DA SEÇÃO DO PARAQUEDAS
 
   //----------------------------------------------------------------
 
