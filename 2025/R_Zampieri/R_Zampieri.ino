@@ -161,7 +161,7 @@ void loop() {
 
   //DETECTOR DE QUEDA
   if (altura_filtrada2 < alturapassada) {  //Comparação da altura atual pós-filtros com a altura anterior ("alturapassada")
-    detectorqueda = 1;
+    detectorqueda += 1;
   } else {
     detectorqueda = 0;
   }
@@ -190,7 +190,7 @@ void loop() {
   // check to see if it's time to blink the LED; that is, if the difference
   // between the current time and last time you blinked the LED is bigger than
   // the interval at which you want to blink the LED.
-  if ((detectorqueda == 1) && (paraquedasarmado != 1)) {
+  if ((detectorqueda >= 10) && (paraquedasarmado != 1)) {
     digitalWrite(IGN_1, HIGH);
     paraquedasarmado = 1;
     paraquedasativo = 1;
