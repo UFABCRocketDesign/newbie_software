@@ -224,23 +224,23 @@ float filtros(float altitudeReal, int i) {
   leituras[i][indiceAtual[i]] = (altitudeReal);
   total[i] = total[i] + leituras[i][indiceAtual[i]];
   indiceAtual[i] = (indiceAtual[i] + 1) % LEITURAS;
-  float media = total[i] / LEITURAS;
+  float altura = total[i] / LEITURAS;
 
-  return media;
+  return altura;
 #endif
 }
 
-int detector_queda(float media) {
+int detector_queda(float altura) {
 #if BARO
   float altitudeAnterior = 0;
 
-  if (media < altitudeAnterior) {
+  if (altura < altitudeAnterior) {
     contadorQueda++;
   } else {
     contadorQueda = 0;
   }
 
-  altitudeAnterior = media;
+  altitudeAnterior = altura;
 
   if (contadorQueda >= 10) {
     queda = 1;
@@ -251,7 +251,7 @@ int detector_queda(float media) {
 #endif
 }
 
-int paraquedas1(float media, int queda) {
+int paraquedas1(float altura, int queda) {
 #if BARO
   if (queda == 1 && paraquedas_1 == 0) {
     paraquedas_1 = 1;
@@ -263,10 +263,11 @@ int paraquedas1(float media, int queda) {
     paraquedas_1 = 2;
     digitalWrite(IGN_1, LOW);
   }
+  return paraquedas_1;
 #endif
 }
 
-int paraquedas2(float media, int queda) {
+int paraquedas2(float altura, int queda) {
 #if BARO
   if (queda == 1 && paraquedas_2 == 0) {
     paraquedas_2 = 1;
@@ -283,12 +284,13 @@ int paraquedas2(float media, int queda) {
     paraquedas_2 = 3;
     digitalWrite(IGN_2, LOW);
   }
+  return paraquedas_2;
 #endif
 }
 
-int paraquedas3(float media, int queda) {
+int paraquedas3(float altura, int queda) {
 #if BARO
-  if (queda == 1 && paraquedas_3 == 0 && media < ALTITUDE_TETO) {
+  if (queda == 1 && paraquedas_3 == 0 && altura < ALTITUDE_TETO) {
     paraquedas_3 = 1;
     digitalWrite(IGN_3, HIGH);
     timer_p3 = millis();
@@ -298,12 +300,13 @@ int paraquedas3(float media, int queda) {
     paraquedas_3 = 2;
     digitalWrite(IGN_3, LOW);
   }
+  return paraquedas_3;
 #endif
 }
 
-int paraquedas4(float media, int queda) {
+int paraquedas4(float altura, int queda) {
 #if BARO
-  if (queda == 1 && paraquedas_4 == 0 && media < ALTITUDE_TETO) {
+  if (queda == 1 && paraquedas_4 == 0 && altura < ALTITUDE_TETO) {
     paraquedas_4 = 1;
     timer_p4 = millis();
   }
@@ -318,6 +321,7 @@ int paraquedas4(float media, int queda) {
     paraquedas_4 = 3;
     digitalWrite(IGN_4, LOW);
   }
+  return paraquedas_4;
 #endif
 }
 
@@ -391,12 +395,14 @@ void loop() {
   /* Tratamento de Dados */
 #if BARO
 
-  float media = filtros(altitudeReal, 1);
-  int queda = detector_queda(media);
-  int paraquedas_1 = paraquedas1(media, queda);
-  int paraquedas_2 = paraquedas2(media, queda);
-  int paraquedas_3 = paraquedas3(media, queda);
-  int paraquedas_4 = paraquedas4(media, queda);
+  float altura = filtros(altitudeReal, 1);
+  int queda = detector_queda(altura);
+
+  // Paraquedas
+  paraquedas1(altura, queda);
+  paraquedas2(altura, queda);
+  paraquedas3(altura, queda);
+  paraquedas4(altura, queda);
 
 #endif
 
@@ -412,7 +418,7 @@ void loop() {
 #if PRESSAO
   dataString += String(pressao) + "\t";
 #endif
-  dataString += String(media) + "\t";
+  dataString += String(altura) + "\t";
   dataString += String(altitudeReal) + "\t";
   dataString += String(queda) + "\t";
   dataString += String(paraquedas_1) + "\t";
