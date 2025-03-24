@@ -55,16 +55,32 @@ HardwareSerial &GPS = Serial1;
 
 String filename;
 
-#if BARO
-int estadoParaquedas1 = 0, estadoParaquedas2 = 0, estadoParaquedas3 = 0, estadoParaquedas4 = 0, contadorQueda = 0, queda = 0;
+class FiltroMediaMovel {
+private:
+  float leituras[LEITURAS] = {};
+  float total = 0;
+  int indiceAtual = 0;
+public:
+  float filtro(float altitudeReal) {
+    total = total - leituras[indiceAtual];
+    leituras[indiceAtual] = (altitudeReal);
+    total = total + leituras[indiceAtual];
+    indiceAtual = (indiceAtual + 1) % LEITURAS;
+    float altura = total / LEITURAS;
+    
+    return altura;
+  }
+};
+
+FiltroMediaMovel f1;
+FiltroMediaMovel f2;
+
+int estadoParaquedas1 = 0,
+    estadoParaquedas2 = 0, estadoParaquedas3 = 0, estadoParaquedas4 = 0, contadorQueda = 0, queda = 0;
 unsigned long desativacaoP2 = 0, desativacaoP4 = 0;
 unsigned long timerP1, timerP2, timerP3, timerP4;
-float leituras[FILTROS][LEITURAS] = {};
-float total[FILTROS] = {};
-int indiceAtual[FILTROS] = {};
 float altitudes[NUMERO_QUEDAS];
 float alt = 0;
-#endif
 
 void setup() {
   Serial.begin(115200);
@@ -216,18 +232,6 @@ void setup() {
   pinMode(IGN_2, OUTPUT);
   pinMode(IGN_3, OUTPUT);
   pinMode(IGN_4, OUTPUT);
-}
-
-float filtros(float altitudeReal, int i) {
-#if BARO
-  total[i] = total[i] - leituras[i][indiceAtual[i]];
-  leituras[i][indiceAtual[i]] = (altitudeReal);
-  total[i] = total[i] + leituras[i][indiceAtual[i]];
-  indiceAtual[i] = (indiceAtual[i] + 1) % LEITURAS;
-  float altura = total[i] / LEITURAS;
-
-  return altura;
-#endif
 }
 
 int detectorQueda(float altura) {
@@ -395,7 +399,7 @@ void loop() {
   /* Tratamento de Dados */
 #if BARO
 
-  float altura = filtros(altitudeReal, 1);
+  float altura = f2.filtro(f1.filtro(altitudeReal));
   int queda = detectorQueda(altura);
 
   // Paraquedas
