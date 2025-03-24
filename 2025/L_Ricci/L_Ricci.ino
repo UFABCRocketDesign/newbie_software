@@ -56,9 +56,9 @@ HardwareSerial &GPS = Serial1;
 String filename;
 
 #if BARO
-int paraquedas_1 = 0, paraquedas_2 = 0, paraquedas_3 = 0, paraquedas_4 = 0, contadorQueda = 0, queda = 0;
-unsigned long desativacao_p2 = 0, desativacao_p4 = 0;
-unsigned long timer_p1, timer_p2, timer_p3, timer_p4;
+int estadoParaquedas1 = 0, estadoParaquedas2 = 0, estadoParaquedas3 = 0, estadoParaquedas4 = 0, contadorQueda = 0, queda = 0;
+unsigned long desativacaoP2 = 0, desativacaoP4 = 0;
+unsigned long timerP1, timerP2, timerP3, timerP4;
 float leituras[FILTROS][LEITURAS] = {};
 float total[FILTROS] = {};
 int indiceAtual[FILTROS] = {};
@@ -230,7 +230,7 @@ float filtros(float altitudeReal, int i) {
 #endif
 }
 
-int detector_queda(float altura) {
+int detectorQueda(float altura) {
 #if BARO
   float altitudeAnterior = 0;
 
@@ -253,80 +253,80 @@ int detector_queda(float altura) {
 
 int paraquedas1(float altura, int queda) {
 #if BARO
-  if (queda == 1 && paraquedas_1 == 0) {
-    paraquedas_1 = 1;
+  if (queda == 1 && estadoParaquedas1 == 0) {
+    estadoParaquedas1 = 1;
     digitalWrite(IGN_1, HIGH);
-    timer_p1 = millis();
+    timerP1 = millis();
   }
 
-  if (paraquedas_1 == 1 && (millis() - timer_p1) >= 2000) {
-    paraquedas_1 = 2;
+  if (estadoParaquedas1 == 1 && (millis() - timerP1) >= 2000) {
+    estadoParaquedas1 = 2;
     digitalWrite(IGN_1, LOW);
   }
-  return paraquedas_1;
+  return estadoParaquedas1;
 #endif
 }
 
 int paraquedas2(float altura, int queda) {
 #if BARO
-  if (queda == 1 && paraquedas_2 == 0) {
-    paraquedas_2 = 1;
-    timer_p2 = millis();
+  if (queda == 1 && estadoParaquedas2 == 0) {
+    estadoParaquedas2 = 1;
+    timerP2 = millis();
   }
 
-  if (paraquedas_2 == 1 && (millis() - timer_p2) >= 2000) {
-    paraquedas_2 = 2;
+  if (estadoParaquedas2 == 1 && (millis() - timerP2) >= 2000) {
+    estadoParaquedas2 = 2;
     digitalWrite(IGN_2, HIGH);
-    desativacao_p2 = millis();
+    desativacaoP2 = millis();
   }
 
-  if (paraquedas_2 == 2 && (millis() - desativacao_p2) >= 1500) {
-    paraquedas_2 = 3;
+  if (estadoParaquedas2 == 2 && (millis() - desativacaoP2) >= 1500) {
+    estadoParaquedas2 = 3;
     digitalWrite(IGN_2, LOW);
   }
-  return paraquedas_2;
+  return estadoParaquedas2;
 #endif
 }
 
 int paraquedas3(float altura, int queda) {
 #if BARO
-  if (queda == 1 && paraquedas_3 == 0 && altura < ALTITUDE_TETO) {
-    paraquedas_3 = 1;
+  if (queda == 1 && estadoParaquedas3 == 0 && altura < ALTITUDE_TETO) {
+    estadoParaquedas3 = 1;
     digitalWrite(IGN_3, HIGH);
-    timer_p3 = millis();
+    timerP3 = millis();
   }
 
-  if (paraquedas_3 == 1 && (millis() - timer_p3) >= 2000) {
-    paraquedas_3 = 2;
+  if (estadoParaquedas3 == 1 && (millis() - timerP3) >= 2000) {
+    estadoParaquedas3 = 2;
     digitalWrite(IGN_3, LOW);
   }
-  return paraquedas_3;
+  return estadoParaquedas3;
 #endif
 }
 
 int paraquedas4(float altura, int queda) {
 #if BARO
-  if (queda == 1 && paraquedas_4 == 0 && altura < ALTITUDE_TETO) {
-    paraquedas_4 = 1;
-    timer_p4 = millis();
+  if (queda == 1 && estadoParaquedas4 == 0 && altura < ALTITUDE_TETO) {
+    estadoParaquedas4 = 1;
+    timerP4 = millis();
   }
 
-  if (paraquedas_4 == 1 && (millis() - timer_p4) >= 2000) {
-    paraquedas_4 = 2;
+  if (estadoParaquedas4 == 1 && (millis() - timerP4) >= 2000) {
+    estadoParaquedas4 = 2;
     digitalWrite(IGN_4, HIGH);
-    desativacao_p4 = millis();
+    desativacaoP4 = millis();
   }
 
-  if (paraquedas_4 == 2 && (millis() - desativacao_p4) >= 1500) {
-    paraquedas_4 = 3;
+  if (estadoParaquedas4 == 2 && (millis() - desativacaoP4) >= 1500) {
+    estadoParaquedas4 = 3;
     digitalWrite(IGN_4, LOW);
   }
-  return paraquedas_4;
+  return estadoParaquedas4;
 #endif
 }
 
 void loop() {
-  unsigned long timer_lora = millis();
+  unsigned long timerLora = millis();
   float tempo = millis() / 1000.0;
 
 #if BARO
@@ -343,26 +343,26 @@ void loop() {
   sensors_event_t event_accel;
   accel.getEvent(&event_accel);
 #if AX
-  float accel_x = event_accel.acceleration.x;
+  float accelX = event_accel.acceleration.x;
 #endif
 #if AY
-  float accel_y = event_accel.acceleration.y;
+  float accelY = event_accel.acceleration.y;
 #endif
 #if AZ
-  float accel_z = event_accel.acceleration.z;
+  float accelZ = event_accel.acceleration.z;
 #endif
 #endif
 
 #if GIRO
   gyro.read();
 #if GX
-  int gyro_x = gyro.g.x;
+  int gyroX = gyro.g.x;
 #endif
 #if GY
-  int gyro_y = gyro.g.y;
+  int gyroY = gyro.g.y;
 #endif
 #if GZ
-  int gyro_z = gyro.g.z;
+  int gyroZ = gyro.g.z;
 #endif
 #endif
 
@@ -382,13 +382,13 @@ void loop() {
   sensors_event_t event_mag;
   mag.getEvent(&event_mag);
 #if MX
-  float mag_x = event_mag.magnetic.x;
+  float magX = event_mag.magnetic.x;
 #endif
 #if MY
-  float mag_y = event_mag.magnetic.y;
+  float magY = event_mag.magnetic.y;
 #endif
 #if MZ
-  float mag_z = event_mag.magnetic.z;
+  float magZ = event_mag.magnetic.z;
 #endif
 #endif
 
@@ -396,7 +396,7 @@ void loop() {
 #if BARO
 
   float altura = filtros(altitudeReal, 1);
-  int queda = detector_queda(altura);
+  int queda = detectorQueda(altura);
 
   // Paraquedas
   paraquedas1(altura, queda);
@@ -421,45 +421,45 @@ void loop() {
   dataString += String(altura) + "\t";
   dataString += String(altitudeReal) + "\t";
   dataString += String(queda) + "\t";
-  dataString += String(paraquedas_1) + "\t";
-  dataString += String(paraquedas_2) + "\t";
-  dataString += String(paraquedas_3) + "\t";
-  dataString += String(paraquedas_4) + "\t";
+  dataString += String(estadoParaquedas1) + "\t";
+  dataString += String(estadoParaquedas2) + "\t";
+  dataString += String(estadoParaquedas3) + "\t";
+  dataString += String(estadoParaquedas4) + "\t";
 #endif
 
 #if ACEL
 #if AX
-  dataString += String(accel_x) + "\t";
+  dataString += String(accelX) + "\t";
 #endif
 #if AY
-  dataString += String(accel_y) + "\t";
+  dataString += String(accelY) + "\t";
 #endif
 #if AZ
-  dataString += String(accel_z) + "\t";
+  dataString += String(accelZ) + "\t";
 #endif
 #endif
 
 #if GIRO
 #if GX
-  dataString += String(gyro_x) + "\t";
+  dataString += String(gyroX) + "\t";
 #endif
 #if GY
-  dataString += String(gyro_y) + "\t";
+  dataString += String(gyroY) + "\t";
 #endif
 #if GZ
-  dataString += String(gyro_z) + "\t";
+  dataString += String(gyroZ) + "\t";
 #endif
 #endif
 
 #if MAG
 #if MX
-  dataString += String(mag_x) + "\t";
+  dataString += String(magX) + "\t";
 #endif
 #if MY
-  dataString += String(mag_y) + "\t";
+  dataString += String(magY) + "\t";
 #endif
 #if MZ
-  dataString += String(mag_z) + "\t";
+  dataString += String(magZ) + "\t";
 #endif
 #endif
 
@@ -487,9 +487,9 @@ void loop() {
 #endif
 
 #if LORA
-  unsigned long transmissao_lora = 0;
-  if (timer_lora - transmissao_lora >= 3000) {
-    transmissao_lora = timer_lora;
+  unsigned long transmissaoLora = 0;
+  if (timerLora - transmissaoLora >= 3000) {
+    transmissaoLora = timerLora;
     LoRa.println(dataString);
   }
 #endif
