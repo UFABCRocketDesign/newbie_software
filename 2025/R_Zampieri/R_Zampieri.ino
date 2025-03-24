@@ -29,7 +29,7 @@ int zerospacelength;
 
 //Declarações pro Paraquedas
 int paraquedasarmado = 0;
-int paraquedasativo= 0;
+
 // Generally, you should use "unsigned long" for variables that hold time
 // The value will quickly become too large for an int to store
 unsigned long previousMillis = 0;  // will store last time LED was updated
@@ -100,7 +100,7 @@ void setup() {
   Serial.print("Detector de Queda\t");
   Serial.print("Temperatura\t");
   Serial.print("Pressão\t");
-  Serial.print("paraquedasativo\t");
+  Serial.print("paraquedasarmado\t");
   Serial.println();
   //FIM DO SETUP BMP
 
@@ -112,7 +112,7 @@ void setup() {
     dataFile.print("Detector de Queda\t");
     dataFile.print("Temperatura\t");
     dataFile.print("Pressão\t");
-    dataFile.print("paraquedasativo\t");
+    dataFile.print("paraquedasarmado\t");
     dataFile.println();
     dataFile.close();
   }
@@ -176,7 +176,7 @@ void loop() {
   dataString += String(detectorqueda) + "\t";
   dataString += String(bmp.readTemperature()) + "\t";
   dataString += String(bmp.readPressure()) + "\t";
-  dataString += String(paraquedasativo) + "\t";
+  dataString += String(paraquedasarmado) + "\t";
 
   //Print da dataString
   Serial.println(dataString);
@@ -190,18 +190,17 @@ void loop() {
   // check to see if it's time to blink the LED; that is, if the difference
   // between the current time and last time you blinked the LED is bigger than
   // the interval at which you want to blink the LED.
-  if ((detectorqueda >= 10) && (paraquedasarmado != 1)) {
+  if ((detectorqueda >= 10) && (paraquedasarmado == 0)) {
     digitalWrite(IGN_1, HIGH);
     previousMillis = currentMillis;
     paraquedasarmado = 1;
-    paraquedasativo = 1;
     Serial.println("Paraquedas Ativado");
   }
 
-  if (currentMillis - previousMillis >= interval) {
+  if ((currentMillis - previousMillis >= interval) && (paraquedasarmado == 1)) {
     digitalWrite(IGN_1, LOW);
-    paraquedasativo = 0;
-    Serial.println("Paraqeudas Desativado");
+    paraquedasarmado = 2;
+    Serial.println("Paraquedas Desativado");
 
   }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
