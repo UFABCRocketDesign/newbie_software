@@ -28,7 +28,6 @@ String zerospacetext;
 int zerospacelength;
 
 //Declarações pro Paraquedas
-int relogio = 0;
 int paraquedasarmado = 0;
 int paraquedasativo= 0;
 // Generally, you should use "unsigned long" for variables that hold time
@@ -38,7 +37,6 @@ unsigned long previousMillis = 0;  // will store last time LED was updated
 // constants won't change:
 const long interval = 5000;  // interval at which to blink (milliseconds)
 
-unsigned long currentMillis;
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void setup() {
   //COMEÇO DO SETUP DATALOGGER
@@ -127,6 +125,7 @@ void setup() {
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void loop() {
+  unsigned long currentMillis = millis();
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
   File dataFile = SD.open(nomearquivo, FILE_WRITE);
@@ -193,18 +192,16 @@ void loop() {
   // the interval at which you want to blink the LED.
   if ((detectorqueda >= 10) && (paraquedasarmado != 1)) {
     digitalWrite(IGN_1, HIGH);
+    previousMillis = currentMillis;
     paraquedasarmado = 1;
     paraquedasativo = 1;
-    Serial.println("Teste paraquedas");
-    relogio = 1;
+    Serial.println("Paraquedas Ativado");
   }
 
-if (relogio == 1){
-  currentMillis = millis();
-}
   if (currentMillis - previousMillis >= interval) {
     digitalWrite(IGN_1, LOW);
     paraquedasativo = 0;
+    Serial.println("Paraqeudas Desativado");
 
   }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
