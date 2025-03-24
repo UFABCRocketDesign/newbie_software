@@ -2,19 +2,27 @@
 #include <SD.h>
 #include <Wire.h>
 
-#define ACCEL_HA 0
-#define MAG_HA 0
-#define GYRO_HA 0
+#define ACCEL_HABILITAR 0
+#define MAG_HABILITAR 0
+#define GYRO_HABILITAR 0
+#define BMP_HABILITAR 0
+#define PQUEDAS_HABILITAR (BMP_HABILITAR && 0)
 
 #include <Adafruit_Sensor.h>
-#if ACCEL_HA
+
+#if ACCEL_HABILITAR
 #include <Adafruit_ADXL345_U.h>
 #endif
-#if MAG_HA
+
+#if MAG_HABILITAR
 #include <Adafruit_HMC5883_U.h>
 #endif
+
+#if BMP_HABILITAR
 #include <Adafruit_BMP085.h>
-#if GYRO_HA
+#endif
+
+#if GYRO_HABILITAR
 #include <L3G.h>
 #endif
 
@@ -65,14 +73,16 @@ float troca = 0;
 String docName = "";
 int valSd = 0;
 
-#if MAG_HA
+#if MAG_HABILITAR
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 #endif
-#if ACCEL_HA
+#if ACCEL_HABILITAR
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
 #endif
+#if BMP_HABILITAR
 Adafruit_BMP085 bmp;
-#if GYRO_HA
+#endif
+#if GYRO_HABILITAR
 L3G gyro;
 #endif 
 
@@ -91,11 +101,13 @@ void setup() {
     while (1)
       ;
   }
+#if BMP_HABILITAR
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
-#if ACCEL_HA
+#endif
+#if ACCEL_HABILITAR
   if (!accel.begin()) {
     /* There was a problem detecting the ADXL345 ... check your connections */
     Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
@@ -103,14 +115,14 @@ void setup() {
       ;
   }
 #endif
-#if GYRO_HA
+#if GYRO_HABILITAR
   if (!gyro.init()) {
     Serial.println("Failed to autodetect gyro type!");
     while (1)
       ;
   }
 #endif
-#if MAG_HA
+#if MAG_HABILITAR
   if (!mag.begin()) {
     /* There was a problem detecting the HMC5883 ... check your connections */
     Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
@@ -141,24 +153,47 @@ void setup() {
 
   Serial.println("Creating " + docName + "...");
   dataFile = SD.open(docName, FILE_WRITE);
-  cabe += String("Temperature\tPressure\tAltitude\tPressure\tAltitude\t");
+
+  cabe += String("tempo\t");
+#if BMP_HABILITAR
+  cabe += String("Temperature\tPressure\t");
+  for(int i=0;i<N+1;i++){
+    cabe += String("Filtro");
+    cabe += String(i+1) +"\t";
+  }
+  cabe += String("h\t");
+#endif
+#if PQUEDAS_HABILITAR
+  cabe += String("pQuedas1\tpQuedas2\tpQuedas3\tpQuedas4\t");
+#endif
+#if ACCEL_HABILITAR
+  cabe += String("acc_x\tacc_y\tacc_z\t");
+#endif
+#if GYRO_HABILITAR
+  cabe += String("gyro_x\tgyro_y\tgyro_z\t");
+#endif
+#if BMP_HABILITAR
+  cabe += String("mag_x\tmag_y\tmag_z\t");
+#endif
   dataFile.println(cabe);
   dataFile.close();
-
+#if BMP_HABILITAR
   Serial.println(cabe);
   for (int i = 0; i < 10; i++) {
     med_alt += bmp.readAltitude();
   }
   med_alt /= 10;
-
+#endif
+#if PQUEDAS_HABILITAR
   pinMode(IGN_1, OUTPUT);
   pinMode(IGN_2, OUTPUT);
   pinMode(IGN_3, OUTPUT);
   pinMode(IGN_4, OUTPUT);
-#if ACCEL_HA
+#endif
+#if ACCEL_HABILITAR
   accel.setRange(ADXL345_RANGE_16_G);
 #endif
-#if GYRO_HA
+#if GYRO_HABILITAR
   gyro.enableDefault();
 #endif
 }
@@ -168,17 +203,18 @@ void loop() {
 
   t = millis();
   String dataString = "";
-#if ACCEL_HA
+#if ACCEL_HABILITAR
   sensors_event_t eventac;
   accel.getEvent(&eventac);
 #endif
-#if GYRO_HA
+#if GYRO_HABILITAR
   gyro.read();
 #endif
-#if MAG_HA
+#if MAG_HABILITAR
   sensors_event_t eventmag;
   mag.getEvent(&eventmag);
 #endif
+#if BMP_HABILITAR
   vFiltro[0] = bmp.readAltitude() - med_alt;
 
   for (int i = 0; i < N; i++) {
@@ -202,8 +238,8 @@ void loop() {
   for (int i = 0; i < H - 1; i++) {
     h = h && (ordH[i] < ordH[i + 1]);
   }
-
-
+#endif
+#if PQUEDAS_HABILITAR
   if (h) {
     ocoAp = 1;
   }
@@ -250,12 +286,12 @@ void loop() {
     digitalWrite(IGN_4, LOW);
     pQued4 = 2;
   }
-
-
+#endif 
 
   dataString += String(t / 1000.0);
   dataString += "\t";
 
+#if BMP_HABILITAR
   dataString += String(bmp.readTemperature());
   dataString += "\t";
 
@@ -269,7 +305,8 @@ void loop() {
 
   dataString += String(h);
   dataString += "\t";
-
+#endif
+#if PQUEDAS_HABILITAR
   dataString += String(pQued1);
   dataString += "\t";
 
@@ -281,7 +318,8 @@ void loop() {
 
   dataString += String(pQued4);
   dataString += "\t";
-#if ACCEL_HA
+#endif
+#if ACCEL_HABILITAR
   dataString += String(eventac.acceleration.x);
   dataString += "\t";
 
@@ -291,7 +329,7 @@ void loop() {
   dataString += String(eventac.acceleration.z);
   dataString += "\t";
 #endif
-#if GYRO_HA
+#if GYRO_HABILITARBILITAR
   dataString += String((int)gyro.g.x);
   dataString += "\t";
 
@@ -301,7 +339,7 @@ void loop() {
   dataString += String((int)gyro.g.z);
   dataString += "\t";
 #endif 
-#if MAG_HA
+#if MAG_HABILITAR
   dataString += String(eventmag.magnetic.x);
   dataString += "\t";
 
