@@ -21,7 +21,7 @@
 #define IGN_3 46 /*act3*/
 #define IGN_4 55 /*act4*/
 
-#define chipSelect  53
+#define chipSelect 53
 
 #define N 3
 #define L 5
@@ -90,12 +90,12 @@ void setup() {
     while (1)
       ;
   }
-    if (!gyro.init()) {
+  if (!gyro.init()) {
     Serial.println("Failed to autodetect gyro type!");
     while (1)
       ;
   }
-    if (!mag.begin()) {
+  if (!mag.begin()) {
     /* There was a problem detecting the HMC5883 ... check your connections */
     Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
     while (1)
@@ -110,15 +110,15 @@ void setup() {
     }
   }
 
-  
+
   do {
-    valSd += 1;
     docName = nome;
 
 
     for (int i = 0; i < tamN - tamVal; i++) {
       docName += String(0);
     }
+    valSd += 1;
 
     docName += String(valSd) + ".txt";
   } while (SD.exists(docName));
