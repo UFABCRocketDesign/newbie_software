@@ -3,8 +3,17 @@
 #include <Wire.h>
 
 #define ACCEL_HABILITAR 0
+#define ACCEL_X_HABILITAR (ACCEL_HABILITAR && 0)
+#define ACCEL_Y_HABILITAR (ACCEL_HABILITAR && 0)
+#define ACCEL_Z_HABILITAR (ACCEL_HABILITAR && 0)
 #define MAG_HABILITAR 0
+#define MAG_X_HABILITAR (MAG_HABILITAR && 0)
+#define MAG_Y_HABILITAR (MAG_HABILITAR && 0)
+#define MAG_Z_HABILITAR (MAG_HABILITAR && 0)
 #define GYRO_HABILITAR 0
+#define GYRO_X_HABILITAR (GYRO_X_HABILITAR && 0)
+#define GYRO_y_HABILITAR (GYRO_X_HABILITAR && 0)
+#define GYRO_Z_HABILITAR (GYRO_X_HABILITAR && 0)
 #define BMP_HABILITAR 0
 #define PQUEDAS_HABILITAR (BMP_HABILITAR && 0)
 #define CHIP_HABILITAR 0
@@ -33,28 +42,38 @@
 #define SD_CS_PIN 10
 #endif  // ARDUINO_AVR_MEGA2560
 
+#if PQUEDAS_HABILITAR
 #define IGN_1 36 /*act1*/
 #define IGN_2 61 /*act2*/
 #define IGN_3 46 /*act3*/
 #define IGN_4 55 /*act4*/
-
-#define chipSelect 53
-
-#define N 3
-#define L 5
-#define H 14
-#define maxTamSD 8
-
 #define inter1 5000
 #define interEsp 2000
 #define inter2 5000
 #define inter3 5000
 #define inter4 5000
 #define apoH -3
+#endif
+
+#if CHIP_HABILITAR
+#define chipSelect 53
+#define maxTamSD 8
+#endif
+
+#if BMP_HABILITAR
+#define N 3
+#define L 5
+#define H 14
+#define valMedH 10
+#endif
+
 #if CHIP_HABILITAR
 File dataFile;
 String nome = "leo";
+String docName = "";
+int valSd = 0;
 #endif
+
 #if PQUEDAS_HABILITAR
 long int t = 0;
 long int t1 = 0;
@@ -65,19 +84,20 @@ int pQued1 = 0;
 int pQued2 = -1;
 int pQued3 = 0;
 int pQued4 = -1;
+bool ocoAp = 0;
 #endif
 
+#if BMP_HABILITAR
 bool h;
-bool ocoAp = 0;
 float med_alt = 0;
-float c[N][L];
+float valoresFiltros[N][L];
 float vFiltro[N + 1];
 float ordH[H];
 int k = 0;
+#endif
 
-float troca = 0;
-String docName = "";
-int valSd = 0;
+
+
 
 #if MAG_HABILITAR
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
@@ -162,7 +182,9 @@ void setup() {
   Serial.println("Creating " + docName + "...");
   dataFile = SD.open(docName, FILE_WRITE);
 #endif 
+#if PQUEDAS_HABILITAR
   cabe += String("tempo\t");
+#endif
 #if BMP_HABILITAR
   cabe += String("Temperature\tPressure\t");
   for(int i=0;i<N+1;i++){
@@ -174,24 +196,43 @@ void setup() {
 #if PQUEDAS_HABILITAR
   cabe += String("pQuedas1\tpQuedas2\tpQuedas3\tpQuedas4\t");
 #endif
-#if ACCEL_HABILITAR
-  cabe += String("acc_x\tacc_y\tacc_z\t");
+#if ACCEL_X_HABILITAR
+  cabe += String("acc_x\t");
 #endif
-#if GYRO_HABILITAR
-  cabe += String("gyro_x\tgyro_y\tgyro_z\t");
+#if ACCEL_Y_HABILITAR
+  cabe += String("acc_y\t");
 #endif
-#if BMP_HABILITAR
-  cabe += String("mag_x\tmag_y\tmag_z\t");
+#if ACCEL_Z_HABILITAR
+  cabe += String("acc_z\t");
 #endif
-
+#if GYRO_X_HABILITAR
+  cabe += String("gyro_x\t");
+#endif
+#if GYRO_Y_HABILITAR
+  cabe += String("gyro_y\t");
+#endif
+#if GYRO_Z_HABILITAR
+  cabe += String("gyro_z\t");
+#endif
+#if MAG_X_HABILITAR
+  cabe += String("mag_x\t");
+#endif
+#if MAG_Y_HABILITAR
+  cabe += String("mag_y\t");
+#endif
+#if MAG_Z_HABILITAR
+  cabe += String("mag_z\t");
+#endif
+#if CHIP_HABILITAR
   dataFile.println(cabe);
   dataFile.close();
+#endif
   Serial.println(cabe);
 #if BMP_HABILITAR
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < valMedH; i++) {
     med_alt += bmp.readAltitude();
   }
-  med_alt /= 10;
+  med_alt /= valMedH;
 #endif
 #if PQUEDAS_HABILITAR
   pinMode(IGN_1, OUTPUT);
@@ -209,8 +250,9 @@ void setup() {
 
 
 void loop() {
-
+#if PQUEDAS_HABILITAR
   t = millis();
+#endif
   String dataString = "";
 #if ACCEL_HABILITAR
   sensors_event_t eventac;
@@ -227,10 +269,10 @@ void loop() {
   vFiltro[0] = bmp.readAltitude() - med_alt;
 
   for (int i = 0; i < N; i++) {
-    c[i][k] = vFiltro[i];
+    valoresFiltros[i][k] = vFiltro[i];
     vFiltro[i + 1] = 0;
     for (int j = 0; j < L; j++) {
-      vFiltro[i + 1] += c[i][j];
+      vFiltro[i + 1] += valoresFiltros[i][j];
     }
     vFiltro[i + 1] /= L;
   }
@@ -296,10 +338,10 @@ void loop() {
     pQued4 = 2;
   }
 #endif 
-
+#if PQUEDAS_HABILITAR
   dataString += String(t / 1000.0);
   dataString += "\t";
-
+#endif
 #if BMP_HABILITAR
   dataString += String(bmp.readTemperature());
   dataString += "\t";
@@ -328,33 +370,39 @@ void loop() {
   dataString += String(pQued4);
   dataString += "\t";
 #endif
-#if ACCEL_HABILITAR
+#if ACCEL_X_HABILITAR
   dataString += String(eventac.acceleration.x);
   dataString += "\t";
-
+#endif
+#if ACCEL_Y_HABILITAR
   dataString += String(eventac.acceleration.y);
   dataString += "\t";
-
+#endif
+#if ACCEL_Z_HABILITAR
   dataString += String(eventac.acceleration.z);
   dataString += "\t";
 #endif
-#if GYRO_HABILITARBILITAR
+#if GYRO_X_HABILITAR
   dataString += String((int)gyro.g.x);
   dataString += "\t";
-
+#endif
+#if GYRO_Y_HABILITAR
   dataString += String((int)gyro.g.y);
   dataString += "\t";
-
+#endif
+#if GYRO_Z_HABILITAR
   dataString += String((int)gyro.g.z);
   dataString += "\t";
 #endif 
-#if MAG_HABILITAR
+#if MAG_X_HABILITAR
   dataString += String(eventmag.magnetic.x);
   dataString += "\t";
-
+#endif
+#if MAG_Y_HABILITAR
   dataString += String(eventmag.magnetic.y);
   dataString += "\t";
-
+#endif
+#if MAG_Z_HABILITAR
   dataString += String(eventmag.magnetic.z);
   dataString += "\t";
 #endif
