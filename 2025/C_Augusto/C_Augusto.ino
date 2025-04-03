@@ -99,7 +99,7 @@ void loop() {
     alturaMAX = altitudeFiltrada2;
   }
   
-    if(contagemQUEDA == 10){
+    if(contagemQUEDA >= 10){
       altitude0ou1 = 1;  
     }else if (contagemQUEDA > 10 || contagemQUEDA < 10){
       altitude0ou1 = 0;
