@@ -24,7 +24,7 @@ float altura_filtrada = 0;
 float altura_filtrada2 = 0;
 
 bool queda = false;
-
+float tempo = 0;
 //Declarações pro SD DataLogger
 const int chipSelect = 53;
 int lognumber = 0;
@@ -106,7 +106,7 @@ void setup() {
   }
   tara /= 10;
   //
-
+  Serial.print("tempo\t");
   Serial.print("alturapassada\t");
   Serial.print("Altura Sem Filtro\t");
   Serial.print("Altura Filtrada\t");
@@ -119,6 +119,7 @@ void setup() {
   //FIM DO SETUP BMP
 
   if (dataFile) {
+    dataFile.print("tempo\t");
     dataFile.print("alturapassada\t");
     dataFile.print("Altura Sem Filtro\t");
     dataFile.print("Altura Filtrada\t");
@@ -149,6 +150,8 @@ void loop() {
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
   File dataFile = SD.open(nomearquivo, FILE_WRITE);
+
+  tempo = currentMillis/1000.0;
 
   //COMEÇO DA SEÇÃO DO SENSOR BMP
   //FILTROS
@@ -192,6 +195,7 @@ void loop() {
 
   // Armazenamento dos valores na dataString
   String dataString = "";
+  dataString += String(tempo) + "\t";
   dataString += String(alturapassada) + "\t";
   dataString += String(vetor[guia]) + "\t";
   dataString += String(altura_filtrada) + "\t";
