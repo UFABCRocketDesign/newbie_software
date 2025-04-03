@@ -141,14 +141,12 @@ void loop() {
   
   
   unsigned long tempoatual = millis();
-  if(tempoatual - tempoantigo >= intervalo ){
-   tempoantigo = tempoatual;
-  }
 
-  if (altitude0ou1 == 1 && desativarign == 0){
+  if (altitude0ou1 == 1 && desativarign == 0 && tempoatual - tempoantigo >= intervalo){
     IGNSTATUS = HIGH;
     digitalWrite(IGN_1,IGNSTATUS);
     Serial.println("Ignitores ativados!!");
+    tempoantigo = tempoatual;
   }
   if (tempoatual - tempoantigo >= 5000){
     IGNSTATUS = LOW;
