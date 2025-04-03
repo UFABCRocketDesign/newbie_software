@@ -27,7 +27,7 @@
 
 #if LORA_HABILITAR
 HardwareSerial &LoRa(Serial3);
-#define loraEsp 2000
+#define loraEsp 3000
 long int tLora=0;
 #endif
 
