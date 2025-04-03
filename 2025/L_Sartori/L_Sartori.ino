@@ -444,7 +444,9 @@ void loop() {
   dataString += "\t";
 #endif
 #if GPS_HABILITAR
-  gps.encode(GPS.read());
+  while (GPS.available()){
+    gps.encode(GPS.read());
+  }
   dataString += String(gps.location.lat(), 6);
   dataString += "\t";
 
