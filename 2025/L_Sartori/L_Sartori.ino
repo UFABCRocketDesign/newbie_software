@@ -12,10 +12,13 @@
 #define MAG_Z_HABILITAR (MAG_HABILITAR && 0)
 #define GYRO_HABILITAR 0
 #define GYRO_X_HABILITAR (GYRO_X_HABILITAR && 0)
-#define GYRO_y_HABILITAR (GYRO_X_HABILITAR && 1)
+#define GYRO_y_HABILITAR (GYRO_X_HABILITAR && 0)
 #define GYRO_Z_HABILITAR (GYRO_X_HABILITAR && 0)
 #define BMP_HABILITAR 1
-#define PQUEDAS_HABILITAR (BMP_HABILITAR && 0)
+#define TEMP_HABILITAR (BMP_HABILITAR && 1)
+#define BARO_HABILITAR (BMP_HABILITAR && 0)
+#define PRESS_HABILITAR (BMP_HABILITAR && 1)
+#define PQUEDAS_HABILITAR (BARO_HABILITAR && 0)
 #define CHIP_HABILITAR 1
 
 #include <Adafruit_Sensor.h>
@@ -60,7 +63,7 @@
 #define maxTamSD 8
 #endif
 
-#if BMP_HABILITAR
+#if BARO_HABILITAR
 #define N 3
 #define L 5
 #define H 14
@@ -87,7 +90,7 @@ int pQued4 = -1;
 bool ocoAp = 0;
 #endif
 
-#if BMP_HABILITAR
+#if BARO_HABILITAR
 bool h;
 float med_alt = 0;
 float valoresFiltros[N][L];
@@ -185,8 +188,11 @@ void setup() {
 #if PQUEDAS_HABILITAR
   cabe += String("tempo\t");
 #endif
-#if BMP_HABILITAR
-  cabe += String("Temperature\tPressure\t");
+#if TEMP_HABILITAR
+  cabe += String("Temperature\t");
+#endif
+#if BARO_HABILITAR
+  cabe += String("Pressure\t");
   for(int i=0;i<N+1;i++){
     cabe += String("Filtro");
     cabe += String(i+1) +"\t";
@@ -228,7 +234,7 @@ void setup() {
   dataFile.close();
 #endif
   Serial.println(cabe);
-#if BMP_HABILITAR
+#if BARO_HABILITAR
   for (int i = 0; i < valMedH; i++) {
     med_alt += bmp.readAltitude();
   }
@@ -265,7 +271,7 @@ void loop() {
   sensors_event_t eventmag;
   mag.getEvent(&eventmag);
 #endif
-#if BMP_HABILITAR
+#if BARO_HABILITAR
   vFiltro[0] = bmp.readAltitude() - med_alt;
 
   for (int i = 0; i < N; i++) {
@@ -342,13 +348,15 @@ void loop() {
   dataString += String(t / 1000.0);
   dataString += "\t";
 #endif
-#if BMP_HABILITAR
+#if TEMP_HABILITAR
   dataString += String(bmp.readTemperature());
   dataString += "\t";
-
+#endif
+#if PRESS_HABILITAR
   dataString += String(bmp.readPressure());
   dataString += "\t";
-
+#endif
+#if BARO_HABILITAR
   for (int i = 0; i < N + 1; i++) {
     dataString += String(vFiltro[i]);
     dataString += "\t";
