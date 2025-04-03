@@ -256,7 +256,7 @@ void loop() {
   }
 
   // Paraquedas 4
-  if ((queda) && (altura_filtrada2 <= -3) && (paraquedas2armado == 0)) {
+  if ((queda) && (altura_filtrada2 <= -3) && (paraquedas4armado == 0)) {
     previousMillisPRQ4 = currentMillis;
     paraquedas4armado = -1;
   }
