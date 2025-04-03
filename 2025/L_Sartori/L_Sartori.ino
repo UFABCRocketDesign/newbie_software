@@ -445,13 +445,6 @@ void loop() {
   dataString += String(eventmag.magnetic.z);
   dataString += "\t";
 #endif
-  Serial.println(dataString);
-#if LORA_HABILITAR
-  if(t-tLora>=loraEsp){
-    LoRa.println(dataString);
-    tLora = t;
-  }
-#endif
 #if GPS_HABILITAR
   gps.encode(GPS.read());
   dataString += String(gps.location.lat(), 6);
@@ -460,6 +453,14 @@ void loop() {
   dataString += String(gps.location.lng(), 6);
   dataString += "\t";
 #endif
+  Serial.println(dataString);
+#if LORA_HABILITAR
+  if(t-tLora>=loraEsp){
+    LoRa.println(dataString);
+    tLora = t;
+  }
+#endif
+
 #if CHIP_HABILITAR
   
 
