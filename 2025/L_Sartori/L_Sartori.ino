@@ -191,8 +191,10 @@ void setup() {
 #if TEMP_HABILITAR
   cabe += String("Temperature\t");
 #endif
-#if BARO_HABILITAR
+#if PRESS_HABILITAR
   cabe += String("Pressure\t");
+#endif
+#if BARO_HABILITAR
   for(int i=0;i<N+1;i++){
     cabe += String("Filtro");
     cabe += String(i+1) +"\t";
