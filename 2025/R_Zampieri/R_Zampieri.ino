@@ -40,7 +40,8 @@ unsigned long previousMillisPRQ2 = 0;
 
 // constants won't change:
 const long intervalPRQ1 = 5000;  // interval at which to blink (milliseconds)
-const long intervalPRQ2 = 5000;
+const long intervalPRQ2A = 2000;
+const long intervalPRQ2B = 5000;
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void setup() {
@@ -128,6 +129,7 @@ void setup() {
   }
 
   pinMode(IGN_1, OUTPUT);
+  pinMode(IGN_2, OUTPUT);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void loop() {
@@ -213,13 +215,13 @@ void loop() {
     paraquedas2armado = -1;
   }
 
-  if ((currentMillis - previousMillisPRQ2 >= intervalPRQ2) && (paraquedas2armado == -1)) {
+  if ((currentMillis - previousMillisPRQ2 >= intervalPRQ2A) && (paraquedas2armado == -1)) {
     digitalWrite(IGN_2, HIGH);
     previousMillisPRQ2 = currentMillis;
     paraquedas2armado = 1;
   }
 
-  if ((currentMillis - previousMillisPRQ2 >= intervalPRQ2) && (paraquedas2armado == 1)) {
+  if ((currentMillis - previousMillisPRQ2 >= intervalPRQ2B) && (paraquedas2armado == 1)) {
     digitalWrite(IGN_2, LOW);
     paraquedas2armado = 2;
   }
