@@ -11,11 +11,11 @@
 #define MAG_HABILITAR 1
 #define MAG_X_HABILITAR (MAG_HABILITAR && 0)
 #define MAG_Y_HABILITAR (MAG_HABILITAR && 0)
-#define MAG_Z_HABILITAR (MAG_HABILITAR && 0)
-#define GYRO_HABILITAR 0
-#define GYRO_X_HABILITAR (GYRO_X_HABILITAR && 0)
-#define GYRO_y_HABILITAR (GYRO_X_HABILITAR && 0)
-#define GYRO_Z_HABILITAR (GYRO_X_HABILITAR && 0)
+#define MAG_Z_HABILITAR (MAG_HABILITAR && 1)
+#define GYRO_HABILITAR 1
+#define GYRO_X_HABILITAR (GYRO_X_HABILITAR && 1)
+#define GYRO_y_HABILITAR (GYRO_X_HABILITAR && 1)
+#define GYRO_Z_HABILITAR (GYRO_X_HABILITAR && 1)
 #define BMP_HABILITAR 1
 #define TEMP_HABILITAR (BMP_HABILITAR && 1)
 #define BARO_HABILITAR (BMP_HABILITAR && 0)
@@ -84,9 +84,9 @@ String nome = "leo";
 String docName = "";
 int valSd = 0;
 #endif
-#if (PQUEDAS_HABILITAR || LORA_HABILITAR)
+
 long int t = 0;
-#endif
+
 #if PQUEDAS_HABILITAR
 long int t1 = 0;
 long int t2 = 0;
@@ -198,9 +198,9 @@ void setup() {
   Serial.println("Creating " + docName + "...");
   dataFile = SD.open(docName, FILE_WRITE);
 #endif 
-#if PQUEDAS_HABILITAR
+
   cabe += String("tempo\t");
-#endif
+
 #if TEMP_HABILITAR
   cabe += String("Temperature\t");
 #endif
@@ -274,9 +274,9 @@ void setup() {
 
 
 void loop() {
-#if (PQUEDAS_HABILITAR || LORA_HABILITAR) 
+
   t = millis();
-#endif
+
   String dataString = "";
 #if ACCEL_HABILITAR
   sensors_event_t eventac;
@@ -362,10 +362,10 @@ void loop() {
     pQued4 = 2;
   }
 #endif 
-#if PQUEDAS_HABILITAR
+
   dataString += String(t / 1000.0);
   dataString += "\t";
-#endif
+
 #if TEMP_HABILITAR
   dataString += String(bmp.readTemperature());
   dataString += "\t";
