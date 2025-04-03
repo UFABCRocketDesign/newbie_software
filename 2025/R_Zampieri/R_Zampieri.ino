@@ -22,6 +22,8 @@ float alturapassada = 0;
 float altura_filtrada = 0;
 float altura_filtrada2 = 0;
 
+bool queda = false;
+
 //Declarações pro SD DataLogger
 const int chipSelect = 53;
 int lognumber = 0;
@@ -177,6 +179,9 @@ void loop() {
   } else {
     detectorqueda = 0;
   }
+  if (detectorqueda >= 10){
+    queda = true; 
+  }
   alturapassada = altura_filtrada2;  //Armazenamento da altura atual para usar como "alturapassada" no próximo loop
 
   // Armazenamento dos valores na dataString
@@ -202,7 +207,7 @@ void loop() {
   //COMEÇO DA SEÇÃO DO PARAQUEDAS
 
 // Paraquedas 1
-  if ((detectorqueda >= 10) && (paraquedas1armado == 0)) {
+  if ((queda) && (paraquedas1armado == 0)) {
     digitalWrite(IGN_1, HIGH);
     previousMillisPRQ1 = currentMillis;
     paraquedas1armado = 1;
@@ -215,7 +220,7 @@ void loop() {
   }
 
 // Paraquedas 2
-  if ((detectorqueda >= 10) && (paraquedas2armado == 0)) {
+  if ((queda) && (paraquedas2armado == 0)) {
     previousMillisPRQ2 = currentMillis;
     paraquedas2armado = -1;
   }
@@ -232,7 +237,7 @@ void loop() {
   }
 
 // Paraquedas 3
-    if ((detectorqueda >= 10) && (altura_filtrada2 <= -3) && (paraquedas3armado == 0)) {
+    if ((queda) && (altura_filtrada2 <= -3) && (paraquedas3armado == 0)) {
     digitalWrite(IGN_3, HIGH);
     previousMillisPRQ3 = currentMillis;
     paraquedas3armado = 1;
