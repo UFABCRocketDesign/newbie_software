@@ -151,20 +151,19 @@ void loop() {
     //paraquedascontador += 1;
   //}
   
-  while (desativarign == 0){
-    if (altitude0ou1 == 1){
-      IGNSTATUS = HIGH;
-      digitalWrite(IGN_1,IGNSTATUS);
-      Serial.println("Ignitores ativados!!");
-      unsigned long tempoatual = millis();
+  
+  if (altitude0ou1 == 1 && desativarign == 0){
+    IGNSTATUS = HIGH;
+    digitalWrite(IGN_1,IGNSTATUS);
+    Serial.println("Ignitores ativados!!");
+    unsigned long tempoatual = millis();
+  if (tempoatual - millis() >= 5000){
+    IGNSTATUS = LOW;
+    digitalWrite(IGN_1,IGNSTATUS);
+    Serial.println("Ignitores desativados!!");
+    desativarign = 1;
   }
-    if (tempoatual - millis() >= 5000){
-      IGNSTATUS = LOW;
-      digitalWrite(IGN_1,IGNSTATUS);
-      Serial.println("Ignitores desativados!!");
-      desativarign = 1;
-  }
-  }
+
   
 
   
