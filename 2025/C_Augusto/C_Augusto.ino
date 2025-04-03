@@ -5,7 +5,27 @@
 Adafruit_BMP085 bmp;
 
 #define AMOSTRAS 20
+#ifdef ARDUINO_AVR_MEGA2560
+#define SD_CS_PIN 53
+#else
+#define SD_CS_PIN 10
+#endif // ARDUINO_AVR_MEGA2560
 
+#define IGN_1 36	/*act1*/
+#define IGN_2 61	/*act2*/
+#define IGN_3 46	/*act3*/
+#define IGN_4 55	/*act4*/
+
+#define HEAL_1 68	/*health 1*/
+#define HEAL_2 62	/*health 2*/
+#define HEAL_3 56	/*health 3*/
+#define HEAL_4 58	/*health 4*/
+
+#define BUZZ_PIN A0
+#define BUZZ_CMD LOW
+
+HardwareSerial &LoRa(Serial3);
+HardwareSerial &GPS(Serial1);
 
 const int chipSelect = 53;
 float leituras[AMOSTRAS];
@@ -21,6 +41,8 @@ int contagemQUEDA = 0;
 float alturaMAX = 0;
 String dataString = "";
 int altitude0ou1 = 0;
+unsigned long tempoantigo = 0;
+const long intervalo = 1000;
 
 void setup() {
   Serial.begin(115200);
@@ -34,7 +56,7 @@ void setup() {
   }
   altitudeTarada /= 10.0;
 
-  Serial.println("Temperatura\tPressao\tAltitude\tNivel do mar\tAltitude Filtrada\tAltura\tParaquedas");
+  Serial.println("Temperatura\tPressao\tAltitude\tNivel do mar\tAltitude Filtrada\tAltura\tParaquedas\tTempo");
 
   while (!Serial);
 
@@ -58,8 +80,10 @@ do {
     sprintf(nomeSD, "dataC%03d.txt", contagemSD);
   }
   contagemSD++;
-  Serial.println(nomeSD);
+  
 } while (SD.exists(nomeSD));
+
+Serial.println(nomeSD);
 
 dataFile = SD.open(nomeSD, FILE_WRITE);
 
@@ -79,6 +103,7 @@ void loop() {
 
   float altitude = bmp.readAltitude();
   float altura = altitude - altitudeTarada;
+  
   soma = soma - leituras[indice] + altura;
   leituras[indice] = altura;
   indice = (indice + 1) % AMOSTRAS;
@@ -105,7 +130,12 @@ void loop() {
       altitude0ou1 = 0;
     }
   
+  unsigned long tempoatual = millis();
+  if(tempoatual - tempoantigo >= intervalo ){
+    tempoantigo = tempoatual;
+  }
 
+   
   
   String dataString = "";
   dataString += String(bmp.readTemperature()) + "\t";
@@ -115,8 +145,9 @@ void loop() {
   dataString += String(altitudeFiltrada) + "\t";
   dataString += String(altura) + "\t";
   dataString += String(altitude0ou1) + "\t";
-  dataString += String(alturaMAX);
-
+  dataString += String(alturaMAX) + "\t";
+  dataString += String(tempoatual);
+  
   Serial.println(dataString);
 
   File dataFile = SD.open(nomeSD, FILE_WRITE);
