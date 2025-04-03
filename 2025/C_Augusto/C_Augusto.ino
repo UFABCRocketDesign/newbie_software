@@ -43,6 +43,9 @@ String dataString = "";
 int altitude0ou1 = 0;
 unsigned long tempoantigo = 0;
 const long intervalo = 1000;
+int paraquedascontador = 0;
+int tempoparaquedas = 0;
+
 
 void setup() {
   Serial.begin(115200);
@@ -130,12 +133,21 @@ void loop() {
       altitude0ou1 = 0;
     }
   
+  
   unsigned long tempoatual = millis();
   if(tempoatual - tempoantigo >= intervalo ){
     tempoantigo = tempoatual;
   }
+  
 
-   
+  if (tempoatual == 5000*paraquedascontador){
+    tempoparaquedas = tempoatual;
+    paraquedascontador += 1;
+  }
+  
+  if (altitude0ou1 == 1 && (tempoatual - tempoparaquedas == 5000){
+    Serial.println("Abertura de paraquedas!!")
+  }
   
   String dataString = "";
   dataString += String(bmp.readTemperature()) + "\t";
