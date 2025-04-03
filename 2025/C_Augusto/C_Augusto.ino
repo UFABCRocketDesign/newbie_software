@@ -150,7 +150,7 @@ void loop() {
     paraquedascontador += 1;
   }
   
-  if (altitude0ou1 == 1 && (tempoatual - tempoparaquedas == 5000)){
+  if (altitude0ou1 == 1 && (tempoatual - tempoparaquedas >= 5000)){
     IGNSTATUS = HIGH;
     digitalWrite(IGN_1,IGNSTATUS);
     Serial.println("Ignitores ativados!!");
