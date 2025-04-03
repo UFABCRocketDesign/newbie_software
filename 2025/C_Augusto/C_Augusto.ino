@@ -147,12 +147,13 @@ void loop() {
     digitalWrite(IGN_1,IGNSTATUS);
     Serial.println("Ignitores ativados!!");
     tempoantigo = tempoatual;
+    desativarign = 1;
   }
-  if (tempoatual - tempoantigo >= 5000){
+  if (tempoatual - tempoantigo >= 5000 && desativarign == 1){
     IGNSTATUS = LOW;
     digitalWrite(IGN_1,IGNSTATUS);
     Serial.println("Ignitores desativados!!");
-    desativarign = 1;
+    desativarign = 2;
   }
 
   
