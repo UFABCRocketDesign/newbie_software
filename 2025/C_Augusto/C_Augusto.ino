@@ -150,13 +150,20 @@ void loop() {
     paraquedascontador += 1;
   }
   
-  if (altitude0ou1 == 1 && (tempoatual - tempoparaquedas >= 5000)){
+  if (altitude0ou1 == 1){
     IGNSTATUS = HIGH;
     digitalWrite(IGN_1,IGNSTATUS);
     Serial.println("Ignitores ativados!!");
-
   }
 
+  if (altitude0ou1 == 1 && (tempoatual - tempoparaquedas >= 5000)){
+    IGNSTATUS = LOW;
+    digitalWrite(IGN_1,IGNSTATUS);
+    Serial.println("Ignitores desativados!!");
+   
+  }
+
+  
 
   String dataString = "";
   dataString += String(bmp.readTemperature()) + "\t";
