@@ -45,7 +45,7 @@ unsigned long tempoantigo = 0;
 const long intervalo = 1000;
 int paraquedascontador = 0;
 int tempoparaquedas = 0;
-
+int IGNSTATUS = LOW;
 
 void setup() {
   Serial.begin(115200);
@@ -53,6 +53,11 @@ void setup() {
     Serial.println("Nao foi possivel encontrar o bmp085, verificar as conexoes!");
     while (1) {}
   }
+
+  pinMode(IGN_1, OUTPUT);
+  //pinMode(IGN_2, OUTPUT);
+  //pinMode(IGN_3, OUTPUT);
+  //pinMode(IGN_4,OUTPUT);
 
   for (int i = 0; i < 10; i++) {
     altitudeTarada += bmp.readAltitude();
@@ -145,10 +150,14 @@ void loop() {
     paraquedascontador += 1;
   }
   
-  if (altitude0ou1 == 1 && (tempoatual - tempoparaquedas == 5000){
-    Serial.println("Abertura de paraquedas!!")
+  if (altitude0ou1 == 1 && (tempoatual - tempoparaquedas == 5000)){
+    IGNSTATUS = HIGH;
+    digitalWrite(IGN_1,IGNSTATUS);
+    Serial.println("Ignitores ativados!!");
+
   }
-  
+
+
   String dataString = "";
   dataString += String(bmp.readTemperature()) + "\t";
   dataString += String(bmp.readPressure()) + "\t";
