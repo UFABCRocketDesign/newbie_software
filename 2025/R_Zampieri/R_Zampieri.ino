@@ -1,7 +1,9 @@
 #include <Adafruit_BMP085.h>  //Sensor BMP
 
 #define tamanho 10  //Usado pro filtro de dados do BMP
+
 #define IGN_1 36    /*act1*/
+#define IGN_2 61	/*act2*/
 
 Adafruit_BMP085 bmp;  //Sensor BMP
 
@@ -28,14 +30,17 @@ String zerospacetext;
 int zerospacelength;
 
 //Declarações pro Paraquedas
-int paraquedasarmado = 0;
+int paraquedas1armado = 0;
+int paraquedas2armado = 0;
 
 // Generally, you should use "unsigned long" for variables that hold time
 // The value will quickly become too large for an int to store
-unsigned long previousMillis = 0;  // will store last time LED was updated
+unsigned long previousMillisPRQ1 = 0;  // will store last time LED was updated
+unsigned long previousMillisPRQ2 = 0;
 
 // constants won't change:
-const long interval = 5000;  // interval at which to blink (milliseconds)
+const long intervalPRQ1 = 5000;  // interval at which to blink (milliseconds)
+const long intervalPRQ2 = 5000;
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void setup() {
@@ -112,7 +117,8 @@ void setup() {
     dataFile.print("Detector de Queda\t");
     dataFile.print("Temperatura\t");
     dataFile.print("Pressão\t");
-    dataFile.print("paraquedasarmado\t");
+    dataFile.print("paraquedas1armado\t");
+    dataFile.print("paraquedas2armado\t");
     dataFile.println();
     dataFile.close();
   }
@@ -176,7 +182,8 @@ void loop() {
   dataString += String(detectorqueda) + "\t";
   dataString += String(bmp.readTemperature()) + "\t";
   dataString += String(bmp.readPressure()) + "\t";
-  dataString += String(paraquedasarmado) + "\t";
+  dataString += String(paraquedas1armado) + "\t";
+  dataString += String(paraquedas2armado) + "\t";
 
   //Print da dataString
   Serial.println(dataString);
@@ -187,20 +194,39 @@ void loop() {
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //COMEÇO DA SEÇÃO DO PARAQUEDAS
 
-  // check to see if it's time to blink the LED; that is, if the difference
-  // between the current time and last time you blinked the LED is bigger than
-  // the interval at which you want to blink the LED.
-  if ((detectorqueda >= 10) && (paraquedasarmado == 0)) {
+// Paraquedas 1
+  if ((detectorqueda >= 10) && (paraquedas1armado == 0)) {
     digitalWrite(IGN_1, HIGH);
-    previousMillis = currentMillis;
-    paraquedasarmado = 1;
-    Serial.println("Paraquedas Ativado");
+    previousMillisPRQ1 = currentMillis;
+    paraquedas1armado = 1;
+    Serial.println("Paraquedas 1 Ativado");
   }
 
-  if ((currentMillis - previousMillis >= interval) && (paraquedasarmado == 1)) {
+  if ((currentMillis - previousMillisPRQ1 >= intervalPRQ1) && (paraquedas1armado == 1)) {
     digitalWrite(IGN_1, LOW);
-    paraquedasarmado = 2;
-    Serial.println("Paraquedas Desativado");
+    paraquedas1armado = 2;
+    Serial.println("Paraquedas 1 Desativado");
+
+  }
+
+// Paraquedas 2
+  if ((detectorqueda >= 10) && (paraquedas2armado == 0)) {
+    previousMillisPRQ2 = currentMillis;
+    paraquedas2armado = 3;
+    Serial.println("Paraquedas 2 Armado");
+  }
+
+  if ((currentMillis - previousMillisPRQ2 >= intervalPRQ2) && (paraquedas2armado == 3)) {
+    digitalWrite(IGN_2, HIGH);
+    paraquedas2armado = 1;
+    Serial.println("Paraquedas 2 Ativado");
+
+  }
+
+  if ((currentMillis - previousMillisPRQ2 >= intervalPRQ2) && (paraquedas2armado == 1)) {
+    digitalWrite(IGN_2, LOW);
+    paraquedas2armado = 2;
+    Serial.println("Paraquedas 2 Desativado");
 
   }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
