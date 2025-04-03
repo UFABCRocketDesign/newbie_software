@@ -87,36 +87,8 @@ long int tLora=0;
 
 #if CHIP_HABILITAR
 File dataFile;
-String nome = "leo";
 String docName = "";
-int valSd = 0;
 #endif
-
-long int t = 0;
-
-#if PQUEDAS_HABILITAR
-long int t1 = 0;
-long int t2 = 0;
-long int t3 = 0;
-long int t4 = 0;
-int pQued1 = 0;
-int pQued2 = -1;
-int pQued3 = 0;
-int pQued4 = -1;
-bool ocoAp = 0;
-#endif
-
-#if BARO_HABILITAR
-bool h;
-float med_alt = 0;
-float valoresFiltros[N][L];
-float vFiltro[N + 1];
-float ordH[H];
-int k = 0;
-#endif
-
-
-
 
 #if MAG_HABILITAR
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
@@ -131,10 +103,36 @@ Adafruit_BMP085 bmp;
 L3G gyro;
 #endif 
 
+#if BMP_HABILITAR
+float med_alt = 0;
+int k = 0;
+#endif
 
+#if PQUEDAS_HABILITAR
+  long int t1 = 0;
+  long int t2 = 0;
+  long int t3 = 0;
+  long int t4 = 0;
+  int pQued1 = 0;
+  int pQued2 = -1;
+  int pQued3 = 0;
+  int pQued4 = -1;
+  bool ocoAp = 0;
+#endif
+
+#if BARO_HABILITAR
+  bool h;
+  float valoresFiltros[N][L];
+  float vFiltro[N + 1];
+  float ordH[H];
+#endif
 
 void setup() {
   String cabe = "";
+#if CHIP_HABILITAR
+  String nome = "leo";
+  int valSd = 0;
+#endif
   Serial.begin(115200);
 #if LORA_HABILITAR
   LoRa.begin(9600);
@@ -288,7 +286,7 @@ void setup() {
 
 void loop() {
 
-  t = millis();
+  long int t = millis();
 
   String dataString = "";
 #if ACCEL_HABILITAR
