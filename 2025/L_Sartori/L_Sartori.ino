@@ -2,6 +2,8 @@
 #include <SD.h>
 #include <Wire.h>
 
+
+#define LORA_HABILITAR 1
 #define ACCEL_HABILITAR 1
 #define ACCEL_X_HABILITAR (ACCEL_HABILITAR && 0)
 #define ACCEL_Y_HABILITAR (ACCEL_HABILITAR && 0)
@@ -22,6 +24,12 @@
 #define CHIP_HABILITAR 1
 
 #include <Adafruit_Sensor.h>
+
+#if LORA_HABILITAR
+HardwareSerial &LoRa(Serial3);
+#define loraEsp 2000
+long int tLora=0;
+#endif
 
 #if ACCEL_HABILITAR
 #include <Adafruit_ADXL345_U.h>
@@ -76,9 +84,10 @@ String nome = "leo";
 String docName = "";
 int valSd = 0;
 #endif
-
-#if PQUEDAS_HABILITAR
+#if (PQUEDAS_HABILITAR || LORA_HABILITAR)
 long int t = 0;
+#endif
+#if PQUEDAS_HABILITAR
 long int t1 = 0;
 long int t2 = 0;
 long int t3 = 0;
@@ -115,9 +124,13 @@ Adafruit_BMP085 bmp;
 L3G gyro;
 #endif 
 
+
+
 void setup() {
   String cabe = "";
-
+#if LORA_HABILITAR
+  LoRa.begin(9600);
+#endif
   Serial.begin(115200);
   Wire.begin();
   while (!Serial) {
@@ -236,6 +249,9 @@ void setup() {
   dataFile.close();
 #endif
   Serial.println(cabe);
+#if LORA_HABILITAR
+  LoRa.println(cabe);
+#endif
 #if BARO_HABILITAR
   for (int i = 0; i < valMedH; i++) {
     med_alt += bmp.readAltitude();
@@ -258,7 +274,7 @@ void setup() {
 
 
 void loop() {
-#if PQUEDAS_HABILITAR
+#if (PQUEDAS_HABILITAR || LORA_HABILITAR) 
   t = millis();
 #endif
   String dataString = "";
@@ -417,6 +433,12 @@ void loop() {
   dataString += "\t";
 #endif
   Serial.println(dataString);
+#if LORA_HABILITAR
+  if(t-tLora>=loraEsp){
+    LoRa.println(dataString);
+    tLora = t;
+  }
+#endif
 #if CHIP_HABILITAR
   
 
