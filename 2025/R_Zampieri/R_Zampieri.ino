@@ -5,6 +5,7 @@
 #define IGN_1 36    /*act1*/
 #define IGN_2 61	/*act2*/
 #define IGN_3 46	/*act3*/
+#define IGN_4 55	/*act4*/
 
 Adafruit_BMP085 bmp;  //Sensor BMP
 
@@ -23,7 +24,7 @@ float altura_filtrada = 0;
 float altura_filtrada2 = 0;
 
 bool queda = false;
-
+float tempo = 0;
 //Declarações pro SD DataLogger
 const int chipSelect = 53;
 int lognumber = 0;
@@ -36,16 +37,19 @@ int zerospacelength;
 int paraquedas1armado = 0;
 int paraquedas2armado = 0;
 int paraquedas3armado = 0;
+int paraquedas4armado = 0;
 
 // Generally, you should use "unsigned long" for variables that hold time
 // The value will quickly become too large for an int to store
 unsigned long previousMillisPRQ1 = 0;  // will store last time LED was updated
 unsigned long previousMillisPRQ2 = 0;
 unsigned long previousMillisPRQ3 = 0;
+unsigned long previousMillisPRQ4 = 0;
 
 // constants won't change:
 const long intervalIGN = 5000;  // interval at which to blink (milliseconds)
 const long intervalPRQ2 = 2000;
+const long intervalPRQ4 = 2000;
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void setup() {
@@ -102,7 +106,7 @@ void setup() {
   }
   tara /= 10;
   //
-
+  Serial.print("tempo\t");
   Serial.print("alturapassada\t");
   Serial.print("Altura Sem Filtro\t");
   Serial.print("Altura Filtrada\t");
@@ -115,6 +119,7 @@ void setup() {
   //FIM DO SETUP BMP
 
   if (dataFile) {
+    dataFile.print("tempo\t");
     dataFile.print("alturapassada\t");
     dataFile.print("Altura Sem Filtro\t");
     dataFile.print("Altura Filtrada\t");
@@ -125,6 +130,7 @@ void setup() {
     dataFile.print("paraquedas1armado\t");
     dataFile.print("paraquedas2armado\t");
     dataFile.print("paraquedas3armado\t");
+    dataFile.print("paraquedas4armado\t");
     dataFile.println();
     dataFile.close();
   }
@@ -136,6 +142,7 @@ void setup() {
   pinMode(IGN_1, OUTPUT);
   pinMode(IGN_2, OUTPUT);
   pinMode(IGN_3, OUTPUT);
+  pinMode(IGN_4, OUTPUT);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void loop() {
@@ -143,6 +150,8 @@ void loop() {
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
   File dataFile = SD.open(nomearquivo, FILE_WRITE);
+
+  tempo = currentMillis/1000.0;
 
   //COMEÇO DA SEÇÃO DO SENSOR BMP
   //FILTROS
@@ -186,6 +195,7 @@ void loop() {
 
   // Armazenamento dos valores na dataString
   String dataString = "";
+  dataString += String(tempo) + "\t";
   dataString += String(alturapassada) + "\t";
   dataString += String(vetor[guia]) + "\t";
   dataString += String(altura_filtrada) + "\t";
@@ -196,6 +206,7 @@ void loop() {
   dataString += String(paraquedas1armado) + "\t";
   dataString += String(paraquedas2armado) + "\t";
   dataString += String(paraquedas3armado) + "\t";
+  dataString += String(paraquedas4armado) + "\t";
 
   //Print da dataString
   Serial.println(dataString);
@@ -246,6 +257,23 @@ void loop() {
   if ((currentMillis - previousMillisPRQ3 >= intervalIGN) && (paraquedas3armado == 1)) {
     digitalWrite(IGN_3, LOW);
     paraquedas3armado = 2;
+  }
+
+  // Paraquedas 4
+  if ((queda) && (altura_filtrada2 <= -3) && (paraquedas4armado == 0)) {
+    previousMillisPRQ4 = currentMillis;
+    paraquedas4armado = -1;
+  }
+
+  if ((currentMillis - previousMillisPRQ4 >= intervalPRQ4) && (paraquedas4armado == -1)) {
+    digitalWrite(IGN_4, HIGH);
+    previousMillisPRQ4 = currentMillis;
+    paraquedas4armado = 1;
+  }
+
+  if ((currentMillis - previousMillisPRQ4 >= intervalIGN) && (paraquedas4armado == 1)) {
+    digitalWrite(IGN_4, LOW);
+    paraquedas4armado = 2;
   }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //FIM DA SEÇÃO DO PARAQUEDAS
