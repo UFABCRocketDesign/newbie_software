@@ -140,25 +140,17 @@ void loop() {
     }
   
   
-  //unsigned long tempoatual = millis();
-  //if(tempoatual - tempoantigo >= intervalo ){
-   // tempoantigo = tempoatual;
-  //}
-  
-
-  //if (tempoatual >= 5000*paraquedascontador){
-    //tempoparaquedas = tempoatual;
-    //paraquedascontador += 1;
-  //}
-  
   unsigned long tempoatual = millis();
+  if(tempoatual - tempoantigo >= intervalo ){
+   tempoantigo = tempoatual;
+  }
 
   if (altitude0ou1 == 1 && desativarign == 0){
     IGNSTATUS = HIGH;
     digitalWrite(IGN_1,IGNSTATUS);
     Serial.println("Ignitores ativados!!");
   }
-  if (tempoatual - millis() >= 5000){
+  if (tempoatual - tempoantigo >= 5000){
     IGNSTATUS = LOW;
     digitalWrite(IGN_1,IGNSTATUS);
     Serial.println("Ignitores desativados!!");
