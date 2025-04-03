@@ -3,6 +3,7 @@
 #include <Wire.h>
 
 
+#define GPS_HABILITAR 1
 #define LORA_HABILITAR 1
 #define ACCEL_HABILITAR 1
 #define ACCEL_X_HABILITAR (ACCEL_HABILITAR && 1)
@@ -22,6 +23,12 @@
 #define PRESS_HABILITAR (BMP_HABILITAR && 1)
 #define PQUEDAS_HABILITAR (BARO_HABILITAR && 1)
 #define CHIP_HABILITAR 1
+
+#if GPS_HABILITAR
+HardwareSerial &GPS = Serial1;
+#include <TinyGPSPlus.h>
+TinyGPSPlus gps;
+#endif
 
 #include <Adafruit_Sensor.h>
 
@@ -128,10 +135,13 @@ L3G gyro;
 
 void setup() {
   String cabe = "";
+  Serial.begin(115200);
 #if LORA_HABILITAR
   LoRa.begin(9600);
 #endif
-  Serial.begin(115200);
+#if GPS_HABILITAR
+  GPS.begin(9600);
+#endif
   Wire.begin();
   while (!Serial) {
     ;  // wait for serial port to connect. Needed for native USB port only
@@ -243,6 +253,9 @@ void setup() {
 #endif
 #if MAG_Z_HABILITAR
   cabe += String("mag_z\t");
+#endif
+#if GPS_LORA 
+  cabe += String("latitude\tlongitude\t");
 #endif
 #if CHIP_HABILITAR
   dataFile.println(cabe);
@@ -438,6 +451,14 @@ void loop() {
     LoRa.println(dataString);
     tLora = t;
   }
+#endif
+#if GPS_HABILITAR
+  gps.encode(GPS.read());
+  dataString += String(gps.location.lat(), 6);
+  dataString += "\t";
+
+  dataString += String(gps.location.lng(), 6);
+  dataString += "\t";
 #endif
 #if CHIP_HABILITAR
   
