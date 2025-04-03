@@ -199,35 +199,29 @@ void loop() {
     digitalWrite(IGN_1, HIGH);
     previousMillisPRQ1 = currentMillis;
     paraquedas1armado = 1;
-    Serial.println("Paraquedas 1 Ativado");
   }
 
   if ((currentMillis - previousMillisPRQ1 >= intervalPRQ1) && (paraquedas1armado == 1)) {
     digitalWrite(IGN_1, LOW);
     paraquedas1armado = 2;
-    Serial.println("Paraquedas 1 Desativado");
 
   }
 
 // Paraquedas 2
   if ((detectorqueda >= 10) && (paraquedas2armado == 0)) {
     previousMillisPRQ2 = currentMillis;
-    paraquedas2armado = 3;
-    Serial.println("Paraquedas 2 Armado");
+    paraquedas2armado = -1;
   }
 
-  if ((currentMillis - previousMillisPRQ2 >= intervalPRQ2) && (paraquedas2armado == 3)) {
+  if ((currentMillis - previousMillisPRQ2 >= intervalPRQ2) && (paraquedas2armado == -1)) {
     digitalWrite(IGN_2, HIGH);
+    previousMillisPRQ2 = currentMillis;
     paraquedas2armado = 1;
-    Serial.println("Paraquedas 2 Ativado");
-
   }
 
   if ((currentMillis - previousMillisPRQ2 >= intervalPRQ2) && (paraquedas2armado == 1)) {
     digitalWrite(IGN_2, LOW);
     paraquedas2armado = 2;
-    Serial.println("Paraquedas 2 Desativado");
-
   }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //FIM DA SEÇÃO DO PARAQUEDAS
