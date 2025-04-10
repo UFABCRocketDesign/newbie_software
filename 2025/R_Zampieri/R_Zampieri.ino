@@ -277,9 +277,9 @@ void loop() {
   dataString += String((int)gyro.g.x) + "\t";
   dataString += String((int)gyro.g.y) + "\t";
   dataString += String((int)gyro.g.z) + "\t";
-  dataString += String(event.magnetic.x) + "\t";
-  dataString += String(event.magnetic.y) + "\t";
-  dataString += String(event.magnetic.z) + "\t";
+  dataString += String(eventmag.magnetic.x) + "\t";
+  dataString += String(eventmag.magnetic.y) + "\t";
+  dataString += String(eventmag.magnetic.z) + "\t";
   //Print da dataString
   Serial.println(dataString);
 
