@@ -1,6 +1,7 @@
-#include <Adafruit_BMP085.h>  //Sensor BMP
 #include <Adafruit_Sensor.h>
+#include <Adafruit_BMP085.h>  //Sensor BMP
 #include <Adafruit_ADXL345_U.h>
+#include <Adafruit_HMC5883_U.h>
 #include <Wire.h>
 #include <L3G.h>
 
@@ -14,6 +15,7 @@
 Adafruit_BMP085 bmp;  //Sensor BMP
 /* Assign a unique ID to this sensor at the same time */
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
+Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(54321);
 L3G gyro;
 
 #include <SPI.h>  //Usado no DataLogger
@@ -128,6 +130,9 @@ void setup() {
   Serial.print("Gyro x\t");
   Serial.print("Gyro y\t");
   Serial.print("Gyro z\t");
+  Serial.print("Magnet x\t");
+  Serial.print("Magnet y\t");
+  Serial.print("Magnet z\t");
   Serial.println();
   //FIM DO SETUP BMP
 
@@ -150,6 +155,9 @@ void setup() {
     dataFile.print("Gyro x\t");
     dataFile.print("Gyro y\t");
     dataFile.print("Gyro z\t");
+    dataFile.print("Magnet x\t");
+    dataFile.print("Magnet y\t");
+    dataFile.print("Magnet z\t");
     dataFile.println();
     dataFile.close();
   }
@@ -181,6 +189,14 @@ void setup() {
   }
 
   gyro.enableDefault();
+
+  /* Initialise the sensor */
+  if (!mag.begin()) {
+    /* There was a problem detecting the HMC5883 ... check your connections */
+    Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
+    while (1)
+      ;
+  }
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void loop() {
@@ -236,6 +252,11 @@ void loop() {
   accel.getEvent(&event);
 
   gyro.read();
+
+  /* Get a new sensor event */
+  sensors_event_t eventmag;
+  mag.getEvent(&eventmag);
+
   // Armazenamento dos valores na dataString
   String dataString = "";
   dataString += String(tempo) + "\t";
@@ -256,6 +277,9 @@ void loop() {
   dataString += String((int)gyro.g.x) + "\t";
   dataString += String((int)gyro.g.y) + "\t";
   dataString += String((int)gyro.g.z) + "\t";
+  dataString += String(event.magnetic.x) + "\t";
+  dataString += String(event.magnetic.y) + "\t";
+  dataString += String(event.magnetic.z) + "\t";
   //Print da dataString
   Serial.println(dataString);
 
