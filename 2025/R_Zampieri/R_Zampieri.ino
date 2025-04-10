@@ -1,13 +1,18 @@
 #include <Adafruit_BMP085.h>  //Sensor BMP
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_ADXL345_U.h>
 
 #define tamanho 10  //Usado pro filtro de dados do BMP
 
-#define IGN_1 36    /*act1*/
-#define IGN_2 61	/*act2*/
-#define IGN_3 46	/*act3*/
-#define IGN_4 55	/*act4*/
+#define IGN_1 36 /*act1*/
+#define IGN_2 61 /*act2*/
+#define IGN_3 46 /*act3*/
+#define IGN_4 55 /*act4*/
 
 Adafruit_BMP085 bmp;  //Sensor BMP
+/* Assign a unique ID to this sensor at the same time */
+Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
 
 #include <SPI.h>  //Usado no DataLogger
 #include <SD.h>   //Usado no DataLogger
@@ -115,6 +120,9 @@ void setup() {
   Serial.print("Temperatura\t");
   Serial.print("Pressão\t");
   Serial.print("paraquedasarmado\t");
+  Serial.print("x (m/s^2)\t");
+  Serial.print("y (m/s^2)\t");
+  Serial.print("z (m/s^2)\t");
   Serial.println();
   //FIM DO SETUP BMP
 
@@ -131,6 +139,9 @@ void setup() {
     dataFile.print("paraquedas2armado\t");
     dataFile.print("paraquedas3armado\t");
     dataFile.print("paraquedas4armado\t");
+    dataFile.print("x (m/s^2)\t");
+    dataFile.print("y (m/s^2)\t");
+    dataFile.print("z (m/s^2)\t");
     dataFile.println();
     dataFile.close();
   }
@@ -143,6 +154,15 @@ void setup() {
   pinMode(IGN_2, OUTPUT);
   pinMode(IGN_3, OUTPUT);
   pinMode(IGN_4, OUTPUT);
+
+  /* Initialise the sensor */
+  if (!accel.begin()) {
+    /* There was a problem detecting the ADXL345 ... check your connections */
+    Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
+    while (1)
+      ;
+  }
+  accel.setRange(ADXL345_RANGE_16_G);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void loop() {
@@ -151,7 +171,7 @@ void loop() {
   // so you have to close this one before opening another.
   File dataFile = SD.open(nomearquivo, FILE_WRITE);
 
-  tempo = currentMillis/1000.0;
+  tempo = currentMillis / 1000.0;
 
   //COMEÇO DA SEÇÃO DO SENSOR BMP
   //FILTROS
@@ -188,10 +208,14 @@ void loop() {
   } else {
     detectorqueda = 0;
   }
-  if (detectorqueda >= 10){
-    queda = true; 
+  if (detectorqueda >= 10) {
+    queda = true;
   }
   alturapassada = altura_filtrada2;  //Armazenamento da altura atual para usar como "alturapassada" no próximo loop
+
+  /* Get a new sensor event */
+  sensors_event_t event;
+  accel.getEvent(&event);
 
   // Armazenamento dos valores na dataString
   String dataString = "";
@@ -207,17 +231,17 @@ void loop() {
   dataString += String(paraquedas2armado) + "\t";
   dataString += String(paraquedas3armado) + "\t";
   dataString += String(paraquedas4armado) + "\t";
-
+  dataString += String(event.acceleration.x) + "\t";
+  dataString += String(event.acceleration.y) + "\t";
+  dataString += String(event.acceleration.z) + "\t";
   //Print da dataString
   Serial.println(dataString);
 
   //FIM DA SEÇÃO DO SENSOR BMP
 
-  //----------------------------------------------------------------
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //COMEÇO DA SEÇÃO DO PARAQUEDAS
 
-// Paraquedas 1
+  // Paraquedas 1
   if ((queda) && (paraquedas1armado == 0)) {
     digitalWrite(IGN_1, HIGH);
     previousMillisPRQ1 = currentMillis;
@@ -227,10 +251,9 @@ void loop() {
   if ((currentMillis - previousMillisPRQ1 >= intervalIGN) && (paraquedas1armado == 1)) {
     digitalWrite(IGN_1, LOW);
     paraquedas1armado = 2;
-
   }
 
-// Paraquedas 2
+  // Paraquedas 2
   if ((queda) && (paraquedas2armado == 0)) {
     previousMillisPRQ2 = currentMillis;
     paraquedas2armado = -1;
@@ -247,8 +270,8 @@ void loop() {
     paraquedas2armado = 2;
   }
 
-// Paraquedas 3
-    if ((queda) && (altura_filtrada2 <= -3) && (paraquedas3armado == 0)) {
+  // Paraquedas 3
+  if ((queda) && (altura_filtrada2 <= -3) && (paraquedas3armado == 0)) {
     digitalWrite(IGN_3, HIGH);
     previousMillisPRQ3 = currentMillis;
     paraquedas3armado = 1;
@@ -275,10 +298,7 @@ void loop() {
     digitalWrite(IGN_4, LOW);
     paraquedas4armado = 2;
   }
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //FIM DA SEÇÃO DO PARAQUEDAS
-
-  //----------------------------------------------------------------
 
   //COMEÇO DA SEÇÃO DO DATALOGGER
 
