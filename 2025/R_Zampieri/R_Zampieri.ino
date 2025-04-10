@@ -1,7 +1,8 @@
 #include <Adafruit_BMP085.h>  //Sensor BMP
-#include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_ADXL345_U.h>
+#include <Wire.h>
+#include <L3G.h>
 
 #define tamanho 10  //Usado pro filtro de dados do BMP
 
@@ -13,6 +14,7 @@
 Adafruit_BMP085 bmp;  //Sensor BMP
 /* Assign a unique ID to this sensor at the same time */
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
+L3G gyro;
 
 #include <SPI.h>  //Usado no DataLogger
 #include <SD.h>   //Usado no DataLogger
@@ -123,6 +125,9 @@ void setup() {
   Serial.print("x (m/s^2)\t");
   Serial.print("y (m/s^2)\t");
   Serial.print("z (m/s^2)\t");
+  Serial.print("Gyro x\t");
+  Serial.print("Gyro y\t");
+  Serial.print("Gyro z\t");
   Serial.println();
   //FIM DO SETUP BMP
 
@@ -142,6 +147,9 @@ void setup() {
     dataFile.print("x (m/s^2)\t");
     dataFile.print("y (m/s^2)\t");
     dataFile.print("z (m/s^2)\t");
+    dataFile.print("Gyro x\t");
+    dataFile.print("Gyro y\t");
+    dataFile.print("Gyro z\t");
     dataFile.println();
     dataFile.close();
   }
@@ -163,6 +171,16 @@ void setup() {
       ;
   }
   accel.setRange(ADXL345_RANGE_16_G);
+
+  Wire.begin();
+
+  if (!gyro.init()) {
+    Serial.println("Failed to autodetect gyro type!");
+    while (1)
+      ;
+  }
+
+  gyro.enableDefault();
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void loop() {
@@ -217,6 +235,7 @@ void loop() {
   sensors_event_t event;
   accel.getEvent(&event);
 
+  gyro.read();
   // Armazenamento dos valores na dataString
   String dataString = "";
   dataString += String(tempo) + "\t";
@@ -234,6 +253,9 @@ void loop() {
   dataString += String(event.acceleration.x) + "\t";
   dataString += String(event.acceleration.y) + "\t";
   dataString += String(event.acceleration.z) + "\t";
+  dataString += String((int)gyro.g.x) + "\t";
+  dataString += String((int)gyro.g.y) + "\t";
+  dataString += String((int)gyro.g.z) + "\t";
   //Print da dataString
   Serial.println(dataString);
 
