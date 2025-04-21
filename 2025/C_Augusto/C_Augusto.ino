@@ -42,6 +42,7 @@ float alturaMAX = 0;
 String dataString = "";
 int altitude0ou1 = 0;
 unsigned long tempoantigo = 0;
+unsigned long tempoantigo2 = 0;
 const long intervalo = 1000;
 int paraquedascontador = 0;
 int tempoparaquedas = 0;
@@ -143,6 +144,7 @@ void loop() {
   
   
   unsigned long tempoatual = millis();
+  unsigned long tempoatual2 = millis();
 
   if (altitude0ou1 == 1 && desativarign == 0){
     IGNSTATUS = HIGH;
@@ -156,17 +158,21 @@ void loop() {
     desativarign = 2;
   }
 
-  if (altitude0ou1 == 1 && desativarign2 == 0 && tempoatual - tempoantigo >= 2000){
-    IGNSTATUS2 = HIGH;
-    digitalWrite(IGN_2,IGNSTATUS2);
-    tempoantigo = tempoatual;
+  
+  if (altitude0ou1 == 1 && desativarign2 == 0){
+    tempoantigo2 = tempoatual2;
     desativarign2 = 1;
   }
-  if (tempoatual - tempoantigo >= 2000 && desativarign2 == 1){
+  if (altitude0ou1 == 1 && tempoatual2 - tempoantigo2 == 2000 && desativarign2 == 1){
+    IGNSTATUS = LOW;
+    digitalWrite(IGN_2, IGNSTATUS2);
+    desativarign2 = 2;
+  }
+
+  if (tempoatual2 - tempoantigo2 >= 2000 && desativarign2 == 2){
     IGNSTATUS2 = LOW;
     digitalWrite(IGN_2,IGNSTATUS2);
-    //Serial.println("Ignitores desativados!!");
-    desativarign2 = 2;
+    desativarign2 = 3;
   }
 
 
