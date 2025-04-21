@@ -56,7 +56,7 @@ void setup() {
   }
 
   pinMode(IGN_1, OUTPUT);
-  //pinMode(IGN_2, OUTPUT);
+  pinMode(IGN_2, OUTPUT);
   //pinMode(IGN_3, OUTPUT);
   //pinMode(IGN_4,OUTPUT);
 
@@ -145,18 +145,31 @@ void loop() {
   if (altitude0ou1 == 1 && desativarign == 0){
     IGNSTATUS = HIGH;
     digitalWrite(IGN_1,IGNSTATUS);
-    Serial.println("Ignitores ativados!!");
+    //Serial.println("Ignitores ativados!!");
     tempoantigo = tempoatual;
     desativarign = 1;
   }
   if (tempoatual - tempoantigo >= 5000 && desativarign == 1){
     IGNSTATUS = LOW;
     digitalWrite(IGN_1,IGNSTATUS);
-    Serial.println("Ignitores desativados!!");
+    //Serial.println("Ignitores desativados!!");
     desativarign = 2;
   }
 
-  
+  if (altitude0ou1 == 1 && desativarign == 0 && tempoatual - tempoantigo >= 5000){
+    IGNSTATUS = HIGH;
+    digitalWrite(IGN_2,IGNSTATUS);
+    //Serial.println("Ignitores ativados!!");
+    tempoantigo = tempoatual;
+    desativarign = 1;
+  }
+  if (tempoatual - tempoantigo >= 5000 && desativarign == 1){
+    IGNSTATUS = LOW;
+    digitalWrite(IGN_2,IGNSTATUS);
+    //Serial.println("Ignitores desativados!!");
+    desativarign = 2;
+  }
+
 
   
 
