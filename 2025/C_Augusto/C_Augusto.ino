@@ -165,7 +165,7 @@ void loop() {
     desativarign2 = 1;
   }
   if (altitude0ou1 == 1 && tempoatual2 - tempoantigo2 >= 2000 && desativarign2 == 1){
-    IGNSTATUS = LOW;
+    IGNSTATUS2 = HIGH;
     digitalWrite(IGN_2, IGNSTATUS2);
     desativarign2 = 2;
     temponovo = tempoatual2;
