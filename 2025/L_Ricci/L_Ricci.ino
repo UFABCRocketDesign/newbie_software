@@ -36,7 +36,7 @@ L3G gyro;
 #define GPS_LNG 1
 
 #define LORA 1
-#define SD_CARD 1
+#define SD_CARD 0
 #define HEADING 1
 
 #define IGN_1 36
@@ -126,7 +126,7 @@ Paraquedas p2(true);
 Paraquedas p3(false);
 Paraquedas p4(false);
 
-int queda, contadorQueda = 0;
+int queda = 0, contadorQueda = 0;
 float altitudes[NUMERO_QUEDAS];
 float alt = 0;
 
