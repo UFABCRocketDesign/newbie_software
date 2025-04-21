@@ -46,7 +46,9 @@ const long intervalo = 1000;
 int paraquedascontador = 0;
 int tempoparaquedas = 0;
 int IGNSTATUS = LOW;
+int IGNSTATUS2 = LOW;
 int desativarign = 0;
+int desativarign2 = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -145,29 +147,26 @@ void loop() {
   if (altitude0ou1 == 1 && desativarign == 0){
     IGNSTATUS = HIGH;
     digitalWrite(IGN_1,IGNSTATUS);
-    //Serial.println("Ignitores ativados!!");
     tempoantigo = tempoatual;
     desativarign = 1;
   }
-  if (tempoatual - tempoantigo >= 5000 && desativarign == 1){
+  if (tempoatual - tempoantigo >= 10000 && desativarign == 1){
     IGNSTATUS = LOW;
     digitalWrite(IGN_1,IGNSTATUS);
-    //Serial.println("Ignitores desativados!!");
     desativarign = 2;
   }
 
-  if (altitude0ou1 == 1 && desativarign == 0 && tempoatual - tempoantigo >= 5000){
-    IGNSTATUS = HIGH;
-    digitalWrite(IGN_2,IGNSTATUS);
-    //Serial.println("Ignitores ativados!!");
+  if (altitude0ou1 == 1 && desativarign2 == 0 && tempoatual - tempoantigo >= 2000){
+    IGNSTATUS2 = HIGH;
+    digitalWrite(IGN_2,IGNSTATUS2);
     tempoantigo = tempoatual;
-    desativarign = 1;
+    desativarign2 = 1;
   }
-  if (tempoatual - tempoantigo >= 5000 && desativarign == 1){
+  if (tempoatual - tempoantigo >= 2000 && desativarign == 1){
     IGNSTATUS = LOW;
-    digitalWrite(IGN_2,IGNSTATUS);
+    digitalWrite(IGN_2,IGNSTATUS2);
     //Serial.println("Ignitores desativados!!");
-    desativarign = 2;
+    desativarign2 = 2;
   }
 
 
@@ -183,7 +182,8 @@ void loop() {
   dataString += String(altitude0ou1) + "\t";
   dataString += String(alturaMAX) + "\t";
   dataString += String(tempoatual) + "\t";
-  dataString += String(desativarign);
+  dataString += String(desativarign) + "\t";
+  dataString += String(desativarign2);
   
   Serial.println(dataString);
 
