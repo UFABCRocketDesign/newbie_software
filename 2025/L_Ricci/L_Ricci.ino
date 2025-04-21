@@ -114,9 +114,9 @@ FiltroMediaMovel f1;
 FiltroMediaMovel f2;
 
 Paraquedas p1(IGN_1, 0, 1500, false);
-Paraquedas p2(IGN_1, 2000, 1500, false);
-Paraquedas p3(IGN_1, 0, 1500, true);
-Paraquedas p4(IGN_1, 2000, 1500, false);
+Paraquedas p2(IGN_2, 2000, 1500, false);
+Paraquedas p3(IGN_3, 0, 1500, true);
+Paraquedas p4(IGN_4, 2000, 1500, true);
 
 int queda = 0, contadorQueda = 0;
 float altitudes[NUMERO_QUEDAS];
