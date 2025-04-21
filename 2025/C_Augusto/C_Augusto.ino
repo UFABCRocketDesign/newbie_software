@@ -169,7 +169,8 @@ void loop() {
   dataString += String(altura) + "\t";
   dataString += String(altitude0ou1) + "\t";
   dataString += String(alturaMAX) + "\t";
-  dataString += String(tempoatual);
+  dataString += String(tempoatual) + "\t";
+  dataString += String(desativarign);
   
   Serial.println(dataString);
 
