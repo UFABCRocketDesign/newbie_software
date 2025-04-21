@@ -77,18 +77,18 @@ public:
 
 class Paraquedas {
 private:
-  float altura;
-  int queda;
-  int estadoParaquedas;
   int pinoIgnicao;
-  bool ignicaoImediata;
-  unsigned long desativacao;
+  int estadoParaquedas;
   unsigned long timer;
+  unsigned long desativacao;
+  bool usaDesativacao;
+  bool ignicaoImediata;
 public:
-  Paraquedas(bool ignicaoImediata = true)
-    : ignicaoImediata(ignicaoImediata) {}
+  Paraquedas(int pino, bool usaDesativacao, bool ignicaoImediata)
+    : pinoIgnicao(pino), usaDesativacao(usaDesativacao), ignicaoImediata(ignicaoImediata) {}
   int ativar(float altura, int queda) {
-    if (queda == 1 && estadoParaquedas == 0 && altura < ALTITUDE_TETO) {
+#if BARO
+    if (queda == 1 && estadoParaquedas == 0 && (ALTITUDE_TETO < 0 || altura < ALTITUDE_TETO)) {
       estadoParaquedas = 1;
       if (ignicaoImediata) {
         digitalWrite(pinoIgnicao, HIGH);
@@ -106,25 +106,26 @@ public:
       }
     }
 
-    if (estadoParaquedas == 2 && (millis() - desativacao) >= 1500) {
+    if (usaDesativacao && estadoParaquedas == 2 && (millis() - desativacao) >= 1500) {
       estadoParaquedas = 3;
       digitalWrite(pinoIgnicao, LOW);
     }
-
-    return estadoParaquedas;
+#endif
   }
+#if BARO
   int getValor() {
     return estadoParaquedas;
   }
+#endif
 };
 
 FiltroMediaMovel f1;
 FiltroMediaMovel f2;
 
-Paraquedas p1(true);
-Paraquedas p2(true);
-Paraquedas p3(false);
-Paraquedas p4(false);
+Paraquedas p1(IGN_1, false, true);
+Paraquedas p2(IGN_2, true, false);
+Paraquedas p3(IGN_3, false, true);
+Paraquedas p4(IGN_4, true, false);
 
 int queda = 0, contadorQueda = 0;
 float altitudes[NUMERO_QUEDAS];
