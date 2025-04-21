@@ -67,18 +67,66 @@ public:
     total = total + leituras[indiceAtual];
     indiceAtual = (indiceAtual + 1) % LEITURAS;
     float altura = total / LEITURAS;
-    
+
     return altura;
+  }
+  float getMedia() {
+    return (total / LEITURAS);
+  }
+};
+
+class Paraquedas {
+private:
+  float altura;
+  int queda;
+  int estadoParaquedas;
+  int pinoIgnicao;
+  bool ignicaoImediata;
+  unsigned long desativacao;
+  unsigned long timer;
+public:
+  Paraquedas(bool ignicaoImediata = true)
+    : ignicaoImediata(ignicaoImediata) {}
+  int ativar(float altura, int queda) {
+    if (queda == 1 && estadoParaquedas == 0 && altura < ALTITUDE_TETO) {
+      estadoParaquedas = 1;
+      if (ignicaoImediata) {
+        digitalWrite(pinoIgnicao, HIGH);
+      }
+      timer = millis();
+    }
+
+    if (estadoParaquedas == 1 && (millis() - timer) >= 2000) {
+      estadoParaquedas = 2;
+      if (!ignicaoImediata) {
+        digitalWrite(pinoIgnicao, HIGH);
+        desativacao = millis();
+      } else {
+        digitalWrite(pinoIgnicao, LOW);
+      }
+    }
+
+    if (estadoParaquedas == 2 && (millis() - desativacao) >= 1500) {
+      estadoParaquedas = 3;
+      digitalWrite(pinoIgnicao, LOW);
+    }
+
+    return estadoParaquedas;
+  }
+  int getValor() {
+    return estadoParaquedas;
   }
 };
 
 FiltroMediaMovel f1;
 FiltroMediaMovel f2;
 
-int estadoParaquedas1 = 0,
-    estadoParaquedas2 = 0, estadoParaquedas3 = 0, estadoParaquedas4 = 0, contadorQueda = 0, queda = 0;
-unsigned long desativacaoP2 = 0, desativacaoP4 = 0;
-unsigned long timerP1, timerP2, timerP3, timerP4;
+Paraquedas p1(true);
+Paraquedas p2(true);
+Paraquedas p3(false);
+Paraquedas p4(false);
+
+int queda, contadorQueda = 0;
 float altitudes[NUMERO_QUEDAS];
 float alt = 0;
 
@@ -255,80 +303,6 @@ int detectorQueda(float altura) {
 #endif
 }
 
-int paraquedas1(float altura, int queda) {
-#if BARO
-  if (queda == 1 && estadoParaquedas1 == 0) {
-    estadoParaquedas1 = 1;
-    digitalWrite(IGN_1, HIGH);
-    timerP1 = millis();
-  }
-
-  if (estadoParaquedas1 == 1 && (millis() - timerP1) >= 2000) {
-    estadoParaquedas1 = 2;
-    digitalWrite(IGN_1, LOW);
-  }
-  return estadoParaquedas1;
-#endif
-}
-
-int paraquedas2(float altura, int queda) {
-#if BARO
-  if (queda == 1 && estadoParaquedas2 == 0) {
-    estadoParaquedas2 = 1;
-    timerP2 = millis();
-  }
-
-  if (estadoParaquedas2 == 1 && (millis() - timerP2) >= 2000) {
-    estadoParaquedas2 = 2;
-    digitalWrite(IGN_2, HIGH);
-    desativacaoP2 = millis();
-  }
-
-  if (estadoParaquedas2 == 2 && (millis() - desativacaoP2) >= 1500) {
-    estadoParaquedas2 = 3;
-    digitalWrite(IGN_2, LOW);
-  }
-  return estadoParaquedas2;
-#endif
-}
-
-int paraquedas3(float altura, int queda) {
-#if BARO
-  if (queda == 1 && estadoParaquedas3 == 0 && altura < ALTITUDE_TETO) {
-    estadoParaquedas3 = 1;
-    digitalWrite(IGN_3, HIGH);
-    timerP3 = millis();
-  }
-
-  if (estadoParaquedas3 == 1 && (millis() - timerP3) >= 2000) {
-    estadoParaquedas3 = 2;
-    digitalWrite(IGN_3, LOW);
-  }
-  return estadoParaquedas3;
-#endif
-}
-
-int paraquedas4(float altura, int queda) {
-#if BARO
-  if (queda == 1 && estadoParaquedas4 == 0 && altura < ALTITUDE_TETO) {
-    estadoParaquedas4 = 1;
-    timerP4 = millis();
-  }
-
-  if (estadoParaquedas4 == 1 && (millis() - timerP4) >= 2000) {
-    estadoParaquedas4 = 2;
-    digitalWrite(IGN_4, HIGH);
-    desativacaoP4 = millis();
-  }
-
-  if (estadoParaquedas4 == 2 && (millis() - desativacaoP4) >= 1500) {
-    estadoParaquedas4 = 3;
-    digitalWrite(IGN_4, LOW);
-  }
-  return estadoParaquedas4;
-#endif
-}
-
 void loop() {
   unsigned long timerLora = millis();
   float tempo = millis() / 1000.0;
@@ -399,14 +373,15 @@ void loop() {
   /* Tratamento de Dados */
 #if BARO
 
-  float altura = f2.filtro(f1.filtro(altitudeReal));
-  int queda = detectorQueda(altura);
+  float valorFiltrado1 = f1.filtro(altitudeReal);
+  float valorFiltrado2 = f2.filtro(f1.getMedia());
+  int queda = detectorQueda(valorFiltrado2);
 
   // Paraquedas
-  paraquedas1(altura, queda);
-  paraquedas2(altura, queda);
-  paraquedas3(altura, queda);
-  paraquedas4(altura, queda);
+  p1.ativar(valorFiltrado2, queda);
+  p2.ativar(valorFiltrado2, queda);
+  p3.ativar(valorFiltrado2, queda);
+  p4.ativar(valorFiltrado2, queda);
 
 #endif
 
@@ -422,13 +397,13 @@ void loop() {
 #if PRESSAO
   dataString += String(pressao) + "\t";
 #endif
-  dataString += String(altura) + "\t";
+  dataString += String(valorFiltrado2) + "\t";
   dataString += String(altitudeReal) + "\t";
   dataString += String(queda) + "\t";
-  dataString += String(estadoParaquedas1) + "\t";
-  dataString += String(estadoParaquedas2) + "\t";
-  dataString += String(estadoParaquedas3) + "\t";
-  dataString += String(estadoParaquedas4) + "\t";
+  dataString += String(p1.getValor()) + "\t";
+  dataString += String(p2.getValor()) + "\t";
+  dataString += String(p3.getValor()) + "\t";
+  dataString += String(p4.getValor()) + "\t";
 #endif
 
 #if ACEL
