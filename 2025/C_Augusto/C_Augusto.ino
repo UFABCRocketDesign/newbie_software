@@ -163,7 +163,7 @@ void loop() {
     desativarign2 = 1;
   }
   if (tempoatual - tempoantigo >= 2000 && desativarign2 == 1){
-    IGNSTATUS = LOW;
+    IGNSTATUS2 = LOW;
     digitalWrite(IGN_2,IGNSTATUS2);
     //Serial.println("Ignitores desativados!!");
     desativarign2 = 2;
