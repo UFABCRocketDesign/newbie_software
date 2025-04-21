@@ -43,6 +43,7 @@ String dataString = "";
 int altitude0ou1 = 0;
 unsigned long tempoantigo = 0;
 unsigned long tempoantigo2 = 0;
+unsigned long tempoantigo3 = 0;
 unsigned long temponovo = 0;
 const long intervalo = 1000;
 int paraquedascontador = 0;
@@ -180,12 +181,13 @@ void loop() {
   }
 
   if(altitudeFiltrada2 <= -3 && altitude0ou1 == 1 && desativarign3 == 0){
+    tempoantigo3 = tempoatual;
     IGNSTATUS3 = HIGH;
     digitalWrite(IGN_3,IGNSTATUS3);
     desativarign3 = 1;
   }
 
-if(desativarign3 == 1){
+if(desativarign3 == 1 && tempoatual - tempoantigo3 >= 3000){
   IGNSTATUS3 = LOW;
   digitalWrite(IGN_3,IGNSTATUS3);
 }
