@@ -47,10 +47,13 @@ unsigned long temponovo = 0;
 const long intervalo = 1000;
 int paraquedascontador = 0;
 int tempoparaquedas = 0;
+int alturaparaquedas = 0;
 int IGNSTATUS = LOW;
 int IGNSTATUS2 = LOW;
+int IGNSTATUS3 = LOW;
 int desativarign = 0;
 int desativarign2 = 0;
+int desativarign3 = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -61,7 +64,7 @@ void setup() {
 
   pinMode(IGN_1, OUTPUT);
   pinMode(IGN_2, OUTPUT);
-  //pinMode(IGN_3, OUTPUT);
+  pinMode(IGN_3, OUTPUT);
   //pinMode(IGN_4,OUTPUT);
 
   for (int i = 0; i < 10; i++) {
@@ -176,7 +179,16 @@ void loop() {
     desativarign2 = 3;
   }
 
+  if(alturaMAX - altitudeFiltrada2 == -3 && altitude0ou1 == 1 && desativarign3 == 0){
+    IGNSTATUS3 = HIGH;
+    digitalWrite(IGN_3,IGNSTATUS3);
+    desativarign3 = 1;
+  }
 
+if(desativarign3 == 1){
+  IGNSTATUS3 = LOW;
+  digitalWrite(IGN_3,IGNSTATUS3);
+}
   
 
   String dataString = "";
@@ -190,7 +202,8 @@ void loop() {
   dataString += String(alturaMAX) + "\t";
   dataString += String(tempoatual) + "\t";
   dataString += String(desativarign) + "\t";
-  dataString += String(desativarign2);
+  dataString += String(desativarign2) + "\t";
+  dataString += String(desativarign3) + "\t";
   
   Serial.println(dataString);
 
