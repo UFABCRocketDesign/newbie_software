@@ -179,7 +179,7 @@ void loop() {
     desativarign2 = 3;
   }
 
-  if(alturaMAX - altitudeFiltrada2 == -3 && altitude0ou1 == 1 && desativarign3 == 0){
+  if(altitudeFiltrada2 <= -3 && altitude0ou1 == 1 && desativarign3 == 0){
     IGNSTATUS3 = HIGH;
     digitalWrite(IGN_3,IGNSTATUS3);
     desativarign3 = 1;
