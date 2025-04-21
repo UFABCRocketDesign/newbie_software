@@ -81,51 +81,42 @@ private:
   int estadoParaquedas;
   unsigned long timer;
   unsigned long desativacao;
-  bool usaDesativacao;
-  bool ignicaoImediata;
+  const unsigned long tempoAtraso;
+  const unsigned long tempoLigado;
+  const bool usaAltura;
+
 public:
-  Paraquedas(int pino, bool usaDesativacao, bool ignicaoImediata)
-    : pinoIgnicao(pino), usaDesativacao(usaDesativacao), ignicaoImediata(ignicaoImediata) {}
+  Paraquedas(int pino, unsigned long atraso, unsigned long ligado, bool altura)
+    : pinoIgnicao(pino), tempoAtraso(atraso), tempoLigado(ligado), usaAltura(altura) {}
   int ativar(float altura, int queda) {
-#if BARO
-    if (queda == 1 && estadoParaquedas == 0 && (ALTITUDE_TETO < 0 || altura < ALTITUDE_TETO)) {
+    if (queda == 1 && estadoParaquedas == 0 && (!usaAltura || altura < ALTITUDE_TETO)) {
       estadoParaquedas = 1;
-      if (ignicaoImediata) {
-        digitalWrite(pinoIgnicao, HIGH);
-      }
       timer = millis();
     }
 
-    if (estadoParaquedas == 1 && (millis() - timer) >= 2000) {
+    if (estadoParaquedas == 1 && (millis() - timer) >= tempoAtraso) {
       estadoParaquedas = 2;
-      if (!ignicaoImediata) {
-        digitalWrite(pinoIgnicao, HIGH);
-        desativacao = millis();
-      } else {
-        digitalWrite(pinoIgnicao, LOW);
-      }
+      digitalWrite(pinoIgnicao, HIGH);
+      desativacao = millis();
     }
 
-    if (usaDesativacao && estadoParaquedas == 2 && (millis() - desativacao) >= 1500) {
+    if (estadoParaquedas == 2 && (millis() - desativacao) >= tempoLigado) {
       estadoParaquedas = 3;
       digitalWrite(pinoIgnicao, LOW);
     }
-#endif
   }
-#if BARO
   int getValor() {
     return estadoParaquedas;
   }
-#endif
 };
 
 FiltroMediaMovel f1;
 FiltroMediaMovel f2;
 
-Paraquedas p1(IGN_1, false, true);
-Paraquedas p2(IGN_2, true, false);
-Paraquedas p3(IGN_3, false, true);
-Paraquedas p4(IGN_4, true, false);
+Paraquedas p1(IGN_1, 0, 1500, false);
+Paraquedas p2(IGN_1, 2000, 1500, false);
+Paraquedas p3(IGN_1, 0, 1500, true);
+Paraquedas p4(IGN_1, 2000, 1500, false);
 
 int queda = 0, contadorQueda = 0;
 float altitudes[NUMERO_QUEDAS];
