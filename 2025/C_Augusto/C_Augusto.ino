@@ -145,7 +145,6 @@ void loop() {
   
   
   unsigned long tempoatual = millis();
-  unsigned long tempoatual2 = millis();
 
   if (altitude0ou1 == 1 && desativarign == 0){
     IGNSTATUS = HIGH;
@@ -161,17 +160,17 @@ void loop() {
 
   
   if (altitude0ou1 == 1 && desativarign2 == 0){
-    tempoantigo2 = tempoatual2;
+    tempoantigo2 = tempoatual;
     desativarign2 = 1;
   }
-  if (altitude0ou1 == 1 && tempoatual2 - tempoantigo2 >= 2000 && desativarign2 == 1){
+  if (altitude0ou1 == 1 && tempoatual - tempoantigo2 >= 4000 && desativarign2 == 1){
     IGNSTATUS2 = HIGH;
     digitalWrite(IGN_2, IGNSTATUS2);
     desativarign2 = 2;
-    temponovo = tempoatual2;
+    temponovo = tempoatual;
   }
 
-  if (tempoatual2 - temponovo >= 2000 && desativarign2 == 2){
+  if (tempoatual - temponovo >= 2000 && desativarign2 == 2){
     IGNSTATUS2 = LOW;
     digitalWrite(IGN_2,IGNSTATUS2);
     desativarign2 = 3;
