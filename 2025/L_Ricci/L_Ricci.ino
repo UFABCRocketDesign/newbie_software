@@ -6,6 +6,7 @@
 #include <Adafruit_HMC5883_U.h>
 #include <L3G.h>
 #include <TinyGPSPlus.h>
+#include "src/lib/Apogeu/Apogeu.h"
 Adafruit_BMP085 bmp;
 Adafruit_ADXL345_Unified accel;
 Adafruit_HMC5883_Unified mag;
@@ -110,30 +111,30 @@ public:
   }
 };
 
-class DetectorApogeu {
-private:
-  int queda = 0;
-  int contadorQueda = 0;
-public:
-  int detectorQueda(float altura) {
-    float altitudeAnterior = 0;
+// class DetectorApogeu {
+// private:
+//   int queda = 0;
+//   int contadorQueda = 0;
+// public:
+//   int detectorQueda(float altura) {
+//     float altitudeAnterior = 0;
 
-    if (altura < altitudeAnterior) {
-      contadorQueda++;
-    } else {
-      contadorQueda = 0;
-    }
+//     if (altura < altitudeAnterior) {
+//       contadorQueda++;
+//     } else {
+//       contadorQueda = 0;
+//     }
 
-    altitudeAnterior = altura;
+//     altitudeAnterior = altura;
 
-    if (contadorQueda >= 10) {
-      queda = 1;
-    } else {
-      queda = 0;
-    }
-    return queda;
-  }
-};
+//     if (contadorQueda >= 10) {
+//       queda = 1;
+//     } else {
+//       queda = 0;
+//     }
+//     return queda;
+//   }
+// };
 
 FiltroMediaMovel f1;
 FiltroMediaMovel f2;
@@ -143,7 +144,7 @@ Paraquedas p2(IGN_2, 2000, 1500, false);
 Paraquedas p3(IGN_3, 0, 1500, true);
 Paraquedas p4(IGN_4, 2000, 1500, true);
 
-DetectorApogeu apg;
+Apogeu apg;
 
 float altitudes[NUMERO_QUEDAS];
 float alt = 0;
