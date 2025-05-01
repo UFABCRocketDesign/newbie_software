@@ -15,11 +15,15 @@ void loop() {
     Serial.println(" *C");
     digitalWrite(LED_BUILTIN, HIGH);  
     delay(1000);
+    digitalWrite(LED_BUILTIN, LOW);  // turn the LED on (HIGH is the voltage level)
+    delay(1000);
 
     Serial.print("Pressure = ");
     Serial.print(bmp.readPressure());
     Serial.println(" Pa");
     digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
+    delay(1000);
+    digitalWrite(LED_BUILTIN, LOW);  // turn the LED on (HIGH is the voltage level)
     delay(1000);
 
     // Calculate altitude assuming 'standard' barometric
@@ -29,11 +33,15 @@ void loop() {
     Serial.println(" meters");
     digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
     delay(1000);
+    digitalWrite(LED_BUILTIN, LOW);  // turn the LED on (HIGH is the voltage level)
+    delay(1000);
 
     Serial.print("Pressure at sealevel (calculated) = ");
     Serial.print(bmp.readSealevelPressure());
     Serial.println(" Pa");
     digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
+    delay(1000);
+    digitalWrite(LED_BUILTIN, LOW);  // turn the LED on (HIGH is the voltage level)
     delay(1000);
 
   // you can get a more precise measurement of altitude
@@ -44,6 +52,8 @@ void loop() {
     Serial.print(bmp.readAltitude(101500));
     Serial.println(" meters");
     digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
+    delay(1000);
+    digitalWrite(LED_BUILTIN, LOW);  // turn the LED on (HIGH is the voltage level)
     delay(1000);
     Serial.println();
     delay(500);
