@@ -1,8 +1,8 @@
 #include "Filtro.h"
 
-FiltroMediaMovel::FiltroMediaMovel(unsigned int n) : numLeituras(n) {}
+Filtro::Filtro(unsigned int n) : numLeituras(n) {}
 
-float FiltroMediaMovel::filtro(float altitudeReal) {
+float Filtro::filtro(float altitudeReal) {
   total = total - leituras[indiceAtual];
   leituras[indiceAtual] = (altitudeReal);
   total = total + leituras[indiceAtual];
@@ -12,6 +12,6 @@ float FiltroMediaMovel::filtro(float altitudeReal) {
   return altura;
 }
 
-float FiltroMediaMovel::getMedia() {
+float Filtro::getMedia() {
   return (total / numLeituras);
 }

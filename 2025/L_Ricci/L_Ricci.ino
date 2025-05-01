@@ -137,8 +137,8 @@ String filename;
 //   }
 // };
 
-FiltroMediaMovel f1(10);
-FiltroMediaMovel f2(10);
+Filtro f1(10);
+Filtro f2(10);
 
 Paraquedas p1(IGN_1, 0, 1500, false, -3);
 Paraquedas p2(IGN_2, 2000, 1500, false, -3);
@@ -202,7 +202,8 @@ void setup() {
 #endif
 
 #if BARO
-  heading += "Altitude Filtrada\t";
+  heading += "Altitude Filtrada 1\t";
+  heading += "Altitude Filtrada 2\t";
   heading += "Altitude Raw\t";
   heading += "Queda\t";
   heading += "Paraquedas 1\t";
@@ -396,6 +397,7 @@ void loop() {
 #if PRESSAO
   dataString += String(pressao) + "\t";
 #endif
+  dataString += String(valorFiltrado1) + "\t";
   dataString += String(valorFiltrado2) + "\t";
   dataString += String(altitudeReal) + "\t";
   dataString += String(apg.detectorQueda(f2.getMedia())) + "\t";
