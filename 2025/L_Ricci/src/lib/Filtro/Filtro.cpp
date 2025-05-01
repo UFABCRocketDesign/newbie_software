@@ -1,6 +1,12 @@
 #include "Filtro.h"
 
-Filtro::Filtro(unsigned int n) : numLeituras(n) {}
+Filtro::Filtro(unsigned int n) : numLeituras(n) {
+  for (unsigned int i = 0; i < numLeituras; i++) leituras[i] = 0;
+}
+
+Filtro::~Filtro() {
+  delete[] leituras;
+}
 
 float Filtro::filtro(float altitudeReal) {
   total = total - leituras[indiceAtual];

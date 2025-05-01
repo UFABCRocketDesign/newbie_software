@@ -6,6 +6,7 @@ private:
   int indiceAtual = 0;
 public:
   Filtro(unsigned int n);
+  ~Filtro();
   float filtro(float altitudeReal);
   float getMedia();
 };
