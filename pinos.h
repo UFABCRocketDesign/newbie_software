@@ -19,3 +19,9 @@
 
 HardwareSerial &LoRa(Serial3);
 HardwareSerial &GPS(Serial1);
+
+#define USANDO_SD 1
+
+#if USANDO_SD 
+// Codigo pro cartao SD
+#endif
