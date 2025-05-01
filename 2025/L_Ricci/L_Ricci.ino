@@ -145,7 +145,6 @@ Paraquedas p4(IGN_4, 2000, 1500, true);
 
 DetectorApogeu apg;
 
-int queda = 0, contadorQueda = 0;
 float altitudes[NUMERO_QUEDAS];
 float alt = 0;
 
