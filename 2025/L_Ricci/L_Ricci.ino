@@ -6,7 +6,11 @@
 #include <Adafruit_HMC5883_U.h>
 #include <L3G.h>
 #include <TinyGPSPlus.h>
+
 #include "src/lib/Apogeu/Apogeu.h"
+#include "src/lib/Paraquedas/Paraquedas.h"
+#include "src/lib/Filtro/Filtro.h"
+
 Adafruit_BMP085 bmp;
 Adafruit_ADXL345_Unified accel;
 Adafruit_HMC5883_Unified mag;
@@ -45,71 +49,68 @@ L3G gyro;
 #define IGN_3 46
 #define IGN_4 55
 
-#define LEITURAS 10
-#define FILTROS 2
 #define CHIP_SELECT 53
 #define NUMERO_QUEDAS 5
-#define ALTITUDE_TETO -3
 
 HardwareSerial &LoRa = Serial3;
 HardwareSerial &GPS = Serial1;
 
 String filename;
 
-class FiltroMediaMovel {
-private:
-  float leituras[LEITURAS] = {};
-  float total = 0;
-  int indiceAtual = 0;
-public:
-  float filtro(float altitudeReal) {
-    total = total - leituras[indiceAtual];
-    leituras[indiceAtual] = (altitudeReal);
-    total = total + leituras[indiceAtual];
-    indiceAtual = (indiceAtual + 1) % LEITURAS;
-    float altura = total / LEITURAS;
+// class FiltroMediaMovel {
+// private:
+//   float leituras[LEITURAS] = {};
+//   float total = 0;
+//   int indiceAtual = 0;
+// public:
+//   float filtro(float altitudeReal) {
+//     total = total - leituras[indiceAtual];
+//     leituras[indiceAtual] = (altitudeReal);
+//     total = total + leituras[indiceAtual];
+//     indiceAtual = (indiceAtual + 1) % LEITURAS;
+//     float altura = total / LEITURAS;
 
-    return altura;
-  }
-  float getMedia() {
-    return (total / LEITURAS);
-  }
-};
+//     return altura;
+//   }
+//   float getMedia() {
+//     return (total / LEITURAS);
+//   }
+// };
 
-class Paraquedas {
-private:
-  int pinoIgnicao;
-  int estadoParaquedas;
-  unsigned long timer;
-  unsigned long desativacao;
-  const unsigned long tempoAtraso;
-  const unsigned long tempoLigado;
-  const bool usaAltura;
+// class Paraquedas {
+// private:
+//   int pinoIgnicao;
+//   int estadoParaquedas;
+//   unsigned long timer;
+//   unsigned long desativacao;
+//   const unsigned long tempoAtraso;
+//   const unsigned long tempoLigado;
+//   const bool usaAltura;
 
-public:
-  Paraquedas(int pino, unsigned long atraso, unsigned long ligado, bool altura)
-    : pinoIgnicao(pino), tempoAtraso(atraso), tempoLigado(ligado), usaAltura(altura) {}
-  int ativar(float altura, int queda) {
-    if (queda == 1 && estadoParaquedas == 0 && (!usaAltura || altura < ALTITUDE_TETO)) {
-      estadoParaquedas = 1;
-      timer = millis();
-    }
+// public:
+//   Paraquedas(int pino, unsigned long atraso, unsigned long ligado, bool altura)
+//     : pinoIgnicao(pino), tempoAtraso(atraso), tempoLigado(ligado), usaAltura(altura) {}
+//   int ativar(float altura, int queda) {
+//     if (queda == 1 && estadoParaquedas == 0 && (!usaAltura || altura < ALTITUDE_TETO)) {
+//       estadoParaquedas = 1;
+//       timer = millis();
+//     }
 
-    if (estadoParaquedas == 1 && (millis() - timer) >= tempoAtraso) {
-      estadoParaquedas = 2;
-      digitalWrite(pinoIgnicao, HIGH);
-      desativacao = millis();
-    }
+//     if (estadoParaquedas == 1 && (millis() - timer) >= tempoAtraso) {
+//       estadoParaquedas = 2;
+//       digitalWrite(pinoIgnicao, HIGH);
+//       desativacao = millis();
+//     }
 
-    if (estadoParaquedas == 2 && (millis() - desativacao) >= tempoLigado) {
-      estadoParaquedas = 3;
-      digitalWrite(pinoIgnicao, LOW);
-    }
-  }
-  int getValor() {
-    return estadoParaquedas;
-  }
-};
+//     if (estadoParaquedas == 2 && (millis() - desativacao) >= tempoLigado) {
+//       estadoParaquedas = 3;
+//       digitalWrite(pinoIgnicao, LOW);
+//     }
+//   }
+//   int getValor() {
+//     return estadoParaquedas;
+//   }
+// };
 
 // class DetectorApogeu {
 // private:
@@ -136,13 +137,13 @@ public:
 //   }
 // };
 
-FiltroMediaMovel f1;
-FiltroMediaMovel f2;
+FiltroMediaMovel f1(10);
+FiltroMediaMovel f2(10);
 
-Paraquedas p1(IGN_1, 0, 1500, false);
-Paraquedas p2(IGN_2, 2000, 1500, false);
-Paraquedas p3(IGN_3, 0, 1500, true);
-Paraquedas p4(IGN_4, 2000, 1500, true);
+Paraquedas p1(IGN_1, 0, 1500, false, -3);
+Paraquedas p2(IGN_2, 2000, 1500, false, -3);
+Paraquedas p3(IGN_3, 0, 1500, true, -3);
+Paraquedas p4(IGN_4, 2000, 1500, true, -3);
 
 Apogeu apg;
 
