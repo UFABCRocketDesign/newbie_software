@@ -110,6 +110,31 @@ public:
   }
 };
 
+class DetectorApogeu {
+private:
+  int queda = 0;
+  int contadorQueda = 0;
+public:
+  int detectorQueda(float altura) {
+    float altitudeAnterior = 0;
+
+    if (altura < altitudeAnterior) {
+      contadorQueda++;
+    } else {
+      contadorQueda = 0;
+    }
+
+    altitudeAnterior = altura;
+
+    if (contadorQueda >= 10) {
+      queda = 1;
+    } else {
+      queda = 0;
+    }
+    return queda;
+  }
+};
+
 FiltroMediaMovel f1;
 FiltroMediaMovel f2;
 
@@ -117,6 +142,8 @@ Paraquedas p1(IGN_1, 0, 1500, false);
 Paraquedas p2(IGN_2, 2000, 1500, false);
 Paraquedas p3(IGN_3, 0, 1500, true);
 Paraquedas p4(IGN_4, 2000, 1500, true);
+
+DetectorApogeu apg;
 
 int queda = 0, contadorQueda = 0;
 float altitudes[NUMERO_QUEDAS];
@@ -274,27 +301,6 @@ void setup() {
   pinMode(IGN_4, OUTPUT);
 }
 
-int detectorQueda(float altura) {
-#if BARO
-  float altitudeAnterior = 0;
-
-  if (altura < altitudeAnterior) {
-    contadorQueda++;
-  } else {
-    contadorQueda = 0;
-  }
-
-  altitudeAnterior = altura;
-
-  if (contadorQueda >= 10) {
-    queda = 1;
-  } else {
-    queda = 0;
-  }
-  return queda;
-#endif
-}
-
 void loop() {
   unsigned long timerLora = millis();
   float tempo = millis() / 1000.0;
@@ -367,7 +373,7 @@ void loop() {
 
   float valorFiltrado1 = f1.filtro(altitudeReal);
   float valorFiltrado2 = f2.filtro(f1.getMedia());
-  int queda = detectorQueda(valorFiltrado2);
+  int queda = apg.detectorQueda(f2.getMedia());
 
   // Paraquedas
   p1.ativar(valorFiltrado2, queda);
@@ -391,7 +397,7 @@ void loop() {
 #endif
   dataString += String(valorFiltrado2) + "\t";
   dataString += String(altitudeReal) + "\t";
-  dataString += String(queda) + "\t";
+  dataString += String(apg.detectorQueda(f2.getMedia())) + "\t";
   dataString += String(p1.getValor()) + "\t";
   dataString += String(p2.getValor()) + "\t";
   dataString += String(p3.getValor()) + "\t";
