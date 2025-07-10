@@ -320,11 +320,7 @@ void loop() {
 
   for (int i = 0; i < N; i++) {
     valoresFiltros[i][k] = vFiltro[i];
-    vFiltro[i + 1] = 0;
-    for (int j = 0; j < L; j++) {
-      vFiltro[i + 1] += valoresFiltros[i][j];
-    }
-    vFiltro[i + 1] /= L;
+    vFiltro[i + 1] = filtro(i,vFiltro[i]);
   }
 
   k += 1;
