@@ -129,8 +129,9 @@ int k = 0;
 
 
 
-float somasFil;
+
 float filtro(int numFiltragem, float valorRecebido){
+  float somasFil;
   valoresFiltros[numFiltragem][k] = valorRecebido;
   somasFil=0;
 
@@ -319,7 +320,6 @@ void loop() {
   vFiltro[0] = bmp.readAltitude() - med_alt;
 
   for (int i = 0; i < N; i++) {
-    valoresFiltros[i][k] = vFiltro[i];
     vFiltro[i + 1] = filtro(i,vFiltro[i]);
   }
 
