@@ -1,12 +1,6 @@
 #ifndef _BMP085_h
 #define _BMP085_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 class BMP085 {
 private:
   int ac1, ac2, ac3;
@@ -18,9 +12,15 @@ private:
   long x1, x2, x3;
   unsigned long b4, b7;
   const int oss = 0;
-  long celsius;
+  float celsius;
+  long pressao;
+  float altitude;
 public:
   bool begin();
+  bool readAll(float pressaoInicial);
   bool readAll();
+  float readTemperature();
+  float readPressure();
+  float readAltitude();
 };
 #endif
