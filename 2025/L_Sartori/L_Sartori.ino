@@ -337,11 +337,11 @@ void loop() {
   k %= L;
 
 
- h = detecQued(vFiltro[N]);
+
 
 #endif
 #if PQUEDAS_HABILITAR
-  if (h) {
+  if (detecQued(vFiltro[N])) {
     ocoAp = 1;
   }
 
