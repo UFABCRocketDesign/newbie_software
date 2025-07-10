@@ -127,7 +127,17 @@ int k = 0;
   float ordH[H];
 #endif
 
-
+bool detecQued(float ultAlt){
+  for (int i = H - 1; i > 0; i--) {
+    ordH[i] = ordH[i - 1];
+  }
+  ordH[0] = ultAlt;
+  h = true;
+  for (int i = 0; i < H - 1; i++) {
+    h = h && (ordH[i] < ordH[i + 1]);
+  }
+  return h;
+}
 
 
 float filtro(int numFiltragem, float valorRecebido){
@@ -327,14 +337,8 @@ void loop() {
   k %= L;
 
 
-  for (int i = H - 1; i > 0; i--) {
-    ordH[i] = ordH[i - 1];
-  }
-  ordH[0] = vFiltro[N];
-  h = true;
-  for (int i = 0; i < H - 1; i++) {
-    h = h && (ordH[i] < ordH[i + 1]);
-  }
+ h = detecQued(vFiltro[N]);
+
 #endif
 #if PQUEDAS_HABILITAR
   if (h) {
