@@ -10,8 +10,9 @@
 #include "src/lib/Apogeu/Apogeu.h"
 #include "src/lib/Paraquedas/Paraquedas.h"
 #include "src/lib/Filtro/Filtro.h"
+#include "src/lib/BMP085/BMP085.h"
 
-Adafruit_BMP085 bmp;
+// Adafruit_BMP085 bmp;
 Adafruit_ADXL345_Unified accel;
 Adafruit_HMC5883_Unified mag;
 TinyGPSPlus gps;
@@ -57,85 +58,7 @@ HardwareSerial &GPS = Serial1;
 
 String filename;
 
-// class FiltroMediaMovel {
-// private:
-//   float leituras[LEITURAS] = {};
-//   float total = 0;
-//   int indiceAtual = 0;
-// public:
-//   float filtro(float altitudeReal) {
-//     total = total - leituras[indiceAtual];
-//     leituras[indiceAtual] = (altitudeReal);
-//     total = total + leituras[indiceAtual];
-//     indiceAtual = (indiceAtual + 1) % LEITURAS;
-//     float altura = total / LEITURAS;
-
-//     return altura;
-//   }
-//   float getMedia() {
-//     return (total / LEITURAS);
-//   }
-// };
-
-// class Paraquedas {
-// private:
-//   int pinoIgnicao;
-//   int estadoParaquedas;
-//   unsigned long timer;
-//   unsigned long desativacao;
-//   const unsigned long tempoAtraso;
-//   const unsigned long tempoLigado;
-//   const bool usaAltura;
-
-// public:
-//   Paraquedas(int pino, unsigned long atraso, unsigned long ligado, bool altura)
-//     : pinoIgnicao(pino), tempoAtraso(atraso), tempoLigado(ligado), usaAltura(altura) {}
-//   int ativar(float altura, int queda) {
-//     if (queda == 1 && estadoParaquedas == 0 && (!usaAltura || altura < ALTITUDE_TETO)) {
-//       estadoParaquedas = 1;
-//       timer = millis();
-//     }
-
-//     if (estadoParaquedas == 1 && (millis() - timer) >= tempoAtraso) {
-//       estadoParaquedas = 2;
-//       digitalWrite(pinoIgnicao, HIGH);
-//       desativacao = millis();
-//     }
-
-//     if (estadoParaquedas == 2 && (millis() - desativacao) >= tempoLigado) {
-//       estadoParaquedas = 3;
-//       digitalWrite(pinoIgnicao, LOW);
-//     }
-//   }
-//   int getValor() {
-//     return estadoParaquedas;
-//   }
-// };
-
-// class DetectorApogeu {
-// private:
-//   int queda = 0;
-//   int contadorQueda = 0;
-// public:
-//   int detectorQueda(float altura) {
-//     float altitudeAnterior = 0;
-
-//     if (altura < altitudeAnterior) {
-//       contadorQueda++;
-//     } else {
-//       contadorQueda = 0;
-//     }
-
-//     altitudeAnterior = altura;
-
-//     if (contadorQueda >= 10) {
-//       queda = 1;
-//     } else {
-//       queda = 0;
-//     }
-//     return queda;
-//   }
-// };
+BMP085 bmp;
 
 Filtro f1(10);
 Filtro f2(10);
