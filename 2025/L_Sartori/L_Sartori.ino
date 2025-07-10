@@ -4,7 +4,7 @@
 
 
 #define GPS_HABILITAR 1
-#define LORA_HABILITAR 1
+#define LORA_HABILITAR 0
 #define ACCEL_HABILITAR 1
 #define ACCEL_X_HABILITAR (ACCEL_HABILITAR && 1)
 #define ACCEL_Y_HABILITAR (ACCEL_HABILITAR && 1)
@@ -79,8 +79,8 @@ long int tLora=0;
 #endif
 
 #if BARO_HABILITAR
-#define N 3
-#define L 5
+#define N 4
+#define L 9
 #define H 14
 #define valMedH 10
 #endif
