@@ -21,7 +21,8 @@ void loop() {
  
     Serial.print(bmp.readTemperature());
     Serial.print(" ");
-    Serial.print(bmp.readPressure()); 
+    Serial.print(bmp.readPressure());
+    Serial.print(" ");
     // Calculate altitude assuming 'standard' barometric
     // pressure of 1013.25 millibar = 101325 Pascal 
     Serial.print(bmp.readAltitude());
