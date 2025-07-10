@@ -127,6 +127,24 @@ int k = 0;
   float ordH[H];
 #endif
 
+
+
+float somasFil;
+float filtro(int numFiltragem, float valorRecebido){
+  valoresFiltros[numFiltragem][k] = valorRecebido;
+  somasFil=0;
+  if (numFiltragem==-1){
+    return somasFil/N;
+  }
+
+  for(int i=0; i < N; i++){
+    somasFil += valoresFiltros[numFiltragem][i];
+  }
+
+  return  filtro(numFiltragem-1, somasFil/N);
+}
+
+
 void setup() {
   String cabe = "";
 #if CHIP_HABILITAR
