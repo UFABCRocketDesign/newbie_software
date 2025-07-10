@@ -319,7 +319,7 @@ void loop() {
 #if BARO_HABILITAR
   vFiltro[0] = bmp.readAltitude() - med_alt;
 
-  for (int i = 0; i < N; i++) {
+  for (int i = 0; i < L; i++) {
     vFiltro[i + 1] = filtro(i,vFiltro[i]);
   }
 
