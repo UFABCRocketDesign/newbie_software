@@ -1,3 +1,9 @@
+#if defined(ARDUINO) && ARDUINO >= 100
+#include "arduino.h"
+#else
+#include "WProgram.h"
+#endif
+
 #ifdef ARDUINO_AVR_MEGA2560
 #define SD_CS_PIN 53
 #else
@@ -20,8 +26,13 @@
 HardwareSerial &LoRa(Serial3);
 HardwareSerial &GPS(Serial1);
 
+
+#define M0_LORA_PIN 12 // Pinos adicionais do LoRa
+#define M1_LORA_PIN 11 // Pinos adicionais do LoRa
+#define AUX_LORA_PIN A8 // Pinos adicionais do LoRa
+
 #define USANDO_SD 1
 
-#if USANDO_SD 
+#if USANDO_SD
 // Codigo pro cartao SD
 #endif
