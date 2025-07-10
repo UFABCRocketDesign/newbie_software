@@ -14,34 +14,19 @@ void setup() {
     while (1) {}
   }
 }
-
 // the loop function runs over and over again forever
 void loop() {
+  Serial.print(bmp.readTemperature());
+  Serial.print("\t\t");
+
+  Serial.print(bmp.readPressure());
+  Serial.print("\t\t");
+
+  Serial.println(bmp.readAltitude());
+  
   digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
   delay(500);                      // wait for a second
   digitalWrite(LED_BUILTIN, LOW);   // turn the LED off by making the voltage LOW
   delay(500);                      // wait for a second
-
-    Serial.print("Temperatura = "); 
-    Serial.print(bmp.readTemperature()); 
-    Serial.println(" *C");
-    
-    Serial.print("Pressão = ");
-    Serial.print(bmp.readPressure());
-    Serial.println(" Pa");
-    
-    Serial.print("Altitude = ");
-    Serial.print(bmp.readAltitude());
-    Serial.println(" metros");
-
-    Serial.print("Pressão ao nível do mar (calculada) = ");
-    Serial.print(bmp.readSealevelPressure());
-    Serial.println(" Pa");
-
-
-    Serial.print("Altitude real = ");
-    Serial.print(bmp.readAltitude(101500));
-    Serial.println(" metros");
-    
-    Serial.println();
 }
+
