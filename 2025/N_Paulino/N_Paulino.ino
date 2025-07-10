@@ -20,22 +20,16 @@ void loop() {
   delay(2000); 
  
     Serial.print(bmp.readTemperature());
-    Serial.print(" ");
+    Serial.print("\t");
     Serial.print(bmp.readPressure());
-    Serial.print(" ");
-    // Calculate altitude assuming 'standard' barometric
-    // pressure of 1013.25 millibar = 101325 Pascal 
+    Serial.print("\t");
     Serial.print(bmp.readAltitude());
-    Serial.print(" ");
+    Serial.print("\t");
     Serial.print(bmp.readSealevelPressure());
-    Serial.print(" ");
-  // you can get a more precise measurement of altitude
-  // if you know the current sea level pressure which will
-  // vary with weather and such. If it is 1015 millibars
-  // that is equal to 101500 Pascals.
-    Serial.print(" ");
+    Serial.print("\t");
+    Serial.print("\t");
     Serial.print(bmp.readAltitude(101500));
-    Serial.print(" ");
+    Serial.print("\t");
     Serial.println();
     delay(500);
                      // wait for a second
