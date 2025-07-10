@@ -125,7 +125,7 @@ int k = 0;
   float valoresFiltros[N][L];
   float vFiltro[N + 1];
   float ordH[H];
-#endif
+
 
 bool detecQued(float ultAlt){
   for (int i = H - 1; i > 0; i--) {
@@ -152,7 +152,7 @@ float filtro(int numFiltragem, float valorRecebido){
   return somasFil/L;
 }
 
-
+#endif
 void setup() {
   String cabe = "";
 #if CHIP_HABILITAR
