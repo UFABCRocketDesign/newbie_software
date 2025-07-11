@@ -18,7 +18,6 @@ private:
 public:
   bool begin();
   bool readAll(float pressaoInicial);
-  bool readAll();
   float readTemperature();
   float readPressure();
   float readAltitude();
