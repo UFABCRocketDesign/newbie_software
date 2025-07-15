@@ -73,7 +73,7 @@ bool BMP085::readAll(float pressaoInicial) {
   x1 = (ut - (long)ac6) * (long)ac5 >> 15;
   x2 = ((long)mc << 11) / (x1 + md);
   b5 = x1 + x2;
-  temperatura = (float)((b5 + 8) >> 4)/ 10.0;
+  celsius = (float)((b5 + 8) >> 4)/ 10.0;
 
   // True Pressure
   b6 = b5 - 4000;
