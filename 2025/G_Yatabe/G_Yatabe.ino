@@ -33,23 +33,20 @@
 
 Adafruit_BMP085 bmp;
 
+float Alt_zero = 0; 
+
 void setup() {
-  // initialize digital pin LED_BUILTIN as an output.
-  Serial.begin(115200);
-  if (!bmp.begin()) {
-	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-	while (1) {}
+  float soma = 0 ; 
+  for ( int i = 0 ; i < 10 ; i++) {
+    soma += bmp.readAltitude();
   }
-  pinMode(LED_BUILTIN, OUTPUT);
+  Alt_zero = soma / 10;
+
 }
 
 // the loop function runs over and over again forever
-void loop() {
-  digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
-  delay(500);                      // wait for a second
-  digitalWrite(LED_BUILTIN, LOW);   // turn the LED off by making the voltage LOW
-  delay(500);     
-  
+void loop() {     
+    
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
     
@@ -66,6 +63,11 @@ void loop() {
     Serial.print("\t");
     Serial.print(bmp.readAltitude(101500));
     Serial.print("\t");
+    Serial.print(bmp.readAltitude() - bmp.readAlt_zero());
+    Serial.print("\t");
     Serial.println();
     delay(500);
+
+    
+    
     }
