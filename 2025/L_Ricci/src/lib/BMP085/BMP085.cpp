@@ -4,7 +4,7 @@
 
 bool BMP085::begin() {
   Wire.beginTransmission(0x77);
-  Wire.write(0xAA);
+  Wire.write(0XAA);
   Wire.endTransmission();
 
   Wire.requestFrom(0x77, (uint8_t)22);
@@ -67,11 +67,13 @@ bool BMP085::readAll(float pressaoInicial) {
 
   up = (((unsigned long)Wire.read() << 16) | ((unsigned long)Wire.read() << 8) | (unsigned long)Wire.read()) >> (8 - oss);
 
+  Wire.beginTransmission(0x77);
+
   // True Temperature
   x1 = (ut - (long)ac6) * (long)ac5 >> 15;
   x2 = ((long)mc << 11) / (x1 + md);
   b5 = x1 + x2;
-  celsius = (float)((b5 + 8) >> 4) / 10;
+  temperatura = (float)((b5 + 8) >> 4)/ 10.0;
 
   // True Pressure
   b6 = b5 - 4000;
@@ -87,9 +89,9 @@ bool BMP085::readAll(float pressaoInicial) {
 
   b7 = ((unsigned long)(up - b3) * (50000 >> oss));
   if (b7 < 0x80000000) {
-    pressao = (b7 * 2) / b4;
+    pressao = (b7 << 1) / b4;
   } else {
-    pressao = (b7 / b4) * 2;
+    pressao = (b7 / b4) << 1;
   }
 
   x1 = (pressao >> 8) * (pressao >> 8);
@@ -97,7 +99,7 @@ bool BMP085::readAll(float pressaoInicial) {
   x2 = (-7357 * pressao) >> 16;
   pressao = pressao + ((x1 + x2 + 3791) >> 4);
 
-  altitude = 44330 * (1.0 - pow((pressao / pressaoInicial), (1/5.255)));
+  altitude = 44330.0 * (1.0 - pow((pressao / pressaoInicial), (1.0/5.255)));
 
   return true;
 }
