@@ -28,7 +28,7 @@ bool BMP085::begin() {
   return true;
 }
 
-bool BMP085::readAll(float pressaoInicial) {
+bool BMP085::readAll(float pressaoInicial = 101325) {
 
   Wire.beginTransmission(0x77);
   Wire.write(0xF4);
