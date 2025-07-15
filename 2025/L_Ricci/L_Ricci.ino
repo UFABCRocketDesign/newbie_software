@@ -75,6 +75,7 @@ float alt = 0;
 
 void setup() {
   Serial.begin(115200);
+  Wire.begin();
   LoRa.begin(9600);
   GPS.begin(9600);
 
@@ -187,7 +188,7 @@ void setup() {
   /* Média de Alturas */
 #if BARO
   for (int i = 0; i < 10; i++) {
-    bmp.readAll(101325);
+    bmp.readAll(101325.0);
     alt += bmp.readAltitude();
   }
   alt = alt / 10;
@@ -232,7 +233,7 @@ void loop() {
   float tempo = millis() / 1000.0;
 
 #if BARO
-  bmp.readAll(101325);
+  bmp.readAll(101325.0);
   float altitudeReal = bmp.readAltitude() - alt;
 #if TERMOMETRO
   float temperatura = bmp.readTemperature();

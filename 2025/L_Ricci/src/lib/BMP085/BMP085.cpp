@@ -108,7 +108,7 @@ float BMP085::readTemperature() {
   return celsius;
 }
 
-float BMP085::readPressure() {
+long BMP085::readPressure() {
   return pressao;
 }
 
