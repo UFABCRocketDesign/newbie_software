@@ -97,7 +97,7 @@ bool BMP085::readAll(float pressaoInicial) {
   x2 = (-7357 * pressao) >> 16;
   pressao = pressao + ((x1 + x2 + 3791) >> 4);
 
-  altitude = 44330 * (1.0 - pow((pressao / (pressaoInicial/100)), (1/5.255)));
+  altitude = 44330 * (1.0 - pow((pressao / pressaoInicial), (1/5.255)));
 
   return true;
 }
