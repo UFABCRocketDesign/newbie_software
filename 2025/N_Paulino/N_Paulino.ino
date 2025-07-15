@@ -1,7 +1,7 @@
 #include <Adafruit_BMP085.h>
 
 Adafruit_BMP085 bmp;
-float alt_zero = 0.0;              
+float alt_zero = 0;              
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
