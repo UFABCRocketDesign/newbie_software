@@ -63,7 +63,7 @@ void loop() {
     Serial.print("\t");
     Serial.print(bmp.readAltitude(101500));
     Serial.print("\t");
-    Serial.print(bmp.readAltitude() - bmp.readAlt_zero());
+    Serial.print(bmp.readAltitude() - Alt_zero);
     Serial.print("\t");
     Serial.println();
     delay(500);
