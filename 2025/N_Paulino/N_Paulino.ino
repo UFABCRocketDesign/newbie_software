@@ -23,9 +23,9 @@ void loop() {
   Serial.print('\t');
   Serial.print(bmp.readPressure());          
   Serial.print('\t');
+  Serial.print(bmp.readAltitude() - alt_zero);
   Serial.print(bmp.readSealevelPressure());  
   Serial.print('\t');
-  Serial.print(bmp.readAltitude() - alt_zero);
   Serial.println();
 
 }
