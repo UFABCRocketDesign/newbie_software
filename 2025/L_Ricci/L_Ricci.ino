@@ -187,7 +187,7 @@ void setup() {
   /* Média de Alturas */
 #if BARO
   for (int i = 0; i < 10; i++) {
-    bmp.readAll();
+    bmp.readAll(101325);
     alt += bmp.readAltitude();
   }
   alt = alt / 10;
@@ -232,7 +232,7 @@ void loop() {
   float tempo = millis() / 1000.0;
 
 #if BARO
-  bmp.readAll();
+  bmp.readAll(101325);
   float altitudeReal = bmp.readAltitude() - alt;
 #if TERMOMETRO
   float temperatura = bmp.readTemperature();
