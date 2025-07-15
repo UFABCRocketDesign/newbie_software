@@ -3,8 +3,7 @@
 Adafruit_BMP085 bmp;
 
 void setup() {
-  pinMode(LED_BUILTIN, OUTPUT);
-  Serial.begin(9600);
+  Serial.begin(115200);
   if (!bmp.begin()) {
 	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
 	while (1) {}
@@ -12,29 +11,20 @@ void setup() {
 }
 
 void loop() {
-  digitalWrite(LED_BUILTIN, HIGH);  
-  delay(20);                      
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(20);
-  Serial.print("Temperature = ");
-    Serial.print(bmp.readTemperature());
-    Serial.println(" *C");
+
+    /*cabeçalho!*/
+    Serial.println("Temperature\tPressure\tAltitude\tPressure at sealevel\tReal altitude")
+
+    /*Valores*/
+    Serial.print(bmp.readTemperature()); Serial.print("\t");
     
-    Serial.print("Pressure = ");
-    Serial.print(bmp.readPressure());
-    Serial.println(" Pa");
+    Serial.print(bmp.readPressure()); Serial.print("\t");
 
-    Serial.print("Altitude = ");
-    Serial.print(bmp.readAltitude());
-    Serial.println(" meters");
+    Serial.print(bmp.readAltitude()); Serial.print("\t")
 
-    Serial.print("Pressure at sealevel (calculated) = ");
-    Serial.print(bmp.readSealevelPressure());
-    Serial.println(" Pa");
+    Serial.print(bmp.readSealevelPressure()); Serial.print("\t")
 
-    Serial.print("Real altitude = ");
-    Serial.print(bmp.readAltitude(101500));
-    Serial.println(" meters");
+    Serial.println(bmp.readAltitude(101500)); Serial.print("\t")
     
     Serial.println();
     delay(500);                
