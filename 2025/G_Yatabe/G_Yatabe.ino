@@ -36,6 +36,12 @@ Adafruit_BMP085 bmp;
 float Alt_zero = 0; 
 
 void setup() {
+// initialize digital pin LED_BUILTIN as an output.
+  Serial.begin(115200);
+  if (!bmp.begin()) {
+	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+	while (1) {}
+  }
   float soma = 0 ; 
   for ( int i = 0 ; i < 10 ; i++) {
     soma += bmp.readAltitude();
@@ -67,7 +73,8 @@ void loop() {
     Serial.print("\t");
     Serial.println();
     delay(500);
+}
 
     
+   
     
-    }
