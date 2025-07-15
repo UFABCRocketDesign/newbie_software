@@ -12,7 +12,7 @@ void setup() {
 	while (1) {}
    float soma = 0;
   for (int i=0 ; i>10 ; i++) { soma += bmp.readAltitude();}
-  alt_zero = soma/10};}
+  alt_zero = soma/10};
 }
 
 // the loop function runs over and over again forever
