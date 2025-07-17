@@ -111,12 +111,14 @@ int k = 0;
 uint8_t IGN[4] = {IGN_1,IGN_2,IGN_3,IGN_4};
 long int te[4] = {0,0,0,0};
 bool ocoAp = 0;
-int pQued[4]= {0,0,0,0};
+int pQuedasApo[4] = {0,0,apoH,apoH};
+bool pQuedasAlt[4] = {1,1,0,0};
+int pQued[4]= {0,0,1,1};
 int interEsp[4] = {0,2000,0,2000};
 int inters[4] = {inter1,inter2,inter3,inter4};
 
-void detecQueda(int numPaQue,long int t,float ordH[0] ){
-    if (ocoAp && pQued[numPaQue] == 0 && (apoH >= ordH[0] || (numPaQue==0) || (numPaQue==1) )) {
+void detecQueda(int numPaQue,long int t,float hNow, bool ocoAp){
+    if (ocoAp && pQued[numPaQue] == 0 && (pQuedasApo[numPaQue] >= hNow || pQuedasAlt[numPaQue])) {
     te[numPaQue] = t;
     pQued[numPaQue] = 1;
   } else if (pQued[numPaQue] == 1 && t - te[numPaQue] >= interEsp[numPaQue]) {
@@ -357,7 +359,7 @@ void loop() {
     }
   }
   for(int i=0;i<4;i++){
-    detecQueda(i,t,&ordH[0]);
+    detecQueda(i,t,ordH[0],ocoAp);
   }
 #endif
 
