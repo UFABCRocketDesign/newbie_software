@@ -33,6 +33,8 @@ float alturapassada = 0;
 float altura_filtrada = 0;
 float altura_filtrada2 = 0;
 
+int32_t pressao;
+float temperatura;
 //Declaração pro detector de queda
 bool queda = false;
 
@@ -64,7 +66,7 @@ const long intervalPRQ2 = 2000;
 const long intervalPRQ4 = 2000;
 
 void setup() {
-  /*------SETUP DATALOGGER------*/
+  /*------INICIALIZAÇÃO DATALOGGER------*/
   // Open serial communications and wait for port to open:
   Serial.begin(115200);
   // wait for Serial Monitor to connect. Needed for native USB port boards only:
@@ -102,7 +104,7 @@ void setup() {
   File dataFile = SD.open(nomearquivo, FILE_WRITE);
   //FIM DO SETUP DATALOGGER
 
-  /*------SETUP BMP------*/
+  /*------INICIALIZAÇÃO BMP------*/
   //Inicialização do sensor
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
@@ -117,15 +119,49 @@ void setup() {
   tara /= 10;
   //
 
+  /*------INICIALIZAÇÃO ACELERÔMETRO------*/
+  if (!accel.begin()) {
+    /* There was a problem detecting the ADXL345 ... check your connections */
+    Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
+    while (1)
+      ;
+  }
+  accel.setRange(ADXL345_RANGE_16_G);
+
+  //Originalmente tinha um Wire.begin() aqui (entre o setup do acelerômetro e giroscópio), não sei de onde veio, e eu tirei.
+  //Se parar de rodar, tenta por de volta
+
+  /*------INICIALIZAÇÃO GIROSCÓPIO------*/
+  if (!gyro.init()) {
+    Serial.println("Failed to autodetect gyro type!");
+    while (1)
+      ;
+  }
+  gyro.enableDefault();
+
+  /*------INICIALIZAÇÃO MAGNETÔMETRO------*/
+  if (!mag.begin()) {
+    /* There was a problem detecting the HMC5883 ... check your connections */
+    Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
+    while (1)
+      ;
+  }
+
+  /*------PINOS DO PARAQUEDAS------*/
+  pinMode(IGN_1, OUTPUT);
+  pinMode(IGN_2, OUTPUT);
+  pinMode(IGN_3, OUTPUT);
+  pinMode(IGN_4, OUTPUT);
+
+  /*
   Serial.print("tempo\t");
-  Serial.print("alturapassada\t");
   Serial.print("Altura Sem Filtro\t");
   Serial.print("Altura Filtrada\t");
   Serial.print("Altura Filtrada 2\t");
   Serial.print("Detector de Queda\t");
   Serial.print("Temperatura\t");
   Serial.print("Pressão\t");
-  Serial.print("paraquedasarmado\t");
+  Serial.print("paraquedas1armado\t");
   Serial.print("x (m/s^2)\t");
   Serial.print("y (m/s^2)\t");
   Serial.print("z (m/s^2)\t");
@@ -136,12 +172,47 @@ void setup() {
   Serial.print("Magnet y\t");
   Serial.print("Magnet z\t");
   Serial.println();
-  //FIM DO SETUP BMP
+  */
+
+  // Armazenamento dos valores na dataString
+  String dataString = "";
+  dataString += ("tempo\t");
+  dataString += ("Altura Sem Filtro\t");
+  dataString += ("Altura Filtrada\t");
+  dataString += ("Altura Filtrada 2\t");
+  dataString += ("Detector de Queda\t");
+  dataString += ("Temperatura\t");
+  dataString += ("Pressão\t");
+  dataString += ("paraquedas1armado\t");
+  dataString += ("paraquedas2armado\t");
+  dataString += ("paraquedas3armado\t");
+  dataString += ("paraquedas4armado\t");
+  dataString += ("x (m/s^2)\t");
+  dataString += ("y (m/s^2)\t");
+  dataString += ("z (m/s^2)\t");
+  dataString += ("Gyro x\t");
+  dataString += ("Gyro y\t");
+  dataString += ("Gyro z\t");
+  dataString += ("Magnet x\t");
+  dataString += ("Magnet y\t");
+  dataString += ("Magnet z\t");
+  //Print da dataString
+  Serial.println(dataString);
+
+  /*------SALVA NO ARQUIVO------*/
+  // if the file is available, write to it:
+  if (dataFile) {
+    dataFile.println(dataString);
+    dataFile.close();
+  }
+  else {
+    Serial.println("Erro ao abrir" + nomearquivo);
+  }
 
   /*------SETUP ARMAZENAMENTO NO ARQUIVO------*/
+  /*
   if (dataFile) {
     dataFile.print("tempo\t");
-    dataFile.print("alturapassada\t");
     dataFile.print("Altura Sem Filtro\t");
     dataFile.print("Altura Filtrada\t");
     dataFile.print("Altura Filtrada 2\t");
@@ -168,40 +239,7 @@ void setup() {
   else {
     Serial.println("Erro ao abrir" + nomearquivo);
   }
-
-  /*------PINOS DO PARAQUEDAS------*/
-  pinMode(IGN_1, OUTPUT);
-  pinMode(IGN_2, OUTPUT);
-  pinMode(IGN_3, OUTPUT);
-  pinMode(IGN_4, OUTPUT);
-
-  /*------INICIALIZAÇÃO ACELERÔMETRO------*/
-  if (!accel.begin()) {
-    /* There was a problem detecting the ADXL345 ... check your connections */
-    Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
-    while (1)
-      ;
-  }
-  accel.setRange(ADXL345_RANGE_16_G);
-
-  Wire.begin();
-
-  /*------INICIALIZAÇÃO GIROSCÓPIO------*/
-  if (!gyro.init()) {
-    Serial.println("Failed to autodetect gyro type!");
-    while (1)
-      ;
-  }
-
-  gyro.enableDefault();
-
-  /*------INICIALIZAÇÃO MAGNETÔMETRO------*/
-  if (!mag.begin()) {
-    /* There was a problem detecting the HMC5883 ... check your connections */
-    Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
-    while (1)
-      ;
-  }
+  */
 }
 
 void loop() {
@@ -222,6 +260,9 @@ void loop() {
   // Get a new sensor event (Magnetômetro)
   sensors_event_t eventmag;
   mag.getEvent(&eventmag);
+
+  temperatura = bmp.readTemperature();
+  pressao = bmp.readPressure();
 
   //*------SENSOR BMP------*/
   //FILTROS
@@ -328,13 +369,12 @@ void loop() {
   // Armazenamento dos valores na dataString
   String dataString = "";
   dataString += String(tempo) + "\t";
-  dataString += String(alturapassada) + "\t";
   dataString += String(vetor[guia]) + "\t";
   dataString += String(altura_filtrada) + "\t";
   dataString += String(altura_filtrada2) + "\t";
   dataString += String(detectorqueda) + "\t";
-  dataString += String(bmp.readTemperature()) + "\t";
-  dataString += String(bmp.readPressure()) + "\t";
+  dataString += String(temperatura) + "\t";
+  dataString += String(pressao) + "\t";
   dataString += String(paraquedas1armado) + "\t";
   dataString += String(paraquedas2armado) + "\t";
   dataString += String(paraquedas3armado) + "\t";
