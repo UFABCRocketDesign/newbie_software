@@ -1,10 +1,8 @@
 #include <Adafruit_BMP085.h>
 
 Adafruit_BMP085 bmp;
-
-// the setup function runs once when you press reset or power the board
+float alturaZero = 0;
 void setup() {
-  // initialize digital pin LED_BUILTIN as an output.
   pinMode(LED_BUILTIN, OUTPUT);
 
 
@@ -13,20 +11,31 @@ void setup() {
     Serial.println("Não foi possível encontrar um sensor BMP085 válido, verifique a fiação!");
     while (1) {}
   }
+Serial.println("calibrando altura");
+float soma = 0;
+for (int i = 0; i < 20, i++;) {
+  soma += bmp.readAltitude();
+  delay(50);
+  }
+  alturaZero = soma/20;
 }
-// the loop function runs over and over again forever
+
 void loop() {
+  float Altitude = bmp.readAltitude();
+  float Altura = Altitude - alturaZero;
+  
   Serial.print(bmp.readTemperature());
-  Serial.print("\t\t");
+  Serial.print("\t");
 
   Serial.print(bmp.readPressure());
-  Serial.print("\t\t");
+  Serial.print("\t");
 
-  Serial.println(bmp.readAltitude());
+  Serial.print(bmp.readAltitude());
+  Serial.print("\t");
   
-  digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
-  delay(500);                      // wait for a second
-  digitalWrite(LED_BUILTIN, LOW);   // turn the LED off by making the voltage LOW
-  delay(500);                      // wait for a second
+  Serial.print(Altura);
+  Serial.println();
+
+  delay(100);
 }
 
