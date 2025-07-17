@@ -84,7 +84,7 @@ void setup() {
     while (true)
       ;
   }
-
+  
   Serial.println("initialization done.");
 
   do {
@@ -98,10 +98,6 @@ void setup() {
   } while (SD.exists(nomearquivo));
 
   Serial.println(nomearquivo);
-
-  // open the file. note that only one file can be open at a time,
-  // so you have to close this one before opening another.
-  File dataFile = SD.open(nomearquivo, FILE_WRITE);
   //FIM DO SETUP DATALOGGER
 
   /*------INICIALIZAÇÃO BMP------*/
@@ -153,28 +149,10 @@ void setup() {
   pinMode(IGN_3, OUTPUT);
   pinMode(IGN_4, OUTPUT);
 
-  /*
-  Serial.print("tempo\t");
-  Serial.print("Altura Sem Filtro\t");
-  Serial.print("Altura Filtrada\t");
-  Serial.print("Altura Filtrada 2\t");
-  Serial.print("Detector de Queda\t");
-  Serial.print("Temperatura\t");
-  Serial.print("Pressão\t");
-  Serial.print("paraquedas1armado\t");
-  Serial.print("x (m/s^2)\t");
-  Serial.print("y (m/s^2)\t");
-  Serial.print("z (m/s^2)\t");
-  Serial.print("Gyro x\t");
-  Serial.print("Gyro y\t");
-  Serial.print("Gyro z\t");
-  Serial.print("Magnet x\t");
-  Serial.print("Magnet y\t");
-  Serial.print("Magnet z\t");
-  Serial.println();
-  */
-
-  // Armazenamento dos valores na dataString
+  /*------SETUP ARMAZENAMENTO NO ARQUIVO------*/
+  // Abre o arquivo
+  File dataFile = SD.open(nomearquivo, FILE_WRITE);
+  // Armazena o cabeçalho na dataString
   String dataString = "";
   dataString += ("tempo\t");
   dataString += ("Altura Sem Filtro\t");
@@ -208,38 +186,6 @@ void setup() {
   else {
     Serial.println("Erro ao abrir" + nomearquivo);
   }
-
-  /*------SETUP ARMAZENAMENTO NO ARQUIVO------*/
-  /*
-  if (dataFile) {
-    dataFile.print("tempo\t");
-    dataFile.print("Altura Sem Filtro\t");
-    dataFile.print("Altura Filtrada\t");
-    dataFile.print("Altura Filtrada 2\t");
-    dataFile.print("Detector de Queda\t");
-    dataFile.print("Temperatura\t");
-    dataFile.print("Pressão\t");
-    dataFile.print("paraquedas1armado\t");
-    dataFile.print("paraquedas2armado\t");
-    dataFile.print("paraquedas3armado\t");
-    dataFile.print("paraquedas4armado\t");
-    dataFile.print("x (m/s^2)\t");
-    dataFile.print("y (m/s^2)\t");
-    dataFile.print("z (m/s^2)\t");
-    dataFile.print("Gyro x\t");
-    dataFile.print("Gyro y\t");
-    dataFile.print("Gyro z\t");
-    dataFile.print("Magnet x\t");
-    dataFile.print("Magnet y\t");
-    dataFile.print("Magnet z\t");
-    dataFile.println();
-    dataFile.close();
-  }
-  // if the file isn't open, pop up an error:
-  else {
-    Serial.println("Erro ao abrir" + nomearquivo);
-  }
-  */
 }
 
 void loop() {
