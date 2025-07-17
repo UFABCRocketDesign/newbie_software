@@ -2,7 +2,7 @@
 
 Adafruit_BMP085 bmp;
 float alturaZero = 0;
-const float ALPHA = 0.1;
+const float ALPHA = 0.05;
 float alturaFiltrada = 0;
 
 void setup() {
