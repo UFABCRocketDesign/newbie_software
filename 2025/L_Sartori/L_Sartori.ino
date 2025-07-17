@@ -35,7 +35,7 @@ TinyGPSPlus gps;
 #if LORA_HABILITAR
 HardwareSerial &LoRa(Serial3);
 #define loraEsp 3000
-long int tLora=0;
+long int tLora = 0;
 #endif
 
 #if ACCEL_HABILITAR
@@ -101,7 +101,7 @@ Adafruit_BMP085 bmp;
 #endif
 #if GYRO_HABILITAR
 L3G gyro;
-#endif 
+#endif
 
 #if BMP_HABILITAR
 float med_alt = 0;
@@ -109,25 +109,25 @@ int k = 0;
 #endif
 
 #if PQUEDAS_HABILITAR
-  long int t1 = 0;
-  long int t2 = 0;
-  long int t3 = 0;
-  long int t4 = 0;
-  int pQued1 = 0;
-  int pQued2 = -1;
-  int pQued3 = 0;
-  int pQued4 = -1;
-  bool ocoAp = 0;
+long int t1 = 0;
+long int t2 = 0;
+long int t3 = 0;
+long int t4 = 0;
+int pQued1 = 0;
+int pQued2 = -1;
+int pQued3 = 0;
+int pQued4 = -1;
+bool ocoAp = 0;
 #endif
 
 #if BARO_HABILITAR
-  bool h;
-  float valoresFiltros[N][L];
-  float vFiltro[N + 1];
-  float ordH[H];
+bool h;
+float valoresFiltros[N][L];
+float vFiltro[N + 1];
+float ordH[H];
 
 
-bool detecQued(float ultAlt){
+bool detecQued(float ultAlt) {
   for (int i = H - 1; i > 0; i--) {
     ordH[i] = ordH[i - 1];
   }
@@ -140,16 +140,16 @@ bool detecQued(float ultAlt){
 }
 
 
-float filtro(int numFiltragem, float valorRecebido){
+float filtro(int numFiltragem, float valorRecebido) {
   float somasFil;
   valoresFiltros[numFiltragem][k] = valorRecebido;
-  somasFil=0;
+  somasFil = 0;
 
-  for(int i=0; i < L; i++){
+  for (int i = 0; i < L; i++) {
     somasFil += valoresFiltros[numFiltragem][i];
   }
 
-  return somasFil/L;
+  return somasFil / L;
 }
 
 #endif
@@ -231,7 +231,7 @@ void setup() {
 
   Serial.println("Creating " + docName + "...");
   dataFile = SD.open(docName, FILE_WRITE);
-#endif 
+#endif
 
   cabe += String("tempo\t");
 
@@ -242,9 +242,9 @@ void setup() {
   cabe += String("Pressure\t");
 #endif
 #if BARO_HABILITAR
-  for(int i=0;i<N+1;i++){
+  for (int i = 0; i < N + 1; i++) {
     cabe += String("Filtro");
-    cabe += String(i+1) +"\t";
+    cabe += String(i + 1) + "\t";
   }
   cabe += String("h\t");
 #endif
@@ -330,7 +330,7 @@ void loop() {
   vFiltro[0] = bmp.readAltitude() - med_alt;
 
   for (int i = 0; i < N; i++) {
-    vFiltro[i + 1] = filtro(i,vFiltro[i]);
+    vFiltro[i + 1] = filtro(i, vFiltro[i]);
   }
 
   k += 1;
@@ -341,10 +341,11 @@ void loop() {
 
 #endif
 #if PQUEDAS_HABILITAR
-  if (detecQued(vFiltro[N])) {
-    ocoAp = 1;
+  if (ocoAp = 0) {
+    if (detecQued(vFiltro[N])) {
+      ocoAp = 1;
+    }
   }
-
   if (ocoAp && pQued1 == 0) {
     t1 = t;
     pQued1 = 1;
@@ -387,7 +388,7 @@ void loop() {
     digitalWrite(IGN_4, LOW);
     pQued4 = 2;
   }
-#endif 
+#endif
 
   dataString += String(t / 1000.0);
   dataString += "\t";
@@ -445,7 +446,7 @@ void loop() {
 #if GYRO_Z_HABILITAR
   dataString += String((int)gyro.g.z);
   dataString += "\t";
-#endif 
+#endif
 #if MAG_X_HABILITAR
   dataString += String(eventmag.magnetic.x);
   dataString += "\t";
@@ -459,7 +460,7 @@ void loop() {
   dataString += "\t";
 #endif
 #if GPS_HABILITAR
-  while (GPS.available()){
+  while (GPS.available()) {
     gps.encode(GPS.read());
   }
   dataString += String(gps.location.lat(), 6);
@@ -470,14 +471,14 @@ void loop() {
 #endif
   Serial.println(dataString);
 #if LORA_HABILITAR
-  if(t-tLora>=loraEsp){
+  if (t - tLora >= loraEsp) {
     LoRa.println(dataString);
     tLora = t;
   }
 #endif
 
 #if CHIP_HABILITAR
-  
+
 
   File dataFile = SD.open(docName, FILE_WRITE);
   if (dataFile) {
