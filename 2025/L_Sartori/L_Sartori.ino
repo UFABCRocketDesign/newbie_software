@@ -66,7 +66,6 @@ long int tLora = 0;
 #define IGN_3 46 /*act3*/
 #define IGN_4 55 /*act4*/
 #define inter1 5000
-#define interEsp 2000
 #define inter2 5000
 #define inter3 5000
 #define inter4 5000
@@ -109,15 +108,26 @@ int k = 0;
 #endif
 
 #if PQUEDAS_HABILITAR
-long int t1 = 0;
-long int t2 = 0;
-long int t3 = 0;
-long int t4 = 0;
-int pQued1 = 0;
-int pQued2 = -1;
-int pQued3 = 0;
-int pQued4 = -1;
+uint8_t IGN[4] = {IGN_1,IGN_2,IGN_3,IGN_4};
+long int te[4] = {0,0,0,0};
 bool ocoAp = 0;
+int pQued[4]= {0,0,0,0};
+int interEsp[4] = {0,2000,0,2000};
+int inters[4] = {inter1,inter2,inter3,inter4};
+
+void detecQueda(int numPaQue,long int t,float ordH[0] ){
+    if (ocoAp && pQued[numPaQue] == 0 && (apoH >= ordH[0] || (numPaQue==0) || (numPaQue==1) )) {
+    te[numPaQue] = t;
+    pQued[numPaQue] = 1;
+  } else if (pQued[numPaQue] == 1 && t - te[numPaQue] >= interEsp[numPaQue]) {
+    digitalWrite(IGN[numPaQue], HIGH);
+    pQued[numPaQue] = 2;
+    te[numPaQue] = t;
+  } else if (pQued[numPaQue] == 2 && t - te[numPaQue] >= inters[numPaQue]) {
+    digitalWrite(IGN[numPaQue], LOW);
+    pQued[numPaQue] = 3;
+  }
+}
 #endif
 
 #if BARO_HABILITAR
@@ -346,47 +356,8 @@ void loop() {
       ocoAp = 1;
     }
   }
-  if (ocoAp && pQued1 == 0) {
-    t1 = t;
-    pQued1 = 1;
-    digitalWrite(IGN_1, HIGH);
-  } else if (pQued1 == 1 && t - t1 >= inter1) {
-    digitalWrite(IGN_1, LOW);
-    pQued1 = 2;
-  }
-
-  if (ocoAp && pQued2 == -1) {
-    t2 = t;
-    pQued2 = 0;
-  } else if (pQued2 == 0 && t - t2 >= interEsp) {
-    digitalWrite(IGN_2, HIGH);
-    pQued2 = 1;
-    t2 = t;
-  } else if (pQued2 == 1 && t - t2 >= inter2) {
-    digitalWrite(IGN_2, LOW);
-    pQued2 = 2;
-  }
-
-  if (ocoAp && pQued3 == 0 && apoH >= ordH[0]) {
-    t3 = t;
-    pQued3 = 1;
-    digitalWrite(IGN_3, HIGH);
-  } else if (pQued3 == 1 && t - t3 >= inter3) {
-    digitalWrite(IGN_3, LOW);
-    pQued3 = 2;
-  }
-
-
-  if (ocoAp && pQued4 == -1 && apoH >= ordH[0]) {
-    t4 = t;
-    pQued4 = 0;
-  } else if (pQued4 == 0 && t - t4 >= interEsp) {
-    digitalWrite(IGN_4, HIGH);
-    pQued4 = 1;
-    t4 = t;
-  } else if (pQued4 == 1 && t - t4 >= inter4) {
-    digitalWrite(IGN_4, LOW);
-    pQued4 = 2;
+  for(int i=0;i<4;i++){
+    detecQueda(i,t,&ordH[0]);
   }
 #endif
 
@@ -411,16 +382,16 @@ void loop() {
   dataString += "\t";
 #endif
 #if PQUEDAS_HABILITAR
-  dataString += String(pQued1);
+  dataString += String(pQued[0]);
   dataString += "\t";
 
-  dataString += String(pQued2);
+  dataString += String(pQued[1]);
   dataString += "\t";
 
-  dataString += String(pQued3);
+  dataString += String(pQued[2]);
   dataString += "\t";
 
-  dataString += String(pQued4);
+  dataString += String(pQued[3]);
   dataString += "\t";
 #endif
 #if ACCEL_X_HABILITAR
