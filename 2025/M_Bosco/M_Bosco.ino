@@ -13,9 +13,8 @@ void setup() {
   }
 Serial.println("calibrando altura");
 float soma = 0;
-for (int i = 0; i < 20, i++;) {
+for (int i = 0; i < 20; i++) {
   soma += bmp.readAltitude();
-  delay(50);
   }
   alturaZero = soma/20;
 }
@@ -30,12 +29,10 @@ void loop() {
   Serial.print(bmp.readPressure());
   Serial.print("\t");
 
-  Serial.print(bmp.readAltitude());
+  Serial.print(Altitude);
   Serial.print("\t");
   
   Serial.print(Altura);
   Serial.println();
-
-  delay(100);
 }
 
