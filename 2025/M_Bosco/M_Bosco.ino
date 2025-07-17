@@ -1,8 +1,11 @@
 #include <Adafruit_BMP085.h>
 
 Adafruit_BMP085 bmp;
+
 float alturaZero = 0;
-const float ALPHA = 0.05;
+
+float alturaFiltradaSegundaVez = 0.0;
+const float ALPHA = 0.15;
 float alturaFiltrada = 0;
 
 void setup() {
@@ -27,6 +30,7 @@ void loop() {
   float Altura = Altitude - alturaZero;
   
   alturaFiltrada = (ALPHA * Altura) + (1 - ALPHA) * alturaFiltrada;
+  alturaFiltradaSegundaVez = (ALPHA * alturaFiltrada) + (1.0 - ALPHA) * alturaFiltradaSegundaVez;
 
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
