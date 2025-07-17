@@ -341,7 +341,7 @@ void loop() {
 
 #endif
 #if PQUEDAS_HABILITAR
-  if (ocoAp = 0) {
+  if (!ocoAp) {
     if (detecQued(vFiltro[N])) {
       ocoAp = 1;
     }
