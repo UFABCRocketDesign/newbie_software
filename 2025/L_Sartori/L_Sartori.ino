@@ -118,7 +118,7 @@ int interEsp[4] = {0,2000,0,2000};
 int inters[4] = {inter1,inter2,inter3,inter4};
 
 void detecQueda(int numPaQue,long int t,float hNow, bool ocoAp){
-    if (ocoAp && pQued[numPaQue] == 0 && (pQuedasApo[numPaQue] >= hNow || pQuedasAlt[numPaQue])) {
+    if ((ocoAp) && (pQued[numPaQue] == 0 )&& ((pQuedasApo[numPaQue] >= hNow) || pQuedasAlt[numPaQue])) {
     te[numPaQue] = t;
     pQued[numPaQue] = 1;
   } else if (pQued[numPaQue] == 1 && t - te[numPaQue] >= interEsp[numPaQue]) {
