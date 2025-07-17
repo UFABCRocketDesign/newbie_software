@@ -45,6 +45,9 @@ void loop() {
   Serial.print("\t");
 
   Serial.print(alturaFiltrada);
+  Serial.print("\t");
+
+  Serial.print(alturaFiltradaSegundaVez);
   Serial.println();
 }
 
