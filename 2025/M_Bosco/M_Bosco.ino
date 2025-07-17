@@ -2,6 +2,9 @@
 
 Adafruit_BMP085 bmp;
 float alturaZero = 0;
+const float ALPHA = 0.2;
+float alturaFiltrada = 0;
+
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
 
@@ -23,6 +26,8 @@ void loop() {
   float Altitude = bmp.readAltitude();
   float Altura = Altitude - alturaZero;
   
+  alturaFiltrada = (ALPHA * Altura) + (1 - ALPHA) * alturaFiltrada;
+
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
 
@@ -33,6 +38,9 @@ void loop() {
   Serial.print("\t");
   
   Serial.print(Altura);
+  Serial.println();
+
+  Serial.print(alturaFiltrada);
   Serial.println();
 }
 
