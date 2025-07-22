@@ -247,6 +247,7 @@ void loop() {
 #endif
 
 #if ACEL
+  accel.readAll();
   // sensors_event_t event_accel;
   // accel.getEvent(&event_accel);
 #if AX
