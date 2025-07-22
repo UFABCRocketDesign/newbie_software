@@ -10,10 +10,11 @@
 #include "src/lib/Apogeu/Apogeu.h"
 #include "src/lib/Paraquedas/Paraquedas.h"
 #include "src/lib/Filtro/Filtro.h"
-#include "src/lib/BMP085/BMP085.h"
+#include "src/lib/Barometro/BMP085.h"
+#include "src/lib/Acelerometro/ADXL345.h"
 
 // Adafruit_BMP085 bmp;
-Adafruit_ADXL345_Unified accel;
+// Adafruit_ADXL345_Unified accel;
 Adafruit_HMC5883_Unified mag;
 TinyGPSPlus gps;
 L3G gyro;
@@ -59,6 +60,8 @@ HardwareSerial &GPS = Serial1;
 String filename;
 
 BMP085 bmp;
+
+ADXL345 accel(2);
 
 Filtro f1(10);
 Filtro f2(10);
@@ -244,16 +247,16 @@ void loop() {
 #endif
 
 #if ACEL
-  sensors_event_t event_accel;
-  accel.getEvent(&event_accel);
+  // sensors_event_t event_accel;
+  // accel.getEvent(&event_accel);
 #if AX
-  float accelX = event_accel.acceleration.x;
+  float accelX = accel.getX();
 #endif
 #if AY
-  float accelY = event_accel.acceleration.y;
+  float accelY = accel.getY();
 #endif
 #if AZ
-  float accelZ = event_accel.acceleration.z;
+  float accelZ = accel.getZ();
 #endif
 #endif
 
