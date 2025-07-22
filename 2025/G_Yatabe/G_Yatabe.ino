@@ -35,6 +35,8 @@ Adafruit_BMP085 bmp;
 
 float Alt_zero = 0; 
 
+float vetor[10];
+
 void setup() {
 // initialize digital pin LED_BUILTIN as an output.
   Serial.begin(115200);
@@ -52,7 +54,19 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {     
-    
+    float nova_alt = (bmp.readAltitude() - Alt_zero);
+    for(int i = 9; i > 0; i--){
+      vetor[i] = vetor[i-1];
+    }
+
+    vetor[0] = nova_alt;
+
+    float soma = 0;
+    for(int i = 0; i<10; i++) {
+      soma += vetor[i];
+    }
+    float media = soma/10;
+
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
     
@@ -66,6 +80,8 @@ void loop() {
     Serial.print(bmp.readAltitude(101500));
     Serial.print("\t");
     Serial.print(bmp.readAltitude() - Alt_zero);
+    Serial.print("\t");
+    Serial.print(nova_alt);
     Serial.print("\t");
     Serial.println();
     
