@@ -62,7 +62,7 @@ void loop() {
     vetor[0] = nova_alt;
 
     float soma = 0;
-    for(int i = 0; i<10; i++) {
+    for(int i = 0; i<75; i++) {
       soma += vetor[i];
     }
     float media = soma/75;
