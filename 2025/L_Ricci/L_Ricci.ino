@@ -12,12 +12,13 @@
 #include "src/lib/Filtro/Filtro.h"
 #include "src/lib/Barometro/BMP085.h"
 #include "src/lib/Acelerometro/ADXL345.h"
+#include "src/lib/Giroscopio/L3G4200D.h"
 
 // Adafruit_BMP085 bmp;
 // Adafruit_ADXL345_Unified accel;
+// L3G gyro;
 Adafruit_HMC5883_Unified mag;
 TinyGPSPlus gps;
-L3G gyro;
 
 #define BARO 1
 #define TERMOMETRO 1
@@ -63,6 +64,8 @@ BMP085 bmp;
 
 ADXL345 accel(2);
 
+L3G4200D gyro;
+
 Filtro f1(10);
 Filtro f2(10);
 
@@ -104,12 +107,10 @@ void setup() {
   }
 #endif
 #if GIRO
-  if (!gyro.init()) {
+  if (!gyro.begin()) {
     Serial.println("Failed to autodetect gyro type!");
     while (1) {}
   }
-
-  gyro.enableDefault();
 #endif
 #if MAG
   if (!mag.begin()) {
@@ -262,15 +263,15 @@ void loop() {
 #endif
 
 #if GIRO
-  gyro.read();
+  gyro.readAll();
 #if GX
-  int gyroX = gyro.g.x;
+  int gyroX = gyro.getX();
 #endif
 #if GY
-  int gyroY = gyro.g.y;
+  int gyroY = gyro.getY();
 #endif
 #if GZ
-  int gyroZ = gyro.g.z;
+  int gyroZ = gyro.getZ();
 #endif
 #endif
 

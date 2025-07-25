@@ -30,7 +30,7 @@ bool ADXL345::readAll() {
   Wire.write(0x32);
   Wire.endTransmission();
 
-  Wire.requestFrom(0x53, 6);
+  Wire.requestFrom(0x53, (uint8_t)6);
   if (Wire.available() == 6) {
     X0 = Wire.read();
     X1 = Wire.read();
@@ -49,9 +49,9 @@ bool ADXL345::readAll() {
   Z1 = Z1 << 8;
   Z_out = Z0 + Z1;
 
-  x = X_out / scale;
-  y = Y_out / scale;
-  z = Z_out / scale;
+  x = (X_out / scale) * 9.80665;
+  y = (Y_out / scale) * 9.80665;
+  z = (Z_out / scale) * 9.80665;
 
   return true;
 }
