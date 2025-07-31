@@ -1,11 +1,10 @@
-#define USANDO_BMP 1 
+#define USANDO_BMP 1
 #define USANDO_ACELEROMETRO 1
 #define USANDO_MAGNETOMETRO 1
 #define USANDO_GIROSCOPIO 1
-#define USANDO_PARAQUEDAS 1
-#define USANDO_RELOGIO 1
+#define USANDO_PARAQUEDAS (USANDO_BMP && 1)
+#define USANDO_RELOGIO (USANDO_PARAQUEDAS || 1)
 #define USANDO_SD 1
-#define USANDO_ARMAZENAMENTO 1
 
 /*---------------BMP---------------*/
 #if USANDO_BMP
@@ -25,25 +24,25 @@ float altura_filtrada2 = 0;
 int32_t pressao;
 float temperatura;
 bool queda = false; //Declaração pro detector de queda
-#endif
+#endif //BMP
 
 /*---------------ACELERÔMETRO---------------*/
 #if USANDO_ACELEROMETRO
 #include <Adafruit_ADXL345_U.h> //Acelerômetro
 Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
-#endif
+#endif //ACELEROMETRO
 
 /*---------------MAGNETÔMETRO---------------*/
 #if USANDO_MAGNETOMETRO
 #include <Adafruit_HMC5883_U.h> //Magnetômetro
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(54321);
-#endif
+#endif //MAGNETOMETRO
 
 /*---------------GIROSCÓPIO---------------*/
 #if USANDO_GIROSCOPIO
 #include <L3G.h> // Giroscópio
 L3G gyro;
-#endif
+#endif //GIROSCOPIO
 
 /*---------------PARAQUEDAS---------------*/
 #if USANDO_PARAQUEDAS
@@ -66,7 +65,7 @@ unsigned long previousMillisPRQ4 = 0;
 const long intervalIGN = 5000;
 const long intervalPRQ2 = 2000;
 const long intervalPRQ4 = 2000;
-#endif
+#endif //PARAQUEDAS
 
 /*---------------SD DATALOGGER---------------*/
 #if USANDO_SD
@@ -79,12 +78,12 @@ String nomearquivo;
 String nomelog = "ZAMP";
 String zerospacetext;
 int zerospacelength;
-#endif
+#endif //SD
 
 /*---------------RELÓGIO---------------*/
-#if USANDO_RELOGIO || USANDO_PARAQUEDAS
+#if USANDO_RELOGIO
 float tempo = 0; //Declaração pro relógio (millis)
-#endif
+#endif //RELOGIO
 
 void setup() {
   /*---------------INICIALIZAÇÃO DATALOGGER---------------*/
@@ -120,7 +119,7 @@ void setup() {
   } while (SD.exists(nomearquivo));
 
   Serial.println(nomearquivo);
-  #endif
+  #endif //SD
 
   /*---------------INICIALIZAÇÃO BMP---------------*/
   #if USANDO_BMP
@@ -136,7 +135,7 @@ void setup() {
     tara += bmp.readAltitude();
   }
   tara /= 10;
-  #endif
+  #endif //BMP
 
 
   /*---------------INICIALIZAÇÃO ACELERÔMETRO---------------*/
@@ -148,7 +147,7 @@ void setup() {
       ;
   }
   accel.setRange(ADXL345_RANGE_16_G);
-  #endif
+  #endif //ACELEROMETRO
 
   //Originalmente tinha um Wire.begin() aqui (entre o setup do acelerômetro e giroscópio), não sei de onde veio, e eu tirei.
   //Se parar de rodar, tenta por de volta
@@ -161,7 +160,7 @@ void setup() {
       ;
   }
   gyro.enableDefault();
-  #endif
+  #endif //GIROSCOPIO
 
   /*---------------INICIALIZAÇÃO MAGNETÔMETRO---------------*/
   #if USANDO_MAGNETOMETRO
@@ -171,7 +170,7 @@ void setup() {
     while (1)
       ;
   }
-  #endif
+  #endif //MAGNETOMETRO
 
   /*---------------PINOS DO PARAQUEDAS---------------*/
   #if USANDO_PARAQUEDAS
@@ -179,34 +178,46 @@ void setup() {
   pinMode(IGN_2, OUTPUT);
   pinMode(IGN_3, OUTPUT);
   pinMode(IGN_4, OUTPUT);
-  #endif
+  #endif //PARAQUEDAS
 
   /*---------------SETUP ARMAZENAMENTO NO ARQUIVO---------------*/
-  #if USANDO_SD && USANDO_ARMAZENAMENTO
+  #if USANDO_SD
   // Abre o arquivo
   File dataFile = SD.open(nomearquivo, FILE_WRITE);
   // Armazena o cabeçalho na dataString
   String dataString = "";
+  #if USANDO_RELOGIO
   dataString += ("tempo\t");
+  #endif //RELOGIO
+  #if USANDO_BMP
   dataString += ("Altura Sem Filtro\t");
   dataString += ("Altura Filtrada\t");
   dataString += ("Altura Filtrada 2\t");
   dataString += ("Detector de Queda\t");
   dataString += ("Temperatura\t");
   dataString += ("Pressão\t");
+  #endif //BMP
+  #if USANDO_BMP && USANDO_PARAQUEDAS
   dataString += ("paraquedas1armado\t");
   dataString += ("paraquedas2armado\t");
   dataString += ("paraquedas3armado\t");
   dataString += ("paraquedas4armado\t");
+  #endif //PARAQUEDAS
+  #if USANDO_ACELEROMETRO
   dataString += ("x (m/s^2)\t");
   dataString += ("y (m/s^2)\t");
   dataString += ("z (m/s^2)\t");
+  #endif //ACELEROMETRO
+  #if USANDO_GIROSCOPIO
   dataString += ("Gyro x\t");
   dataString += ("Gyro y\t");
   dataString += ("Gyro z\t");
+  #endif //GIROSCOPIO
+  #if USANDO_MAGNETOMETRO
   dataString += ("Magnet x\t");
   dataString += ("Magnet y\t");
   dataString += ("Magnet z\t");
+  #endif //MAGNETOMETRO
   //Print da dataString
   Serial.println(dataString);
 
@@ -219,7 +230,7 @@ void setup() {
   else {
     Serial.println("Erro ao abrir" + nomearquivo);
   }
-  #endif
+  #endif //SD
 }
 
 void loop() {
@@ -236,17 +247,17 @@ void loop() {
   // Get a new sensor event (Acelerômetro)
   sensors_event_t event;
   accel.getEvent(&event);
-  #endif
+  #endif //ACELEROMETRO
 
   #if USANDO_GIROSCOPIO
   gyro.read();
-  #endif
+  #endif //GIROSCOPIO
 
   #if USANDO_MAGNETOMETRO
   // Get a new sensor event (Magnetômetro)
   sensors_event_t eventmag;
   mag.getEvent(&eventmag);
-  #endif
+  #endif //MAGNETOMETRO
 
   //*------SENSOR BMP------*/
   #if USANDO_BMP
@@ -290,7 +301,7 @@ void loop() {
     queda = true;
   }
   alturapassada = altura_filtrada2;  //Armazenamento da altura atual para usar como "alturapassada" no próximo loop
-  #endif
+  #endif //BMP
 
   /*------ACIONAMENTO DE PARAQUEDAS------*/
   #if USANDO_BMP && USANDO_PARAQUEDAS
@@ -351,34 +362,46 @@ void loop() {
     digitalWrite(IGN_4, LOW);
     paraquedas4armado = 2;
   }
-  #endif
+  #endif //PARAQUEDAS
 
   /*------ARMAZENAMENTO DE DADOS------*/
-  #if USANDO_SD && USANDO_ARMAZENAMENTO
+  #if USANDO_SD
   //Abre o arquivo
   File dataFile = SD.open(nomearquivo, FILE_WRITE);
   // Armazenamento dos valores na dataString
   String dataString = "";
+  #if USANDO_RELOGIO
   dataString += String(tempo) + "\t";
+  #endif //RELOGIO
+  #if USANDO_BMP
   dataString += String(vetor[guia]) + "\t";
   dataString += String(altura_filtrada) + "\t";
   dataString += String(altura_filtrada2) + "\t";
   dataString += String(detectorqueda) + "\t";
   dataString += String(temperatura) + "\t";
   dataString += String(pressao) + "\t";
+  #endif //BMP
+  #if USANDO_BMP && USANDO_PARAQUEDAS
   dataString += String(paraquedas1armado) + "\t";
   dataString += String(paraquedas2armado) + "\t";
   dataString += String(paraquedas3armado) + "\t";
   dataString += String(paraquedas4armado) + "\t";
+  #endif //PARAQUEDAS
+  #if USANDO_ACELEROMETRO
   dataString += String(event.acceleration.x) + "\t";
   dataString += String(event.acceleration.y) + "\t";
   dataString += String(event.acceleration.z) + "\t";
+  #endif //ACELEROMETRO
+  #if USANDO_GIROSCOPIO
   dataString += String((int)gyro.g.x) + "\t";
   dataString += String((int)gyro.g.y) + "\t";
   dataString += String((int)gyro.g.z) + "\t";
+  #endif //GIROSCOPIO
+  #if USANDO_MAGNETOMETRO
   dataString += String(eventmag.magnetic.x) + "\t";
   dataString += String(eventmag.magnetic.y) + "\t";
   dataString += String(eventmag.magnetic.z) + "\t";
+  #endif //MAGNETOMETRO
   //Print da dataString
   Serial.println(dataString);
 
@@ -392,5 +415,5 @@ void loop() {
   else {
     Serial.println("Erro ao abrir" + nomearquivo);
   }
-  #endif
+  #endif //SD
 }
