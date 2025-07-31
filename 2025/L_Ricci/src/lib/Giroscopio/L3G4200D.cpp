@@ -1,4 +1,5 @@
 #include "L3G4200D.h"
+#include <Arduino.h>
 
 bool L3G4200D::begin() {
   Wire.beginTransmission(0x69);
@@ -55,8 +56,11 @@ bool L3G4200D::readAll() {
   }
 
   x = (int16_t)(X0 | (X1 << 8));
+  Serial.println(x);
   y = (int16_t)(Y0 | (Y1 << 8));
+  Serial.println(y);
   z = (int16_t)(Z0 | (Z1 << 8));
+  Serial.println(z);
 
   return true;
 }
