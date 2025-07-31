@@ -47,20 +47,17 @@ bool L3G4200D::readAll() {
 
   Wire.requestFrom(0x69, (uint8_t)6);
   if (Wire.available() == 6) {
-    uint8_t X0 = Wire.read();
-    uint8_t X1 = Wire.read();
-    uint8_t Y0 = Wire.read();
-    uint8_t Y1 = Wire.read();
-    uint8_t Z0 = Wire.read();
-    uint8_t Z1 = Wire.read();
+    X0 = Wire.read();
+    X1 = Wire.read();
+    Y0 = Wire.read();
+    Y1 = Wire.read();
+    Z0 = Wire.read();
+    Z1 = Wire.read();
   }
 
   x = (int16_t)(X0 | (X1 << 8));
-  Serial.println(x);
   y = (int16_t)(Y0 | (Y1 << 8));
-  Serial.println(y);
   z = (int16_t)(Z0 | (Z1 << 8));
-  Serial.println(z);
 
   return true;
 }
