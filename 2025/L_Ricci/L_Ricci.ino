@@ -265,13 +265,13 @@ void loop() {
 #if GIRO
   gyro.readAll();
 #if GX
-  int gyroX = gyro.getX();
+  float gyroX = gyro.getX();
 #endif
 #if GY
-  int gyroY = gyro.getY();
+  float gyroY = gyro.getY();
 #endif
 #if GZ
-  int gyroZ = gyro.getZ();
+  float gyroZ = gyro.getZ();
 #endif
 #endif
 

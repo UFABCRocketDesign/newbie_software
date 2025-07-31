@@ -54,9 +54,9 @@ bool L3G4200D::readAll() {
     uint8_t Z1 = Wire.read();
   }
 
-  x = (uint16_t)(X0 | (X1 << 8));
-  y = (uint16_t)(Y0 | (Y1 << 8));
-  z = (uint16_t)(Z0 | (Z1 << 8));
+  x = (int16_t)(X0 | (X1 << 8));
+  y = (int16_t)(Y0 | (Y1 << 8));
+  z = (int16_t)(Z0 | (Z1 << 8));
 
   return true;
 }
