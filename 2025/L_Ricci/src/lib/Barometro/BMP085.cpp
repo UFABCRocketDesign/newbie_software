@@ -7,7 +7,7 @@ bool BMP085::begin() {
   Wire.write(0XAA);
   Wire.endTransmission();
 
-  Wire.requestFrom(0x77, (uint8_t)22);
+  Wire.requestFrom((uint8_t)0x77, (uint8_t)22);
   unsigned long tempo = micros();
   while (Wire.available() < 22) {
     if (tempo + 10 < micros()) break;
@@ -41,7 +41,7 @@ bool BMP085::readAll(float pressaoInicial) {
   Wire.write(0xF6);
   Wire.endTransmission();
 
-  Wire.requestFrom(0x77, (uint8_t)2);
+  Wire.requestFrom((uint8_t)0x77, (uint8_t)2);
   unsigned long tempo = micros();
   while (Wire.available() < 2) {
     if (tempo + 10 < micros()) break;
@@ -59,7 +59,7 @@ bool BMP085::readAll(float pressaoInicial) {
   Wire.write(0xF6);
   Wire.endTransmission();
 
-  Wire.requestFrom(0x77, (uint8_t)3);
+  Wire.requestFrom((uint8_t)0x77, (uint8_t)3);
   tempo = micros();
   while (Wire.available() < 3) {
     if (tempo + 10 < micros()) break;

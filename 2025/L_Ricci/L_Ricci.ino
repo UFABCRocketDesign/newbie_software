@@ -13,11 +13,12 @@
 #include "src/lib/Barometro/BMP085.h"
 #include "src/lib/Acelerometro/ADXL345.h"
 #include "src/lib/Giroscopio/L3G4200D.h"
+#include "src/lib/Magnetrometro/HMC5883L.h"
 
 // Adafruit_BMP085 bmp;
 // Adafruit_ADXL345_Unified accel;
 // L3G gyro;
-Adafruit_HMC5883_Unified mag;
+// Adafruit_HMC5883_Unified mag;
 TinyGPSPlus gps;
 
 #define BARO 1
@@ -65,6 +66,8 @@ BMP085 bmp;
 ADXL345 accel(2);
 
 L3G4200D gyro;
+
+HMC5883L mag;
 
 Filtro f1(10);
 Filtro f2(10);
@@ -288,16 +291,17 @@ void loop() {
 #endif
 
 #if MAG
-  sensors_event_t event_mag;
-  mag.getEvent(&event_mag);
+  // sensors_event_t event_mag;
+  // mag.getEvent(&event_mag);
+  mag.readAll();
 #if MX
-  float magX = event_mag.magnetic.x;
+  float magX = mag.getX();
 #endif
 #if MY
-  float magY = event_mag.magnetic.y;
+  float magY = mag.getY();
 #endif
 #if MZ
-  float magZ = event_mag.magnetic.z;
+  float magZ = mag.getZ();
 #endif
 #endif
 

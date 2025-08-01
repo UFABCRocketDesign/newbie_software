@@ -30,7 +30,7 @@ bool ADXL345::readAll() {
   Wire.write(0x32);
   Wire.endTransmission();
 
-  Wire.requestFrom(0x53, (uint8_t)6);
+  Wire.requestFrom((uint8_t)0x53, (uint8_t)6);
   if (Wire.available() == 6) {
     X0 = Wire.read();
     X1 = Wire.read();

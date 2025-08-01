@@ -45,7 +45,7 @@ bool L3G4200D::readAll() {
   Wire.write(0x28 | 0x80); // O que essa parte faz?
   Wire.endTransmission();
 
-  Wire.requestFrom(0x69, (uint8_t)6);
+  Wire.requestFrom((uint8_t)0x69, (uint8_t)6);
   if (Wire.available() == 6) {
     X0 = Wire.read();
     X1 = Wire.read();
