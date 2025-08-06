@@ -9,8 +9,8 @@ private:
 public:
   bool begin();
   bool readAll();
-  float getX();
-  float getY();
-  float getZ();
+  int getX();
+  int getY();
+  int getZ();
 };
 #endif
