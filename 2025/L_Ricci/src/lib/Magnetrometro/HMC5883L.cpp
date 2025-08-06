@@ -23,14 +23,14 @@ bool HMC5883L::readAll() {
   return true;
 }
 
-float HMC5883L::getX() {
+int HMC5883L::getX() {
   return x;
 }
 
-float HMC5883L::getY() {
+int HMC5883L::getY() {
   return y;
 }
 
-float HMC5883L::getZ() {
+int HMC5883L::getZ() {
   return z;
 }

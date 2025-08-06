@@ -15,10 +15,6 @@
 #include "src/lib/Giroscopio/L3G4200D.h"
 #include "src/lib/Magnetrometro/HMC5883L.h"
 
-// Adafruit_BMP085 bmp;
-// Adafruit_ADXL345_Unified accel;
-// L3G gyro;
-// Adafruit_HMC5883_Unified mag;
 TinyGPSPlus gps;
 
 #define BARO 1
@@ -295,13 +291,13 @@ void loop() {
   // mag.getEvent(&event_mag);
   mag.readAll();
 #if MX
-  float magX = mag.getX();
+  int magX = mag.getX();
 #endif
 #if MY
-  float magY = mag.getY();
+  int magY = mag.getY();
 #endif
 #if MZ
-  float magZ = mag.getZ();
+  int magZ = mag.getZ();
 #endif
 #endif
 

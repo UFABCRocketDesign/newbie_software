@@ -5,7 +5,7 @@
 
 class HMC5883L {
 private:
-  float x, y, z;
+  int x, y, z;
 public:
   bool begin();
   bool readAll();
