@@ -1,10 +1,5 @@
-#include <Adafruit_BMP085.h>
 #include <SD.h>
 #include <Wire.h>
-#include <Adafruit_Sensor.h>
-#include <Adafruit_ADXL345_U.h>
-#include <Adafruit_HMC5883_U.h>
-#include <L3G.h>
 #include <TinyGPSPlus.h>
 
 #include "src/lib/Apogeu/Apogeu.h"
@@ -232,6 +227,10 @@ void setup() {
 }
 
 void loop() {
+
+  int contador = 0;
+  contador += 1;
+
   unsigned long timerLora = millis();
   float tempo = millis() / 1000.0;
 
@@ -321,6 +320,7 @@ void loop() {
   String dataString = "";
 
 #if BARO
+  dataString += String(contador) + "\t";
   dataString += String(tempo) + "\t";
 #if TERMOMETRO
   dataString += String(temperatura) + "\t";
