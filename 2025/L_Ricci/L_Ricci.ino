@@ -72,6 +72,7 @@ Apogeu apg;
 
 float altitudes[NUMERO_QUEDAS];
 float alt = 0;
+int contador = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -227,8 +228,6 @@ void setup() {
 }
 
 void loop() {
-
-  int contador = 0;
   contador += 1;
 
   unsigned long timerLora = millis();
