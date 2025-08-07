@@ -13,11 +13,10 @@ float Filtro::filtro(float altitudeReal) {
   leituras[indiceAtual] = (altitudeReal);
   total = total + leituras[indiceAtual];
   indiceAtual = (indiceAtual + 1) % numLeituras;
-  float altura = total / numLeituras;
-
-  return altura;
+  media = total / numLeituras;
+  return media;
 }
 
 float Filtro::getMedia() {
-  return (total / numLeituras);
+  return media;
 }

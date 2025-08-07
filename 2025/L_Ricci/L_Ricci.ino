@@ -16,20 +16,20 @@ TinyGPSPlus gps;
 #define TERMOMETRO 1
 #define PRESSAO 1
 
-#define ACEL 0
-#define AX 0
-#define AY 0
-#define AZ 0
+#define ACEL 1
+#define AX 1
+#define AY 1
+#define AZ 1
 
-#define MAG 0
-#define MX 0
-#define MY 0
-#define MZ 0
+#define MAG 1
+#define MX 1
+#define MY 1
+#define MZ 1
 
-#define GIRO 0
-#define GX 0
-#define GY 0
-#define GZ 0
+#define GIRO 1
+#define GX 1
+#define GY 1
+#define GZ 1
 
 #define USANDO_GPS 1
 #define GPS_LAT 1
@@ -73,6 +73,17 @@ Apogeu apg;
 float altitudes[NUMERO_QUEDAS];
 float alt = 0;
 int contador = 0;
+
+void readAll() {
+  accel.readAll();
+  gyro.readAll();
+  mag.readAll();
+  bmp.readAll(101325.0);
+
+  while (GPS.available()) {
+    gps.encode(GPS.read());
+  }
+}
 
 void setup() {
   Serial.begin(115200);
@@ -228,90 +239,24 @@ void setup() {
 }
 
 void loop() {
-  contador += 1;
+
+  readAll();
 
   unsigned long timerLora = millis();
   float tempo = millis() / 1000.0;
 
+/* Tratamento de Dados */
 #if BARO
-  bmp.readAll(101325.0);
   float altitudeReal = bmp.readAltitude() - alt;
-#if TERMOMETRO
-  float temperatura = bmp.readTemperature();
-#endif
-#if PRESSAO
-  float pressao = bmp.readPressure();
-#endif
-#endif
-
-#if ACEL
-  accel.readAll();
-  // sensors_event_t event_accel;
-  // accel.getEvent(&event_accel);
-#if AX
-  float accelX = accel.getX();
-#endif
-#if AY
-  float accelY = accel.getY();
-#endif
-#if AZ
-  float accelZ = accel.getZ();
-#endif
-#endif
-
-#if GIRO
-  gyro.readAll();
-#if GX
-  float gyroX = gyro.getX();
-#endif
-#if GY
-  float gyroY = gyro.getY();
-#endif
-#if GZ
-  float gyroZ = gyro.getZ();
-#endif
-#endif
-
-#if USANDO_GPS
-  while (GPS.available()) {
-    gps.encode(GPS.read());
-  }
-#if GPS_LAT
-  float lat = gps.location.lat();
-#endif
-#if GPS_LNG
-  float lng = gps.location.lng();
-#endif
-#endif
-
-#if MAG
-  // sensors_event_t event_mag;
-  // mag.getEvent(&event_mag);
-  mag.readAll();
-#if MX
-  int magX = mag.getX();
-#endif
-#if MY
-  int magY = mag.getY();
-#endif
-#if MZ
-  int magZ = mag.getZ();
-#endif
-#endif
-
-  /* Tratamento de Dados */
-#if BARO
-
-  float valorFiltrado1 = f1.filtro(altitudeReal);
-  float valorFiltrado2 = f2.filtro(f1.getMedia());
-  int queda = apg.detectorQueda(f2.getMedia());
+  f1.filtro(altitudeReal);
+  f2.filtro(f1.getMedia());
+  bool queda = apg.detectorQueda(f2.getMedia());
 
   // Paraquedas
-  p1.ativar(valorFiltrado2, queda);
-  p2.ativar(valorFiltrado2, queda);
-  p3.ativar(valorFiltrado2, queda);
-  p4.ativar(valorFiltrado2, queda);
-
+  p1.ativar(f2.getMedia(), queda);
+  p2.ativar(f2.getMedia(), queda);
+  p3.ativar(f2.getMedia(), queda);
+  p4.ativar(f2.getMedia(), queda);
 #endif
 
   /* Imprimindo Dados */
@@ -319,18 +264,17 @@ void loop() {
   String dataString = "";
 
 #if BARO
-  dataString += String(contador) + "\t";
   dataString += String(tempo) + "\t";
 #if TERMOMETRO
-  dataString += String(temperatura) + "\t";
+  dataString += String(bmp.readTemperature()) + "\t";
 #endif
 #if PRESSAO
-  dataString += String(pressao) + "\t";
+  dataString += String(bmp.readPressure()) + "\t";
 #endif
-  dataString += String(valorFiltrado1) + "\t";
-  dataString += String(valorFiltrado2) + "\t";
+  dataString += String(f1.getMedia()) + "\t";
+  dataString += String(f2.getMedia()) + "\t";
   dataString += String(altitudeReal) + "\t";
-  dataString += String(apg.detectorQueda(f2.getMedia())) + "\t";
+  dataString += String(queda) + "\t";
   dataString += String(p1.getValor()) + "\t";
   dataString += String(p2.getValor()) + "\t";
   dataString += String(p3.getValor()) + "\t";
@@ -339,46 +283,46 @@ void loop() {
 
 #if ACEL
 #if AX
-  dataString += String(accelX) + "\t";
+  dataString += String(accel.getX()) + "\t";
 #endif
 #if AY
-  dataString += String(accelY) + "\t";
+  dataString += String(accel.getY()) + "\t";
 #endif
 #if AZ
-  dataString += String(accelZ) + "\t";
+  dataString += String(accel.getZ()) + "\t";
 #endif
 #endif
 
 #if GIRO
 #if GX
-  dataString += String(gyroX) + "\t";
+  dataString += String(gyro.getX()) + "\t";
 #endif
 #if GY
-  dataString += String(gyroY) + "\t";
+  dataString += String(gyro.getY()) + "\t";
 #endif
 #if GZ
-  dataString += String(gyroZ) + "\t";
+  dataString += String(gyro.getZ()) + "\t";
 #endif
 #endif
 
 #if MAG
 #if MX
-  dataString += String(magX) + "\t";
+  dataString += String(mag.getX()) + "\t";
 #endif
 #if MY
-  dataString += String(magY) + "\t";
+  dataString += String(mag.getY()) + "\t";
 #endif
 #if MZ
-  dataString += String(magZ) + "\t";
+  dataString += String(mag.getZ()) + "\t";
 #endif
 #endif
 
 #if USANDO_GPS
 #if GPS_LAT
-  dataString += String(lat, 6) + "\t";
+  dataString += String(gps.location.lat(), 6) + "\t";
 #endif
 #if GPS_LNG
-  dataString += String(lng, 6);
+  dataString += String(gps.location.lng(), 6);
 #endif
 #endif
 
