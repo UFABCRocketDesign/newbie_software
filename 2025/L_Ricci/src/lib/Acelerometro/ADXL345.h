@@ -2,6 +2,7 @@
 #define _ADXL345_h
 
 #include <Wire.h>
+#include "../Eixos/Eixos.h"
 
 class ADXL345 {
 private:
@@ -15,8 +16,5 @@ public:
   ADXL345(uint8_t range = 2);
   bool begin();
   bool readAll();
-  float getX();
-  float getY();
-  float getZ();
 };
 #endif

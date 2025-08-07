@@ -55,15 +55,3 @@ bool ADXL345::readAll() {
 
   return true;
 }
-
-float ADXL345::getX() {
-  return x;
-}
-
-float ADXL345::getY() {
-  return y;
-}
-
-float ADXL345::getZ() {
-  return z;
-}
