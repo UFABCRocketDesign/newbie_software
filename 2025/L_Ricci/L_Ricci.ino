@@ -31,11 +31,11 @@ TinyGPSPlus gps;
 #define GY 0
 #define GZ 0
 
-#define USANDO_GPS 0
-#define GPS_LAT 0
-#define GPS_LNG 0
+#define USANDO_GPS 1
+#define GPS_LAT 1
+#define GPS_LNG 1
 
-#define LORA 0
+#define LORA 1
 #define SD_CARD 0
 #define HEADING 1
 
