@@ -16,26 +16,26 @@ TinyGPSPlus gps;
 #define TERMOMETRO 1
 #define PRESSAO 1
 
-#define ACEL 1
-#define AX 1
-#define AY 1
-#define AZ 1
+#define ACEL 0
+#define AX 0
+#define AY 0
+#define AZ 0
 
-#define MAG 1
-#define MX 1
-#define MY 1
-#define MZ 1
+#define MAG 0
+#define MX 0
+#define MY 0
+#define MZ 0
 
-#define GIRO 1
-#define GX 1
-#define GY 1
-#define GZ 1
+#define GIRO 0
+#define GX 0
+#define GY 0
+#define GZ 0
 
-#define USANDO_GPS 1
-#define GPS_LAT 1
-#define GPS_LNG 1
+#define USANDO_GPS 0
+#define GPS_LAT 0
+#define GPS_LNG 0
 
-#define LORA 1
+#define LORA 0
 #define SD_CARD 0
 #define HEADING 1
 
