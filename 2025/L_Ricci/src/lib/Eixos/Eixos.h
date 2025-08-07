@@ -8,4 +8,5 @@ public:
   float getX();
   float getY();
   float getZ();
-}
+};
+#endif
