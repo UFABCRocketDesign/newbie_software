@@ -22,15 +22,3 @@ bool HMC5883L::readAll() {
 
   return true;
 }
-
-int HMC5883L::getX() {
-  return x;
-}
-
-int HMC5883L::getY() {
-  return y;
-}
-
-int HMC5883L::getZ() {
-  return z;
-}

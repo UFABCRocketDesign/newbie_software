@@ -1,8 +1,8 @@
 #ifndef _Eixos_h
 #define _Eixos_h
 
-class Eixos {
-private:
+class Eixos{
+protected:
   float x, y, z;
 public:
   float getX();

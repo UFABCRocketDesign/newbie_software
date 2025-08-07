@@ -4,12 +4,11 @@
 #include <Wire.h>
 #include "../Eixos/Eixos.h"
 
-class ADXL345 {
+class ADXL345 : public Eixos {
 private:
   int X0, X1, X_out;
   int Y0, Y1, Y_out;
   int Z0, Z1, Z_out;
-  float x, y, z;
   float scale;
   uint8_t range;
 public:

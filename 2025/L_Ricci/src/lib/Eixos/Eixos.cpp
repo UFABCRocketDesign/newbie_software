@@ -1,13 +1,13 @@
 #include "Eixos.h"
 
-Eixos::getX() {
+float Eixos::getX() {
   return x;
 }
 
-Eixos::getY() {
+float Eixos::getY() {
   return y;
 }
 
-Eixos::getZ() {
+float Eixos::getZ() {
   return z;
 }

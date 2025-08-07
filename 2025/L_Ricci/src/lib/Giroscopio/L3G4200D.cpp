@@ -61,15 +61,3 @@ bool L3G4200D::readAll() {
 
   return true;
 }
-
-float L3G4200D::getX() {
-  return x;
-}
-
-float L3G4200D::getY() {
-  return y;
-}
-
-float L3G4200D::getZ() {
-  return z;
-}

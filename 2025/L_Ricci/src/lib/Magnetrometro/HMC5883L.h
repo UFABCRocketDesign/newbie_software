@@ -2,15 +2,11 @@
 #define _HMC5883L_h
 
 #include <Wire.h>
+#include "../Eixos/Eixos.h"
 
-class HMC5883L {
-private:
-  int x, y, z;
+class HMC5883L : public Eixos {
 public:
   bool begin();
   bool readAll();
-  int getX();
-  int getY();
-  int getZ();
 };
 #endif
