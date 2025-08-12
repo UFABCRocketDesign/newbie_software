@@ -55,18 +55,30 @@ void setup() {
 // the loop function runs over and over again forever
 void loop() {     
     float nova_alt = (bmp.readAltitude() - Alt_zero);
-    for(int i = 74; i > 0; i--){
+    for(int i = 14; i > 0; i--){
       vetor[i] = vetor[i-1];
     }
 
     vetor[0] = nova_alt;
 
     float soma = 0;
-    for(int i = 0; i<75; i++) {
+    for(int i = 0; i<15; i++) {
       soma += vetor[i];
     }
-    float media = soma/75;
+    float media = soma/15;
+    }
 
+    for(int i = 14; i > 0; i--){
+      vetor_2[i] = media;
+
+    vetor_2[0]= nova_alt_2;
+
+    float soma2 = 0;
+    for(int i = 0; i<15; i++) {
+      soma2 += vetor_2[i];
+    }
+    float media2 = soma2/15;
+  
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
     
@@ -82,6 +94,8 @@ void loop() {
     Serial.print(nova_alt);
     Serial.print("\t");
     Serial.print(media);
+    Serial.print("\t");
+    Serial.print(nova_alt_2);
     Serial.print("\t");
     Serial.println();
     
