@@ -180,6 +180,13 @@ void readAll() {
   }
 }
 
+void doAll() {
+  p1.ativar(f2.getMedia(), apg.getQueda());
+  p2.ativar(f2.getMedia(), apg.getQueda());
+  p3.ativar(f2.getMedia(), apg.getQueda());
+  p4.ativar(f2.getMedia(), apg.getQueda());
+}
+
 void setup() {
   Serial.begin(115200);
   Wire.begin();
@@ -354,17 +361,12 @@ void loop() {
   readAll();
   writeAll();
 
-/* Tratamento de Dados */
 #if BARO
   altitudeReal = bmp.readAltitude() - alt;
   f1.filtro(altitudeReal);
   f2.filtro(f1.getMedia());
   queda = apg.detectorQueda(f2.getMedia());
-
-  // Paraquedas
-  p1.ativar(f2.getMedia(), apg.getQueda());
-  p2.ativar(f2.getMedia(), apg.getQueda());
-  p3.ativar(f2.getMedia(), apg.getQueda());
-  p4.ativar(f2.getMedia(), apg.getQueda());
 #endif
+
+  doAll();
 }
