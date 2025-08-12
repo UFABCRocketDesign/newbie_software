@@ -332,7 +332,7 @@ void setup() {
   pinMode(IGN_3, OUTPUT);
   pinMode(IGN_4, OUTPUT);
 
-  while (abs(bmp.readAltitude() - alt) < wufAltura) {
+  do {
     tempo = millis();
 
     altitudeReal = bmp.readAltitude() - alt;
@@ -341,7 +341,10 @@ void setup() {
 
     readAll();
     writeAll();
-  }
+
+  } while (abs(f2.getMedia()) < wufAltura);
+
+  Serial.println("Sai do WUF!");
 }
 
 void loop() {
