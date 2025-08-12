@@ -75,6 +75,7 @@ float alt = 0;
 int contador = 0;
 float altitudeReal;
 bool queda = 0;
+float wufAltura = 2;
 
 unsigned long tempo = 0;
 
@@ -330,6 +331,12 @@ void setup() {
   pinMode(IGN_2, OUTPUT);
   pinMode(IGN_3, OUTPUT);
   pinMode(IGN_4, OUTPUT);
+
+  while (abs(bmp.readAltitude()) < wufAltura) {
+    tempo = millis();
+    readAll();
+    writeAll();
+  }
 }
 
 void loop() {
@@ -347,9 +354,9 @@ void loop() {
   queda = apg.detectorQueda(f2.getMedia());
 
   // Paraquedas
-  p1.ativar(f2.getMedia(), queda);
-  p2.ativar(f2.getMedia(), queda);
-  p3.ativar(f2.getMedia(), queda);
-  p4.ativar(f2.getMedia(), queda);
+  p1.ativar(f2.getMedia(), apg.getQueda());
+  p2.ativar(f2.getMedia(), apg.getQueda());
+  p3.ativar(f2.getMedia(), apg.getQueda());
+  p4.ativar(f2.getMedia(), apg.getQueda());
 #endif
 }
