@@ -37,6 +37,7 @@ float Alt_zero = 0;
 
 float vetor[15];
 float vetor_2[15];
+float media_anterior = 0;
 
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
@@ -78,6 +79,13 @@ void loop() {
     soma2 += vetor_2[i];
   }
   float media2 = soma2 / 15;
+
+
+  float dif = media2 - media_anterior;
+  if (dif < 0){
+    Serial.print(dif);
+  }
+  media_anterior = media2;
 
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
