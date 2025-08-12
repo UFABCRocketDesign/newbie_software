@@ -332,7 +332,7 @@ void setup() {
   pinMode(IGN_3, OUTPUT);
   pinMode(IGN_4, OUTPUT);
 
-  while (abs(bmp.readAltitude()) < wufAltura) {
+  while (abs(bmp.readAltitude() - alt) < wufAltura) {
     tempo = millis();
     readAll();
     writeAll();
