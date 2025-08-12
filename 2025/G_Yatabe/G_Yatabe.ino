@@ -83,7 +83,10 @@ void loop() {
 
   float dif = media2 - media_anterior;
   if (dif < 0){
-    Serial.print(dif);
+    dif = 1;
+  }
+  else {
+    dif = 0;
   }
   media_anterior = media2;
 
@@ -104,6 +107,8 @@ void loop() {
   Serial.print(media);
   Serial.print("\t");
   Serial.print(media2);
+  Serial.print("\t");
+  Serial.print(dif);
   Serial.print("\t");
   Serial.println();
 }
