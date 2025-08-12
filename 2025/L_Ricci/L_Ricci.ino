@@ -73,6 +73,100 @@ Apogeu apg;
 float altitudes[NUMERO_QUEDAS];
 float alt = 0;
 int contador = 0;
+float altitudeReal;
+bool queda = 0;
+
+unsigned long tempo = 0;
+
+void writeAll() {
+
+  float tempoSegundos = tempo / 1000.0;
+
+  String dataString = "";
+
+#if BARO
+  dataString += String(tempoSegundos) + "\t";
+#if TERMOMETRO
+  dataString += String(bmp.readTemperature()) + "\t";
+#endif
+#if PRESSAO
+  dataString += String(bmp.readPressure()) + "\t";
+#endif
+  dataString += String(f1.getMedia()) + "\t";
+  dataString += String(f2.getMedia()) + "\t";
+  dataString += String(altitudeReal) + "\t";
+  dataString += String(queda) + "\t";
+  dataString += String(p1.getValor()) + "\t";
+  dataString += String(p2.getValor()) + "\t";
+  dataString += String(p3.getValor()) + "\t";
+  dataString += String(p4.getValor()) + "\t";
+#endif
+
+#if ACEL
+#if AX
+  dataString += String(accel.getX()) + "\t";
+#endif
+#if AY
+  dataString += String(accel.getY()) + "\t";
+#endif
+#if AZ
+  dataString += String(accel.getZ()) + "\t";
+#endif
+#endif
+
+#if GIRO
+#if GX
+  dataString += String(gyro.getX()) + "\t";
+#endif
+#if GY
+  dataString += String(gyro.getY()) + "\t";
+#endif
+#if GZ
+  dataString += String(gyro.getZ()) + "\t";
+#endif
+#endif
+
+#if MAG
+#if MX
+  dataString += String(mag.getX()) + "\t";
+#endif
+#if MY
+  dataString += String(mag.getY()) + "\t";
+#endif
+#if MZ
+  dataString += String(mag.getZ()) + "\t";
+#endif
+#endif
+
+#if USANDO_GPS
+#if GPS_LAT
+  dataString += String(gps.location.lat(), 6) + "\t";
+#endif
+#if GPS_LNG
+  dataString += String(gps.location.lng(), 6);
+#endif
+#endif
+
+  Serial.println(dataString);
+
+#if SD_CARD
+  File dataFile = SD.open(filename, FILE_WRITE);
+  if (dataFile) {
+    dataFile.println(dataString);
+    dataFile.close();
+  } else {
+    Serial.println("Erro ao abrir o arquivo para escrita.");
+  }
+#endif
+
+#if LORA
+  unsigned long transmissaoLora = 0;
+  if (tempo - transmissaoLora >= 3000) {
+    transmissaoLora = tempo;
+    LoRa.println(dataString);
+  }
+#endif
+}
 
 void readAll() {
   accel.readAll();
@@ -240,111 +334,22 @@ void setup() {
 
 void loop() {
 
-  readAll();
+  tempo = millis();
 
-  unsigned long timerLora = millis();
-  float tempo = millis() / 1000.0;
+  readAll();
+  writeAll();
 
 /* Tratamento de Dados */
 #if BARO
-  float altitudeReal = bmp.readAltitude() - alt;
+  altitudeReal = bmp.readAltitude() - alt;
   f1.filtro(altitudeReal);
   f2.filtro(f1.getMedia());
-  bool queda = apg.detectorQueda(f2.getMedia());
+  queda = apg.detectorQueda(f2.getMedia());
 
   // Paraquedas
   p1.ativar(f2.getMedia(), queda);
   p2.ativar(f2.getMedia(), queda);
   p3.ativar(f2.getMedia(), queda);
   p4.ativar(f2.getMedia(), queda);
-#endif
-
-  /* Imprimindo Dados */
-
-  String dataString = "";
-
-#if BARO
-  dataString += String(tempo) + "\t";
-#if TERMOMETRO
-  dataString += String(bmp.readTemperature()) + "\t";
-#endif
-#if PRESSAO
-  dataString += String(bmp.readPressure()) + "\t";
-#endif
-  dataString += String(f1.getMedia()) + "\t";
-  dataString += String(f2.getMedia()) + "\t";
-  dataString += String(altitudeReal) + "\t";
-  dataString += String(queda) + "\t";
-  dataString += String(p1.getValor()) + "\t";
-  dataString += String(p2.getValor()) + "\t";
-  dataString += String(p3.getValor()) + "\t";
-  dataString += String(p4.getValor()) + "\t";
-#endif
-
-#if ACEL
-#if AX
-  dataString += String(accel.getX()) + "\t";
-#endif
-#if AY
-  dataString += String(accel.getY()) + "\t";
-#endif
-#if AZ
-  dataString += String(accel.getZ()) + "\t";
-#endif
-#endif
-
-#if GIRO
-#if GX
-  dataString += String(gyro.getX()) + "\t";
-#endif
-#if GY
-  dataString += String(gyro.getY()) + "\t";
-#endif
-#if GZ
-  dataString += String(gyro.getZ()) + "\t";
-#endif
-#endif
-
-#if MAG
-#if MX
-  dataString += String(mag.getX()) + "\t";
-#endif
-#if MY
-  dataString += String(mag.getY()) + "\t";
-#endif
-#if MZ
-  dataString += String(mag.getZ()) + "\t";
-#endif
-#endif
-
-#if USANDO_GPS
-#if GPS_LAT
-  dataString += String(gps.location.lat(), 6) + "\t";
-#endif
-#if GPS_LNG
-  dataString += String(gps.location.lng(), 6);
-#endif
-#endif
-
-  Serial.println(dataString);
-
-  /* Salvando no Cartão SD */
-
-#if SD_CARD
-  File dataFile = SD.open(filename, FILE_WRITE);
-  if (dataFile) {
-    dataFile.println(dataString);
-    dataFile.close();
-  } else {
-    Serial.println("Erro ao abrir o arquivo para escrita.");
-  }
-#endif
-
-#if LORA
-  unsigned long transmissaoLora = 0;
-  if (timerLora - transmissaoLora >= 3000) {
-    transmissaoLora = timerLora;
-    LoRa.println(dataString);
-  }
 #endif
 }
