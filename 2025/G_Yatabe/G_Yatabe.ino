@@ -73,7 +73,7 @@ void loop() {
   }
   vetor_2[0] = media;
 
-    float soma2 = 0;
+  float soma2 = 0;
   for (int i = 0; i < 15; i++) {
     soma2 += vetor_2[i];
   }
@@ -94,6 +94,8 @@ void loop() {
   Serial.print(nova_alt);
   Serial.print("\t");
   Serial.print(media);
+  Serial.print("\t");
+  Serial.print(media2);
   Serial.print("\t");
   Serial.println();
 }
