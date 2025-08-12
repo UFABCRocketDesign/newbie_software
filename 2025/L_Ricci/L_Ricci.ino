@@ -334,6 +334,11 @@ void setup() {
 
   while (abs(bmp.readAltitude() - alt) < wufAltura) {
     tempo = millis();
+
+    altitudeReal = bmp.readAltitude() - alt;
+    f1.filtro(altitudeReal);
+    f2.filtro(f1.getMedia());
+
     readAll();
     writeAll();
   }
