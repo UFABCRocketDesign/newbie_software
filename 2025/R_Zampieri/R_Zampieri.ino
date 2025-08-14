@@ -24,9 +24,12 @@
 #define USANDO_PARAQUEDAS_3 (USANDO_PARAQUEDAS && 1)
 #define USANDO_PARAQUEDAS_4 (USANDO_PARAQUEDAS && 1)
 
-#define USANDO_RELOGIO (USANDO_PARAQUEDAS || 1)
-
 #define USANDO_SD 1
+
+#define USANDO_TELEMETRIA 1
+
+#define USANDO_RELOGIO (USANDO_PARAQUEDAS || USANDO_TELEMETRIA || 1)
+
 
 /*---------------BMP---------------*/
 #if USANDO_BMP
@@ -122,6 +125,13 @@ int zerospacelength;
 float tempo = 0;  //Declaração pro relógio (millis)
 #endif            //RELOGIO
 
+/*---------------TELEMETRIA---------------*/
+#if USANDO_TELEMETRIA
+HardwareSerial &LoRa(Serial3);
+unsigned long previousMillisTELEMETRIA = 0;
+const long intervalTELEMETRIA = 3000; 
+#endif  //Telemetria
+
 void setup() {
 /*---------------INICIALIZAÇÃO DATALOGGER---------------*/
 #if USANDO_SD
@@ -157,6 +167,11 @@ void setup() {
 
   Serial.println(nomearquivo);
 #endif  //SD
+
+/*---------------INICIALIZAÇÃO TELEMETRIA---------------*/
+#if USANDO_TELEMETRIA
+  LoRa.begin(9600);
+#endif
 
 /*---------------INICIALIZAÇÃO BMP---------------*/
 #if USANDO_BMP
@@ -228,11 +243,6 @@ void setup() {
 #endif  //PARAQUEDAS_4
 
 /*---------------SETUP ARMAZENAMENTO NO ARQUIVO---------------*/
-#if USANDO_SD
-
-  // Abre o arquivo
-  File dataFile = SD.open(nomearquivo, FILE_WRITE);
-  // Armazena o cabeçalho na dataString
   String dataString = "";
 
   //-----RELOGIO-----
@@ -318,10 +328,17 @@ void setup() {
   dataString += ("Magnet z\t");
 #endif  //MAGNETOMETRO_Z
 
-  //-----DATASTRING----
-
   //Print da dataString
   Serial.println(dataString);
+
+#if USANDO_TELEMETRIA
+    LoRa.println(dataString);
+#endif
+
+#if USANDO_SD
+
+  // Abre o arquivo
+  File dataFile = SD.open(nomearquivo, FILE_WRITE);
 
   /*---------------SALVA NO ARQUIVO---------------*/
   // if the file is available, write to it:
@@ -479,10 +496,6 @@ void loop() {
 #endif  //Paraquedas 4
 
 /*------ARMAZENAMENTO DE DADOS------*/
-#if USANDO_SD
-  //Abre o arquivo
-  File dataFile = SD.open(nomearquivo, FILE_WRITE);
-  // Armazenamento dos valores na dataString
   String dataString = "";
 
 //------------RELOGIO------------
@@ -539,31 +552,44 @@ void loop() {
 //------------GIROSCOPIO------------
 #if USANDO_GIROSCOPIO_X
   dataString += String((int)gyro.g.x) + "\t";
-  #endif  //GIROSCOPIO X
+#endif  //GIROSCOPIO X
 
-  #if USANDO_GIROSCOPIO_Y
+#if USANDO_GIROSCOPIO_Y
   dataString += String((int)gyro.g.y) + "\t";
-  #endif  //GIROSCOPIO Y
+#endif  //GIROSCOPIO Y
 
-  #if USANDO_GIROSCOPIO_Z
+#if USANDO_GIROSCOPIO_Z
   dataString += String((int)gyro.g.z) + "\t";
-  #endif  //GIROSCOPIO Y
+#endif  //GIROSCOPIO Y
 
 //------------MAGNETOMETRO------------
 #if USANDO_MAGNETOMETRO_X
   dataString += String(eventmag.magnetic.x) + "\t";
-  #endif  //MAGNETOMETRO X
+#endif  //MAGNETOMETRO X
 
-  #if USANDO_MAGNETOMETRO_Y
+#if USANDO_MAGNETOMETRO_Y
   dataString += String(eventmag.magnetic.y) + "\t";
-  #endif  //MAGNETOMETRO Y
+#endif  //MAGNETOMETRO Y
 
-  #if USANDO_MAGNETOMETRO_Z
+#if USANDO_MAGNETOMETRO_Z
   dataString += String(eventmag.magnetic.z) + "\t";
-  #endif  //MAGNETOMETRO Z
+#endif  //MAGNETOMETRO Z
 
   //Print da dataString
   Serial.println(dataString);
+
+
+#if USANDO_TELEMETRIA
+  if (currentMillis - previousMillisTELEMETRIA >= intervalTELEMETRIA){
+    previousMillisTELEMETRIA = currentMillis;
+    LoRa.println(dataString);
+    }
+#endif//Telemetria
+
+
+#if USANDO_SD
+  //Abre o arquivo
+  File dataFile = SD.open(nomearquivo, FILE_WRITE);
 
   /*------SALVA NO ARQUIVO------*/
   // if the file is available, write to it:
