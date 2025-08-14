@@ -129,7 +129,7 @@ float tempo = 0;  //Declaração pro relógio (millis)
 #if USANDO_TELEMETRIA
 HardwareSerial &LoRa(Serial3);
 unsigned long previousMillisTELEMETRIA = 0;
-const long intervalTELEMETRIA = 3000; 
+const long intervalTELEMETRIA = 5000; 
 #endif  //Telemetria
 
 void setup() {
