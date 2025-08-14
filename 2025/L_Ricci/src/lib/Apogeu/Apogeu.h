@@ -7,6 +7,6 @@ private:
   int contadorQueda = 0;
 public:
   int detectorQueda(float altura);
-  int getValor();
+  int getQueda();
 };
 #endif

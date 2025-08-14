@@ -1,22 +1,16 @@
-#include <Adafruit_BMP085.h>
 #include <SD.h>
 #include <Wire.h>
-#include <Adafruit_Sensor.h>
-#include <Adafruit_ADXL345_U.h>
-#include <Adafruit_HMC5883_U.h>
-#include <L3G.h>
 #include <TinyGPSPlus.h>
 
 #include "src/lib/Apogeu/Apogeu.h"
 #include "src/lib/Paraquedas/Paraquedas.h"
 #include "src/lib/Filtro/Filtro.h"
-#include "src/lib/BMP085/BMP085.h"
+#include "src/lib/Barometro/BMP085.h"
+#include "src/lib/Acelerometro/ADXL345.h"
+#include "src/lib/Giroscopio/L3G4200D.h"
+#include "src/lib/Magnetrometro/HMC5883L.h"
 
-// Adafruit_BMP085 bmp;
-Adafruit_ADXL345_Unified accel;
-Adafruit_HMC5883_Unified mag;
 TinyGPSPlus gps;
-L3G gyro;
 
 #define BARO 1
 #define TERMOMETRO 1
@@ -60,6 +54,12 @@ String filename;
 
 BMP085 bmp;
 
+ADXL345 accel(2);
+
+L3G4200D gyro;
+
+HMC5883L mag;
+
 Filtro f1(10);
 Filtro f2(10);
 
@@ -72,9 +72,124 @@ Apogeu apg;
 
 float altitudes[NUMERO_QUEDAS];
 float alt = 0;
+int contador = 0;
+float altitudeReal;
+bool queda = 0;
+float wufAltura = 2;
+
+unsigned long tempo = 0;
+
+void writeAll() {
+
+  float tempoSegundos = tempo / 1000.0;
+
+  String dataString = "";
+
+#if BARO
+  dataString += String(tempoSegundos) + "\t";
+#if TERMOMETRO
+  dataString += String(bmp.readTemperature()) + "\t";
+#endif
+#if PRESSAO
+  dataString += String(bmp.readPressure()) + "\t";
+#endif
+  dataString += String(f1.getMedia()) + "\t";
+  dataString += String(f2.getMedia()) + "\t";
+  dataString += String(altitudeReal) + "\t";
+  dataString += String(queda) + "\t";
+  dataString += String(p1.getValor()) + "\t";
+  dataString += String(p2.getValor()) + "\t";
+  dataString += String(p3.getValor()) + "\t";
+  dataString += String(p4.getValor()) + "\t";
+#endif
+
+#if ACEL
+#if AX
+  dataString += String(accel.getX()) + "\t";
+#endif
+#if AY
+  dataString += String(accel.getY()) + "\t";
+#endif
+#if AZ
+  dataString += String(accel.getZ()) + "\t";
+#endif
+#endif
+
+#if GIRO
+#if GX
+  dataString += String(gyro.getX()) + "\t";
+#endif
+#if GY
+  dataString += String(gyro.getY()) + "\t";
+#endif
+#if GZ
+  dataString += String(gyro.getZ()) + "\t";
+#endif
+#endif
+
+#if MAG
+#if MX
+  dataString += String(mag.getX()) + "\t";
+#endif
+#if MY
+  dataString += String(mag.getY()) + "\t";
+#endif
+#if MZ
+  dataString += String(mag.getZ()) + "\t";
+#endif
+#endif
+
+#if USANDO_GPS
+#if GPS_LAT
+  dataString += String(gps.location.lat(), 6) + "\t";
+#endif
+#if GPS_LNG
+  dataString += String(gps.location.lng(), 6);
+#endif
+#endif
+
+  Serial.println(dataString);
+
+#if SD_CARD
+  File dataFile = SD.open(filename, FILE_WRITE);
+  if (dataFile) {
+    dataFile.println(dataString);
+    dataFile.close();
+  } else {
+    Serial.println("Erro ao abrir o arquivo para escrita.");
+  }
+#endif
+
+#if LORA
+  unsigned long transmissaoLora = 0;
+  if (tempo - transmissaoLora >= 3000) {
+    transmissaoLora = tempo;
+    LoRa.println(dataString);
+  }
+#endif
+}
+
+void readAll() {
+  accel.readAll();
+  gyro.readAll();
+  mag.readAll();
+  bmp.readAll(101325.0);
+
+  while (GPS.available()) {
+    gps.encode(GPS.read());
+  }
+}
+
+void doAll() {
+  p1.ativar(f2.getMedia(), apg.getQueda());
+  p2.ativar(f2.getMedia(), apg.getQueda());
+  p3.ativar(f2.getMedia(), apg.getQueda());
+  p4.ativar(f2.getMedia(), apg.getQueda());
+}
 
 void setup() {
   Serial.begin(115200);
+  Wire.begin();
   LoRa.begin(9600);
   GPS.begin(9600);
 
@@ -100,12 +215,10 @@ void setup() {
   }
 #endif
 #if GIRO
-  if (!gyro.init()) {
+  if (!gyro.begin()) {
     Serial.println("Failed to autodetect gyro type!");
     while (1) {}
   }
-
-  gyro.enableDefault();
 #endif
 #if MAG
   if (!mag.begin()) {
@@ -187,7 +300,7 @@ void setup() {
   /* Média de Alturas */
 #if BARO
   for (int i = 0; i < 10; i++) {
-    bmp.readAll(101325);
+    bmp.readAll(101325.0);
     alt += bmp.readAltitude();
   }
   alt = alt / 10;
@@ -225,177 +338,35 @@ void setup() {
   pinMode(IGN_2, OUTPUT);
   pinMode(IGN_3, OUTPUT);
   pinMode(IGN_4, OUTPUT);
+
+  do {
+    tempo = millis();
+
+    altitudeReal = bmp.readAltitude() - alt;
+    f1.filtro(altitudeReal);
+    f2.filtro(f1.getMedia());
+
+    readAll();
+    writeAll();
+
+  } while (abs(f2.getMedia()) < wufAltura);
+
+  Serial.println("Sai do WUF!");
 }
 
 void loop() {
-  unsigned long timerLora = millis();
-  float tempo = millis() / 1000.0;
+
+  tempo = millis();
+
+  readAll();
+  writeAll();
 
 #if BARO
-  bmp.readAll(101325);
-  float altitudeReal = bmp.readAltitude() - alt;
-#if TERMOMETRO
-  float temperatura = bmp.readTemperature();
-#endif
-#if PRESSAO
-  float pressao = bmp.readPressure();
-#endif
+  altitudeReal = bmp.readAltitude() - alt;
+  f1.filtro(altitudeReal);
+  f2.filtro(f1.getMedia());
+  queda = apg.detectorQueda(f2.getMedia());
 #endif
 
-#if ACEL
-  sensors_event_t event_accel;
-  accel.getEvent(&event_accel);
-#if AX
-  float accelX = event_accel.acceleration.x;
-#endif
-#if AY
-  float accelY = event_accel.acceleration.y;
-#endif
-#if AZ
-  float accelZ = event_accel.acceleration.z;
-#endif
-#endif
-
-#if GIRO
-  gyro.read();
-#if GX
-  int gyroX = gyro.g.x;
-#endif
-#if GY
-  int gyroY = gyro.g.y;
-#endif
-#if GZ
-  int gyroZ = gyro.g.z;
-#endif
-#endif
-
-#if USANDO_GPS
-  while (GPS.available()) {
-    gps.encode(GPS.read());
-  }
-#if GPS_LAT
-  float lat = gps.location.lat();
-#endif
-#if GPS_LNG
-  float lng = gps.location.lng();
-#endif
-#endif
-
-#if MAG
-  sensors_event_t event_mag;
-  mag.getEvent(&event_mag);
-#if MX
-  float magX = event_mag.magnetic.x;
-#endif
-#if MY
-  float magY = event_mag.magnetic.y;
-#endif
-#if MZ
-  float magZ = event_mag.magnetic.z;
-#endif
-#endif
-
-  /* Tratamento de Dados */
-#if BARO
-
-  float valorFiltrado1 = f1.filtro(altitudeReal);
-  float valorFiltrado2 = f2.filtro(f1.getMedia());
-  int queda = apg.detectorQueda(f2.getMedia());
-
-  // Paraquedas
-  p1.ativar(valorFiltrado2, queda);
-  p2.ativar(valorFiltrado2, queda);
-  p3.ativar(valorFiltrado2, queda);
-  p4.ativar(valorFiltrado2, queda);
-
-#endif
-
-  /* Imprimindo Dados */
-
-  String dataString = "";
-
-#if BARO
-  dataString += String(tempo) + "\t";
-#if TERMOMETRO
-  dataString += String(temperatura) + "\t";
-#endif
-#if PRESSAO
-  dataString += String(pressao) + "\t";
-#endif
-  dataString += String(valorFiltrado1) + "\t";
-  dataString += String(valorFiltrado2) + "\t";
-  dataString += String(altitudeReal) + "\t";
-  dataString += String(apg.detectorQueda(f2.getMedia())) + "\t";
-  dataString += String(p1.getValor()) + "\t";
-  dataString += String(p2.getValor()) + "\t";
-  dataString += String(p3.getValor()) + "\t";
-  dataString += String(p4.getValor()) + "\t";
-#endif
-
-#if ACEL
-#if AX
-  dataString += String(accelX) + "\t";
-#endif
-#if AY
-  dataString += String(accelY) + "\t";
-#endif
-#if AZ
-  dataString += String(accelZ) + "\t";
-#endif
-#endif
-
-#if GIRO
-#if GX
-  dataString += String(gyroX) + "\t";
-#endif
-#if GY
-  dataString += String(gyroY) + "\t";
-#endif
-#if GZ
-  dataString += String(gyroZ) + "\t";
-#endif
-#endif
-
-#if MAG
-#if MX
-  dataString += String(magX) + "\t";
-#endif
-#if MY
-  dataString += String(magY) + "\t";
-#endif
-#if MZ
-  dataString += String(magZ) + "\t";
-#endif
-#endif
-
-#if USANDO_GPS
-#if GPS_LAT
-  dataString += String(lat, 6) + "\t";
-#endif
-#if GPS_LNG
-  dataString += String(lng, 6);
-#endif
-#endif
-
-  Serial.println(dataString);
-
-  /* Salvando no Cartão SD */
-
-#if SD_CARD
-  File dataFile = SD.open(filename, FILE_WRITE);
-  if (dataFile) {
-    dataFile.println(dataString);
-    dataFile.close();
-  } else {
-    Serial.println("Erro ao abrir o arquivo para escrita.");
-  }
-#endif
-
-#if LORA
-  unsigned long transmissaoLora = 0;
-  if (timerLora - transmissaoLora >= 3000) {
-    transmissaoLora = timerLora;
-    LoRa.println(dataString);
-  }
-#endif
+  doAll();
 }

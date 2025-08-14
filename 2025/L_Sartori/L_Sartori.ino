@@ -18,9 +18,9 @@
 #define GYRO_Y_HABILITAR (GYRO_HABILITAR && 1)
 #define GYRO_Z_HABILITAR (GYRO_HABILITAR && 1)
 #define BMP_HABILITAR 1
-#define TEMP_HABILITAR (BMP_HABILITAR && 1)
+#define TEMP_HABILITAR (BMP_HABILITAR && 0)
 #define BARO_HABILITAR (BMP_HABILITAR && 1)
-#define PRESS_HABILITAR (BMP_HABILITAR && 1)
+#define PRESS_HABILITAR (BMP_HABILITAR && 0)
 #define PQUEDAS_HABILITAR (BARO_HABILITAR && 1)
 #define CHIP_HABILITAR 0
 
@@ -35,7 +35,7 @@ TinyGPSPlus gps;
 #if LORA_HABILITAR
 HardwareSerial &LoRa(Serial3);
 #define loraEsp 3000
-long int tLora=0;
+long int tLora = 0;
 #endif
 
 #if ACCEL_HABILITAR
@@ -66,7 +66,6 @@ long int tLora=0;
 #define IGN_3 46 /*act3*/
 #define IGN_4 55 /*act4*/
 #define inter1 5000
-#define interEsp 2000
 #define inter2 5000
 #define inter3 5000
 #define inter4 5000
@@ -101,7 +100,7 @@ Adafruit_BMP085 bmp;
 #endif
 #if GYRO_HABILITAR
 L3G gyro;
-#endif 
+#endif
 
 #if BMP_HABILITAR
 float med_alt = 0;
@@ -109,25 +108,38 @@ int k = 0;
 #endif
 
 #if PQUEDAS_HABILITAR
-  long int t1 = 0;
-  long int t2 = 0;
-  long int t3 = 0;
-  long int t4 = 0;
-  int pQued1 = 0;
-  int pQued2 = -1;
-  int pQued3 = 0;
-  int pQued4 = -1;
-  bool ocoAp = 0;
+uint8_t IGN[4] = {IGN_1,IGN_2,IGN_3,IGN_4};
+long int te[4] = {0,0,0,0};
+bool ocoAp = 0;
+int pQuedasApo[4] = {0,0,apoH,apoH};
+bool pQuedasAlt[4] = {1,1,0,0};
+int paraQued[4]= {0,0,0,0};
+int interEsp[4] = {0,2000,0,2000};
+int inters[4] = {inter1,inter2,inter3,inter4};
+
+void detecQueda(int numPaQue,long int t,float hNow, bool ap){
+    if ((ap) && (paraQued[numPaQue] == 0 )&& ((pQuedasApo[numPaQue] >= hNow) || pQuedasAlt[numPaQue])) {
+    te[numPaQue] = t;
+    paraQued[numPaQue] = 1;
+  } else if (paraQued[numPaQue] == 1 && t - te[numPaQue] >= interEsp[numPaQue]) {
+    digitalWrite(IGN[numPaQue], HIGH);
+    paraQued[numPaQue] = 2;
+    te[numPaQue] = t;
+  } else if (paraQued[numPaQue] == 2 && t - te[numPaQue] >= inters[numPaQue]) {
+    digitalWrite(IGN[numPaQue], LOW);
+    paraQued[numPaQue] = 3;
+  }
+}
 #endif
 
 #if BARO_HABILITAR
-  bool h;
-  float valoresFiltros[N][L];
-  float vFiltro[N + 1];
-  float ordH[H];
+bool h;
+float valoresFiltros[N][L];
+float vFiltro[N + 1];
+float ordH[H];
 
 
-bool detecQued(float ultAlt){
+bool detecQued(float ultAlt) {
   for (int i = H - 1; i > 0; i--) {
     ordH[i] = ordH[i - 1];
   }
@@ -140,16 +152,16 @@ bool detecQued(float ultAlt){
 }
 
 
-float filtro(int numFiltragem, float valorRecebido){
+float filtro(int numFiltragem, float valorRecebido) {
   float somasFil;
   valoresFiltros[numFiltragem][k] = valorRecebido;
-  somasFil=0;
+  somasFil = 0;
 
-  for(int i=0; i < L; i++){
+  for (int i = 0; i < L; i++) {
     somasFil += valoresFiltros[numFiltragem][i];
   }
 
-  return somasFil/L;
+  return somasFil / L;
 }
 
 #endif
@@ -231,7 +243,7 @@ void setup() {
 
   Serial.println("Creating " + docName + "...");
   dataFile = SD.open(docName, FILE_WRITE);
-#endif 
+#endif
 
   cabe += String("tempo\t");
 
@@ -242,9 +254,9 @@ void setup() {
   cabe += String("Pressure\t");
 #endif
 #if BARO_HABILITAR
-  for(int i=0;i<N+1;i++){
+  for (int i = 0; i < N + 1; i++) {
     cabe += String("Filtro");
-    cabe += String(i+1) +"\t";
+    cabe += String(i + 1) + "\t";
   }
   cabe += String("h\t");
 #endif
@@ -330,7 +342,7 @@ void loop() {
   vFiltro[0] = bmp.readAltitude() - med_alt;
 
   for (int i = 0; i < N; i++) {
-    vFiltro[i + 1] = filtro(i,vFiltro[i]);
+    vFiltro[i + 1] = filtro(i, vFiltro[i]);
   }
 
   k += 1;
@@ -341,53 +353,15 @@ void loop() {
 
 #endif
 #if PQUEDAS_HABILITAR
-  if (detecQued(vFiltro[N])) {
-    ocoAp = 1;
+  if (!ocoAp) {
+    if (detecQued(vFiltro[N])) {
+      ocoAp = 1;
+    }
   }
-
-  if (ocoAp && pQued1 == 0) {
-    t1 = t;
-    pQued1 = 1;
-    digitalWrite(IGN_1, HIGH);
-  } else if (pQued1 == 1 && t - t1 >= inter1) {
-    digitalWrite(IGN_1, LOW);
-    pQued1 = 2;
+  for(int i=0;i<4;i++){
+    detecQueda(i,t,ordH[0],ocoAp);
   }
-
-  if (ocoAp && pQued2 == -1) {
-    t2 = t;
-    pQued2 = 0;
-  } else if (pQued2 == 0 && t - t2 >= interEsp) {
-    digitalWrite(IGN_2, HIGH);
-    pQued2 = 1;
-    t2 = t;
-  } else if (pQued2 == 1 && t - t2 >= inter2) {
-    digitalWrite(IGN_2, LOW);
-    pQued2 = 2;
-  }
-
-  if (ocoAp && pQued3 == 0 && apoH >= ordH[0]) {
-    t3 = t;
-    pQued3 = 1;
-    digitalWrite(IGN_3, HIGH);
-  } else if (pQued3 == 1 && t - t3 >= inter3) {
-    digitalWrite(IGN_3, LOW);
-    pQued3 = 2;
-  }
-
-
-  if (ocoAp && pQued4 == -1 && apoH >= ordH[0]) {
-    t4 = t;
-    pQued4 = 0;
-  } else if (pQued4 == 0 && t - t4 >= interEsp) {
-    digitalWrite(IGN_4, HIGH);
-    pQued4 = 1;
-    t4 = t;
-  } else if (pQued4 == 1 && t - t4 >= inter4) {
-    digitalWrite(IGN_4, LOW);
-    pQued4 = 2;
-  }
-#endif 
+#endif
 
   dataString += String(t / 1000.0);
   dataString += "\t";
@@ -410,16 +384,16 @@ void loop() {
   dataString += "\t";
 #endif
 #if PQUEDAS_HABILITAR
-  dataString += String(pQued1);
+  dataString += String(paraQued[0]);
   dataString += "\t";
 
-  dataString += String(pQued2);
+  dataString += String(paraQued[1]);
   dataString += "\t";
 
-  dataString += String(pQued3);
+  dataString += String(paraQued[2]);
   dataString += "\t";
 
-  dataString += String(pQued4);
+  dataString += String(paraQued[3]);
   dataString += "\t";
 #endif
 #if ACCEL_X_HABILITAR
@@ -445,7 +419,7 @@ void loop() {
 #if GYRO_Z_HABILITAR
   dataString += String((int)gyro.g.z);
   dataString += "\t";
-#endif 
+#endif
 #if MAG_X_HABILITAR
   dataString += String(eventmag.magnetic.x);
   dataString += "\t";
@@ -459,7 +433,7 @@ void loop() {
   dataString += "\t";
 #endif
 #if GPS_HABILITAR
-  while (GPS.available()){
+  while (GPS.available()) {
     gps.encode(GPS.read());
   }
   dataString += String(gps.location.lat(), 6);
@@ -470,14 +444,14 @@ void loop() {
 #endif
   Serial.println(dataString);
 #if LORA_HABILITAR
-  if(t-tLora>=loraEsp){
+  if (t - tLora >= loraEsp) {
     LoRa.println(dataString);
     tLora = t;
   }
 #endif
 
 #if CHIP_HABILITAR
-  
+
 
   File dataFile = SD.open(docName, FILE_WRITE);
   if (dataFile) {

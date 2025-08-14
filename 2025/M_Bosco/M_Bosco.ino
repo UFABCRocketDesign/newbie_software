@@ -1,10 +1,14 @@
 #include <Adafruit_BMP085.h>
 
 Adafruit_BMP085 bmp;
+// --- Variáveis Globais ---
+float alturaZero = 0;
+// --- Variáveis do Filtro ---
+float alturaFiltradaSegundaVez = 0.0;
+const float ALPHA = 0.15;
+float alturaFiltrada = 0;
 
-// the setup function runs once when you press reset or power the board
 void setup() {
-  // initialize digital pin LED_BUILTIN as an output.
   pinMode(LED_BUILTIN, OUTPUT);
 
 
@@ -13,20 +17,41 @@ void setup() {
     Serial.println("Não foi possível encontrar um sensor BMP085 válido, verifique a fiação!");
     while (1) {}
   }
+  // --- Calibração da Altura Zero ---
+Serial.println("calibrando altura");
+float soma = 0;
+for (int i = 0; i < 20; i++) {
+  soma += bmp.readAltitude();
+  }
+  alturaZero = soma/20;
 }
-// the loop function runs over and over again forever
+
 void loop() {
+  // --- Leituras e Cálculos ---
+  float Altitude = bmp.readAltitude();
+  float Altura = Altitude - alturaZero;
+  // --- Aplicação do Primeiro Filtro ---
+  alturaFiltrada = (ALPHA * Altura) + (1 - ALPHA) * alturaFiltrada;
+  // --- Aplicação do Segundo Filtro (em cascata) ---
+  alturaFiltradaSegundaVez = (ALPHA * alturaFiltrada) + (1.0 - ALPHA) * alturaFiltradaSegundaVez;
+
+// --- Prints dos valores ---
   Serial.print(bmp.readTemperature());
-  Serial.print("\t\t");
+  Serial.print("\t");
 
   Serial.print(bmp.readPressure());
-  Serial.print("\t\t");
+  Serial.print("\t");
 
-  Serial.println(bmp.readAltitude());
+  Serial.print(Altitude);
+  Serial.print("\t");
   
-  digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
-  delay(500);                      // wait for a second
-  digitalWrite(LED_BUILTIN, LOW);   // turn the LED off by making the voltage LOW
-  delay(500);                      // wait for a second
+  Serial.print(Altura);
+  Serial.print("\t");
+
+  Serial.print(alturaFiltrada);
+  Serial.print("\t");
+
+  Serial.print(alturaFiltradaSegundaVez);
+  Serial.println();
 }
 

@@ -33,44 +33,82 @@
 
 Adafruit_BMP085 bmp;
 
-float Alt_zero = 0; 
+float Alt_zero = 0;
+
+float vetor[15];
+float vetor_2[15];
+float media_anterior = 0;
 
 void setup() {
-// initialize digital pin LED_BUILTIN as an output.
+  // initialize digital pin LED_BUILTIN as an output.
   Serial.begin(115200);
   if (!bmp.begin()) {
-	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-	while (1) {}
+    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+    while (1) {}
   }
-  float soma = 0 ; 
-  for ( int i = 0 ; i < 10 ; i++) {
+  float soma = 0;
+  for (int i = 0; i < 10; i++) {
     soma += bmp.readAltitude();
   }
   Alt_zero = soma / 10;
-
 }
 
 // the loop function runs over and over again forever
-void loop() {     
-    
-    Serial.print(bmp.readTemperature());
-    Serial.print("\t");
-    
-    Serial.print(bmp.readPressure());
-    Serial.print("\t");
-    
-    // Calculate altitude assuming 'standard' barometric
-    // pressure of 1013.25 millibar = 101325 Pascal 
-    Serial.print(bmp.readSealevelPressure());
-    Serial.print("\t");
-    Serial.print(bmp.readAltitude(101500));
-    Serial.print("\t");
-    Serial.print(bmp.readAltitude() - Alt_zero);
-    Serial.print("\t");
-    Serial.println();
-    
-}
+void loop() {
+  float nova_alt = (bmp.readAltitude() - Alt_zero);
+  for (int i = 14; i > 0; i--) {
+    vetor[i] = vetor[i - 1];
+  }
 
-    
-   
-    
+  vetor[0] = nova_alt;
+
+  float soma = 0;
+  for (int i = 0; i < 15; i++) {
+    soma += vetor[i];
+  }
+  float media = soma / 15;
+
+
+  for (int i = 14; i > 0; i--) {
+    vetor_2[i] = vetor_2[i - 1];
+  }
+  vetor_2[0] = media;
+
+  float soma2 = 0;
+  for (int i = 0; i < 15; i++) {
+    soma2 += vetor_2[i];
+  }
+  float media2 = soma2 / 15;
+
+
+  float dif = media2 - media_anterior;
+  if (dif < 0){
+    dif = 1;
+  }
+  else {
+    dif = 0;
+  }
+  media_anterior = media2;
+
+  Serial.print(bmp.readTemperature());
+  Serial.print("\t");
+
+  Serial.print(bmp.readPressure());
+  Serial.print("\t");
+
+  // Calculate altitude assuming 'standard' barometric
+  // pressure of 1013.25 millibar = 101325 Pascal
+  Serial.print(bmp.readSealevelPressure());
+  Serial.print("\t");
+  Serial.print(bmp.readAltitude(101500));
+  Serial.print("\t");
+  Serial.print(nova_alt);
+  Serial.print("\t");
+  Serial.print(media);
+  Serial.print("\t");
+  Serial.print(media2);
+  Serial.print("\t");
+  Serial.print(dif);
+  Serial.print("\t");
+  Serial.println();
+}

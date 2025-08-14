@@ -1,6 +1,8 @@
 #ifndef _BMP085_h
 #define _BMP085_h
 
+#include <Wire.h>
+
 class BMP085 {
 private:
   int ac1, ac2, ac3;
@@ -19,7 +21,7 @@ public:
   bool begin();
   bool readAll(float pressaoInicial);
   float readTemperature();
-  float readPressure();
+  long readPressure();
   float readAltitude();
 };
 #endif
