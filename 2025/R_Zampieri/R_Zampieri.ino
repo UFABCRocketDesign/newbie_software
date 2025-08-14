@@ -318,7 +318,7 @@ void setup() {
   dataString += ("Magnet z\t");
 #endif  //MAGNETOMETRO_Z
 
-//-----DATASTRING----
+  //-----DATASTRING----
 
   //Print da dataString
   Serial.println(dataString);
@@ -361,9 +361,15 @@ void loop() {
 #endif  //MAGNETOMETRO
 
 //*------SENSOR BMP------*/
-#if USANDO_BMP
+#if USANDO_BMP_TEMPERATURA
   temperatura = bmp.readTemperature();
+#endif  //Temperatura BMP
+
+#if USANDO_BMP_PRESSAO
   pressao = bmp.readPressure();
+#endif  //Pressao BMP
+
+#if USANDO_BMP_ALTURA
   //FILTROS
   vetor[guia] = bmp.readAltitude() - tara;  //setup do filtro 1
   if (guia < tamanho - 1) {
@@ -402,10 +408,11 @@ void loop() {
     queda = true;
   }
   alturapassada = altura_filtrada2;  //Armazenamento da altura atual para usar como "alturapassada" no próximo loop
-#endif                               //BMP
+#endif                               //Altura BMP
+
 
 /*------ACIONAMENTO DE PARAQUEDAS------*/
-#if USANDO_BMP && USANDO_PARAQUEDAS
+#if USANDO_PARAQUEDAS_1
   // Paraquedas 1
   if ((queda) && (paraquedas1armado == 0)) {
     digitalWrite(IGN_1, HIGH);
@@ -417,7 +424,9 @@ void loop() {
     digitalWrite(IGN_1, LOW);
     paraquedas1armado = 2;
   }
+#endif  //Paraquedas 1
 
+#if USANDO_PARAQUEDAS_2
   // Paraquedas 2
   if ((queda) && (paraquedas2armado == 0)) {
     previousMillisPRQ2 = currentMillis;
@@ -434,7 +443,9 @@ void loop() {
     digitalWrite(IGN_2, LOW);
     paraquedas2armado = 2;
   }
+#endif  //Paraquedas 2
 
+#if USANDO_PARAQUEDAS_3
   // Paraquedas 3
   if ((queda) && (altura_filtrada2 <= -3) && (paraquedas3armado == 0)) {
     digitalWrite(IGN_3, HIGH);
@@ -446,7 +457,9 @@ void loop() {
     digitalWrite(IGN_3, LOW);
     paraquedas3armado = 2;
   }
+#endif  //Paraquedas 3
 
+#if USANDO_PARAQUEDAS_4
   // Paraquedas 4
   if ((queda) && (altura_filtrada2 <= -3) && (paraquedas4armado == 0)) {
     previousMillisPRQ4 = currentMillis;
@@ -463,7 +476,7 @@ void loop() {
     digitalWrite(IGN_4, LOW);
     paraquedas4armado = 2;
   }
-#endif  //PARAQUEDAS
+#endif  //Paraquedas 4
 
 /*------ARMAZENAMENTO DE DADOS------*/
 #if USANDO_SD
@@ -471,38 +484,84 @@ void loop() {
   File dataFile = SD.open(nomearquivo, FILE_WRITE);
   // Armazenamento dos valores na dataString
   String dataString = "";
+
+//------------RELOGIO------------
 #if USANDO_RELOGIO
   dataString += String(tempo) + "\t";
 #endif  //RELOGIO
-#if USANDO_BMP
+
+//------------BMP------------
+#if USANDO_BMP_ALTURA
   dataString += String(vetor[guia]) + "\t";
   dataString += String(altura_filtrada) + "\t";
   dataString += String(altura_filtrada2) + "\t";
   dataString += String(detectorqueda) + "\t";
+#endif  //Altura
+
+#if USANDO_BMP_TEMPERATURA
   dataString += String(temperatura) + "\t";
+#endif  //Temperatura
+
+#if USANDO_BMP_PRESSAO
   dataString += String(pressao) + "\t";
-#endif  //BMP
-#if USANDO_BMP && USANDO_PARAQUEDAS
+#endif  //Pressao
+
+//------------PARAQUEDAS------------
+#if USANDO_PARAQUEDAS_1
   dataString += String(paraquedas1armado) + "\t";
+#endif  //PARAQUEDAS 1
+
+#if USANDO_PARAQUEDAS_2
   dataString += String(paraquedas2armado) + "\t";
+#endif  //PARAQUEDAS 2
+
+#if USANDO_PARAQUEDAS_3
   dataString += String(paraquedas3armado) + "\t";
+#endif  //PARAQUEDAS 3
+
+#if USANDO_PARAQUEDAS_4
   dataString += String(paraquedas4armado) + "\t";
-#endif  //PARAQUEDAS
-#if USANDO_ACELEROMETRO
+#endif  //PARAQUEDAS 4
+
+//------------ACELEROMETRO------------
+#if USANDO_ACELEROMETRO_X
   dataString += String(event.acceleration.x) + "\t";
+#endif  //ACELEROMETRO X
+
+#if USANDO_ACELEROMETRO_Y
   dataString += String(event.acceleration.y) + "\t";
+#endif  //ACELEROMETRO Y
+
+#if USANDO_ACELEROMETRO_Z
   dataString += String(event.acceleration.z) + "\t";
-#endif  //ACELEROMETRO
-#if USANDO_GIROSCOPIO
+#endif  //ACELEROMETRO Z
+
+//------------GIROSCOPIO------------
+#if USANDO_GIROSCOPIO_X
   dataString += String((int)gyro.g.x) + "\t";
+  #endif  //GIROSCOPIO X
+
+  #if USANDO_GIROSCOPIO_Y
   dataString += String((int)gyro.g.y) + "\t";
+  #endif  //GIROSCOPIO Y
+
+  #if USANDO_GIROSCOPIO_Z
   dataString += String((int)gyro.g.z) + "\t";
-#endif  //GIROSCOPIO
-#if USANDO_MAGNETOMETRO
+  #endif  //GIROSCOPIO Y
+
+//------------MAGNETOMETRO------------
+#if USANDO_MAGNETOMETRO_X
   dataString += String(eventmag.magnetic.x) + "\t";
+  #endif  //MAGNETOMETRO X
+
+  #if USANDO_MAGNETOMETRO_Y
   dataString += String(eventmag.magnetic.y) + "\t";
+  #endif  //MAGNETOMETRO Y
+
+  #if USANDO_MAGNETOMETRO_Z
   dataString += String(eventmag.magnetic.z) + "\t";
-#endif  //MAGNETOMETRO
+  #endif  //MAGNETOMETRO Z
+
   //Print da dataString
   Serial.println(dataString);
 
