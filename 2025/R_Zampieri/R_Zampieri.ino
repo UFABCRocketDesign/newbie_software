@@ -129,7 +129,7 @@ float tempo = 0;  //Declaração pro relógio (millis)
 #if USANDO_TELEMETRIA
 HardwareSerial &LoRa(Serial3);
 unsigned long previousMillisTELEMETRIA = 0;
-const long intervalTELEMETRIA = 5000; 
+const long intervalTELEMETRIA = 5000;
 #endif  //Telemetria
 
 void setup() {
@@ -242,7 +242,7 @@ void setup() {
   pinMode(IGN_4, OUTPUT);
 #endif  //PARAQUEDAS_4
 
-/*---------------SETUP ARMAZENAMENTO NO ARQUIVO---------------*/
+  /*---------------SETUP ARMAZENAMENTO NO ARQUIVO---------------*/
   String dataString = "";
 
   //-----RELOGIO-----
@@ -332,7 +332,7 @@ void setup() {
   Serial.println(dataString);
 
 #if USANDO_TELEMETRIA
-    LoRa.println(dataString);
+  LoRa.println(dataString);
 #endif
 
 #if USANDO_SD
@@ -495,7 +495,7 @@ void loop() {
   }
 #endif  //Paraquedas 4
 
-/*------ARMAZENAMENTO DE DADOS------*/
+  /*------ARMAZENAMENTO DE DADOS------*/
   String dataString = "";
 
 //------------RELOGIO------------
@@ -580,11 +580,11 @@ void loop() {
 
 
 #if USANDO_TELEMETRIA
-  if (currentMillis - previousMillisTELEMETRIA >= intervalTELEMETRIA){
+  if (currentMillis - previousMillisTELEMETRIA >= intervalTELEMETRIA) {
     previousMillisTELEMETRIA = currentMillis;
     LoRa.println(dataString);
-    }
-#endif//Telemetria
+  }
+#endif  //Telemetria
 
 
 #if USANDO_SD
