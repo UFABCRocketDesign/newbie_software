@@ -4,6 +4,7 @@ Adafruit_BMP085 bmp;
 float alt_zero = 0;              
 float vetor_num [10];
 int ind_vetor = 0;
+float valor_flt = 0;
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
@@ -22,7 +23,7 @@ void setup() {
 void loop() {
   float real_alt = bmp.readAltitude() - alt_zero;
   
-  vetornum [ind_vetor] = real_alt;
+  vetor_num [ind_vetor] = real_alt;
   ind_vetor ++;
   if (ind_vetor >= 10) ind_vetor = 0;
     
