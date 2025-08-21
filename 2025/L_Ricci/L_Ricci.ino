@@ -44,6 +44,11 @@ TinyGPSPlus gps;
 #define IGN_3 46
 #define IGN_4 55
 
+#define HEAL_1 68
+#define HEAL_2 62
+#define HEAL_3 56
+#define HEAL_4 58
+
 #define CHIP_SELECT 53
 #define NUMERO_QUEDAS 5
 
@@ -101,6 +106,10 @@ void writeAll() {
   dataString += String(p2.getValor()) + "\t";
   dataString += String(p3.getValor()) + "\t";
   dataString += String(p4.getValor()) + "\t";
+  dataString += String(analogRead(HEAL_1)) + "\t";
+  dataString += String(analogRead(HEAL_2)) + "\t";
+  dataString += String(analogRead(HEAL_3)) + "\t";
+  dataString += String(analogRead(HEAL_4)) + "\t";
 #endif
 
 #if ACEL
@@ -187,6 +196,16 @@ void doAll() {
   p4.ativar(f2.getMedia(), apg.getQueda());
 }
 
+void processAll() {
+
+#if BARO
+  altitudeReal = bmp.readAltitude() - alt;
+  f1.filtro(altitudeReal);
+  f2.filtro(f1.getMedia());
+  queda = apg.detectorQueda(f2.getMedia());
+#endif
+}
+
 void setup() {
   Serial.begin(115200);
   Wire.begin();
@@ -246,11 +265,15 @@ void setup() {
   heading += "Paraquedas 2\t";
   heading += "Paraquedas 3\t";
   heading += "Paraquedas 4\t";
+  heading += "Health 1\t";
+  heading += "Health 2\t";
+  heading += "Health 3\t";
+  heading += "Health 4\t";
 #endif
 
 #if ACEL
 #if AX
-  heading += "Acel X\t";
+    heading += "Acel X\t";
 #endif
 #if AY
   heading += "Acel Y\t";
@@ -339,6 +362,11 @@ void setup() {
   pinMode(IGN_3, OUTPUT);
   pinMode(IGN_4, OUTPUT);
 
+  pinMode(HEAL_1, INPUT);
+  pinMode(HEAL_2, INPUT);
+  pinMode(HEAL_3, INPUT);
+  pinMode(HEAL_4, INPUT);
+
   do {
     tempo = millis();
 
@@ -350,8 +378,6 @@ void setup() {
     writeAll();
 
   } while (abs(f2.getMedia()) < wufAltura);
-
-  Serial.println("Sai do WUF!");
 }
 
 void loop() {
@@ -359,14 +385,7 @@ void loop() {
   tempo = millis();
 
   readAll();
-  writeAll();
-
-#if BARO
-  altitudeReal = bmp.readAltitude() - alt;
-  f1.filtro(altitudeReal);
-  f2.filtro(f1.getMedia());
-  queda = apg.detectorQueda(f2.getMedia());
-#endif
-
+  processAll();
   doAll();
+  writeAll();
 }
