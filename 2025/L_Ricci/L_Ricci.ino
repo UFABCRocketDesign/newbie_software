@@ -68,10 +68,10 @@ HMC5883L mag;
 Filtro f1(10);
 Filtro f2(10);
 
-Paraquedas p1(IGN_1, 0, 1500, false, -3);
-Paraquedas p2(IGN_2, 2000, 1500, false, -3);
-Paraquedas p3(IGN_3, 0, 1500, true, -3);
-Paraquedas p4(IGN_4, 2000, 1500, true, -3);
+Paraquedas p1(IGN_1, HEAL_1, 1500, false, -3, 150);
+Paraquedas p2(IGN_2, HEAL_2, 1500, false, -3, 150);
+Paraquedas p3(IGN_3, HEAL_3, 1500, true, -3, 150);
+Paraquedas p4(IGN_4, HEAL_4, 1500, true, -3, 150);
 
 Apogeu apg;
 
@@ -106,10 +106,10 @@ void writeAll() {
   dataString += String(p2.getValor()) + "\t";
   dataString += String(p3.getValor()) + "\t";
   dataString += String(p4.getValor()) + "\t";
-  dataString += String(analogRead(HEAL_1)) + "\t";
-  dataString += String(analogRead(HEAL_2)) + "\t";
-  dataString += String(analogRead(HEAL_3)) + "\t";
-  dataString += String(analogRead(HEAL_4)) + "\t";
+  dataString += String(p1.getHealth()) + "\t";
+  dataString += String(p2.getHealth()) + "\t";
+  dataString += String(p3.getHealth()) + "\t";
+  dataString += String(p4.getHealth()) + "\t";
 #endif
 
 #if ACEL
@@ -273,7 +273,7 @@ void setup() {
 
 #if ACEL
 #if AX
-    heading += "Acel X\t";
+  heading += "Acel X\t";
 #endif
 #if AY
   heading += "Acel Y\t";

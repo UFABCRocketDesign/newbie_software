@@ -21,3 +21,7 @@ int Paraquedas::ativar(float altura, int queda) {
 int Paraquedas::getValor() {
   return estadoParaquedas;
 }
+
+int Paraquedas::getHealth() {
+  return analogRead(pinoSaude) < sensibilidadeSaude;
+}

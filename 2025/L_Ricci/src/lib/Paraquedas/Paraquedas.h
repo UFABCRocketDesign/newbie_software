@@ -9,19 +9,22 @@
 
 class Paraquedas {
 private:
-  int pinoIgnicao;
   int estadoParaquedas;
   int altitudeTeto;
+  int sensibilidadeSaude;
   unsigned long timer;
   unsigned long desativacao;
+  const int pinoIgnicao;
+  const int pinoSaude;
   const unsigned long tempoAtraso;
   const unsigned long tempoLigado;
   const bool usaAltura;
 
 public:
-  Paraquedas(int pino, unsigned long atraso, unsigned long ligado, bool altura, int altitudeTeto)
-    : pinoIgnicao(pino), tempoAtraso(atraso), tempoLigado(ligado), usaAltura(altura), altitudeTeto(altitudeTeto) {}
+  Paraquedas(int pino, int saude, unsigned long atraso, unsigned long ligado, bool altura, int altitudeTeto, int sensibilidade = 150)
+    : pinoIgnicao(pino), pinoSaude(saude), tempoAtraso(atraso), tempoLigado(ligado), usaAltura(altura), altitudeTeto(altitudeTeto), sensibilidadeSaude(sensibilidade) {}
   int ativar(float altura, int queda);
   int getValor();
+  int getHealth();
 };
 #endif
