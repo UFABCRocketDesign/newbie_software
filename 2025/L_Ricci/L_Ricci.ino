@@ -35,7 +35,7 @@ TinyGPSPlus gps;
 #define GPS_LAT 1
 #define GPS_LNG 1
 
-#define LORA 1
+#define LORA 0
 #define SD_CARD 0
 #define HEADING 1
 
@@ -48,6 +48,9 @@ TinyGPSPlus gps;
 #define HEAL_2 62
 #define HEAL_3 56
 #define HEAL_4 58
+
+#define BUZZ_PIN A0
+#define BUZZ_CMD LOW
 
 #define CHIP_SELECT 53
 #define NUMERO_QUEDAS 5
@@ -75,6 +78,7 @@ Paraquedas p4(IGN_4, HEAL_4, 1500, true, -3, 150);
 
 Apogeu apg;
 
+// Barômetro e Altitude
 float altitudes[NUMERO_QUEDAS];
 float alt = 0;
 int contador = 0;
@@ -82,7 +86,14 @@ float altitudeReal;
 bool queda = 0;
 float wufAltura = 2;
 
+// Tempo
 unsigned long tempo = 0;
+
+// Buzzer
+unsigned long tempoMillisBuzzer = 0;
+int numberOfBeeps = 0;
+int beepCount = 0;
+bool isBeeping = false;
 
 void writeAll() {
 
@@ -179,10 +190,25 @@ void writeAll() {
 }
 
 void readAll() {
-  accel.readAll();
-  gyro.readAll();
-  mag.readAll();
-  bmp.readAll(101325.0);
+  // accel.readAll();
+  if (accel.readAll()) {
+    numberOfBeeps += 1;
+  }
+
+  // gyro.readAll();
+  if (gyro.readAll()) {
+    numberOfBeeps += 1;
+  }
+
+  // mag.readAll();
+  if (mag.readAll()) {
+    numberOfBeeps += 1;
+  }
+
+  // bmp.readAll(101325.0);
+  if (bmp.readAll(101325.0)) {
+    numberOfBeeps += 1;
+  }
 
   while (GPS.available()) {
     gps.encode(GPS.read());
@@ -204,6 +230,27 @@ void processAll() {
   f2.filtro(f1.getMedia());
   queda = apg.detectorQueda(f2.getMedia());
 #endif
+}
+
+void buzzer() {
+
+  if (beepCount >= numberOfBeeps) {
+    digitalWrite(BUZZ_PIN, LOW);
+    return;
+  }
+
+  if (millis() - tempoMillisBuzzer >= 500) {
+    tempoMillisBuzzer = millis();
+
+    isBeeping = !isBeeping;
+
+    if (isBeeping) {
+      digitalWrite(BUZZ_PIN, HIGH);
+    } else {
+      digitalWrite(BUZZ_PIN, LOW);
+      beepCount++;
+    }
+  }
 }
 
 void setup() {
@@ -367,6 +414,8 @@ void setup() {
   pinMode(HEAL_3, INPUT);
   pinMode(HEAL_4, INPUT);
 
+  pinMode(BUZZ_PIN, OUTPUT);
+
   do {
     tempo = millis();
 
@@ -376,6 +425,7 @@ void setup() {
 
     readAll();
     writeAll();
+    buzzer();
 
   } while (abs(f2.getMedia()) < wufAltura);
 }
@@ -385,6 +435,11 @@ void loop() {
   tempo = millis();
 
   readAll();
+
+  if (apg.getQueda()) {
+    buzzer();
+  }
+
   processAll();
   doAll();
   writeAll();
