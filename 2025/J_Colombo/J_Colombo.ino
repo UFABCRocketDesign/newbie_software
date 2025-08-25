@@ -1,12 +1,15 @@
 // Sempre verificar antes de compilar
 // Foguete não tem delay
-// Serial print ln pula a linha
+// Serial println pula a linha
+// Calcular altitude de referência
 
 // Bibliotecas aqui
 #include <Adafruit_BMP085.h>
 
-
 Adafruit_BMP085 bmp;
+
+float alturazero;
+float novaaltura;
   
 void setup() {
   Serial.begin(115200);
@@ -14,6 +17,10 @@ void setup() {
 	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
 	while (1) {}
   }
+
+
+
+  alturazero = bmp.readAltitude();
 
   Serial.print("Temperature (*C)  ");
   Serial.print("\t");
@@ -23,7 +30,9 @@ void setup() {
   Serial.print("\t");
   Serial.print("Pressure at sealevel (calculated in Pa) = ");
   Serial.print("\t");
-  Serial.println("Real altitude (m)  ");
+  Serial.print("Real altitude (m)  ");
+  Serial.print("\t");
+  Serial.println("Altitude zerada (m)  ");
 }
   
 void loop() {
@@ -36,4 +45,7 @@ void loop() {
     Serial.print(bmp.readSealevelPressure());
     Serial.print("\t");
     Serial.println(bmp.readAltitude(101500));
+    Serial.print("\t");
+    novaaltura = bmp.readAltitude()- alturazero ;
+    Serial.println(novaaltura);
 }
