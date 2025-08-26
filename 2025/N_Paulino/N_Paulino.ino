@@ -76,7 +76,7 @@ void loop() {
 
   vetor_num4 [ind_vetor4] = valor_flt3 ;
   ind_vetor4 ++;
-  if (valor_flt4 >=10) valor_flt4 = real_alt;
+  if (valor_flt4 >=10) valor_flt4 = 0;
 
   float valor_vet4 = 0;
   for (int i = 0; i < 10; i++) {
@@ -91,8 +91,11 @@ void loop() {
   Serial.print(real_alt);
   Serial.print('\t');
   Serial.print(valor_flt1);
+  Serial.print('\t');
   Serial.print(valor_flt2);
+  Serial.print('\t');
   Serial.print(valor_flt3);
+  Serial.print('\t');
   Serial.print(valor_flt4);    
   Serial.print('\t');
   Serial.println();
