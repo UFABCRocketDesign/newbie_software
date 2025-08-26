@@ -235,13 +235,11 @@ void processAll() {
 }
 
 void buzzer() {
-  if (beepCount >= numberOfBeeps) {
-    digitalWrite(BUZZ_PIN, !BUZZ_CMD);
+  if (beepCount == -1) {
     if (millis() - tempoMillisBuzzer >= 5000) {
-      tempoMillisBuzzer = millis();
-      beepCount = 0;
+      beepCount++;
     }
-  } else {
+  } else if (beepCount >= 0 && beepCount >= numberOfBeeps) {
     if (millis() - tempoMillisBuzzer >= 250) {
       tempoMillisBuzzer = millis();
 
@@ -254,6 +252,10 @@ void buzzer() {
         beepCount++;
       }
     }
+  } else {
+    digitalWrite(BUZZ_PIN, !BUZZ_CMD);
+    tempoMillisBuzzer = millis();
+    beepCount = -1;
   }
 }
 
