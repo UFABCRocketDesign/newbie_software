@@ -52,7 +52,7 @@ void loop() {
 
   vetor_num2 [ind_vetor2] = valor_flt1;
   ind_vetor2 ++;
-  if (valor_flt1 >= 10) valor_flt1 = 0;
+  if (ind_vetor2 >= 10) ind_vetor2 = 0;
 
   float valor_vet2 = 0;
   for (int i = 0; i < 10 ; i++) {
@@ -64,7 +64,7 @@ void loop() {
 
   vetor_num3 [ind_vetor3] = valor_flt2;
   ind_vetor3 ++;
-  if (valor_flt3 >= 10) valor_flt3 = 0;
+  if (ind_vetor3 >= 10) ind_vetor3 = 0;
 
   float valor_vet3 = 0;
   for (int i = 0; i < 10; i++) {
@@ -76,7 +76,7 @@ void loop() {
 
   vetor_num4 [ind_vetor4] = valor_flt3 ;
   ind_vetor4 ++;
-  if (valor_flt4 >=10) valor_flt4 = 0;
+  if (ind_vetor4 >=10) ind_vetor4 = 0;
 
   float valor_vet4 = 0;
   for (int i = 0; i < 10; i++) {
