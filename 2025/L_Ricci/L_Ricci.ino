@@ -91,6 +91,8 @@ unsigned long tempo = 0;
 
 // Buzzer
 unsigned long tempoMillisBuzzer = 0;
+unsigned long currentMillis = 0;
+unsigned long previousMillis = 0;
 int numberOfBeeps = 0;
 int beepCount = 0;
 bool isBeeping = false;
@@ -233,22 +235,24 @@ void processAll() {
 }
 
 void buzzer() {
-
   if (beepCount >= numberOfBeeps) {
-    digitalWrite(BUZZ_PIN, LOW);
-    return;
-  }
+    digitalWrite(BUZZ_PIN, !BUZZ_CMD);
+    if (millis() - tempoMillisBuzzer >= 1000) {
+      tempoMillisBuzzer = millis();
+      beepCount = 0;
+    }
+  } else {
+    if (millis() - tempoMillisBuzzer >= 500) {
+      tempoMillisBuzzer = millis();
 
-  if (millis() - tempoMillisBuzzer >= 500) {
-    tempoMillisBuzzer = millis();
+      isBeeping = !isBeeping;
 
-    isBeeping = !isBeeping;
-
-    if (isBeeping) {
-      digitalWrite(BUZZ_PIN, HIGH);
-    } else {
-      digitalWrite(BUZZ_PIN, LOW);
-      beepCount++;
+      if (isBeeping) {
+        digitalWrite(BUZZ_PIN, BUZZ_CMD);
+      } else {
+        digitalWrite(BUZZ_PIN, !BUZZ_CMD);
+        beepCount++;
+      }
     }
   }
 }
