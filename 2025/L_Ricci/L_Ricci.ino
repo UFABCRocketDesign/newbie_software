@@ -237,12 +237,12 @@ void processAll() {
 void buzzer() {
   if (beepCount >= numberOfBeeps) {
     digitalWrite(BUZZ_PIN, !BUZZ_CMD);
-    if (millis() - tempoMillisBuzzer >= 1000) {
+    if (millis() - tempoMillisBuzzer >= 5000) {
       tempoMillisBuzzer = millis();
       beepCount = 0;
     }
   } else {
-    if (millis() - tempoMillisBuzzer >= 500) {
+    if (millis() - tempoMillisBuzzer >= 250) {
       tempoMillisBuzzer = millis();
 
       isBeeping = !isBeeping;
