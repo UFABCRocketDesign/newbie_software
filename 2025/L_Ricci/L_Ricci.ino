@@ -31,6 +31,8 @@ TinyGPSPlus gps;
 #define GY 1
 #define GZ 1
 
+#define BUZZER 1
+
 #define USANDO_GPS 1
 #define GPS_LAT 1
 #define GPS_LNG 1
@@ -91,8 +93,6 @@ unsigned long tempo = 0;
 
 // Buzzer
 unsigned long tempoMillisBuzzer = 0;
-unsigned long currentMillis = 0;
-unsigned long previousMillis = 0;
 int numberOfBeeps = 0;
 int beepCount = 0;
 bool isBeeping = false;
@@ -124,7 +124,10 @@ void writeAll() {
   dataString += String(p3.getHealth()) + "\t";
   dataString += String(p4.getHealth()) + "\t";
 #endif
-
+#if BUZZER
+  dataString += String(beepCount) + "\t";
+  dataString += String(numberOfBeeps) + "\t";
+#endif
 #if ACEL
 #if AX
   dataString += String(accel.getX()) + "\t";
@@ -194,22 +197,22 @@ void writeAll() {
 void readAll() {
   // accel.readAll();
   if (accel.readAll()) {
-    numberOfBeeps += 1;
+    numberOfBeeps++;
   }
 
   // gyro.readAll();
   if (gyro.readAll()) {
-    numberOfBeeps += 1;
+    numberOfBeeps++;
   }
 
   // mag.readAll();
   if (mag.readAll()) {
-    numberOfBeeps += 1;
+    numberOfBeeps++;
   }
 
   // bmp.readAll(101325.0);
   if (bmp.readAll(101325.0)) {
-    numberOfBeeps += 1;
+    numberOfBeeps++;
   }
 
   while (GPS.available()) {
@@ -239,7 +242,7 @@ void buzzer() {
     if (millis() - tempoMillisBuzzer >= 5000) {
       beepCount++;
     }
-  } else if (beepCount >= 0 && beepCount >= numberOfBeeps) {
+  } else if (beepCount >= 0 && beepCount < numberOfBeeps) {
     if (millis() - tempoMillisBuzzer >= 250) {
       tempoMillisBuzzer = millis();
 
@@ -323,7 +326,10 @@ void setup() {
   heading += "Health 3\t";
   heading += "Health 4\t";
 #endif
-
+#if BUZZER
+  heading += "Beep Count\t";
+  heading += "Number of Beeps\t";
+#endif
 #if ACEL
 #if AX
   heading += "Acel X\t";
