@@ -195,6 +195,8 @@ void writeAll() {
 }
 
 void readAll() {
+  numberOfBeeps = 0;
+  
   // accel.readAll();
   if (accel.readAll()) {
     numberOfBeeps++;
@@ -238,8 +240,6 @@ void processAll() {
 }
 
 void buzzer() {
-  numberOfBeeps = 0;
-
   if (beepCount == -1) {
     if (millis() - tempoMillisBuzzer >= 5000) {
       beepCount++;
