@@ -238,6 +238,8 @@ void processAll() {
 }
 
 void buzzer() {
+  numberOfBeeps = 0;
+
   if (beepCount == -1) {
     if (millis() - tempoMillisBuzzer >= 5000) {
       beepCount++;
