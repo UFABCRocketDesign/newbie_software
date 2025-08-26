@@ -2,9 +2,24 @@
 
 Adafruit_BMP085 bmp;
 float alt_zero = 0;              
-float vetor_num [10];
-int ind_vetor = 0;
-float valor_flt = 0;
+
+int ind_vetor1 = 0;
+float vetor_num1 [10];
+float valor_flt1 = 0;
+
+int ind_vetor2 = 0;
+float vetor_num2 [10];
+float valor_flt2 = 0;
+
+int ind_vetor3 = 0;
+float vetor_num3 [10];
+float valor_flt3 = 0;
+
+int ind_vetor4 = 0;
+float vetor_num4 [10];
+float valor_flt4 = 0;
+
+
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
@@ -23,15 +38,51 @@ void setup() {
 void loop() {
   float real_alt = bmp.readAltitude() - alt_zero;
   
-  vetor_num [ind_vetor] = real_alt;
-  ind_vetor ++;
-  if (ind_vetor >= 10) ind_vetor = 0;
+  vetor_num1 [ind_vetor1] = real_alt;
+  ind_vetor1 ++;
+  if (ind_vetor1 >= 10) ind_vetor1 = 0;
     
-  float valor_vet = 0;
+  float valor_vet1 = 0;
   for (int i = 0; i < 10 ; i++) {
-   valor_vet += vetor_num [i];
+   valor_vet1 += vetor_num1 [i];
   }
-  valor_flt = valor_vet / 10;
+  valor_flt1 = valor_vet1 / 10;
+
+// --------------------------------------------------------------------------
+
+  vetor_num2 [ind_vetor2] = valor_flt1;
+  ind_vetor2 ++;
+  if (valor_flt1 >= 10) valor_flt1 = 0;
+
+  float valor_vet2 = 0;
+  for (int i = 0; i < 10 ; i++) {
+   valor_vet2 += vetor_num2 [i]; 
+  }
+  valor_flt2 = valor_vet2 / 10;
+
+//--------------------------------------------------------------------------
+
+  vetor_num3 [ind_vetor3] = valor_flt2;
+  ind_vetor3 ++;
+  if (valor_flt3 >= 10) valor_flt3 = 0;
+
+  float valor_vet3 = 0;
+  for (int i = 0; i < 10; i++) {
+    valor_vet3 += vetor_num3 [i];
+  }
+  valor_flt3 = valor_vet3 / 10;
+
+//-------------------------------------------------------------------------
+
+  vetor_num4 [ind_vetor4] = valor_flt3 ;
+  ind_vetor4 ++;
+  if (valor_flt4 >=10) valor_flt4 = real_alt;
+
+  float valor_vet4 = 0;
+  for (int i = 0; i < 10; i++) {
+    valor_vet4 += vetor_num4 [i];
+  }
+  valor_flt4 = valor_vet4 / 10;
 
   Serial.print(bmp.readTemperature());       
   Serial.print('\t');
@@ -39,7 +90,7 @@ void loop() {
   Serial.print('\t');
   Serial.print(real_alt);
   Serial.print('\t');
-  Serial.print(valor_flt);  
+  Serial.print(valor_flt1);  
   Serial.print('\t');
   Serial.println();
 
