@@ -90,7 +90,10 @@ void loop() {
   Serial.print('\t');
   Serial.print(real_alt);
   Serial.print('\t');
-  Serial.print(valor_flt1);  
+  Serial.print(valor_flt1);
+  Serial.print(valor_flt2);
+  Serial.print(valor_flt3);
+  Serial.print(valor_flt4);    
   Serial.print('\t');
   Serial.println();
 
