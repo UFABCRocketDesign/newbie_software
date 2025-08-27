@@ -17,7 +17,7 @@ void setup() {
 	while (1) {}
   }
 
-  float val_alts;
+  float val_alts=0.0;
 
   for (int alt = 0;alt < 15; alt++) {
   val_alts = val_alts + bmp.readAltitude();
@@ -43,16 +43,14 @@ void loop() {
     Serial.print("\t");
     Serial.print(bmp.readPressure());
     Serial.print("\t");
-    float altitude;
-    altitude = bmp.readAltitude();
+    float altitude = bmp.readAltitude();
     Serial.print(altitude);
     Serial.print("\t");
     Serial.print(bmp.readSealevelPressure());
     Serial.print("\t");
     Serial.print(bmp.readAltitude(101500));
     Serial.print("\t");
-    float novaaltura;
-    novaaltura = altitude- alturazero ;
+    float novaaltura = altitude- alturazero ;
     Serial.print(novaaltura);
     Serial.println();
 }
