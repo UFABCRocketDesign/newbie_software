@@ -17,9 +17,13 @@ void setup() {
 	while (1) {}
   }
 
+  float val_alts;
 
-  \\\ puxa umas 15 e tira média pra ter um 0
-  alturazero = bmp.readAltitude();
+  for (int alt = 0;alt < 15; alt++) {
+  val_alts = val_alts + bmp.readAltitude();
+  } 
+
+  alturazero = val_alts/15;
 
   Serial.print("Temperature (*C)  ");
   Serial.print("\t");
@@ -40,7 +44,7 @@ void loop() {
     Serial.print(bmp.readPressure());
     Serial.print("\t");
     float altitude;
-    altitude = bmp.readAltitude() 
+    altitude = bmp.readAltitude();
     Serial.print(altitude);
     Serial.print("\t");
     Serial.print(bmp.readSealevelPressure());
