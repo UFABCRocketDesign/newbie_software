@@ -37,7 +37,8 @@ void setup() {
   Serial.print("\t");
   Serial.println("Altitude zerada (m)  ");
 }
-  
+
+// fazer um filtro passa baixa de média móvel com os valores lidos, estabilizando a altura
 void loop() {
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
