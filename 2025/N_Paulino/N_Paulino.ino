@@ -95,7 +95,7 @@ void loop() {
     contador_queda = 0;  
   }
   if (contador_queda >= LIMITE_QUEDAS_SEGUIDAS) {
-    Serial.println("CAINDO");
+    Serial.println("1");
   }
   ultimo_valor_flt4 = valor_flt4;
 
