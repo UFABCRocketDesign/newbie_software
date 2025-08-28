@@ -19,6 +19,9 @@ int ind_vetor4 = 0;
 float vetor_num4 [10];
 float valor_flt4 = 0;
 
+int contador_queda = 0;
+float ultimo_valor_flt4 = 0;
+const int LIMITE_QUEDAS_SEGUIDAS = 10;
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
@@ -48,7 +51,7 @@ void loop() {
   }
   valor_flt1 = valor_vet1 / 10;
 
-// --------------------------------------------------------------------------
+// -------------------------------------------------------------------------
 
   vetor_num2 [ind_vetor2] = valor_flt1;
   ind_vetor2 ++;
@@ -72,7 +75,7 @@ void loop() {
   }
   valor_flt3 = valor_vet3 / 10;
 
-//-------------------------------------------------------------------------
+//--------------------------------------------------------------------------
 
   vetor_num4 [ind_vetor4] = valor_flt3 ;
   ind_vetor4 ++;
@@ -83,6 +86,20 @@ void loop() {
     valor_vet4 += vetor_num4 [i];
   }
   valor_flt4 = valor_vet4 / 10;
+
+//--------------------------------------------------------------------------
+
+  if (valor_flt4 < ultimo_valor_flt4) {
+    contador_queda++;
+  } else {
+    contador_queda = 0;  
+  }
+  if (contador_queda >= LIMITE_QUEDAS_SEGUIDAS) {
+    Serial.println("CAINDO");
+  }
+  ultimo_valor_flt4 = valor_flt4;
+
+
 
   Serial.print(bmp.readTemperature());       
   Serial.print('\t');
