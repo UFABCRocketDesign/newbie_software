@@ -30,6 +30,8 @@ const int chipSelect = 10;
 
 #include <SPI.h>
 #include <SD.h>
+
+
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
@@ -59,7 +61,13 @@ void setup() {
     while (true);
   }
 
-  Serial.println("initialization done.");
+  if (!SD.exists("datalog.txt")) {
+    File dataFile = SD.open("datalog.txt", FILE_WRITE);
+    if (dataFile) {
+      dataFile.println("Temperature\tPressure\tflt1\tflt2\tflt3\tflt4");
+      dataFile.close();
+    }
+  }
 }
 
 
@@ -153,4 +161,5 @@ void loop() {
   else {
     Serial.println("error opening datalog.txt");
   }
+  Serial.println(dataString);
 }
