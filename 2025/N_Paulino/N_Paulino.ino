@@ -1,3 +1,4 @@
+
 #include <Adafruit_BMP085.h>
 
 Adafruit_BMP085 bmp;
@@ -24,6 +25,11 @@ int contador_queda = 0;
 float ultimo_valor_flt4 = 0;
 const int LIMITE_QUEDAS_SEGUIDAS = 10;
 
+
+const int chipSelect = 10;
+
+#include <SPI.h>
+#include <SD.h>
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
@@ -37,9 +43,28 @@ void setup() {
                       
   }
   alt_zero = soma/10.0;
+
+//-----------------------------------------------------------------------------
+   Serial.begin(9600);
+  while (!Serial);
+
+  Serial.print("Initializing SD card...");
+
+  if (!SD.begin(chipSelect)) {
+    Serial.println("initialization failed. Things to check:");
+    Serial.println("1. is a card inserted?");
+    Serial.println("2. is your wiring correct?");
+    Serial.println("3. did you change the chipSelect pin to match your shield or module?");
+    Serial.println("Note: press reset button on the board and reopen this Serial Monitor after fixing your issue!");
+    while (true);
+  }
+
+  Serial.println("initialization done.");
 }
 
+
 void loop() {
+  
   float real_alt = bmp.readAltitude() - alt_zero;
   
   vetor_num1 [ind_vetor1] = real_alt;
@@ -102,22 +127,30 @@ void loop() {
   }
   ultimo_valor_flt4 = valor_flt4;
 
+//--------------------------------------------------------------------------
+
+  String dataString = "";
+  dataString += String(bmp.readTemperature());
+  dataString += String("\t");
+  dataString += String(bmp.readPressure());
+  dataString += String("\t");
+  dataString += String(valor_flt1);
+  dataString += String("\t");
+  dataString += String(valor_flt2);
+  dataString += String("\t");
+  dataString += String(valor_flt3);
+  dataString += String("\t");
+  dataString += String(valor_flt4);
 
 
-  Serial.print(bmp.readTemperature());       
-  Serial.print('\t');
-  Serial.print(bmp.readPressure());          
-  Serial.print('\t');
-  Serial.print(real_alt);
-  Serial.print('\t');
-  Serial.print(valor_flt1);
-  Serial.print('\t');
-  Serial.print(valor_flt2);
-  Serial.print('\t');
-  Serial.print(valor_flt3);
-  Serial.print('\t');
-  Serial.print(valor_flt4);    
-  Serial.print('\t');
-  Serial.println(queda);
+   File dataFile = SD.open("datalog.txt", FILE_WRITE);
 
+  if (dataFile) {
+    dataFile.println(dataString);
+    dataFile.close();
+    Serial.println(dataString);
+  }
+  else {
+    Serial.println("error opening datalog.txt");
+  }
 }
