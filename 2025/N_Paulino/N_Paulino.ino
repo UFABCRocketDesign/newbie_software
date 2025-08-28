@@ -19,6 +19,7 @@ int ind_vetor4 = 0;
 float vetor_num4 [10];
 float valor_flt4 = 0;
 
+int queda = 0;
 int contador_queda = 0;
 float ultimo_valor_flt4 = 0;
 const int LIMITE_QUEDAS_SEGUIDAS = 10;
@@ -95,7 +96,9 @@ void loop() {
     contador_queda = 0;  
   }
   if (contador_queda >= LIMITE_QUEDAS_SEGUIDAS) {
-    Serial.println("1");
+    queda = 1;
+  } else {
+    queda = 0;
   }
   ultimo_valor_flt4 = valor_flt4;
 
@@ -115,6 +118,6 @@ void loop() {
   Serial.print('\t');
   Serial.print(valor_flt4);    
   Serial.print('\t');
-  Serial.println();
+  Serial.println(queda);
 
 }
