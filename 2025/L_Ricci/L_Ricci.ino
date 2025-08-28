@@ -15,6 +15,7 @@ TinyGPSPlus gps;
 #define BARO 1
 #define TERMOMETRO 1
 #define PRESSAO 1
+#define PARAQUEDAS 0
 
 #define ACEL 1
 #define AX 1
@@ -31,11 +32,11 @@ TinyGPSPlus gps;
 #define GY 1
 #define GZ 1
 
-#define BUZZER 1
+#define BUZZER 0
 
-#define USANDO_GPS 1
-#define GPS_LAT 1
-#define GPS_LNG 1
+#define USANDO_GPS 0
+#define GPS_LAT 0
+#define GPS_LNG 0
 
 #define LORA 0
 #define SD_CARD 0
@@ -115,6 +116,7 @@ void writeAll() {
   dataString += String(f2.getMedia()) + "\t";
   dataString += String(altitudeReal) + "\t";
   dataString += String(queda) + "\t";
+#if PARAQUEDAS
   dataString += String(p1.getValor()) + "\t";
   dataString += String(p2.getValor()) + "\t";
   dataString += String(p3.getValor()) + "\t";
@@ -123,6 +125,7 @@ void writeAll() {
   dataString += String(p2.getHealth()) + "\t";
   dataString += String(p3.getHealth()) + "\t";
   dataString += String(p4.getHealth()) + "\t";
+#endif
 #endif
 #if BUZZER
   dataString += String(beepCount) + "\t";
