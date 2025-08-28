@@ -11,6 +11,8 @@ private:
   int Z0, Z1, Z_out;
   float scale;
   uint8_t range;
+  bool estado;
+  unsigned long ultimoTempoResposta;
 public:
   ADXL345(uint8_t range = 2);
   bool begin();

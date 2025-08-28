@@ -10,6 +10,8 @@ private:
   uint8_t Y0, Y1;
   uint8_t Z0, Z1;
   int scale;
+  bool estado;
+  unsigned long ultimoTempoResposta;
 public:
   bool begin();
   bool readAll();

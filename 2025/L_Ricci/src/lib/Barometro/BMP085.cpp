@@ -68,40 +68,48 @@ bool BMP085::readAll(float pressaoInicial) {
   up = (((unsigned long)Wire.read() << 16) | ((unsigned long)Wire.read() << 8) | (unsigned long)Wire.read()) >> (8 - oss);
 
   Wire.beginTransmission(0x77);
+  estado = Wire.endTransmission();
 
-  // True Temperature
-  x1 = (ut - (long)ac6) * (long)ac5 >> 15;
-  x2 = ((long)mc << 11) / (x1 + md);
-  b5 = x1 + x2;
-  celsius = (float)((b5 + 8) >> 4)/ 10.0;
+  if (estado) {
+    if (millis() - ultimoTempoResposta > 1000) {
+      begin();
+      ultimoTempoResposta = millis();
+    }
+    // True Temperature
+    x1 = (ut - (long)ac6) * (long)ac5 >> 15;
+    x2 = ((long)mc << 11) / (x1 + md);
+    b5 = x1 + x2;
+    celsius = (float)((b5 + 8) >> 4)/ 10.0;
 
-  // True Pressure
-  b6 = b5 - 4000;
-  x1 = (b2 * (b6 * b6 >> 12)) >> 11;
-  x2 = (ac2 * b6) >> 11;
-  x3 = x1 + x2;
-  b3 = ((((long)ac1 * 4 + x3) << oss) + 2) >> 2;
+    // True Pressure
+    b6 = b5 - 4000;
+    x1 = (b2 * (b6 * b6 >> 12)) >> 11;
+    x2 = (ac2 * b6) >> 11;
+    x3 = x1 + x2;
+    b3 = ((((long)ac1 * 4 + x3) << oss) + 2) >> 2;
 
-  x1 = (ac3 * b6) >> 13;
-  x2 = (b1 * (b6 * b6 >> 12)) >> 16;
-  x3 = ((x1 + x2) + 2) >> 2;
-  b4 = (ac4 * (unsigned long)(x3 + 32768)) >> 15;
+    x1 = (ac3 * b6) >> 13;
+    x2 = (b1 * (b6 * b6 >> 12)) >> 16;
+    x3 = ((x1 + x2) + 2) >> 2;
+    b4 = (ac4 * (unsigned long)(x3 + 32768)) >> 15;
 
-  b7 = ((unsigned long)(up - b3) * (50000 >> oss));
-  if (b7 < 0x80000000) {
-    pressao = (b7 << 1) / b4;
-  } else {
-    pressao = (b7 / b4) << 1;
+    b7 = ((unsigned long)(up - b3) * (50000 >> oss));
+    if (b7 < 0x80000000) {
+      pressao = (b7 << 1) / b4;
+    } else {
+      pressao = (b7 / b4) << 1;
+    }
+
+    x1 = (pressao >> 8) * (pressao >> 8);
+    x1 = (x1 * 3038) >> 16;
+    x2 = (-7357 * pressao) >> 16;
+    pressao = pressao + ((x1 + x2 + 3791) >> 4);
+
+    altitude = 44330.0 * (1.0 - pow((pressao / pressaoInicial), (1.0/5.255)));
+    
+    ultimoTempoResposta = millis();
   }
-
-  x1 = (pressao >> 8) * (pressao >> 8);
-  x1 = (x1 * 3038) >> 16;
-  x2 = (-7357 * pressao) >> 16;
-  pressao = pressao + ((x1 + x2 + 3791) >> 4);
-
-  altitude = 44330.0 * (1.0 - pow((pressao / pressaoInicial), (1.0/5.255)));
-
-  return true;
+  return estado;
 }
 
 float BMP085::readTemperature() {

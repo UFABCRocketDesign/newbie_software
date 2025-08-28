@@ -30,6 +30,5 @@ bool HMC5883L::readAll() {
     }
   }
 
-
-  return true;
+  return estado;
 }

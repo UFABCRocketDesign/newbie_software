@@ -43,21 +43,28 @@ bool L3G4200D::begin() {
 bool L3G4200D::readAll() {
   Wire.beginTransmission(0x69);
   Wire.write(0x28 | 0x80); // O que essa parte faz?
-  Wire.endTransmission();
+  estado = Wire.endTransmission();
 
-  Wire.requestFrom((uint8_t)0x69, (uint8_t)6);
-  if (Wire.available() == 6) {
-    X0 = Wire.read();
-    X1 = Wire.read();
-    Y0 = Wire.read();
-    Y1 = Wire.read();
-    Z0 = Wire.read();
-    Z1 = Wire.read();
+  if (estado) {
+    if (millis() - ultimoTempoResposta > 1000) {
+      begin();
+      ultimoTempoResposta = millis();
+    }
+
+    Wire.requestFrom((uint8_t)0x69, (uint8_t)6);
+    ultimoTempoResposta = millis();
+    if (Wire.available() == 6) {
+      X0 = Wire.read();
+      X1 = Wire.read();
+      Y0 = Wire.read();
+      Y1 = Wire.read();
+      Z0 = Wire.read();
+      Z1 = Wire.read();
+    }
+
+    x = (int16_t)(X0 | (X1 << 8));
+    y = (int16_t)(Y0 | (Y1 << 8));
+    z = (int16_t)(Z0 | (Z1 << 8));
   }
-
-  x = (int16_t)(X0 | (X1 << 8));
-  y = (int16_t)(Y0 | (Y1 << 8));
-  z = (int16_t)(Z0 | (Z1 << 8));
-
-  return true;
+  return estado;
 }

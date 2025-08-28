@@ -17,6 +17,8 @@ private:
   float celsius;
   long pressao;
   float altitude;
+  bool estado;
+  unsigned long ultimoTempoResposta;
 public:
   bool begin();
   bool readAll(float pressaoInicial);
