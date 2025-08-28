@@ -26,7 +26,7 @@ float ultimo_valor_flt4 = 0;
 const int LIMITE_QUEDAS_SEGUIDAS = 10;
 
 
-const int chipSelect = 10;
+const int chipSelect = 53;
 
 #include <SPI.h>
 #include <SD.h>
@@ -47,7 +47,6 @@ void setup() {
   alt_zero = soma/10.0;
 
 //-----------------------------------------------------------------------------
-   Serial.begin(9600);
   while (!Serial);
 
   Serial.print("Initializing SD card...");
@@ -61,15 +60,12 @@ void setup() {
     while (true);
   }
 
-  if (!SD.exists("datalog.txt")) {
-    File dataFile = SD.open("datalog.txt", FILE_WRITE);
-    if (dataFile) {
-      dataFile.println("Temperature\tPressure\tflt1\tflt2\tflt3\tflt4");
-      dataFile.close();
+  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  if (dataFile) {
+    dataFile.println("Temperature\tPressure\tflt1\tflt2\tflt3\tflt4");
+    dataFile.close();
     }
   }
-}
-
 
 void loop() {
   
