@@ -68,7 +68,7 @@ bool BMP085::readAll(float pressaoInicial) {
   up = (((unsigned long)Wire.read() << 16) | ((unsigned long)Wire.read() << 8) | (unsigned long)Wire.read()) >> (8 - oss);
 
   Wire.beginTransmission(0x77);
-  estado = Wire.endTransmission();
+  estado = Wire.endTransmission() == 0;
 
   if (estado) {
     if (millis() - ultimoTempoResposta > 1000) {

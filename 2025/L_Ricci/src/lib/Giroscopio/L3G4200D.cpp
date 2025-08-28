@@ -43,7 +43,7 @@ bool L3G4200D::begin() {
 bool L3G4200D::readAll() {
   Wire.beginTransmission(0x69);
   Wire.write(0x28 | 0x80); // O que essa parte faz?
-  estado = Wire.endTransmission();
+  estado = Wire.endTransmission() == 0;
 
   if (estado) {
     if (millis() - ultimoTempoResposta > 1000) {

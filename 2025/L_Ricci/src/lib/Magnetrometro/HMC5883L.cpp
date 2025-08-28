@@ -13,7 +13,7 @@ bool HMC5883L::begin() {
 bool HMC5883L::readAll() {
   Wire.beginTransmission(0x1E);
   Wire.write(0x03);
-  estado = Wire.endTransmission();
+  estado = Wire.endTransmission() == 0;
 
   if (estado) {
     if (millis() - ultimoTempoResposta > 1000) {

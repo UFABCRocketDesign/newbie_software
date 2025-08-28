@@ -29,7 +29,7 @@ bool ADXL345::begin() {
 bool ADXL345::readAll() {
   Wire.beginTransmission(0x53);
   Wire.write(0x32);
-  estado = Wire.endTransmission();
+  estado = Wire.endTransmission() == 0;
 
   if (estado) {
     if (millis() - ultimoTempoResposta > 1000) {
@@ -61,5 +61,5 @@ bool ADXL345::readAll() {
     y = (Y_out / scale) * 9.80665;
     z = (Z_out / scale) * 9.80665;
   }
-  return true;
+  return estado;
 }
