@@ -5,6 +5,9 @@
 #include "../Eixos/Eixos.h"
 
 class HMC5883L : public Eixos {
+private:
+  bool estado;
+  unsigned long ultimoTempoResposta;
 public:
   bool begin();
   bool readAll();
