@@ -1,14 +1,17 @@
 // Sempre verificar antes de compilar
 // Foguete não tem delay
 // Serial println pula a linha
-// Calcular altitude de referência
+// Sempre definir os valores para facilitar manutançao futura o código
+
 
 // Bibliotecas aqui
 #include <Adafruit_BMP085.h>
+#define TAM_FILTRO_ALTURA 15
 
 Adafruit_BMP085 bmp;
 
 float alturazero;
+float VetorFiltroAltura[TAM_FILTRO_ALTURA];
   
 void setup() {
   Serial.begin(115200);
@@ -36,22 +39,39 @@ void setup() {
   Serial.print("Real altitude (m)  ");
   Serial.print("\t");
   Serial.println("Altitude zerada (m)  ");
+  Serial.print("\t");
+  Serial.println("Altitude filtrada (m)  ");
 }
 
-// fazer um filtro passa baixa de média móvel com os valores lidos, estabilizando a altura
 void loop() {
+
+    float altitude = bmp.readAltitude();
+    float altura_bruta = altitude- alturazero ; // tem ruído, necessário um fitro
+
+    for(int i = TAM_FILTRO_ALTURA-1; i>0; i--) {
+      VetorFiltroAltura[i] = VetorFiltroAltura[i-1]; 
+    }
+
+    VetorFiltroAltura[0] = altura_bruta;
+
+    float SomaVetorAltura = 0.0;
+    for(int i=0; i<TAM_FILTRO_ALTURA; i++){
+        SomaVetorAltura += VetorFiltroAltura[i];
+    }
+    float AlturaFiltrada = SomaVetorAltura / TAM_FILTRO_ALTURA;
+  
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
     Serial.print(bmp.readPressure());
     Serial.print("\t");
-    float altitude = bmp.readAltitude();
     Serial.print(altitude);
     Serial.print("\t");
     Serial.print(bmp.readSealevelPressure());
     Serial.print("\t");
     Serial.print(bmp.readAltitude(101500));
     Serial.print("\t");
-    float novaaltura = altitude- alturazero ;
-    Serial.print(novaaltura);
+    Serial.print(altura_bruta);
+    Serial.print("\t");
+    Serial.print(AlturaFiltrada);
     Serial.println();
 }
