@@ -1,7 +1,7 @@
 // Sempre verificar antes de compilar
 // Foguete não tem delay
 // Serial println pula a linha
-// Sempre definir os valores para facilitar manutançao futura o código
+// Sempre definir os valores para facilitar manutençao futura o código
 
 
 // Bibliotecas aqui
@@ -60,6 +60,7 @@ void loop() {
     }
     float AlturaFiltrada = SomaVetorAltura / TAM_FILTRO_ALTURA;
   
+  //fazer 5 filtros e os otimizar
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
     Serial.print(bmp.readPressure());
