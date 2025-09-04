@@ -117,15 +117,15 @@ int paraQued[4] = { 0, 0, 0, 0 };
 int interEsp[4] = { 0, 2000, 0, 2000 };
 int inters[4] = { inter1, inter2, inter3, inter4 };
 
-void detecQueda(int numPaQue, long int t, float hNow, bool ap) {
+void setQueda(int numPaQue, long int t, float hNow, bool ap) {
   if ((ap) && (paraQued[numPaQue] == 0) && ((pQuedasApo[numPaQue] >= hNow) || pQuedasAlt[numPaQue])) {
     te[numPaQue] = t;
     paraQued[numPaQue] = 1;
-  } else if (paraQued[numPaQue] == 1 && t - te[numPaQue] >= interEsp[numPaQue]) {
+  } else if ((paraQued[numPaQue] == 1) && (t - te[numPaQue] >= interEsp[numPaQue])) {
     digitalWrite(IGN[numPaQue], HIGH);
     paraQued[numPaQue] = 2;
     te[numPaQue] = t;
-  } else if (paraQued[numPaQue] == 2 && t - te[numPaQue] >= inters[numPaQue]) {
+  } else if ((paraQued[numPaQue] == 2) && (t - te[numPaQue] >= inters[numPaQue])) {
     digitalWrite(IGN[numPaQue], LOW);
     paraQued[numPaQue] = 3;
   }
@@ -359,7 +359,7 @@ void loop() {
     }
   }
   for (int i = 0; i < 4; i++) {
-    detecQueda(i, t, ordH[0], ocoAp);
+    setQueda(i, t, ordH[0], ocoAp);
   }
 #endif
 
