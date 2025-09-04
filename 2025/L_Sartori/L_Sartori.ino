@@ -135,6 +135,13 @@ void setQueda(int numPaQue, long int timeGlobal, float hNow, bool apogeu) {
 #endif
 
 #if BARO_HABILITAR
+
+class filtros{       
+  private:             
+    int myNum;          
+};
+
+
 bool auxiliarParaCompararAlturas;
 float valoresFiltros[NUMERO_DE_FILTRAGENS][LARGURA_DA_FILTARGEM];
 float valoresFiltrados[NUMERO_DE_FILTRAGENS + 1];
