@@ -359,7 +359,7 @@ void loop() {
     }
   }
   for (int i = 0; i < 4; i++) {
-    setQueda(i, t, ordH[0], ocoAp);
+    setQueda(i, t, vFiltro[N], ocoAp);
   }
 #endif
 
