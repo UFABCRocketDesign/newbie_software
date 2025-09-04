@@ -115,7 +115,7 @@ int pQuedasApo[4] = { 0, 0, apoH, apoH };
 bool pQuedasAlt[4] = { 1, 1, 0, 0 };
 int paraQued[4] = { 0, 0, 0, 0 };
 int interEsp[4] = { 0, 2000, 0, 2000 };
-int inters[4] = { inter1, inter2, inter3, inter4 };
+int intervalos[4] = { inter1, inter2, inter3, inter4 };
 
 void setQueda(int numPaQue, long int t, float hNow, bool ap) {
   if ((ap) && (paraQued[numPaQue] == 0) && ((pQuedasApo[numPaQue] >= hNow) || pQuedasAlt[numPaQue])) {
@@ -125,7 +125,7 @@ void setQueda(int numPaQue, long int t, float hNow, bool ap) {
     digitalWrite(IGN[numPaQue], HIGH);
     paraQued[numPaQue] = 2;
     te[numPaQue] = t;
-  } else if ((paraQued[numPaQue] == 2) && (t - te[numPaQue] >= inters[numPaQue])) {
+  } else if ((paraQued[numPaQue] == 2) && (t - te[numPaQue] >= intervalos[numPaQue])) {
     digitalWrite(IGN[numPaQue], LOW);
     paraQued[numPaQue] = 3;
   }
@@ -135,18 +135,18 @@ void setQueda(int numPaQue, long int t, float hNow, bool ap) {
 #if BARO_HABILITAR
 bool h;
 float valoresFiltros[N][L];
-float vFiltro[N + 1];
-float ordH[H];
+float valoresFiltrados[N + 1];
+float ordemAltura[H];
 
 
 bool detecQued(float ultAlt) {
   for (int i = H - 1; i > 0; i--) {
-    ordH[i] = ordH[i - 1];
+    ordemAltura[i] = ordemAltura[i - 1];
   }
-  ordH[0] = ultAlt;
+  ordemAltura[0] = ultAlt;
   h = true;
   for (int i = 0; i < H - 1; i++) {
-    h = h && (ordH[i] < ordH[i + 1]);
+    h = h && (ordemAltura[i] < ordemAltura[i + 1]);
   }
   return h;
 }
@@ -339,10 +339,10 @@ void loop() {
   mag.getEvent(&eventmag);
 #endif
 #if BARO_HABILITAR
-  vFiltro[0] = bmp.readAltitude() - med_alt;
+  valoresFiltrados[0] = bmp.readAltitude() - med_alt;
 
   for (int i = 0; i < N; i++) {
-    vFiltro[i + 1] = filtro(i, vFiltro[i]);
+    valoresFiltrados[i + 1] = filtro(i, valoresFiltrados[i]);
   }
 
   k += 1;
@@ -354,12 +354,12 @@ void loop() {
 #endif
 #if PQUEDAS_HABILITAR
   if (!ocoAp) {
-    if (detecQued(vFiltro[N])) {
+    if (detecQued(valoresFiltrados[N])) {
       ocoAp = 1;
     }
   }
   for (int i = 0; i < 4; i++) {
-    setQueda(i, t, vFiltro[N], ocoAp);
+    setQueda(i, t, valoresFiltrados[N], ocoAp);
   }
 #endif
 
@@ -376,7 +376,7 @@ void loop() {
 #endif
 #if BARO_HABILITAR
   for (int i = 0; i < N + 1; i++) {
-    dataString += String(vFiltro[i]);
+    dataString += String(valoresFiltrados[i]);
     dataString += "\t";
   }
 
