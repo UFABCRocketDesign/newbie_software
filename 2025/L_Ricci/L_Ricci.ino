@@ -230,12 +230,12 @@ void readAll() {
     p3.emergency(1, 5);
     p4.emergency(1, 5);
     emergencia = true;
-
-  } else if (emergencia){
+  } else if (emergencia) {
     p1.emergency(0, 5);
     p2.emergency(0, 5);
     p3.emergency(0, 5);
     p4.emergency(0, 5);
+    emergencia = false;
   }
 
   while (GPS.available()) {
