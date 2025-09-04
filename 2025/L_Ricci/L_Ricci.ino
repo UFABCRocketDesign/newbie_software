@@ -15,7 +15,7 @@ TinyGPSPlus gps;
 #define BARO 1
 #define TERMOMETRO 1
 #define PRESSAO 1
-#define PARAQUEDAS 0
+#define PARAQUEDAS 1
 
 #define ACEL 1
 #define AX 1
@@ -34,9 +34,9 @@ TinyGPSPlus gps;
 
 #define BUZZER 0
 
-#define USANDO_GPS 0
-#define GPS_LAT 0
-#define GPS_LNG 0
+#define USANDO_GPS 1
+#define GPS_LAT 1
+#define GPS_LNG 1
 
 #define LORA 0
 #define SD_CARD 0
