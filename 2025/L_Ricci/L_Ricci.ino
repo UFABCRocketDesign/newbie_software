@@ -98,6 +98,9 @@ int numberOfBeeps = 0;
 int beepCount = 0;
 bool isBeeping = false;
 
+unsigned long lastBmpReadTime = 0;
+bool emergencia = false;
+
 void writeAll() {
 
   float tempoSegundos = tempo / 1000.0;
@@ -199,7 +202,7 @@ void writeAll() {
 
 void readAll() {
   numberOfBeeps = 0;
-  
+
   // accel.readAll();
   if (accel.readAll()) {
     numberOfBeeps++;
@@ -218,6 +221,21 @@ void readAll() {
   // bmp.readAll(101325.0);
   if (bmp.readAll(101325.0)) {
     numberOfBeeps++;
+    lastBmpReadTime = millis();
+  }
+
+  if (millis() - lastBmpReadTime >= 5000) {
+    p1.emergency(1, 5);
+    p2.emergency(1, 5);
+    p3.emergency(1, 5);
+    p4.emergency(1, 5);
+    emergencia = true;
+
+  } else if (emergencia){
+    p1.emergency(0, 5);
+    p2.emergency(0, 5);
+    p3.emergency(0, 5);
+    p4.emergency(0, 5);
   }
 
   while (GPS.available()) {

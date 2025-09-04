@@ -25,3 +25,15 @@ int Paraquedas::getValor() {
 int Paraquedas::getHealth() {
   return analogRead(pinoSaude) < sensibilidadeSaude;
 }
+
+void Paraquedas::emergency(bool estadoEmergencia, unsigned long tempoEmergencia) {
+  if (estadoEmergencia) {
+    usaAlturaEM = usaAltura;
+    tempoAtrasoEM = tempoAtraso;
+    usaAltura = false;
+    tempoAtraso = (unsigned long)(tempoEmergencia * 1000);
+  } else {
+    usaAltura = usaAlturaEM;
+    tempoAtraso = tempoAtrasoEM;
+  }
+}

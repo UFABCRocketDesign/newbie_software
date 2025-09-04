@@ -2,7 +2,7 @@
 #define _Paraquedas_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
+#include "Arduino.h"
 #else
 #include "WProgram.h"
 #endif
@@ -14,11 +14,15 @@ private:
   int sensibilidadeSaude;
   unsigned long timer;
   unsigned long desativacao;
+  unsigned long tempoAtraso;
+  unsigned long tempoAtrasoEM;
+  unsigned long tempoLigado;
+  unsigned long tempoEM;
+  bool usaAltura;
+  bool usaAlturaEM;
+  bool estadoEmergencia;
   const int pinoIgnicao;
   const int pinoSaude;
-  const unsigned long tempoAtraso;
-  const unsigned long tempoLigado;
-  const bool usaAltura;
 
 public:
   Paraquedas(int pino, int saude, unsigned long atraso, unsigned long ligado, bool altura, int altitudeTeto, int sensibilidade = 150)
@@ -26,5 +30,6 @@ public:
   int ativar(float altura, int queda);
   int getValor();
   int getHealth();
+  void emergency(bool estado, unsigned long atrasoEmergencia);
 };
 #endif
