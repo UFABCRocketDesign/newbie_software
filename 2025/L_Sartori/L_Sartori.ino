@@ -108,17 +108,17 @@ int k = 0;
 #endif
 
 #if PQUEDAS_HABILITAR
-uint8_t IGN[4] = {IGN_1,IGN_2,IGN_3,IGN_4};
-long int te[4] = {0,0,0,0};
+uint8_t IGN[4] = { IGN_1, IGN_2, IGN_3, IGN_4 };
+long int te[4] = { 0, 0, 0, 0 };
 bool ocoAp = 0;
-int pQuedasApo[4] = {0,0,apoH,apoH};
-bool pQuedasAlt[4] = {1,1,0,0};
-int paraQued[4]= {0,0,0,0};
-int interEsp[4] = {0,2000,0,2000};
-int inters[4] = {inter1,inter2,inter3,inter4};
+int pQuedasApo[4] = { 0, 0, apoH, apoH };
+bool pQuedasAlt[4] = { 1, 1, 0, 0 };
+int paraQued[4] = { 0, 0, 0, 0 };
+int interEsp[4] = { 0, 2000, 0, 2000 };
+int inters[4] = { inter1, inter2, inter3, inter4 };
 
-void detecQueda(int numPaQue,long int t,float hNow, bool ap){
-    if ((ap) && (paraQued[numPaQue] == 0 )&& ((pQuedasApo[numPaQue] >= hNow) || pQuedasAlt[numPaQue])) {
+void detecQueda(int numPaQue, long int t, float hNow, bool ap) {
+  if ((ap) && (paraQued[numPaQue] == 0) && ((pQuedasApo[numPaQue] >= hNow) || pQuedasAlt[numPaQue])) {
     te[numPaQue] = t;
     paraQued[numPaQue] = 1;
   } else if (paraQued[numPaQue] == 1 && t - te[numPaQue] >= interEsp[numPaQue]) {
@@ -358,8 +358,8 @@ void loop() {
       ocoAp = 1;
     }
   }
-  for(int i=0;i<4;i++){
-    detecQueda(i,t,ordH[0],ocoAp);
+  for (int i = 0; i < 4; i++) {
+    detecQueda(i, t, ordH[0], ocoAp);
   }
 #endif
 
