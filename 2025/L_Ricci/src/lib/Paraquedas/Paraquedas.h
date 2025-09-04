@@ -17,10 +17,9 @@ private:
   unsigned long tempoAtraso;
   unsigned long tempoAtrasoEM;
   unsigned long tempoLigado;
-  unsigned long tempoEM;
   bool usaAltura;
   bool usaAlturaEM;
-  bool estadoEmergencia;
+  bool emergencia = false;
   const int pinoIgnicao;
   const int pinoSaude;
 
@@ -30,6 +29,6 @@ public:
   int ativar(float altura, int queda);
   int getValor();
   int getHealth();
-  void emergency(bool estado, unsigned long atrasoEmergencia);
+  void emergency(bool estadoEmergencia, unsigned long atrasoEmergencia);
 };
 #endif

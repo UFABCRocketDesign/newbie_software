@@ -32,8 +32,10 @@ void Paraquedas::emergency(bool estadoEmergencia, unsigned long tempoEmergencia)
     tempoAtrasoEM = tempoAtraso;
     usaAltura = false;
     tempoAtraso = (unsigned long)(tempoEmergencia * 1000);
-  } else {
+    emergencia = true;
+  } else if (emergencia){
     usaAltura = usaAlturaEM;
     tempoAtraso = tempoAtrasoEM;
+    emergencia = false;
   }
 }
