@@ -8,5 +8,6 @@ private:
 public:
   int detectorQueda(float altura);
   int getQueda();
+  int forceQueda();
 };
 #endif

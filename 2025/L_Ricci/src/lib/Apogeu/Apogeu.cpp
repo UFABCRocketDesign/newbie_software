@@ -23,3 +23,7 @@ int Apogeu::detectorQueda(float altura) {
 int Apogeu::getQueda() {
   return queda;
 }
+
+int Apogeu::forceQueda() {
+  return queda = 1;
+}

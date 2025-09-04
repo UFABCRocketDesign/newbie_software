@@ -29,6 +29,6 @@ public:
   int ativar(float altura, int queda);
   int getValor();
   int getHealth();
-  void emergency(bool estadoEmergencia, unsigned long atrasoEmergencia);
+  void emergency(bool estadoEmergencia, unsigned long atrasoEmergencia = 0);
 };
 #endif
