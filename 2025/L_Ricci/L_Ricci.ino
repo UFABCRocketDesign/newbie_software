@@ -224,6 +224,12 @@ void readAll() {
     lastBmpReadTime = millis();
   }
 
+  while (GPS.available()) {
+    gps.encode(GPS.read());
+  }
+}
+
+void emergencyProcedure() {
   if (millis() - lastBmpReadTime >= 5000) {
     apg.forceQueda();
     p1.emergency(1, 5);
@@ -237,10 +243,6 @@ void readAll() {
     p3.emergency(0);
     p4.emergency(0);
     emergencia = false;
-  }
-
-  while (GPS.available()) {
-    gps.encode(GPS.read());
   }
 }
 
@@ -471,6 +473,7 @@ void loop() {
   tempo = millis();
 
   readAll();
+  // emergencyProcedure();
 
   if (apg.getQueda()) {
     buzzer();
