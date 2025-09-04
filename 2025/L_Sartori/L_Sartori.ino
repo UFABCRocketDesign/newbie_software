@@ -111,7 +111,7 @@ int indiceRotacaoGeral = 0;
 //mudar
 #if PQUEDAS_HABILITAR
 uint8_t IGN[4] = { IGN_1, IGN_2, IGN_3, IGN_4 };
-long int te[4] = { 0, 0, 0, 0 };
+long int timerParaQuedas[4] = { 0, 0, 0, 0 };
 bool ocorreuApogeu = 0;
 int setComComparacaoAltura[4] = { 0, 0, COMPARACAO_APOGEU_ALTURA, COMPARACAO_APOGEU_ALTURA };
 bool setSemComparacaoAltura[4] = { 1, 1, 0, 0 };
@@ -121,13 +121,13 @@ int intervalos[4] = { INTER1, INTER2, INTER3, INTER4 };
 
 void setQueda(int numPaQue, long int timeGlobal, float hNow, bool apogeu) {
   if ((apogeu) && (estadoTodosParaquedas[numPaQue] == 0) && ((setComComparacaoAltura[numPaQue] >= hNow) || setSemComparacaoAltura[numPaQue])) {
-    te[numPaQue] = timeGlobal;
+    timerParaQuedas[numPaQue] = timeGlobal;
     estadoTodosParaquedas[numPaQue] = 1;
-  } else if ((estadoTodosParaquedas[numPaQue] == 1) && (timeGlobal - te[numPaQue] >= intervalorEmRelacaoTimer[numPaQue])) {
+  } else if ((estadoTodosParaquedas[numPaQue] == 1) && (timeGlobal - timerParaQuedas[numPaQue] >= intervalorEmRelacaoTimer[numPaQue])) {
     digitalWrite(IGN[numPaQue], HIGH);
     estadoTodosParaquedas[numPaQue] = 2;
-    te[numPaQue] = timeGlobal;
-  } else if ((estadoTodosParaquedas[numPaQue] == 2) && (timeGlobal - te[numPaQue] >= intervalos[numPaQue])) {
+    timerParaQuedas[numPaQue] = timeGlobal;
+  } else if ((estadoTodosParaquedas[numPaQue] == 2) && (timeGlobal - timerParaQuedas[numPaQue] >= intervalos[numPaQue])) {
     digitalWrite(IGN[numPaQue], LOW);
     estadoTodosParaquedas[numPaQue] = 3;
   }
