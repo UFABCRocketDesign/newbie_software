@@ -34,8 +34,8 @@ TinyGPSPlus gps;
 
 #if LORA_HABILITAR
 HardwareSerial &LoRa(Serial3);
-#define loraEsp 3000
-long int tLora = 0;
+#define LORA_ESPERA 3000
+long int timerLora = 0;
 #endif
 
 #if ACCEL_HABILITAR
@@ -65,25 +65,27 @@ long int tLora = 0;
 #define IGN_2 61 /*act2*/
 #define IGN_3 46 /*act3*/
 #define IGN_4 55 /*act4*/
-#define inter1 5000
-#define inter2 5000
-#define inter3 5000
-#define inter4 5000
-#define apoH -3
+#define INTER1 5000
+#define INTER2 5000
+#define INTER3 5000
+#define INTER4 5000
+#define COMPARACAO_APOGEU_ALTURA -3
 #endif
 
 #if CHIP_HABILITAR
-#define chipSelect 53
-#define maxTamSD 8
+#define SD_HABILITAR 53
+#define MAX_TAM_SD 8
 #endif
 
 #if BARO_HABILITAR
-#define N 4
-#define L 9
-#define H 14
-#define valMedH 10
-#endif
+#define NUMERO_DE_FILTRAGENS 4
+#define LARGURA_DA_FILTARGEM 9
+#define COMPARACAO_PARA_APOGEU 14
 
+//VER SE N FIZ CAGADA
+#define VALOR_P_MEDIO_ALTURA 10
+#endif
+// Arrumar os define
 #if CHIP_HABILITAR
 File dataFile;
 String docName = "";
@@ -103,70 +105,70 @@ L3G gyro;
 #endif
 
 #if BMP_HABILITAR
-float med_alt = 0;
-int k = 0;
+float mediaAltura = 0;
+int indiceRotacaoGeral = 0;
 #endif
-
+//mudar
 #if PQUEDAS_HABILITAR
 uint8_t IGN[4] = { IGN_1, IGN_2, IGN_3, IGN_4 };
-long int te[4] = { 0, 0, 0, 0 };
-bool ocoAp = 0;
-int pQuedasApo[4] = { 0, 0, apoH, apoH };
-bool pQuedasAlt[4] = { 1, 1, 0, 0 };
-int paraQued[4] = { 0, 0, 0, 0 };
-int interEsp[4] = { 0, 2000, 0, 2000 };
-int intervalos[4] = { inter1, inter2, inter3, inter4 };
+long int timerParaQuedas[4] = { 0, 0, 0, 0 };
+bool ocorreuApogeu = 0;
+int setComComparacaoAltura[4] = { 0, 0, COMPARACAO_APOGEU_ALTURA, COMPARACAO_APOGEU_ALTURA };
+bool setSemComparacaoAltura[4] = { 1, 1, 0, 0 };
+int estadoTodosParaquedas[4] = { 0, 0, 0, 0 };
+int intervalorEmRelacaoTimer[4] = { 0, 2000, 0, 2000 };
+int intervalos[4] = { INTER1, INTER2, INTER3, INTER4 };
 
-void setQueda(int numPaQue, long int t, float hNow, bool ap) {
-  if ((ap) && (paraQued[numPaQue] == 0) && ((pQuedasApo[numPaQue] >= hNow) || pQuedasAlt[numPaQue])) {
-    te[numPaQue] = t;
-    paraQued[numPaQue] = 1;
-  } else if ((paraQued[numPaQue] == 1) && (t - te[numPaQue] >= interEsp[numPaQue])) {
+void setQueda(int numPaQue, long int timeGlobal, float hNow, bool apogeu) {
+  if ((apogeu) && (estadoTodosParaquedas[numPaQue] == 0) && ((setComComparacaoAltura[numPaQue] >= hNow) || setSemComparacaoAltura[numPaQue])) {
+    timerParaQuedas[numPaQue] = timeGlobal;
+    estadoTodosParaquedas[numPaQue] = 1;
+  } else if ((estadoTodosParaquedas[numPaQue] == 1) && (timeGlobal - timerParaQuedas[numPaQue] >= intervalorEmRelacaoTimer[numPaQue])) {
     digitalWrite(IGN[numPaQue], HIGH);
-    paraQued[numPaQue] = 2;
-    te[numPaQue] = t;
-  } else if ((paraQued[numPaQue] == 2) && (t - te[numPaQue] >= intervalos[numPaQue])) {
+    estadoTodosParaquedas[numPaQue] = 2;
+    timerParaQuedas[numPaQue] = timeGlobal;
+  } else if ((estadoTodosParaquedas[numPaQue] == 2) && (timeGlobal - timerParaQuedas[numPaQue] >= intervalos[numPaQue])) {
     digitalWrite(IGN[numPaQue], LOW);
-    paraQued[numPaQue] = 3;
+    estadoTodosParaquedas[numPaQue] = 3;
   }
 }
 #endif
 
 #if BARO_HABILITAR
-bool h;
-float valoresFiltros[N][L];
-float valoresFiltrados[N + 1];
-float ordemAltura[H];
-
+bool auxiliarParaCompararAlturas;
+float valoresFiltros[NUMERO_DE_FILTRAGENS][LARGURA_DA_FILTARGEM];
+float valoresFiltrados[NUMERO_DE_FILTRAGENS + 1];
+float ordemAltura[COMPARACAO_PARA_APOGEU];
+//mudar val
 
 bool detecQued(float ultAlt) {
-  for (int i = H - 1; i > 0; i--) {
+  for (int i = COMPARACAO_PARA_APOGEU - 1; i > 0; i--) {
     ordemAltura[i] = ordemAltura[i - 1];
   }
   ordemAltura[0] = ultAlt;
-  h = true;
-  for (int i = 0; i < H - 1; i++) {
-    h = h && (ordemAltura[i] < ordemAltura[i + 1]);
+  auxiliarParaCompararAlturas = true;
+  for (int i = 0; i < COMPARACAO_PARA_APOGEU - 1; i++) {
+    auxiliarParaCompararAlturas = auxiliarParaCompararAlturas && (ordemAltura[i] < ordemAltura[i + 1]);
   }
-  return h;
+  return auxiliarParaCompararAlturas;
 }
 
 
 float filtro(int numFiltragem, float valorRecebido) {
-  float somasFil;
-  valoresFiltros[numFiltragem][k] = valorRecebido;
-  somasFil = 0;
+  float somasFiltro;
+  valoresFiltros[numFiltragem][indiceRotacaoGeral] = valorRecebido;
+  somasFiltro = 0;
 
-  for (int i = 0; i < L; i++) {
-    somasFil += valoresFiltros[numFiltragem][i];
+  for (int i = 0; i < LARGURA_DA_FILTARGEM; i++) {
+    somasFiltro += valoresFiltros[numFiltragem][i];
   }
 
-  return somasFil / L;
+  return somasFiltro / LARGURA_DA_FILTARGEM;
 }
 
 #endif
 void setup() {
-  String cabe = "";
+  String saidaString = "";
 #if CHIP_HABILITAR
   String nome = "leo";
   int valSd = 0;
@@ -184,7 +186,7 @@ void setup() {
   }
 #if CHIP_HABILITAR
   Serial.print("Initializing SD card...");
-  if (!SD.begin(chipSelect)) {
+  if (!SD.begin(SD_HABILITAR)) {
     Serial.println("Card failed, or not present");
     while (1)
       ;
@@ -222,8 +224,8 @@ void setup() {
 #if CHIP_HABILITAR
   Serial.println("card initialized.");
 
-  if (nome.length() > maxTamSD) {
-    for (int i = 0; i < maxTamSD; i++) {
+  if (nome.length() > MAX_TAM_SD) {
+    for (int i = 0; i < MAX_TAM_SD; i++) {
       nome[i] = nome[i + 1];
     }
   }
@@ -232,7 +234,7 @@ void setup() {
   do {
     docName = nome;
 
-    for (int i = 0; i < (maxTamSD - nome.length()) - (String(valSd).length()); i++) {
+    for (int i = 0; i < (MAX_TAM_SD - nome.length()) - (String(valSd).length()); i++) {
       docName += String(0);
     }
 
@@ -245,67 +247,67 @@ void setup() {
   dataFile = SD.open(docName, FILE_WRITE);
 #endif
 
-  cabe += String("tempo\t");
+  saidaString += String("tempo\t");
 
 #if TEMP_HABILITAR
-  cabe += String("Temperature\t");
+  saidaString += String("Temperature\t");
 #endif
 #if PRESS_HABILITAR
-  cabe += String("Pressure\t");
+  saidaString += String("Pressure\t");
 #endif
 #if BARO_HABILITAR
-  for (int i = 0; i < N + 1; i++) {
-    cabe += String("Filtro");
-    cabe += String(i + 1) + "\t";
+  for (int i = 0; i < NUMERO_DE_FILTRAGENS + 1; i++) {
+    saidaString += String("Filtro");
+    saidaString += String(i + 1) + "\t";
   }
-  cabe += String("h\t");
+  saidaString += String("auxiliarParaCompararAlturas\t");
 #endif
 #if PQUEDAS_HABILITAR
-  cabe += String("pQuedas1\tpQuedas2\tpQuedas3\tpQuedas4\t");
+  saidaString += String("pQuedas1\tpQuedas2\tpQuedas3\tpQuedas4\t");
 #endif
 #if ACCEL_X_HABILITAR
-  cabe += String("acc_x\t");
+  saidaString += String("acc_x\t");
 #endif
 #if ACCEL_Y_HABILITAR
-  cabe += String("acc_y\t");
+  saidaString += String("acc_y\t");
 #endif
 #if ACCEL_Z_HABILITAR
-  cabe += String("acc_z\t");
+  saidaString += String("acc_z\t");
 #endif
 #if GYRO_X_HABILITAR
-  cabe += String("gyro_x\t");
+  saidaString += String("gyro_x\t");
 #endif
 #if GYRO_Y_HABILITAR
-  cabe += String("gyro_y\t");
+  saidaString += String("gyro_y\t");
 #endif
 #if GYRO_Z_HABILITAR
-  cabe += String("gyro_z\t");
+  saidaString += String("gyro_z\t");
 #endif
 #if MAG_X_HABILITAR
-  cabe += String("mag_x\t");
+  saidaString += String("mag_x\t");
 #endif
 #if MAG_Y_HABILITAR
-  cabe += String("mag_y\t");
+  saidaString += String("mag_y\t");
 #endif
 #if MAG_Z_HABILITAR
-  cabe += String("mag_z\t");
+  saidaString += String("mag_z\t");
 #endif
 #if GPS_HABILITAR
-  cabe += String("latitude\tlongitude\t");
+  saidaString += String("latitude\tlongitude\t");
 #endif
 #if CHIP_HABILITAR
-  dataFile.println(cabe);
+  dataFile.println(saidaString);
   dataFile.close();
 #endif
-  Serial.println(cabe);
+  Serial.println(saidaString);
 #if LORA_HABILITAR
-  LoRa.println(cabe);
+  LoRa.println(saidaString);
 #endif
 #if BARO_HABILITAR
-  for (int i = 0; i < valMedH; i++) {
-    med_alt += bmp.readAltitude();
+  for (int i = 0; i < VALOR_P_MEDIO_ALTURA; i++) {
+    mediaAltura += bmp.readAltitude();
   }
-  med_alt /= valMedH;
+  mediaAltura /= VALOR_P_MEDIO_ALTURA;
 #endif
 #if PQUEDAS_HABILITAR
   pinMode(IGN_1, OUTPUT);
@@ -324,7 +326,7 @@ void setup() {
 
 void loop() {
 
-  long int t = millis();
+  long int timeGlobal = millis();
 
   String dataString = "";
 #if ACCEL_HABILITAR
@@ -339,31 +341,31 @@ void loop() {
   mag.getEvent(&eventmag);
 #endif
 #if BARO_HABILITAR
-  valoresFiltrados[0] = bmp.readAltitude() - med_alt;
+  valoresFiltrados[0] = bmp.readAltitude() - mediaAltura;
 
-  for (int i = 0; i < N; i++) {
+  for (int i = 0; i < NUMERO_DE_FILTRAGENS; i++) {
     valoresFiltrados[i + 1] = filtro(i, valoresFiltrados[i]);
   }
 
-  k += 1;
-  k %= L;
+  indiceRotacaoGeral += 1;
+  indiceRotacaoGeral %= LARGURA_DA_FILTARGEM;
 
 
 
 
 #endif
 #if PQUEDAS_HABILITAR
-  if (!ocoAp) {
-    if (detecQued(valoresFiltrados[N])) {
-      ocoAp = 1;
+  if (!ocorreuApogeu) {
+    if (detecQued(valoresFiltrados[NUMERO_DE_FILTRAGENS])) {
+      ocorreuApogeu = 1;
     }
   }
   for (int i = 0; i < 4; i++) {
-    setQueda(i, t, valoresFiltrados[N], ocoAp);
+    setQueda(i, timeGlobal, valoresFiltrados[NUMERO_DE_FILTRAGENS], ocorreuApogeu);
   }
 #endif
 
-  dataString += String(t / 1000.0);
+  dataString += String(timeGlobal / 1000.0);
   dataString += "\t";
 
 #if TEMP_HABILITAR
@@ -375,25 +377,25 @@ void loop() {
   dataString += "\t";
 #endif
 #if BARO_HABILITAR
-  for (int i = 0; i < N + 1; i++) {
+  for (int i = 0; i < NUMERO_DE_FILTRAGENS + 1; i++) {
     dataString += String(valoresFiltrados[i]);
     dataString += "\t";
   }
 
-  dataString += String(h);
+  dataString += String(auxiliarParaCompararAlturas);
   dataString += "\t";
 #endif
 #if PQUEDAS_HABILITAR
-  dataString += String(paraQued[0]);
+  dataString += String(estadoTodosParaquedas[0]);
   dataString += "\t";
 
-  dataString += String(paraQued[1]);
+  dataString += String(estadoTodosParaquedas[1]);
   dataString += "\t";
 
-  dataString += String(paraQued[2]);
+  dataString += String(estadoTodosParaquedas[2]);
   dataString += "\t";
 
-  dataString += String(paraQued[3]);
+  dataString += String(estadoTodosParaquedas[3]);
   dataString += "\t";
 #endif
 #if ACCEL_X_HABILITAR
@@ -444,9 +446,9 @@ void loop() {
 #endif
   Serial.println(dataString);
 #if LORA_HABILITAR
-  if (t - tLora >= loraEsp) {
+  if (timeGlobal - timerLora >= LORA_ESPERA) {
     LoRa.println(dataString);
-    tLora = t;
+    timerLora = timeGlobal;
   }
 #endif
 
