@@ -136,42 +136,52 @@ void setQueda(int numPaQue, long int timeGlobal, float hNow, bool apogeu) {
 
 #if BARO_HABILITAR
 
-class filtros{       
-  private:             
-    int myNum;          
-};
-
-
-bool auxiliarParaCompararAlturas;
 float valoresFiltros[NUMERO_DE_FILTRAGENS][LARGURA_DA_FILTARGEM];
 float valoresFiltrados[NUMERO_DE_FILTRAGENS + 1];
 float ordemAltura[COMPARACAO_PARA_APOGEU];
+
+class Filtros{ 
+  private:
+    bool auxiliarParaCompararAlturas;    
+    float somasFiltro;
+  public:
+     
+    bool detecQued(float ultAlt) {
+      for (int i = COMPARACAO_PARA_APOGEU - 1; i > 0; i--) {
+        ordemAltura[i] = ordemAltura[i - 1];
+      }
+      ordemAltura[0] = ultAlt;
+      auxiliarParaCompararAlturas = true;
+      for (int i = 0; i < COMPARACAO_PARA_APOGEU - 1; i++) {
+        auxiliarParaCompararAlturas = auxiliarParaCompararAlturas && (ordemAltura[i] < ordemAltura[i + 1]);
+      }
+      return auxiliarParaCompararAlturas;
+    }
+
+    float filtro(int numFiltragem, float valorRecebido) {
+      
+      valoresFiltros[numFiltragem][indiceRotacaoGeral] = valorRecebido;
+      somasFiltro = 0;
+
+      for (int i = 0; i < LARGURA_DA_FILTARGEM; i++) {
+        somasFiltro += valoresFiltros[numFiltragem][i];
+      }
+
+      return somasFiltro / LARGURA_DA_FILTARGEM;
+    }
+    bool mostraAuxAltura(){
+      return auxiliarParaCompararAlturas;
+    }
+};
+
+Filtros selectFilter;
+
 //mudar val
 
-bool detecQued(float ultAlt) {
-  for (int i = COMPARACAO_PARA_APOGEU - 1; i > 0; i--) {
-    ordemAltura[i] = ordemAltura[i - 1];
-  }
-  ordemAltura[0] = ultAlt;
-  auxiliarParaCompararAlturas = true;
-  for (int i = 0; i < COMPARACAO_PARA_APOGEU - 1; i++) {
-    auxiliarParaCompararAlturas = auxiliarParaCompararAlturas && (ordemAltura[i] < ordemAltura[i + 1]);
-  }
-  return auxiliarParaCompararAlturas;
-}
 
 
-float filtro(int numFiltragem, float valorRecebido) {
-  float somasFiltro;
-  valoresFiltros[numFiltragem][indiceRotacaoGeral] = valorRecebido;
-  somasFiltro = 0;
 
-  for (int i = 0; i < LARGURA_DA_FILTARGEM; i++) {
-    somasFiltro += valoresFiltros[numFiltragem][i];
-  }
 
-  return somasFiltro / LARGURA_DA_FILTARGEM;
-}
 
 #endif
 void setup() {
@@ -351,7 +361,7 @@ void loop() {
   valoresFiltrados[0] = bmp.readAltitude() - mediaAltura;
 
   for (int i = 0; i < NUMERO_DE_FILTRAGENS; i++) {
-    valoresFiltrados[i + 1] = filtro(i, valoresFiltrados[i]);
+    valoresFiltrados[i + 1] = selectFilter.filtro(i, valoresFiltrados[i]);
   }
 
   indiceRotacaoGeral += 1;
@@ -363,7 +373,7 @@ void loop() {
 #endif
 #if PQUEDAS_HABILITAR
   if (!ocorreuApogeu) {
-    if (detecQued(valoresFiltrados[NUMERO_DE_FILTRAGENS])) {
+    if (selectFilter.detecQued(valoresFiltrados[NUMERO_DE_FILTRAGENS])) {
       ocorreuApogeu = 1;
     }
   }
@@ -389,7 +399,7 @@ void loop() {
     dataString += "\t";
   }
 
-  dataString += String(auxiliarParaCompararAlturas);
+  dataString += String(selectFilter.mostraAuxAltura());
   dataString += "\t";
 #endif
 #if PQUEDAS_HABILITAR
