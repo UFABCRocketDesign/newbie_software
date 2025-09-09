@@ -467,7 +467,7 @@ void loop() {
   tempo = millis();
 
   readAll();
-  // emergencyProcedure();
+  emergencyProcedure();
 
 #if BUZZER
   if (apg.getQueda()) {
