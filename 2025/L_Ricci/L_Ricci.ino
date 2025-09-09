@@ -222,14 +222,6 @@ void readAll() {
   if (bmp.readAll(101325.0)) {
     numberOfBeeps++;
     lastBmpReadTime = millis();
-    if (millis() - lastBmpReadTime >= 5000) {
-      apg.forceQueda();
-      p1.emergency(1, 5);
-      p2.emergency(1, 10);
-      p3.emergency(1, 60);
-      p4.emergency(1, 65);
-      emergencia = true;
-    }
   }
 
   while (GPS.available()) {
@@ -238,7 +230,14 @@ void readAll() {
 }
 
 void emergencyProcedure() {
-  if (emergencia) {
+  if (millis() - lastBmpReadTime >= 5000) {
+    apg.forceQueda();
+    p1.emergency(1, 5);
+    p2.emergency(1, 10);
+    p3.emergency(1, 60);
+    p4.emergency(1, 65);
+    emergencia = true;
+  } else if (emergencia) {
     p1.emergency(0);
     p2.emergency(0);
     p3.emergency(0);
