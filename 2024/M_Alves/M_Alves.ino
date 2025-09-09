@@ -144,7 +144,7 @@ void setup() {
 
 //SDCard
 #if SDCARD
-  if (!SD.begin(chipSelect)) {  // see if the card is present and can be initialized:
+  if (!SD.begin(chipSelect)) {  // 
     Serial.println("Card failed, or not present");
   }
 #endif
