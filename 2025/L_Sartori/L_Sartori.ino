@@ -160,25 +160,30 @@ bool mostraAuxAltura() {
 class Filtros {
 private:
   float valoresFiltros[LARGURA_DA_FILTARGEM];
-  int indiceRotacaoGeral =0;
+  int indiceRotacao = 0;
+  const int* index; 
 public:
-  
+  Filtros(int indexRecebido){
+    index = new const int(indexRecebido);
+  }
   float filtro(float valorRecebido) {
     float somasFiltro;
-    valoresFiltros[indiceRotacaoGeral] = valorRecebido;
+    valoresFiltros[indiceRotacao] = valorRecebido;
     somasFiltro = 0;
 
     for (int i = 0; i < LARGURA_DA_FILTARGEM; i++) {
       somasFiltro += valoresFiltros[i];
       
     }
-    indiceRotacaoGeral += 1;
-    indiceRotacaoGeral %= LARGURA_DA_FILTARGEM;
-    return somasFiltro / LARGURA_DA_FILTARGEM;
+    indiceRotacao += 1;
+    indiceRotacao %= *index;
+    return somasFiltro / *index;
   }
 };
 
-Filtros selectFilter[NUMERO_DE_FILTRAGENS];
+//Filtros selectFilter[NUMERO_DE_FILTRAGENS];
+Filtros selectFilter[4] = {Filtros(9),Filtros(9),Filtros(9),Filtros(9)};
+
 
 //mudar val
 
