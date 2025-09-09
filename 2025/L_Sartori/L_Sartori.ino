@@ -106,7 +106,7 @@ L3G gyro;
 
 #if BMP_HABILITAR
 float mediaAltura = 0;
-int indiceRotacaoGeral = 0;
+
 #endif
 //mudar
 #if PQUEDAS_HABILITAR
@@ -160,9 +160,9 @@ bool mostraAuxAltura() {
 class Filtros {
 private:
   float valoresFiltros[LARGURA_DA_FILTARGEM];
-
+  
 public:
-
+  int indiceRotacaoGeral = 0;
   float filtro(float valorRecebido) {
     float somasFiltro;
     valoresFiltros[indiceRotacaoGeral] = valorRecebido;
@@ -364,10 +364,12 @@ void loop() {
 
   for (int i = 0; i < NUMERO_DE_FILTRAGENS; i++) {
     valoresFiltrados[i + 1] = selectFilter[i].filtro(valoresFiltrados[i]);
+    selectFilter[i].indiceRotacaoGeral += 1;
+    selectFilter[i].indiceRotacaoGeral %= LARGURA_DA_FILTARGEM;
+
   }
 
-  indiceRotacaoGeral += 1;
-  indiceRotacaoGeral %= LARGURA_DA_FILTARGEM;
+  
 
 
 
