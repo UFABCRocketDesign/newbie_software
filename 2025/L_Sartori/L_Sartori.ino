@@ -154,19 +154,17 @@ bool detecQued(float ultAlt) {
 }
 
 bool mostraAuxAltura() {
-    return auxiliarParaCompararAlturas;
+  return auxiliarParaCompararAlturas;
 }
 
 class Filtros {
 private:
   float valoresFiltros[LARGURA_DA_FILTARGEM];
-  float somasFiltro;
+
 public:
 
-
-
-  float filtro( float valorRecebido) {
-
+  float filtro(float valorRecebido) {
+    float somasFiltro;
     valoresFiltros[indiceRotacaoGeral] = valorRecebido;
     somasFiltro = 0;
 
@@ -176,10 +174,9 @@ public:
 
     return somasFiltro / LARGURA_DA_FILTARGEM;
   }
-
 };
 
-Filtros selectFilter;
+Filtros selectFilter[NUMERO_DE_FILTRAGENS];
 
 //mudar val
 
@@ -366,7 +363,7 @@ void loop() {
   valoresFiltrados[0] = bmp.readAltitude() - mediaAltura;
 
   for (int i = 0; i < NUMERO_DE_FILTRAGENS; i++) {
-    valoresFiltrados[i + 1] = selectFilter.filtro(valoresFiltrados[i]);
+    valoresFiltrados[i + 1] = selectFilter[i].filtro(valoresFiltrados[i]);
   }
 
   indiceRotacaoGeral += 1;
