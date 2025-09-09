@@ -293,6 +293,10 @@ void setup() {
   Wire.begin();
   LoRa.begin(9600);
   GPS.begin(9600);
+  p1.begin();
+  p2.begin();
+  p3.begin();
+  p4.begin();
 
   /* Inicializar os Sensores */
 #if SD_CARD
@@ -440,19 +444,8 @@ void setup() {
   }
 #endif
 
-  /* Setar o pinmode dos paraquedas */
-
-  pinMode(IGN_1, OUTPUT);
-  pinMode(IGN_2, OUTPUT);
-  pinMode(IGN_3, OUTPUT);
-  pinMode(IGN_4, OUTPUT);
-
-  pinMode(HEAL_1, INPUT);
-  pinMode(HEAL_2, INPUT);
-  pinMode(HEAL_3, INPUT);
-  pinMode(HEAL_4, INPUT);
-
   pinMode(BUZZ_PIN, OUTPUT);
+  digitalWrite(BUZZ_PIN, !BUZZ_CMD);
 
   do {
     tempo = millis();

@@ -1,5 +1,10 @@
 #include "Paraquedas.h"
 
+void Paraquedas::begin() {
+  pinMode(pinoIgnicao, OUTPUT);
+  pinMode(pinoSaude, INPUT);
+}
+
 int Paraquedas::ativar(float altura, int queda) {
   if (queda == 1 && estadoParaquedas == 0 && (!usaAltura || altura < altitudeTeto)) {
     estadoParaquedas = 1;

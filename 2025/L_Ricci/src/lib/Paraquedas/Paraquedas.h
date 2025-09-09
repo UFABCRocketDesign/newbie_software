@@ -26,6 +26,7 @@ private:
 public:
   Paraquedas(int pino, int saude, unsigned long atraso, unsigned long ligado, bool altura, int altitudeTeto, int sensibilidade = 150)
     : pinoIgnicao(pino), pinoSaude(saude), tempoAtraso(atraso), tempoLigado(ligado), usaAltura(altura), altitudeTeto(altitudeTeto), sensibilidadeSaude(sensibilidade) {}
+  void begin();
   int ativar(float altura, int queda);
   int getValor();
   int getHealth();
