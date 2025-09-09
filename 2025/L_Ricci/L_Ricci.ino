@@ -74,10 +74,10 @@ HMC5883L mag;
 Filtro f1(10);
 Filtro f2(10);
 
-Paraquedas p1(IGN_1, HEAL_1, 0, 1500, false, -3, 150);
-Paraquedas p2(IGN_2, HEAL_2, 2000, 1500, false, -3, 150);
-Paraquedas p3(IGN_3, HEAL_3, 0, 1500, true, -3, 150);
-Paraquedas p4(IGN_4, HEAL_4, 2000, 1500, true, -3, 150);
+Paraquedas p1(IGN_1, HEAL_1, 0, 1500, false, -5, 150);
+Paraquedas p2(IGN_2, HEAL_2, 2000, 1500, false, -5, 150);
+Paraquedas p3(IGN_3, HEAL_3, 0, 1500, true, -5, 150);
+Paraquedas p4(IGN_4, HEAL_4, 2000, 1500, true, -5, 150);
 
 Apogeu apg;
 
@@ -463,8 +463,9 @@ void setup() {
 
     readAll();
     writeAll();
+#if BUZZER
     buzzer();
-
+#endif
   } while (abs(f2.getMedia()) < wufAltura);
 }
 
@@ -475,9 +476,11 @@ void loop() {
   readAll();
   // emergencyProcedure();
 
+#if BUZZER
   if (apg.getQueda()) {
     buzzer();
   }
+#endif
 
   processAll();
   doAll();
