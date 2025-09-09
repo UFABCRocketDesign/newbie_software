@@ -160,9 +160,9 @@ bool mostraAuxAltura() {
 class Filtros {
 private:
   float valoresFiltros[LARGURA_DA_FILTARGEM];
-  
+  int indiceRotacaoGeral =0;
 public:
-  int indiceRotacaoGeral = 0;
+  
   float filtro(float valorRecebido) {
     float somasFiltro;
     valoresFiltros[indiceRotacaoGeral] = valorRecebido;
@@ -170,8 +170,10 @@ public:
 
     for (int i = 0; i < LARGURA_DA_FILTARGEM; i++) {
       somasFiltro += valoresFiltros[i];
+      
     }
-
+    indiceRotacaoGeral += 1;
+    indiceRotacaoGeral %= LARGURA_DA_FILTARGEM;
     return somasFiltro / LARGURA_DA_FILTARGEM;
   }
 };
@@ -364,8 +366,6 @@ void loop() {
 
   for (int i = 0; i < NUMERO_DE_FILTRAGENS; i++) {
     valoresFiltrados[i + 1] = selectFilter[i].filtro(valoresFiltrados[i]);
-    selectFilter[i].indiceRotacaoGeral += 1;
-    selectFilter[i].indiceRotacaoGeral %= LARGURA_DA_FILTARGEM;
 
   }
 
