@@ -159,7 +159,7 @@ bool mostraAuxAltura() {
 
 class Filtros {
 private:
-  float* valoresFiltros = new float(largura);
+  float* valoresFiltros = new float[largura];
   int indiceRotacao=0;
   const int largura; 
 public:
