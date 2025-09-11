@@ -349,6 +349,8 @@ void setup() {
 #if GYRO_HABILITAR
   gyro.enableDefault();
 #endif
+
+  print("foi aqui")
 }
 
 
