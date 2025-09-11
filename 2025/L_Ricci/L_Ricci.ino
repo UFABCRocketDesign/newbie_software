@@ -16,6 +16,7 @@ TinyGPSPlus gps;
 #define TERMOMETRO 0
 #define PRESSAO 0
 #define PARAQUEDAS 1
+#define WUF 0
 
 #define ACEL 0
 #define AX 0
@@ -230,18 +231,18 @@ void readAll() {
 }
 
 void emergencyProcedure() {
-  if (millis() - lastBmpReadTime >= 5000) {
+  if (!emergencia && millis() - lastBmpReadTime >= 5000) {
     apg.forceQueda();
-    p1.emergency(1, 5);
-    p2.emergency(1, 10);
-    p3.emergency(1, 60);
-    p4.emergency(1, 65);
+    p1.emergency(true, 5);
+    p2.emergency(true, 10);
+    p3.emergency(true, 60);
+    p4.emergency(true, 65);
     emergencia = true;
   } else if (emergencia) {
-    p1.emergency(0);
-    p2.emergency(0);
-    p3.emergency(0);
-    p4.emergency(0);
+    p1.emergency(false);
+    p2.emergency(false);
+    p3.emergency(false);
+    p4.emergency(false);
     emergencia = false;
   }
 }
@@ -423,7 +424,7 @@ void setup() {
   String nome = "LUCAS";
   String zeros;
   int incremento = 0;
-  do {
+  c do {
     int tamanho = nome.length() + String(incremento).length();
     zeros = "";
     for (int i = tamanho; i < 8; i++) {
@@ -431,7 +432,9 @@ void setup() {
     }
     filename = nome + zeros + String(incremento) + ".txt";
     incremento++;
-  } while (SD.exists(filename));
+  }
+  while (SD.exists(filename))
+    ;
 
   Serial.println(filename);
 
@@ -447,6 +450,7 @@ void setup() {
   pinMode(BUZZ_PIN, OUTPUT);
   digitalWrite(BUZZ_PIN, !BUZZ_CMD);
 
+#if WUF
   do {
     tempo = millis();
 
@@ -460,6 +464,7 @@ void setup() {
     buzzer();
 #endif
   } while (abs(f2.getMedia()) < wufAltura);
+#endif
 }
 
 void loop() {
