@@ -396,7 +396,7 @@ void loop() {
     setQueda(i, timeGlobal, valoresFiltrados[NUMERO_DE_FILTRAGENS], ocorreuApogeu);
   }
 #endif
-
+  Serial.println("4");
   dataString += String(timeGlobal / 1000.0);
   dataString += "\t";
 
@@ -409,6 +409,7 @@ void loop() {
   dataString += "\t";
 #endif
 #if BARO_HABILITAR
+  Serial.println("5");
   for (int i = 0; i < NUMERO_DE_FILTRAGENS + 1; i++) {
     dataString += String(valoresFiltrados[i]);
     dataString += "\t";
@@ -476,6 +477,7 @@ void loop() {
   dataString += String(gps.location.lng(), 6);
   dataString += "\t";
 #endif
+  Serial.println("6");
   Serial.println(dataString);
 #if LORA_HABILITAR
   if (timeGlobal - timerLora >= LORA_ESPERA) {
