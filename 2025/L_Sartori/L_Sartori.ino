@@ -159,25 +159,24 @@ bool mostraAuxAltura() {
 
 class Filtros {
 private:
-  float* valoresFiltros = new float(index);
+  float* valoresFiltros = new float(largura);
   int indiceRotacao=0;
-  int index; 
+  const int largura; 
 public:
-  Filtros(int indexRecebido){
-    index = indexRecebido;
+  Filtros(int larguraRecebido) : largura(larguraRecebido){
   }
   float filtro(float valorRecebido) {
     float somasFiltro;
     valoresFiltros[indiceRotacao] = valorRecebido;
     somasFiltro = 0;
 
-    for (int i = 0; i < index; i++) {
+    for (int i = 0; i < largura; i++) {
       somasFiltro += valoresFiltros[i];
       
     }
     indiceRotacao += 1;
-    indiceRotacao %= index;
-    return somasFiltro / index;
+    indiceRotacao %= largura;
+    return somasFiltro / largura;
   }
 };
 
