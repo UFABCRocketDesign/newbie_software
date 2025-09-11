@@ -184,7 +184,7 @@ public:
 };
 
 //Filtros selectFilter[NUMERO_DE_FILTRAGENS];
-Filtros selectFilter[4] = { Filtros(9), Filtros(9), Filtros(9), Filtros(9) };
+Filtros selectFilter[NUMERO_DE_FILTRAGENS] = { 9, 9, 9, 9 };
 
 
 //mudar val
