@@ -12,7 +12,7 @@ int Apogeu::detectorQueda(float altura) {
 
     altitudeAnterior = altura;
 
-    if (contadorQueda >= 10) {
+    if (contadorQueda >= 30) {
       queda = 1;
     }
   }
