@@ -350,7 +350,7 @@ void setup() {
   gyro.enableDefault();
 #endif
 
-  print("foi aqui")
+  Serial.println("foi aqui");
 }
 
 
