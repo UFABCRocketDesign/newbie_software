@@ -170,9 +170,8 @@ public:
     delete[] valoresFiltros;
   };
   float filtro(float valorRecebido) {
-    float somasFiltro;
+    float somasFiltro =0;
     valoresFiltros[indiceRotacao] = valorRecebido;
-    somasFiltro = 0;
 
     for (int i = 0; i < largura; i++) {
       somasFiltro += valoresFiltros[i];
@@ -374,7 +373,7 @@ void loop() {
   valoresFiltrados[0] = bmp.readAltitude() - mediaAltura;
 
   for (int i = 0; i < NUMERO_DE_FILTRAGENS; i++) {
-    valoresFiltrados[i + 1] = selectFilter[i].filtro(valoresFiltrados[i]);
+    valoresFiltrados[i + 1] = selectFilter[i].filtro(valoresFiltrados[0]);
   }
 
 
