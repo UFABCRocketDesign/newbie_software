@@ -172,10 +172,11 @@ public:
   float filtro(float valorRecebido) {
     float somasFiltro =0;
     valoresFiltros[indiceRotacao] = valorRecebido;
-
+    Serial.println("10");
     for (int i = 0; i < largura; i++) {
       somasFiltro += valoresFiltros[i];
     }
+    Serial.println("20");
     indiceRotacao += 1;
     indiceRotacao %= largura;
     return somasFiltro / largura;
@@ -356,7 +357,7 @@ void setup() {
 void loop() {
 
   long int timeGlobal = millis();
-
+  Serial.println("1");
   String dataString = "";
 #if ACCEL_HABILITAR
   sensors_event_t eventac;
@@ -372,10 +373,13 @@ void loop() {
 #if BARO_HABILITAR
   valoresFiltrados[0] = bmp.readAltitude() - mediaAltura;
 
+  Serial.println("2");
+
   for (int i = 0; i < NUMERO_DE_FILTRAGENS; i++) {
     valoresFiltrados[i + 1] = selectFilter[i].filtro(valoresFiltrados[0]);
   }
 
+  Serial.println("3");
 
 
 
