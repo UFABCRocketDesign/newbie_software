@@ -31,5 +31,6 @@ public:
   int getValor();
   int getHealth();
   void emergency(bool estadoEmergencia, unsigned long atrasoEmergencia = 0);
+  void imprimirTudo();
 };
 #endif

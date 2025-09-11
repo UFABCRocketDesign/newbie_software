@@ -35,12 +35,17 @@ void Paraquedas::emergency(bool estadoEmergencia, unsigned long tempoEmergencia)
   if (estadoEmergencia) {
     usaAlturaEM = usaAltura;
     tempoAtrasoEM = tempoAtraso;
-    usaAltura = false;
     tempoAtraso = (unsigned long)(tempoEmergencia * 1000);
+    usaAltura = false;
     emergencia = true;
   } else if (emergencia){
     usaAltura = usaAlturaEM;
     tempoAtraso = tempoAtrasoEM;
     emergencia = false;
   }
+}
+
+void Paraquedas::imprimirTudo() {
+  Serial.println(usaAltura);
+  Serial.println(tempoAtraso);
 }

@@ -76,8 +76,8 @@ Filtro f1(10);
 Filtro f2(10);
 
 Paraquedas p1(IGN_1, HEAL_1, 0, 1500, false, -5);
-Paraquedas p2(IGN_2, HEAL_2, 0, 1500, false, -5);
-Paraquedas p3(IGN_3, HEAL_3, 2000, 1500, true, -5);
+Paraquedas p2(IGN_2, HEAL_2, 2000, 1500, false, -5);
+Paraquedas p3(IGN_3, HEAL_3, 0, 1500, true, -5);
 Paraquedas p4(IGN_4, HEAL_4, 2000, 1500, true, -5);
 
 Apogeu apg;
@@ -472,7 +472,18 @@ void loop() {
   tempo = millis();
 
   readAll();
+
+  p1.imprimirTudo();
+  p2.imprimirTudo();
+  p3.imprimirTudo();
+  p4.imprimirTudo();
+
   emergencyProcedure();
+
+  p1.imprimirTudo();
+  p2.imprimirTudo();
+  p3.imprimirTudo();
+  p4.imprimirTudo();
 
 #if BUZZER
   if (apg.getQueda()) {
