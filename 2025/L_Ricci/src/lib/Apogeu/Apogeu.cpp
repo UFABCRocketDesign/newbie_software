@@ -1,8 +1,6 @@
 #include "Apogeu.h"
 
 int Apogeu::detectorQueda(float altura) {
-  float altitudeAnterior = 0;
-
   if (!queda) {
     if (altura < altitudeAnterior) {
       contadorQueda++;

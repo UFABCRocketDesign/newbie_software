@@ -5,6 +5,7 @@ class Apogeu {
 private:
   int queda = 0;
   int contadorQueda = 0;
+  float altitudeAnterior = 0;
 public:
   int detectorQueda(float altura);
   int getQueda();
