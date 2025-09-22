@@ -10,7 +10,7 @@ void setup() { ///inicialização
 	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
 	while (1) {}
 
-  float solo = bmp.readAltitude(); /// cabeçario e leitura de nivel de solo
+  solo = bmp.readAltitude(); /// cabeçario e leitura de nivel de solo
   Serial.println("Temperature(C)|Pressure(PA)|Altitude(Pa)|Pressure at Sea Level(PA)|Real Altitude(m)|Altura Atual(m)");
 
   }
