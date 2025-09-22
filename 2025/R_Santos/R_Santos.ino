@@ -2,19 +2,21 @@
 
 Adafruit_BMP085 bmp;
 
-float solo = 0;
+float solo = 0; ///variaveis
 
-void setup() {
+void setup() { ///inicialização
   Serial.begin(115200);
-  float solo = bmp.readAltitude();
-  Serial.println("Temperature(C)|Pressure(PA)|Altitude(Pa)|Pressure at Sea Level(PA)|Real Altitude(m)|Altura Atual(m)");
   if (!bmp.begin()) {
 	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
 	while (1) {}
+
+  float solo = bmp.readAltitude(); /// cabeçario e leitura de nivel de solo
+  Serial.println("Temperature(C)|Pressure(PA)|Altitude(Pa)|Pressure at Sea Level(PA)|Real Altitude(m)|Altura Atual(m)");
+
   }
 }
   
-void loop() {
+void loop() { ///leituras
     float altitude = bmp.readAltitude() - solo;
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
