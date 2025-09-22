@@ -19,10 +19,10 @@
 
 #define PCHT_INTERVAL 5000
 #define PCHT_DELAY 2000
-#define PCHY_HEIGHT -2
+#define PCHT_HEIGHT -2
 
-#define len 15
-#define lvl 3
+#define len 5
+#define lvl 5
 #define coiso vec[lvl][len]
 #define idx(I) vec[(I)][index[(I)]]
 #define av_pp(I) av[(I)] += idx(I)
@@ -178,7 +178,7 @@ void loop() {
       pchtB = LOW;
     }
 
-    if(pchtC_seal == 0 && curr_val < PCHY_HEIGHT){
+    if(pchtC_seal == 0 && curr_val < PCHT_HEIGHT){
       pchtC_seal++;
       pchtC_time = now + PCHT_INTERVAL;
       pchtC = HIGH;
