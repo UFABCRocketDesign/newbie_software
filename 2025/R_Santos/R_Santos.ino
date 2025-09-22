@@ -2,7 +2,8 @@
 
 Adafruit_BMP085 bmp;
 
-float solo = 0;///variaveis
+float solo = 0;
+float mediaA = 0;
 
 void setup() {  ///inicialização
   Serial.begin(115200);
@@ -20,7 +21,12 @@ void setup() {  ///inicialização
 }
 
 void loop() {  ///leituras
-  float altitude = bmp.readAltitude() - solo;
+  mediaA = 0;
+  for(int i= 0; i < 20; i++){
+    float altitude = bmp.readAltitude() - solo;
+    mediaA = altitude + mediaA;
+  }
+  mediaA = mediaA/20;
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
   Serial.print(bmp.readPressure());
@@ -31,5 +37,5 @@ void loop() {  ///leituras
   Serial.print("\t");
   Serial.print(bmp.readAltitude(101500));
   Serial.print("\t");
-  Serial.println(altitude);
+  Serial.println(mediaA);
 }
