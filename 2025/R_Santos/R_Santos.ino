@@ -21,7 +21,7 @@ void setup() {  ///inicialização
   solo = solo/10;
 
 /// cabeçario
-  Serial.println("Temperature(C)|Pressure(PA)|Altitude(Pa)|Pressure at Sea Level(PA)|Real Altitude(m)|Altura Atual(m)");
+  Serial.println("Temperature(C)|Pressure(PA)|Altitude(Pa)|Pressure at Sea Level(PA)|Real Altitude(m)|Altura Atual(FILTRADA)(m)|Altura Atual(raw)(m)");
 }
 
 void loop() {
@@ -41,5 +41,7 @@ void loop() {
   Serial.print("\t");
   Serial.print(bmp.readAltitude(101500));
   Serial.print("\t");
-  Serial.println(mediaAlt);
+  Serial.print(mediaAlt);
+  Serial.print('\t');
+  Serial.println(altitude);
 }
