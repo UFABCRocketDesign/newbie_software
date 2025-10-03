@@ -31,7 +31,7 @@ void loop() {
   for(int i = 0; i<3; i++){
     somaAlt[i] -= alturaArray[i][idx[i]];              //Retira o ultimo valor usado
     somaAlt[i] += mediaAlt[i];                      //soma que vai ser feita todo ciclo para poder fazer a media
-    alturaArray[i][idx[i]] = altura;
+    alturaArray[i][idx[i]] = mediaAlt[i];
     mediaAlt[i+1] = somaAlt[i] / 10;       
     idx[i] = (idx[i] + 1) % 10;               //contador circular de interações no array (idx)
   }
