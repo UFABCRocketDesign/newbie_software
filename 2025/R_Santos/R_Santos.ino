@@ -22,7 +22,7 @@ void setup() {  ///inicialização
   solo = solo/10;
 
 /// cabeçario
-  Serial.println("Temperature(C)|Pressure(PA)|Real Altitude(m)|Altura Atual(raw)(m)|Altura Atual(FILTRO 1)(m)| Altura Atual(FILTRO 2)(m)|Altura Atual(FILTRO 3)(m)");
+  Serial.println("Temperature(C)\tPressure(PA)\tReal Altitude(m)\tAltura Atual(raw)(m)\tAltura Atual(FILTRO 1)(m)\tAltura Atual(FILTRO 2)(m)\tAltura Atual(FILTRO 3)(m)");
 }
 
 void loop() {
