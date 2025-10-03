@@ -43,6 +43,7 @@ void loop() {
   Serial.print("\t");
   for(int j = 0; j<4; j++){
     Serial.print(mediaAlt[j]);
-    Serial.print("/t");
+    Serial.print("\t");
   }
+  Serial.println();
 }
