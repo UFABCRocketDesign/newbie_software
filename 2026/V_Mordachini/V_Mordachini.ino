@@ -13,7 +13,7 @@ void setup() {
 	while (1) {}
   }
 
-  Serial.println("Temp(C)\tPress(Pa)\tAlt(m)\tStatus_LED");
+  Serial.println("Temp(C)\tPress(Pa)\tAlt(m)");
 }
 
 void loop() {
@@ -27,14 +27,5 @@ void loop() {
   Serial.print(bmp.readAltitude());
   Serial.print("\t");
   
-  digitalWrite(LED_BUILTIN, HIGH); 
-  Serial.println("PISCANDO :)"); 
-  delay(1500);                      
-  digitalWrite(LED_BUILTIN, LOW); 
-  delay(500);   
-  
-  digitalWrite(LED_BUILTIN, HIGH);  
-  delay(500);      
-  digitalWrite(LED_BUILTIN, LOW); 
-  delay(500);         
+         
 }
