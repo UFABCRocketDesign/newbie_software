@@ -25,7 +25,7 @@ void setup() {
 
     Serial.print("Real altitude = ");
     Serial.print(bmp.readAltitude(101500));
-    Serial.print(" meters "); 
+    Serial.println(" meters "); 
 }
 void loop() {
     Serial.print(bmp.readTemperature());
@@ -36,5 +36,5 @@ void loop() {
     Serial.print('/');
     Serial.print(bmp.readSealevelPressure());
     Serial.print('/');
-    Serial.print(bmp.readAltitude(101500)); 
+    Serial.println(bmp.readAltitude(101500)); 
 }
