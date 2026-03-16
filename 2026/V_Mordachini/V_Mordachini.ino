@@ -18,28 +18,25 @@ void loop() {
 
   Serial.print("Temperatura: ");
   Serial.print(bmp.readTemperature());
-  Serial.println(" *C");
+  Serial.print(" *C ||");
 
   Serial.print("Pressao: ");
   Serial.print(bmp.readPressure());
-  Serial.println(" Pa");
+  Serial.print(" Pa ||");
 
   Serial.print("Altitude: ");
   Serial.print(bmp.readAltitude());
-  Serial.println(" m");
-  Serial.println("--------------------");
+  Serial.print(" m ||");
   
   digitalWrite(LED_BUILTIN, HIGH); 
-  Serial.print("LED LIGADO :)"); 
+  Serial.print("LED PISCANDO :)"); 
+  Serial.println("--------------------");
   delay(1500);                      
-  digitalWrite(LED_BUILTIN, LOW);
-  Serial.print("LED DESLIGADO :)");    
+  digitalWrite(LED_BUILTIN, LOW); 
   delay(500);   
   
   digitalWrite(LED_BUILTIN, HIGH);  
-  Serial.print("LED LIGADO :)");  
   delay(500);      
   digitalWrite(LED_BUILTIN, LOW); 
-  Serial.print("LED DESLIGADO :)"); 
   delay(500);         
 }
