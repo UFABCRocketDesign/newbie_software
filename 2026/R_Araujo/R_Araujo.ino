@@ -7,34 +7,20 @@ void setup() {
 	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
 	while (1) {}
   }
-      Serial.print("Temperature = ");
-    Serial.print(bmp.readTemperature());
-    Serial.print(" *C/ ");
-    
-    Serial.print("Pressure = ");
-    Serial.print(bmp.readPressure());
-    Serial.print(" Pa/ ");
-    
-    Serial.print("Altitude = ");
-    Serial.print(bmp.readAltitude());
-    Serial.print(" meters/ ");
-
-    Serial.print("Pressure at sealevel (calculated) = ");
-    Serial.print(bmp.readSealevelPressure());
-    Serial.print(" Pa/ ");
-
-    Serial.print("Real altitude = ");
-    Serial.print(bmp.readAltitude(101500));
-    Serial.println(" meters "); 
+    Serial.print("Temperature\t");
+    Serial.print("Pressure\t");
+    Serial.print("Altitude\t");
+    Serial.print("Pressure at sealevel (calculated)\t ");
+    Serial.println("Real altitude");
 }
 void loop() {
     Serial.print(bmp.readTemperature());
-    Serial.print('/');
+    Serial.print('\t');
     Serial.print(bmp.readPressure());
-    Serial.print('/');
+    Serial.print('\t');
     Serial.print(bmp.readAltitude());
-    Serial.print('/');
+    Serial.print('\t');
     Serial.print(bmp.readSealevelPressure());
-    Serial.print('/');
+    Serial.print('\t');
     Serial.println(bmp.readAltitude(101500)); 
 }
