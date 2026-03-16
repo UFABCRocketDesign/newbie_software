@@ -152,6 +152,7 @@ TinyGPSPlus gps;
 
 // The serial connection to the GPS device
 SoftwareSerial ss(RXPin, TXPin);
+unsigned long dados_totais = gps.passedChecksum() + gps.failedChecksum();
 #endif //GPS
 
 void setup() {
@@ -363,7 +364,7 @@ void setup() {
   ss.begin(GPSBaud);
   dataString += ("Latitude\t");
   dataString += ("Longitude\t");
-  dataString += ("Caracteres Processados\t");
+  dataString += ("Dados enviados pelo módulo\t");
 #endif
 
 #if USANDO_SD
@@ -610,7 +611,7 @@ void loop() {
 #if USANDO_GPS
 dataString += String(gps.location.lat(), 6) + "\t";
 dataString += String(gps.location.lng(), 6) + "\t";
-dataString += String(gps.charsProcessed(), 6) + "\t";
+dataString += String(dados_totais) + "\t";
 #endif //GPS
 
   //Print da dataString
