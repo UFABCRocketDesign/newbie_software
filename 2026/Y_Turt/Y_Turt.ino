@@ -1,6 +1,6 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
-float pressaoInicial;
+float altitudeInicial;
 void setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);
@@ -9,7 +9,7 @@ void setup() {
 	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
 	while (1) {}
   }
-  pressaoInicial = bmp.readPressure();
+  altitudeInicial = bmp.readAltitude();
   Serial.println("*C\tPa\tmeters\tPa\tmeters");
 }
 
@@ -22,7 +22,8 @@ void loop() {
   Serial.print("\t");
   Serial.print(bmp.readSealevelPressure());
   Serial.print("\t");
-  Serial.print(bmp.readAltitude(pressaoInicial));
+  float altitudeRelativa = bmp.readAltitude() - altitudeInicial;
+  Serial.print(bmp.readAltitude(altitudeRelativa));
   Serial.print("\t");
   Serial.println();
 }
