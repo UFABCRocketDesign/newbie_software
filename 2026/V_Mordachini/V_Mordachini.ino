@@ -1,7 +1,11 @@
-// pisca_led Victor :)
+// Victor :)
 #include <Adafruit_BMP085.h>
 
 Adafruit_BMP085 bmp;
+
+float altitudeInicial;
+float altitudeAtual;
+float altura;
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
@@ -13,10 +17,14 @@ void setup() {
 	while (1) {}
   }
 
+  altitudeInicial = bmp.readAltitude(); //altura 0
+
   Serial.println("Temp(C)\tPress(Pa)\tAlt(m)");
 }
 
 void loop() {
+  altitudeAtual = bmp.readAltitude();
+  altura = altitudeAtual - altitudeInicial;
 
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
@@ -24,7 +32,7 @@ void loop() {
   Serial.print(bmp.readPressure());
   Serial.print("\t");
 
-  Serial.print(bmp.readAltitude());
+  Serial.print(altura);
   Serial.println("\t");
   
          
