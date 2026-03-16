@@ -23,7 +23,7 @@ void loop() {
   Serial.print(bmp.readSealevelPressure());
   Serial.print("\t");
   float altitudeRelativa = bmp.readAltitude() - altitudeInicial;
-  Serial.print(bmp.readAltitude(altitudeRelativa));
+  Serial.print(altitudeRelativa);
   Serial.print("\t");
   Serial.println();
 }
