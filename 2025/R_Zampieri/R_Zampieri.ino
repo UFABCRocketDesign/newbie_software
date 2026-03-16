@@ -30,6 +30,8 @@
 
 #define USANDO_RELOGIO (USANDO_PARAQUEDAS || USANDO_TELEMETRIA || 1)
 
+#define USANDO_GPS 1
+
 
 /*---------------BMP---------------*/
 #if USANDO_BMP
@@ -131,6 +133,26 @@ HardwareSerial &LoRa(Serial3);
 unsigned long previousMillisTELEMETRIA = 0;
 const long intervalTELEMETRIA = 5000;
 #endif  //Telemetria
+
+/*---------------GPS---------------*/
+#if USANDO_GPS
+#include <TinyGPSPlus.h>
+#include <SoftwareSerial.h>
+ HardwareSerial &GPS(Serial1);
+/*
+   This sample code demonstrates the normal use of a TinyGPSPlus (TinyGPSPlus) object.
+   It requires the use of SoftwareSerial, and assumes that you have a
+   4800-baud serial GPS device hooked up on pins 4(rx) and 3(tx).
+*/
+static const int RXPin = 4, TXPin = 3;
+static const uint32_t GPSBaud = 9600;
+
+// The TinyGPSPlus object
+TinyGPSPlus gps;
+
+// The serial connection to the GPS device
+SoftwareSerial ss(RXPin, TXPin);
+#endif //GPS
 
 void setup() {
 /*---------------INICIALIZAÇÃO DATALOGGER---------------*/
@@ -331,8 +353,17 @@ void setup() {
   //Print da dataString
   Serial.println(dataString);
 
+ //-----LORA-----
 #if USANDO_TELEMETRIA
   LoRa.println(dataString);
+#endif
+
+//-----GPS-----
+#if USANDO_GPS
+  Serial.begin(115200);
+  ss.begin(GPSBaud);
+  dataString += ("Latitude\t");
+  dataString += ("Longitude\t");
 #endif
 
 #if USANDO_SD
@@ -574,6 +605,12 @@ void loop() {
 #if USANDO_MAGNETOMETRO_Z
   dataString += String(eventmag.magnetic.z) + "\t";
 #endif  //MAGNETOMETRO Z
+
+//------------GPS------------
+#if USANDO_GPS
+dataString += String(gps.location.lat(), 6);
+dataString += String(gps.location.lng(), 6);
+#endif //GPS
 
   //Print da dataString
   Serial.println(dataString);
