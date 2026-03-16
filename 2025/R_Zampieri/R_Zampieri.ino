@@ -155,10 +155,10 @@ SoftwareSerial ss(RXPin, TXPin);
 #endif //GPS
 
 void setup() {
+  Serial.begin(115200);
 /*---------------INICIALIZAÇÃO DATALOGGER---------------*/
 #if USANDO_SD
   // Open serial communications and wait for port to open:
-  Serial.begin(115200);
   // wait for Serial Monitor to connect. Needed for native USB port boards only:
   while (!Serial)
     ;
@@ -360,7 +360,6 @@ void setup() {
 
 //-----GPS-----
 #if USANDO_GPS
-  Serial.begin(115200);
   ss.begin(GPSBaud);
   dataString += ("Latitude\t");
   dataString += ("Longitude\t");
