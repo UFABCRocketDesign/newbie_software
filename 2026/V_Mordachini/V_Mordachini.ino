@@ -7,8 +7,10 @@ float altitudeInicial;
 float altitudeAtual;
 float altura;
 
+float somaCalibragem = 0;
+const int medicoes = 30; // numero de leituras para calibragem
+
 void setup() {
-  pinMode(LED_BUILTIN, OUTPUT);
 
   Serial.begin(115200);
 
@@ -17,9 +19,14 @@ void setup() {
 	while (1) {}
   }
 
-  altitudeInicial = bmp.readAltitude(); //altura 0
+  //LOGICA DE CALIBRACAO:
+  for (int i = 0; i < medicoes; i++) {
+    somaCalibragem += bmp.readAltitude();
+  }
+  altitudeInicial = somaCalibragem / medicoes; //Altura 0
 
-  Serial.println("Temp(C)\tPress(Pa)\tAlt(m)");
+  //CABECALHO
+  Serial.println("Temp(C)\tPressao(Pa)\tAltura(m)");
 }
 
 void loop() {
