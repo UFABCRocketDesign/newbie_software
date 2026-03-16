@@ -137,21 +137,14 @@ const long intervalTELEMETRIA = 5000;
 /*---------------GPS---------------*/
 #if USANDO_GPS
 #include <TinyGPSPlus.h>
-#include <SoftwareSerial.h>
- HardwareSerial &GPS(Serial1);
-/*
-   This sample code demonstrates the normal use of a TinyGPSPlus (TinyGPSPlus) object.
-   It requires the use of SoftwareSerial, and assumes that you have a
-   4800-baud serial GPS device hooked up on pins 4(rx) and 3(tx).
-*/
-static const int RXPin = 4, TXPin = 3;
+
+// Use the Mega's dedicated hardware serial port on pins 19 (RX) and 18 (TX)
+HardwareSerial &GPS(Serial1); 
+
 static const uint32_t GPSBaud = 9600;
 
 // The TinyGPSPlus object
 TinyGPSPlus gps;
-
-// The serial connection to the GPS device
-SoftwareSerial ss(RXPin, TXPin);
 #endif //GPS
 
 void setup() {
@@ -360,10 +353,10 @@ void setup() {
 
 //-----GPS-----
 #if USANDO_GPS
-  ss.begin(GPSBaud);
+GPS.begin(GPSBaud); // Starts Serial1
   dataString += ("Latitude\t");
   dataString += ("Longitude\t");
-  dataString += ("Dados enviados pelo módulo\t");
+  dataString += ("Total Msg (Pass+Fail)\t");
 #endif
 
 #if USANDO_SD
@@ -391,6 +384,12 @@ void loop() {
   // so you have to close this one before opening another.
   tempo = currentMillis / 1000.0;
 #endif
+
+#if USANDO_GPS
+  while (GPS.available() > 0) {
+    gps.encode(GPS.read());
+  }
+#endif //GPS
 
 #if USANDO_ACELEROMETRO
   // Get a new sensor event (Acelerômetro)
@@ -608,11 +607,16 @@ void loop() {
 
 //------------GPS------------
 #if USANDO_GPS
-    while (ss.available())
-      gps.encode(ss.read());
-dataString += String(gps.location.lat(), 6) + "\t";
-dataString += String(gps.location.lng(), 6) + "\t";
-dataString += String(gps.charsProcessed(), 6) + "\t";
+if (gps.location.isValid()) {
+    dataString += String(gps.location.lat(), 6) + "\t";
+    dataString += String(gps.location.lng(), 6) + "\t";
+  } else {
+    dataString += "-Sem Sinal-\t-Sem Sinal-\t";
+  }
+
+  // Calculate total messages sent by the module
+  unsigned long totalSentences = gps.passedChecksum() + gps.failedChecksum();
+  dataString += String(totalSentences) + "\t";
 #endif //GPS
 
   //Print da dataString
