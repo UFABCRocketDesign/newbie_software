@@ -152,15 +152,6 @@ TinyGPSPlus gps;
 
 // The serial connection to the GPS device
 SoftwareSerial ss(RXPin, TXPin);
-static void smartDelay(unsigned long ms)
-{
-  unsigned long start = millis();
-  do 
-  {
-    while (ss.available())
-      gps.encode(ss.read());
-  } while (millis() - start < ms);
-}
 #endif //GPS
 
 void setup() {
@@ -617,9 +608,11 @@ void loop() {
 
 //------------GPS------------
 #if USANDO_GPS
-smartDelay(1000);
+    while (ss.available())
+      gps.encode(ss.read());
 dataString += String(gps.location.lat(), 6) + "\t";
 dataString += String(gps.location.lng(), 6) + "\t";
+dataString += String(gps.charsProcessed(), 6) + "\t";
 #endif //GPS
 
   //Print da dataString
