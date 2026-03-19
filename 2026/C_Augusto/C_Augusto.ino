@@ -1,6 +1,6 @@
 #include <Adafruit_BMP085.h>
 float altura0;
-
+int contador;
 
 Adafruit_BMP085 bmp;
   
@@ -11,7 +11,9 @@ void setup() {
 	while (1) {}
   }
   Serial.println("Temperatura   |   Pressao   |   Altitude    |   ");
-  altura0 = bmp.readAltitude();
+  while (contador <= 9){
+    altura0 = bmp.readAltitude();
+  }
 }
   
 void loop() {
@@ -24,4 +26,5 @@ void loop() {
     Serial.print("\t");
     Serial.print(alturatarada);
     Serial.println();
+    contador += 1;
 }
