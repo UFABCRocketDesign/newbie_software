@@ -17,7 +17,7 @@ void setup() {
   for(int i = 0; i < 9; i++){
     alturasoma += bmp.readAltitude();
   }
-  float alturatarada = bmp.readAltitude() - alturasoma/8;
+  float alturatarada = bmp.readAltitude() - alturasoma/9;
 }
   
 void loop() {
