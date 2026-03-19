@@ -8,19 +8,17 @@ void setup() {
 	Serial.println("bmp nao encontrado, verifique as conexoes");
 	while (1) {}
   }
-  Serial.println("Temperatura   |   Pressao   |   Altitude    |   PressaoMar    |");
+  Serial.println("Temperatura   |   Pressao   |   Altitude    |   ");
 }
   
 void loop() {
     
+    float alturatarada = bmp.readPressure() - bmp.readSealevelPressure();
+
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
     Serial.print(bmp.readPressure());
     Serial.print("\t");
-    Serial.print(bmp.readAltitude());
-    Serial.print("\t");
-    Serial.print(bmp.readSealevelPressure());
-    Serial.print("\t");
-    Serial.print(bmp.readAltitude(101500));
+    Serial.print(alturatarada);
     Serial.println();
 }
