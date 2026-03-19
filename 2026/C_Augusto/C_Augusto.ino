@@ -2,6 +2,10 @@
 float altura0;
 float alturasoma = 0;
 float alturatarada;
+float RS = 0.02; //ruido fisico
+float RM = 0.5; //ruido da medicao
+float c = 1; //confiança do filtro
+float g = 0;//ganho do filtro
 
 Adafruit_BMP085 bmp;
   
@@ -21,7 +25,14 @@ void setup() {
   
 void loop() {
 
-      float alturatarada = bmp.readAltitude() - alturasoma;
+  float alturatarada = bmp.readAltitude() - alturasoma;
+
+  //algoritmo do meu mano calman
+  c = c + RS;
+  g = c/(c+RM);
+  alturatarada = alturatarada - g*(alturatarada);
+  c = (1-g)*c;
+
 
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
