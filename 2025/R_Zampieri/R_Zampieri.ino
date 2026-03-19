@@ -51,12 +51,6 @@ float altura_filtrada = 0;
 float altura_filtrada2 = 0;
 bool queda = false;  //Declaração pro detector de queda
 #endif               //ALTURA
-// #if USANDO_BMP_PRESSAO
-// int32_t pressao;
-// #endif  //PRESSAO
-// #if USANDO_BMP_TEMPERATURA
-// float temperatura;
-// #endif  //TEMPERATURA
 #endif  //BMP
 
 /*---------------ACELERÔMETRO---------------*/
@@ -146,6 +140,42 @@ static const uint32_t GPSBaud = 9600;
 // The TinyGPSPlus object
 TinyGPSPlus gps;
 #endif //GPS
+
+/*---------------FUNÇÕES DOS FILTROS---------------*/
+#if USANDO_BMP_ALTURA
+void filtro1(){
+  vetor[guia] = bmp.readAltitude() - tara;  //setup do filtro 1
+  if (guia < tamanho - 1) {
+    guia += 1;
+  } else {
+    guia = 0;
+  }
+
+  altura_filtrada = 0;                    //reset da altura pra usar no filtro 1
+  for (int i = 0; i < tamanho; i += 1) {  //cálculo do filtro 1
+    altura_filtrada += vetor[i];
+  }
+
+  altura_filtrada /= tamanho;  //output do filtro 1
+}
+
+void filtro2(){
+  
+  vetor2[guia2] = altura_filtrada;  //setup do filtro 2
+  if (guia2 < tamanho - 1) {
+    guia2 += 1;
+  } else {
+    guia2 = 0;
+  }
+
+  altura_filtrada2 = 0;                   //reset da altura pra usar no filtro 2
+  for (int i = 0; i < tamanho; i += 1) {  //cálculo do filtro 2
+    altura_filtrada2 += vetor2[i];
+  }
+  altura_filtrada2 /= tamanho;  //output do filtro 2
+
+}
+#endif
 
 void setup() {
   Serial.begin(115200);
@@ -417,33 +447,35 @@ int32_t pressao = bmp.readPressure();
 #endif  //Pressao BMP
 
 #if USANDO_BMP_ALTURA
-  //FILTROS
-  vetor[guia] = bmp.readAltitude() - tara;  //setup do filtro 1
-  if (guia < tamanho - 1) {
-    guia += 1;
-  } else {
-    guia = 0;
-  }
+//FILTROS
+filtro1();
+filtro2();
+//   vetor[guia] = bmp.readAltitude() - tara;  //setup do filtro 1
+//   if (guia < tamanho - 1) {
+//     guia += 1;
+//   } else {
+//     guia = 0;
+//   }
 
-  altura_filtrada = 0;                    //reset da altura pra usar no filtro 1
-  for (int i = 0; i < tamanho; i += 1) {  //cálculo do filtro 1
-    altura_filtrada += vetor[i];
-  }
+//   altura_filtrada = 0;                    //reset da altura pra usar no filtro 1
+//   for (int i = 0; i < tamanho; i += 1) {  //cálculo do filtro 1
+//     altura_filtrada += vetor[i];
+//   }
 
-  altura_filtrada /= tamanho;  //output do filtro 1
+//   altura_filtrada /= tamanho;  //output do filtro 1
 
-  vetor2[guia2] = altura_filtrada;  //setup do filtro 2
-  if (guia2 < tamanho - 1) {
-    guia2 += 1;
-  } else {
-    guia2 = 0;
-  }
+  // vetor2[guia2] = altura_filtrada;  //setup do filtro 2
+  // if (guia2 < tamanho - 1) {
+  //   guia2 += 1;
+  // } else {
+  //   guia2 = 0;
+  // }
 
-  altura_filtrada2 = 0;                   //reset da altura pra usar no filtro 2
-  for (int i = 0; i < tamanho; i += 1) {  //cálculo do filtro 2
-    altura_filtrada2 += vetor2[i];
-  }
-  altura_filtrada2 /= tamanho;  //output do filtro 2
+  // altura_filtrada2 = 0;                   //reset da altura pra usar no filtro 2
+  // for (int i = 0; i < tamanho; i += 1) {  //cálculo do filtro 2
+  //   altura_filtrada2 += vetor2[i];
+  // }
+  // altura_filtrada2 /= tamanho;  //output do filtro 2
 
   /*------DETECÇÃO DE QUEDA------*/
   if (altura_filtrada2 < alturapassada) {  //Comparação da altura atual pós-filtros com a altura anterior ("alturapassada")
