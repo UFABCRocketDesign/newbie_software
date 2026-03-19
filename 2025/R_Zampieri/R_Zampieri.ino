@@ -356,7 +356,7 @@ void setup() {
 GPS.begin(GPSBaud); // Starts Serial1
   dataString += ("Latitude\t");
   dataString += ("Longitude\t");
-  dataString += ("Total Msg (Pass+Fail)\t");
+  dataString += ("Quantidade de dados GPS\t");
 #endif
 
 #if USANDO_SD
