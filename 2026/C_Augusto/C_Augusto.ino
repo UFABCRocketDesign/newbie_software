@@ -3,7 +3,7 @@
 Adafruit_BMP085 bmp;
   
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
    // inicializa a funcao do pino do led 13
   pinMode(LED_BUILTIN, OUTPUT);
   
