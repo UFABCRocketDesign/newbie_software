@@ -1,7 +1,8 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 float altitudeInicial; //definiçao da altura inicial
-float altitudeAprox[20]; //definição da altura suave
+float altitudeAprox[10]; //definição da altura suave
+float altitudeFiltrado[10]; //definição da altura suave 2
 
 void setup() {
 
@@ -11,6 +12,8 @@ void setup() {
 	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
 	while (1) {}
   }
+
+
 float soma = 0;
   for (int i = 0; i < 10; i++) {
     soma += bmp.readAltitude();
@@ -29,20 +32,37 @@ void loop() {
   Serial.print("\t");
   Serial.print(bmp.readSealevelPressure());
   Serial.print("\t");
+
+
     //definição da altura relativa = 0
     float altura = bmp.readAltitude() - altitudeInicial; 
     Serial.print(altura);
     Serial.print("\t"); 
-  for (int i = 0; i < 19; i++) {
+
+
+  for (int i = 0; i < 9; i++) {
     altitudeAprox[i] = altitudeAprox[i + 1];
   }
-  altitudeAprox[19] = altura;
+  altitudeAprox[9] = altura;
   float somaAprox = 0;
-  for (int i = 0; i < 20; i++) {
+  for (int i = 0; i < 10; i++) {
     somaAprox += altitudeAprox[i];
   }
-  float altitudeSuave = somaAprox / 20;
+  float altitudeSuave = somaAprox / 10;
   Serial.print(altitudeSuave);
+  Serial.print("\t");
+
+for (int i = 0; i < 9; i++) {
+    altitudeFiltrado[i] = altitudeFiltrado[i + 1];
+  }
+  altitudeFiltrado[9] = altitudeSuave;
+  float somaFiltrado = 0;
+  for (int i = 0; i < 10; i++) {
+    somaFiltrado += altitudeFiltrado[i];
+  }
+  float altitudeFinal = somaFiltrado / 10;
+  Serial.print(altitudeFinal);
+
   Serial.print("\t");
   Serial.println();
 }
