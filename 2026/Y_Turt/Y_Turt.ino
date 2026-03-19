@@ -14,9 +14,11 @@ void setup() {
 	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
 	while (1) {}
   }
-
-  altitudeInicial = bmp.readAltitude(); //definição da altura inicial
-   
+float soma = 0;
+  for (int i = 0; i < 10; i++) {
+    soma += bmp.readAltitude();
+  altitudeInicial = soma/10; //definição da altura inicial
+  }
   Serial.println("*C\tPa\tmeters\tPa\tmeters");
 }
 
@@ -31,13 +33,7 @@ void loop() {
   Serial.print("\t");
     //definição da altura relativa = 0
     float altitudeRelativa = bmp.readAltitude() - altitudeInicial; 
-    Serial.print(altitudeRelativa); //print altura relativa
-
-   //for (int i = 0; i < (num-1); i++){
-    //Filtro[i]= altitudeRelativa
-   //}
-   
-
+    Serial.print(altitudeRelativa); 
 
   Serial.print("\t");
   Serial.println();
