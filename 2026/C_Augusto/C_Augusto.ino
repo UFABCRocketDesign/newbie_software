@@ -5,7 +5,7 @@ float alturatarada;
 float RS = 0.5; //ruido fisico
 float RM = 0.9; //ruido da medicao
 float c = 1; //confiança do filtro
-float g = 0;//ganho do filtro
+float g = 0.3;//ganho do filtro
 float filtrocalman = 0;
 
 Adafruit_BMP085 bmp;
