@@ -3,8 +3,7 @@ Adafruit_BMP085 bmp;
 float altitudeInicial; //definiçao da altura inicial
 
 //inicio de vetor e variavel acumulativa da altura relativa
-//const int num = 5; 
-//float Filtro[num];
+float altitudeAprox[5];
 
 void setup() {
 
@@ -17,8 +16,9 @@ void setup() {
 float soma = 0;
   for (int i = 0; i < 10; i++) {
     soma += bmp.readAltitude();
-  altitudeInicial = soma/10; //definição da altura inicial
   }
+  altitudeInicial = soma/10; //definição da altura inicial
+  
   Serial.println("*C\tPa\tmeters\tPa\tmeters");
 }
 
@@ -34,7 +34,16 @@ void loop() {
     //definição da altura relativa = 0
     float altitudeRelativa = bmp.readAltitude() - altitudeInicial; 
     Serial.print(altitudeRelativa); 
-
+  for (int i = 0; i < 4; i++) {
+    altitudeAprox[i] = altitudeAprox[i + 1];
+    altitudeAprox[4] = altitudeRelativa;
+  }
+  float somaAprox = 0;
+  for (int i = 0; i < 5; i++) {
+    somaAprox += altitudeAprox[i];
+  }
+  float altitudeSuave = somaAprox / 5;
+  Serial.print(altitudeSuave);
   Serial.print("\t");
   Serial.println();
 }
