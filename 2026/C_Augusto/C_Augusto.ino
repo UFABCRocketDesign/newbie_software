@@ -16,11 +16,14 @@ void setup() {
   Serial.println("Temperatura   |   Pressao   |   Altitude    |   ");
   for(int i = 0; i < 9; i++){
     alturasoma += bmp.readAltitude();
+    alturasoma = alturasoma/9;  
   }
-  float alturatarada = bmp.readAltitude() - alturasoma/9;
 }
   
 void loop() {
+
+      float alturatarada = bmp.readAltitude() - alturasoma;
+
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
     Serial.print(bmp.readPressure());
