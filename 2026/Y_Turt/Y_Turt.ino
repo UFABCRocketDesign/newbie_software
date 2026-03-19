@@ -32,12 +32,13 @@ void loop() {
   Serial.print(bmp.readSealevelPressure());
   Serial.print("\t");
     //definição da altura relativa = 0
-    float altitudeRelativa = bmp.readAltitude() - altitudeInicial; 
-    Serial.print(altitudeRelativa); 
+    float altura = bmp.readAltitude() - altitudeInicial; 
+    Serial.print(altura);
+    Serial.print("\t"); 
   for (int i = 0; i < 4; i++) {
     altitudeAprox[i] = altitudeAprox[i + 1];
-    altitudeAprox[4] = altitudeRelativa;
   }
+  altitudeAprox[4] = altura;
   float somaAprox = 0;
   for (int i = 0; i < 5; i++) {
     somaAprox += altitudeAprox[i];
