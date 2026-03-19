@@ -27,7 +27,7 @@ void setup() {
   alturaFiltrada = 0;
 
   //CABECALHO
-  Serial.println("Temp(C)\tPressao(Pa)\tAltura(m)");
+  Serial.println("Temp(C)\tPressao(Pa)\tAlturaBruta(m)\tAlturaFiltrada(m)");
 }
 
 void loop() {
@@ -44,6 +44,9 @@ void loop() {
 
   Serial.print(bmp.readPressure());
   Serial.print("\t");
+
+  Serial.print(alturaBruta);
+  Serial.println("\t");
 
   Serial.print(alturaFiltrada);
   Serial.println("\t");
