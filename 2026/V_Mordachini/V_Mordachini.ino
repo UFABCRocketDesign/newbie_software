@@ -4,34 +4,40 @@
 Adafruit_BMP085 bmp;
 
 float altitudeInicial;
-float altitudeAtual;
-float altura;
-
-float somaCalibragem = 0;
+float alturaFiltrada = 0; // valor filtrado
 const int medicoes = 30; // numero de leituras para calibragem
+const float alpha = 0.1;   // fator de suavização
 
 void setup() {
-
   Serial.begin(115200);
 
   if (!bmp.begin()) {
-	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-	while (1) {}
+    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+    while (1) {}
   }
 
-  //LOGICA DE CALIBRACAO:
+  //LOGICA DE CALIBRACAO
+  float soma = 0;
   for (int i = 0; i < medicoes; i++) {
-    somaCalibragem += bmp.readAltitude();
+    soma += bmp.readAltitude();
   }
-  altitudeInicial = somaCalibragem / medicoes; //Altura 0
+  altitudeInicial = soma / medicoes; // altura 0
+  
+  // Inicializa o filtro com o valor zero
+  alturaFiltrada = 0;
 
   //CABECALHO
   Serial.println("Temp(C)\tPressao(Pa)\tAltura(m)");
 }
 
 void loop() {
-  altitudeAtual = bmp.readAltitude();
-  altura = altitudeAtual - altitudeInicial;
+  // leitura bruta
+  float altitudeAtual = bmp.readAltitude();
+  float alturaBruta = altitudeAtual - altitudeInicial;
+
+  // filtro EMA (media movel exponencial)
+  // alturaFiltrada recebe 10% da leitura nova e mantém 90% da anterior
+  alturaFiltrada = (alpha * alturaBruta) + (1.0 - alpha) * alturaFiltrada;
 
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
@@ -39,8 +45,6 @@ void loop() {
   Serial.print(bmp.readPressure());
   Serial.print("\t");
 
-  Serial.print(altura);
+  Serial.print(alturaFiltrada);
   Serial.println("\t");
-  
-         
 }
