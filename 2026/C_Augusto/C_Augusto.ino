@@ -16,8 +16,8 @@ void setup() {
   Serial.println("Temperatura   |   Pressao   |   Altitude    |   ");
   for(int i = 0; i < 9; i++){
     alturasoma += bmp.readAltitude();
-    alturasoma = alturasoma/9;  
   }
+  alturasoma = alturasoma/9; 
 }
   
 void loop() {
