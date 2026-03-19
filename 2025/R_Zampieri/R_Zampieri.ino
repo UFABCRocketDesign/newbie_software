@@ -51,12 +51,12 @@ float altura_filtrada = 0;
 float altura_filtrada2 = 0;
 bool queda = false;  //Declaração pro detector de queda
 #endif               //ALTURA
-#if USANDO_BMP_PRESSAO
-int32_t pressao;
-#endif  //PRESSAO
-#if USANDO_BMP_TEMPERATURA
-float temperatura;
-#endif  //TEMPERATURA
+// #if USANDO_BMP_PRESSAO
+// int32_t pressao;
+// #endif  //PRESSAO
+// #if USANDO_BMP_TEMPERATURA
+// float temperatura;
+// #endif  //TEMPERATURA
 #endif  //BMP
 
 /*---------------ACELERÔMETRO---------------*/
@@ -409,11 +409,11 @@ void loop() {
 
 //*------SENSOR BMP------*/
 #if USANDO_BMP_TEMPERATURA
-  temperatura = bmp.readTemperature();
+float temperatura = bmp.readTemperature();
 #endif  //Temperatura BMP
 
 #if USANDO_BMP_PRESSAO
-  pressao = bmp.readPressure();
+int32_t pressao = bmp.readPressure();
 #endif  //Pressao BMP
 
 #if USANDO_BMP_ALTURA
