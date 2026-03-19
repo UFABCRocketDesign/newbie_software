@@ -46,8 +46,8 @@ void loop() {
   Serial.print("\t");
 
   Serial.print(alturaBruta);
-  Serial.println("\t");
+  Serial.print("\t");
 
   Serial.print(alturaFiltrada);
-  Serial.println("\t");
+  Serial.println("");
 }
