@@ -47,8 +47,8 @@ int guia = 0;
 int guia2 = 0;
 int detectorqueda = 0;
 float alturapassada = 0;
-float altura_filtrada = 0;
-float altura_filtrada2 = 0;
+// float altura_filtrada = 0;
+// float altura_filtrada2 = 0;
 bool queda = false;  //Declaração pro detector de queda
 #endif               //ALTURA
 #endif  //BMP
@@ -113,13 +113,13 @@ int lognumber = 0;
 String nomearquivo;
 String nomelog = "ZAMP";
 String zerospacetext;
-int zerospacelength;
+// int zerospacelength;
 #endif  //SD
 
-/*---------------RELÓGIO---------------*/
-#if USANDO_RELOGIO
-float tempo = 0;  //Declaração pro relógio (millis)
-#endif            //RELOGIO
+// /*---------------RELÓGIO---------------*/
+// #if USANDO_RELOGIO
+// float tempo = 0;  //Declaração pro relógio (millis)
+// #endif            //RELOGIO
 
 /*---------------TELEMETRIA---------------*/
 #if USANDO_TELEMETRIA
@@ -143,24 +143,21 @@ TinyGPSPlus gps;
 
 /*---------------FUNÇÕES DOS FILTROS---------------*/
 #if USANDO_BMP_ALTURA
-void filtro1(){
-  vetor[guia] = bmp.readAltitude() - tara;  //setup do filtro 1
+float filtro(float leitura_altitude){
+  vetor[guia] = leitura_altitude - tara;  //setup do filtro 1
   if (guia < tamanho - 1) {
     guia += 1;
   } else {
     guia = 0;
   }
 
-  altura_filtrada = 0;                    //reset da altura pra usar no filtro 1
+  float altura_filtrada = 0;                    //reset da altura pra usar no filtro 1
   for (int i = 0; i < tamanho; i += 1) {  //cálculo do filtro 1
     altura_filtrada += vetor[i];
   }
 
   altura_filtrada /= tamanho;  //output do filtro 1
-}
 
-void filtro2(){
-  
   vetor2[guia2] = altura_filtrada;  //setup do filtro 2
   if (guia2 < tamanho - 1) {
     guia2 += 1;
@@ -168,16 +165,15 @@ void filtro2(){
     guia2 = 0;
   }
 
-  altura_filtrada2 = 0;                   //reset da altura pra usar no filtro 2
+  float altura_filtrada2 = 0;                   //reset da altura pra usar no filtro 2
   for (int i = 0; i < tamanho; i += 1) {  //cálculo do filtro 2
     altura_filtrada2 += vetor2[i];
   }
   altura_filtrada2 /= tamanho;  //output do filtro 2
-
 }
 #endif
 
-void setup() {
+void setup(){
   Serial.begin(115200);
 /*---------------INICIALIZAÇÃO DATALOGGER---------------*/
 #if USANDO_SD
@@ -412,7 +408,7 @@ void loop() {
   unsigned long currentMillis = millis();
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
-  tempo = currentMillis / 1000.0;
+  float tempo = currentMillis / 1000.0;
 #endif
 
 #if USANDO_GPS
@@ -447,9 +443,11 @@ int32_t pressao = bmp.readPressure();
 #endif  //Pressao BMP
 
 #if USANDO_BMP_ALTURA
-//FILTROS
-filtro1();
-filtro2();
+//FILTRO
+float altura_filtrada = 0;
+float altura_filtrada2 = 0;
+float leitura_altitude = bmp.readAltitude();
+filtro(leitura_altitude);
 //   vetor[guia] = bmp.readAltitude() - tara;  //setup do filtro 1
 //   if (guia < tamanho - 1) {
 //     guia += 1;
