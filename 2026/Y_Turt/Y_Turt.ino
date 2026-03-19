@@ -1,9 +1,7 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 float altitudeInicial; //definiçao da altura inicial
-
-//inicio de vetor e variavel acumulativa da altura relativa
-float altitudeAprox[5];
+float altitudeAprox[20]; //definição da altura suave
 
 void setup() {
 
@@ -35,15 +33,15 @@ void loop() {
     float altura = bmp.readAltitude() - altitudeInicial; 
     Serial.print(altura);
     Serial.print("\t"); 
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 19; i++) {
     altitudeAprox[i] = altitudeAprox[i + 1];
   }
-  altitudeAprox[4] = altura;
+  altitudeAprox[19] = altura;
   float somaAprox = 0;
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 20; i++) {
     somaAprox += altitudeAprox[i];
   }
-  float altitudeSuave = somaAprox / 5;
+  float altitudeSuave = somaAprox / 20;
   Serial.print(altitudeSuave);
   Serial.print("\t");
   Serial.println();
