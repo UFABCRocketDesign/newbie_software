@@ -3,10 +3,21 @@
 
 Adafruit_BMP085 bmp;
 
+//variaveis de altitude
 float altitudeInicial;
-float alturaFiltrada = 0; // valor filtrado
 const int medicoes = 30; // numero de leituras para calibragem
+
+//config filtro EMA
+float alturaFiltradaEMA = 0; // valor filtrado
 const float alpha = 0.1;   // fator de suavização
+
+//config filtro SMA
+const int tamanhoJanela = 10; // quantidade de leituras para media
+float leituras[tamanhoJanela];
+int indice = 0; // posicão atual no vetor
+float somaSMA = 0;
+float alturaFiltradaSMA = 0;
+
 
 void setup() {
   Serial.begin(115200);
@@ -23,11 +34,16 @@ void setup() {
   }
   altitudeInicial = soma / medicoes; // altura 0
   
-  // Inicializa o filtro com o valor zero
-  alturaFiltrada = 0;
+  // inicializa o filtro EMA com o valor zero
+  alturaFiltradaEMA = 0;
+
+  // inicializa o vetor do filtro SMA com zeros
+  for (int i = 0; i < tamanhoJanela; i++) {
+    leituras[i] = 0;
+  }
 
   //CABECALHO
-  Serial.println("Temp(C)\tPressao(Pa)\tAlturaBruta(m)\tAlturaFiltrada(m)");
+  Serial.println("Temp(C)\tPressao(Pa)\tAlturaBruta(m)\tAlturaFiltradaEMA(m)\tAlturaFiltradaSMA(m)");
 }
 
 void loop() {
@@ -37,7 +53,19 @@ void loop() {
 
   // filtro EMA (media movel exponencial)
   // alturaFiltrada recebe 10% da leitura nova e mantém 90% da anterior
-  alturaFiltrada = (alpha * alturaBruta) + (1.0 - alpha) * alturaFiltrada;
+  alturaFiltradaEMA = (alpha * alturaBruta) + (1.0 - alpha) * alturaFiltradaEMA;
+
+  //filtro SMA (media movel simples)
+  somaSMA -= leituras[indice];
+  leituras[indice] = alturaBruta; 
+  somaSMA += leituras[indice]; 
+  indice++; 
+  
+  if (indice >= tamanhoJanela) { // 5 - se chegar no fim do array, volta ao início
+    indice = 0;
+  }
+  
+  alturaFiltradaSMA = somaSMA / tamanhoJanela;
 
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
@@ -48,6 +76,8 @@ void loop() {
   Serial.print(alturaBruta);
   Serial.print("\t");
 
-  Serial.print(alturaFiltrada);
-  Serial.println("");
+  Serial.print(alturaFiltradaEMA);
+  Serial.print("\t");
+
+  Serial.println(alturaFiltradaSMA);
 }
