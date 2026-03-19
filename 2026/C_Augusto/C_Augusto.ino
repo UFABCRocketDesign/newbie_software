@@ -2,8 +2,8 @@
 float altura0;
 float alturasoma = 0;
 float alturatarada;
-float RS = 0.02; //ruido fisico
-float RM = 0.5; //ruido da medicao
+float RS = 0.5; //ruido fisico
+float RM = 0.9; //ruido da medicao
 float c = 1; //confiança do filtro
 float g = 0;//ganho do filtro
 float filtrocalman = 0;
