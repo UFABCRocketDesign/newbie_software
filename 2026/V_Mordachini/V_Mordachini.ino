@@ -8,15 +8,22 @@ float altitudeInicial;
 const int medicoes = 30; // numero de leituras para calibragem
 
 //config filtro EMA
-float alturaFiltradaEMA = 0; // valor filtrado
-const float alpha = 0.1;   // fator de suavização
+//float alturaFiltradaEMA = 0; // valor filtrado
+//const float alpha = 0.1;   // fator de suavização
 
-//config filtro SMA
+//config filtro SMA 1 
 const int tamanhoJanela = 10; // quantidade de leituras para media
 float leituras[tamanhoJanela];
-int indice = 0; // posicão atual no vetor
+int indice = 0; // posicão atual no vetor leituras
 float somaSMA = 0;
 float alturaFiltradaSMA = 0;
+
+//config filtro SMA 2 (cascata - refinamento)
+const int tamanhoJanela2 = 10;
+float leituras2[tamanhoJanela2];
+int indice2 = 0;
+float somaSMA2 = 0;
+float alturaFinal = 0;
 
 
 void setup() {
@@ -35,15 +42,15 @@ void setup() {
   altitudeInicial = soma / medicoes; // altura 0
   
   // inicializa o filtro EMA com o valor zero
-  alturaFiltradaEMA = 0;
+  //alturaFiltradaEMA = 0;
 
-  // inicializa o vetor do filtro SMA com zeros
-  for (int i = 0; i < tamanhoJanela; i++) {
-    leituras[i] = 0;
-  }
+  // inicializa os vetores dos filtros SMA com zeros
+  for (int i = 0; i < tamanhoJanela; i++) leituras[i] = 0;
+  for (int i = 0; i < tamanhoJanela2; i++) leituras2[i] = 0;
+
 
   //CABECALHO
-  Serial.println("Temp(C)\tPressao(Pa)\tAlturaBruta(m)\tAlturaFiltradaEMA(m)\tAlturaFiltradaSMA(m)");
+  Serial.println("Temp(C)\tPressao(Pa)\tAlturaBruta(m)\tAlturaFiltradaSMA(m)\tAlturaFinal(m)");
 }
 
 void loop() {
@@ -53,11 +60,11 @@ void loop() {
 
   // filtro EMA (media movel exponencial)
   // alturaFiltrada recebe 10% da leitura nova e mantém 90% da anterior
-  alturaFiltradaEMA = (alpha * alturaBruta) + (1.0 - alpha) * alturaFiltradaEMA;
+  //alturaFiltradaEMA = (alpha * alturaBruta) + (1.0 - alpha) * alturaFiltradaEMA;
 
-  //filtro SMA (media movel simples)
+  //filtro SMA 1 (media movel simples) 
   somaSMA -= leituras[indice];
-  leituras[indice] = alturaBruta; 
+  leituras[indice] = alturaBruta;
   somaSMA += leituras[indice]; 
   indice++; 
   
@@ -66,6 +73,20 @@ void loop() {
   }
   
   alturaFiltradaSMA = somaSMA / tamanhoJanela;
+
+  //segundo filtro SMA (refinamento)
+  somaSMA2 -= leituras2[indice2];
+  leituras[indice2] = alturaFiltradaSMA;
+  somaSMA2 += leituras2[indice2]; 
+  indice2++; 
+  
+  if (indice2 >= tamanhoJanela2) {
+    indice2 = 0;
+  }
+  
+  alturaFinal = somaSMA2 / tamanhoJanela2;
+
+
 
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
@@ -76,8 +97,8 @@ void loop() {
   Serial.print(alturaBruta);
   Serial.print("\t");
 
-  Serial.print(alturaFiltradaEMA);
+  Serial.print(alturaFiltradaSMA);
   Serial.print("\t");
 
-  Serial.println(alturaFiltradaSMA);
+  Serial.println(alturaFinal);
 }
