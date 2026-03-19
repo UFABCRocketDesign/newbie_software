@@ -7,11 +7,13 @@ void setup() {
 	Serial.println("bmp nao encontrado, verifique as conexoes");
 	while (1) {}
   }
-  Serial.println("Temperatura   |   Pressao   |   Altitude    |   PressaoMar    |")
+  Serial.println("Temperatura   |   Pressao   |   Altitude    |   PressaoMar    |");
 }
   
 void loop() {
-    
-    Serial.print(bmp.readTemperature(), bmp.readPressure(), bmp.readAltitude, bmp.readSealevelPressure(), bmp.readAltitude(101500));
-    
+
+    Serial.print(bmp.readPressure());
+    Serial.print(bmp.readAltitude());
+    Serial.print(bmp.readSealevelPressure());
+    Serial.print(bmp.readAltitude(101500));
 }
