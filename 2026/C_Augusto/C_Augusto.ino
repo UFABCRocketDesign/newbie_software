@@ -1,13 +1,12 @@
 #include <Adafruit_BMP085.h>
 float altura0;
-float alturasoma;
+float alturasoma = 0;
 float alturatarada;
 
 Adafruit_BMP085 bmp;
   
 void setup() {
   int contador = 0;
-  float alturasoma = 0;
   Serial.begin(115200);
   if (!bmp.begin()) {
 	Serial.println("bmp nao encontrado, verifique as conexoes");
