@@ -6,6 +6,7 @@ float RS = 0.02; //ruido fisico
 float RM = 0.5; //ruido da medicao
 float c = 1; //confiança do filtro
 float g = 0;//ganho do filtro
+float filtrocalman = 0;
 
 Adafruit_BMP085 bmp;
   
@@ -16,7 +17,7 @@ void setup() {
 	Serial.println("bmp nao encontrado, verifique as conexoes");
 	while (1) {}
   }
-  Serial.println("Temperatura   |   Pressao   |   Altitude    |   ");
+  Serial.println("Temperatura   |   Pressao   |   Altitude    |   Filtro    ");
   for(int i = 0; i < 9; i++){
     alturasoma += bmp.readAltitude();
   }
@@ -24,13 +25,12 @@ void setup() {
 }
   
 void loop() {
-
   float alturatarada = bmp.readAltitude() - alturasoma;
 
   //algoritmo do meu mano calman
   c = c + RS;
   g = c/(c+RM);
-  alturatarada = alturatarada - g*(alturatarada);
+  filtrocalman = alturatarada - g*(alturatarada);
   c = (1-g)*c;
 
 
@@ -39,5 +39,7 @@ void loop() {
     Serial.print(bmp.readPressure());
     Serial.print("\t");
     Serial.print(alturatarada);
+    Serial.print("\t");
+    Serial.print(filtrocalman);
     Serial.println();
 }
