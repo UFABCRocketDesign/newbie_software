@@ -76,7 +76,7 @@ void loop() {
 
   //segundo filtro SMA (refinamento)
   somaSMA2 -= leituras2[indice2];
-  leituras[indice2] = alturaFiltradaSMA;
+  leituras2[indice2] = alturaFiltradaSMA;
   somaSMA2 += leituras2[indice2]; 
   indice2++; 
   
