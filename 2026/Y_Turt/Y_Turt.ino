@@ -37,7 +37,7 @@ Serial.print("Initializing SD card...");
     while (true);
   }
 Serial.println("initialization done.");
-}
+
 
 // Calibração do referencial zero
 float soma = 0;
@@ -50,6 +50,10 @@ float soma = 0;
 }
 
 void loop() {
+
+// sd
+String dataString = "";
+
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
   Serial.print(bmp.readPressure());
@@ -96,6 +100,9 @@ if (!emQueda && altitudeFinal < (altitudeMaxima - margemQueda)) {
               emQueda = true;
           }
 }
+Serial.print(contadorQueda);
+Serial.print("\t");
+  Serial.print(emQueda); 
 
 // --- Salvar Dados no SD ---
 File dataFile = SD.open("datalog.txt", FILE_WRITE);
@@ -107,14 +114,6 @@ File dataFile = SD.open("datalog.txt", FILE_WRITE);
   else {
     Serial.println("error opening datalog.txt");
   }
-}
-
-
-
-Serial.print(contadorQueda);
-Serial.print("\t");
-  Serial.print(emQueda); 
-
 
 
   Serial.print("\t");
