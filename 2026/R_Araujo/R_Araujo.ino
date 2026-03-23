@@ -7,12 +7,12 @@ float t2;
 float t3;
 float t4;
 float t5;
-float si=0;
-int ci=0;
-float mi=0;
-float s=0;
-int c=1;
-float m=0;
+float som_i=0;
+int contador_i=0;
+float med_i=0;
+float som=0;
+int contador=1;
+float med=0;
 void setup() {
   Serial.begin(115200);
   if (!bmp.begin()) {
@@ -24,55 +24,42 @@ void setup() {
     Serial.print("Altitude\t");
     Serial.print("Pressure at sealevel (calculated)\t ");
     Serial.println("Real altitude");
-    while(ci<30){
+    while(contador_i<30){
     t0=bmp.readAltitude();
-    si=t0+si;
-    ci+= 1;
+    som_i=t0+som_i;
+    contador_i+= 1;
   }
-  mi=si/30;
+  med_i=som_i/30;
 }
 void loop() {
   t1=bmp.readAltitude();
-  s+= t1;
-    if(c==1){
-      s+=t1;
-      m=s/c;
-    }
-    else if (c==2) {
+    if(contador==2) {
       t2=t1;
-      s+=t2;
-      m=s/c;
     }
-    else if (c==3) {
+    else if (contador==3) {
       t3=t1;
-      s+=t3;
-      m=s/c;
     }
-    else if (c==4) {
+    else if (contador==4) {
       t4=t1;
-      s+=t4;
-      m=s/c;
     }
-    else if (c==5) {
+    else if (contador==5) {
       t5=t1;
-      s+=t5;
-      m=s/c;
     }
     else {
       t4=t5;
       t3=t4;
       t2=t3;
       t5=t1;
-      m=(t4+t3+t2+t1)/4;
+      med=(t4+t3+t2+t1)/4;
     }
     Serial.print(bmp.readTemperature());
     Serial.print('\t');
     Serial.print(bmp.readPressure());
     Serial.print('\t');
-    Serial.print(m-mi);
+    Serial.print(med-med_i);
     Serial.print('\t');
     Serial.print(bmp.readSealevelPressure());
     Serial.print('\t');
     Serial.println(bmp.readAltitude(101500));
-  c+= 1;
+  contador+= 1;
 }
