@@ -11,8 +11,8 @@ float altitudeMaxima = 0.0;
 bool emQueda = false;
 const float margemQueda = 1.5;
 
-
-
+int contadorQueda = 0;                 
+const int confirmacoesNecessarias = 5; 
 
 void setup() {
 
@@ -81,10 +81,11 @@ if (altitudeFinal > altitudeMaxima) {
     altitudeMaxima = altitudeFinal;
 }
 if (!emQueda && altitudeFinal < (altitudeMaxima - margemQueda)) {
-    //if (altitudeMaxima > 5.0) {
-      emQueda = true;
-    }
-  
+    contadorQueda = contadorQueda + 1; 
+          if (contadorQueda >= confirmacoesNecessarias) {
+              emQueda = true;
+          }
+}
   Serial.print(emQueda); 
 
 
