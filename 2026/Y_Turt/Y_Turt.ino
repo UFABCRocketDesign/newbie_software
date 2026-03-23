@@ -81,11 +81,13 @@ if (altitudeFinal > altitudeMaxima) {
     altitudeMaxima = altitudeFinal;
 }
 if (!emQueda && altitudeFinal < (altitudeMaxima - margemQueda)) {
-    contadorQueda = contadorQueda + 1; 
+    contadorQueda += 1; 
           if (contadorQueda >= confirmacoesNecessarias) {
               emQueda = true;
           }
 }
+Serial.print(contadorQueda);
+Serial.print("\t");
   Serial.print(emQueda); 
 
 
