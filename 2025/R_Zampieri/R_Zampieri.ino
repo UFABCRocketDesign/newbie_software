@@ -144,7 +144,7 @@ TinyGPSPlus gps;
 /*---------------FUNÇÕES DOS FILTROS---------------*/
 #if USANDO_BMP_ALTURA
 float filtro1(float leitura_altitude){
-  vetor[guia] = leitura_altitude - tara;  //setup do filtro 1
+  vetor[guia] = leitura_altitude;  //setup do filtro 1
   if (guia < tamanho - 1) {
     guia += 1;
   } else {
@@ -449,7 +449,7 @@ int32_t pressao = bmp.readPressure();
 
 #if USANDO_BMP_ALTURA
 //FILTRO
-float leitura_altitude = bmp.readAltitude();
+float leitura_altitude = bmp.readAltitude() - tara;
 float altura_filtrada = filtro1(leitura_altitude);
 float altura_filtrada2 = filtro2(altura_filtrada);
 
