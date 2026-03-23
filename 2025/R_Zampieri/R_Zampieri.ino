@@ -143,7 +143,7 @@ TinyGPSPlus gps;
 
 /*---------------FUNÇÕES DOS FILTROS---------------*/
 #if USANDO_BMP_ALTURA
-float filtro(float leitura_altitude){
+float filtro1(float leitura_altitude){
   vetor[guia] = leitura_altitude - tara;  //setup do filtro 1
   if (guia < tamanho - 1) {
     guia += 1;
@@ -151,25 +151,30 @@ float filtro(float leitura_altitude){
     guia = 0;
   }
 
-  float altura_filtrada = 0;                    //reset da altura pra usar no filtro 1
+  float altura_filtrada_interna = 0;                    //reset da altura pra usar no filtro 1
   for (int i = 0; i < tamanho; i += 1) {  //cálculo do filtro 1
-    altura_filtrada += vetor[i];
+    altura_filtrada_interna += vetor[i];
   }
 
-  altura_filtrada /= tamanho;  //output do filtro 1
+  altura_filtrada_interna /= tamanho;  //output do filtro 1
 
-  vetor2[guia2] = altura_filtrada;  //setup do filtro 2
+  return altura_filtrada_interna;
+}
+float filtro2(float output_filtro1){
+  vetor2[guia2] = output_filtro1;  //setup do filtro 2
   if (guia2 < tamanho - 1) {
     guia2 += 1;
   } else {
     guia2 = 0;
   }
 
-  float altura_filtrada2 = 0;                   //reset da altura pra usar no filtro 2
+  float altura_filtrada2_interna = 0;                   //reset da altura pra usar no filtro 2
   for (int i = 0; i < tamanho; i += 1) {  //cálculo do filtro 2
-    altura_filtrada2 += vetor2[i];
+    altura_filtrada2_interna += vetor2[i];
   }
-  altura_filtrada2 /= tamanho;  //output do filtro 2
+  altura_filtrada2_interna /= tamanho;  //output do filtro 2
+
+  return altura_filtrada2_interna;
 }
 #endif
 
@@ -444,10 +449,10 @@ int32_t pressao = bmp.readPressure();
 
 #if USANDO_BMP_ALTURA
 //FILTRO
-float altura_filtrada = 0;
-float altura_filtrada2 = 0;
 float leitura_altitude = bmp.readAltitude();
-filtro(leitura_altitude);
+float altura_filtrada = filtro1(leitura_altitude);
+float altura_filtrada2 = filtro2(altura_filtrada);
+
 //   vetor[guia] = bmp.readAltitude() - tara;  //setup do filtro 1
 //   if (guia < tamanho - 1) {
 //     guia += 1;
@@ -565,7 +570,7 @@ filtro(leitura_altitude);
 
 //------------BMP------------
 #if USANDO_BMP_ALTURA
-  dataString += String(vetor[guia]) + "\t";
+  dataString += String(leitura_altitude) + "\t";
   dataString += String(altura_filtrada) + "\t";
   dataString += String(altura_filtrada2) + "\t";
   dataString += String(detectorqueda) + "\t";
