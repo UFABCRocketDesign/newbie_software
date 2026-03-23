@@ -36,7 +36,7 @@ void loop() {
   //algoritmo do meu mano calman
   c = c + RS;
   g = c/(c+RM);
-  filtrocalman = filtrocalman + g*(apogeu - filtrocalman);
+  filtrocalman = filtrocalman + g*(alturatarada - filtrocalman);
   c = (1-g)*c;
   lowpass = (filtrocalman*lowpass_suavizacao) + (lowpass*(1.0-lowpass_suavizacao));
 
