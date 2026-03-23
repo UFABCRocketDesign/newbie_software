@@ -9,6 +9,7 @@ float g = 0;//ganho do filtro
 float filtrocalman = 0;
 float lowpass = 0;
 float lowpass_suavizacao = 0.1;
+float apogeu = 0;
 
 
 Adafruit_BMP085 bmp;
@@ -29,11 +30,13 @@ void setup() {
   
 void loop() {
   float alturatarada = bmp.readAltitude() - alturasoma;
-
+  if (alturatarada > apogeu) {
+    apogeu = alturatarada;
+  }
   //algoritmo do meu mano calman
   c = c + RS;
   g = c/(c+RM);
-  filtrocalman = filtrocalman + g*(alturatarada - filtrocalman);
+  filtrocalman = filtrocalman + g*(apogeu - filtrocalman);
   c = (1-g)*c;
   lowpass = (filtrocalman*lowpass_suavizacao) + (lowpass*(1.0-lowpass_suavizacao));
 
