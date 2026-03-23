@@ -4,6 +4,16 @@ float altitudeInicial; //definiçao da altura inicial
 float altitudeAprox[10]; //definição da altura suave
 float altitudeFiltrado[10]; //definição da altura suave 2
 
+
+
+
+float altitudeMaxima = 0.0;
+bool emQueda = false;
+const float margemQueda = 1.5;
+
+
+
+
 void setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);
@@ -62,6 +72,22 @@ for (int i = 0; i < 9; i++) {
   }
   float altitudeFinal = somaFiltrado / 10;
   Serial.print(altitudeFinal);
+  Serial.print("\t");
+
+
+
+
+if (altitudeFinal > altitudeMaxima) {
+    altitudeMaxima = altitudeFinal;
+}
+if (!emQueda && altitudeFinal < (altitudeMaxima - margemQueda)) {
+    if (altitudeMaxima > 5.0) {
+      emQueda = true;
+    }
+  }
+  Serial.print(emQueda); 
+
+
 
   Serial.print("\t");
   Serial.println();
