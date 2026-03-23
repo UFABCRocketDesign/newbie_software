@@ -1,18 +1,20 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
+// --- Variáveis para ajuste de altura ---
 float altitudeInicial; //definiçao da altura inicial
 float altitudeAprox[10]; //definição da altura suave
 float altitudeFiltrado[10]; //definição da altura suave 2
-
-
-
-
+// --- Variáveis para detecção de queda ---
 float altitudeMaxima = 0.0;
 bool emQueda = false;
 const float margemQueda = 1.5;
-
 int contadorQueda = 0;                 
 const int confirmacoesNecessarias = 5; 
+
+// --- Constante SD
+#include <SPI.h>
+#include <SD.h>
+const int chipSelect = 53;
 
 void setup() {
 
@@ -23,7 +25,21 @@ void setup() {
 	while (1) {}
   }
 
+  // -- Inicialização do SD
+Serial.print("Initializing SD card...");
 
+  if (!SD.begin(chipSelect)) {
+    Serial.println("initialization failed. Things to check:");
+    Serial.println("1. is a card inserted?");
+    Serial.println("2. is your wiring correct?");
+    Serial.println("3. did you change the chipSelect pin to match your shield or module?");
+    Serial.println("Note: press reset button on the board and reopen this Serial Monitor after fixing your issue!");
+    while (true);
+  }
+Serial.println("initialization done.");
+}
+
+// Calibração do referencial zero
 float soma = 0;
   for (int i = 0; i < 10; i++) {
     soma += bmp.readAltitude();
@@ -38,18 +54,15 @@ void loop() {
   Serial.print("\t");
   Serial.print(bmp.readPressure());
   Serial.print("\t");
-  Serial.print(bmp.readAltitude());
-  Serial.print("\t");
-  Serial.print(bmp.readSealevelPressure());
-  Serial.print("\t");
 
 
-    //definição da altura relativa = 0
+
+    //definição da altura = 0
     float altura = bmp.readAltitude() - altitudeInicial; 
     Serial.print(altura);
     Serial.print("\t"); 
 
-
+// --- Primeiro Filtro (Média Móvel Simples) ---
   for (int i = 0; i < 9; i++) {
     altitudeAprox[i] = altitudeAprox[i + 1];
   }
@@ -61,7 +74,7 @@ void loop() {
   float altitudeSuave = somaAprox / 10;
   Serial.print(altitudeSuave);
   Serial.print("\t");
-
+// --- Segundo Filtro (Cascata) ---
 for (int i = 0; i < 9; i++) {
     altitudeFiltrado[i] = altitudeFiltrado[i + 1];
   }
@@ -73,10 +86,7 @@ for (int i = 0; i < 9; i++) {
   float altitudeFinal = somaFiltrado / 10;
   Serial.print(altitudeFinal);
   Serial.print("\t");
-
-
-
-
+// --- LÓGICA DE DETECÇÃO DE QUEDA COM MÚLTIPLAS CONFIRMAÇÕES ---
 if (altitudeFinal > altitudeMaxima) {
     altitudeMaxima = altitudeFinal;
 }
@@ -86,6 +96,21 @@ if (!emQueda && altitudeFinal < (altitudeMaxima - margemQueda)) {
               emQueda = true;
           }
 }
+
+// --- Salvar Dados no SD ---
+File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  if (dataFile) {
+    dataFile.println(dataString);
+    dataFile.close();
+    Serial.println(dataString);
+  }
+  else {
+    Serial.println("error opening datalog.txt");
+  }
+}
+
+
+
 Serial.print(contadorQueda);
 Serial.print("\t");
   Serial.print(emQueda); 
