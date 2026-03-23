@@ -103,6 +103,7 @@ if (!emQueda && altitudeFinal < (altitudeMaxima - margemQueda)) {
 Serial.print(contadorQueda);
 Serial.print("\t");
   Serial.print(emQueda); 
+  
 
 // --- Salvar Dados no SD ---
 File dataFile = SD.open("datalog.txt", FILE_WRITE);
@@ -110,6 +111,22 @@ File dataFile = SD.open("datalog.txt", FILE_WRITE);
     dataFile.println(dataString);
     dataFile.close();
     Serial.println(dataString);
+
+    Serial.print(bmp.readTemperature());
+    Serial.print("\t");
+    Serial.print(bmp.readPressure());
+    Serial.print("\t");
+    Serial.print(altura);
+    Serial.print("\t");
+    Serial.print(altitudeSuave);
+    Serial.print("\t");
+    Serial.print(altitudeFinal);
+    Serial.print("\t");
+    Serial.print(contadorQueda);
+    Serial.print("\t");
+    Serial.print(emQueda);
+    Serial.print("\t");
+  
   }
   else {
     Serial.println("error opening datalog.txt");
