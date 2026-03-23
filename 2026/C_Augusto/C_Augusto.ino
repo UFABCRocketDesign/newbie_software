@@ -2,10 +2,10 @@
 float altura0;
 float alturasoma = 0;
 float alturatarada;
-float RS = 0.5; //ruido fisico
-float RM = 0.9; //ruido da medicao
-float c = 1; //confiança do filtro
-float g = 0.3;//ganho do filtro
+float RS = 0.05; //ruido fisico
+float RM = 0.3; //ruido da medicao
+float c = 1.0; //confiança do filtro
+float g = 0;//ganho do filtro
 float filtrocalman = 0;
 
 Adafruit_BMP085 bmp;
@@ -30,7 +30,7 @@ void loop() {
   //algoritmo do meu mano calman
   c = c + RS;
   g = c/(c+RM);
-  filtrocalman = alturatarada - g*(alturatarada);
+  filtrocalman = filtrocalman + g*(alturatarada - filtrocalman);
   c = (1-g)*c;
 
 
