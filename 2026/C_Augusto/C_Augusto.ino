@@ -21,7 +21,7 @@ void setup() {
 	Serial.println("bmp nao encontrado, verifique as conexoes");
 	while (1) {}
   }
-  Serial.println("Temperatura   |   Pressao   |   Altitude    |   Filtro    ");
+  Serial.println("Temperatura   |   Pressao   |   Altitude    |   Filtro    |   Apogeu    ");
   for(int i = 0; i < 9; i++){
     alturasoma += bmp.readAltitude();
   }
@@ -48,5 +48,7 @@ void loop() {
     Serial.print(alturatarada);
     Serial.print("\t");
     Serial.print(lowpass);
+    Serial.print("\t");
+    Serial.print(apogeu);
     Serial.println();
 }
