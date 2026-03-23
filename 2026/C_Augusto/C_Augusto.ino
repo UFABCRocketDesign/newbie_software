@@ -7,6 +7,9 @@ float RM = 0.3; //ruido da medicao
 float c = 1.0; //confiança do filtro
 float g = 0;//ganho do filtro
 float filtrocalman = 0;
+float lowpass = 0;
+float lowpass_suavizacao = 0.1;
+
 
 Adafruit_BMP085 bmp;
   
@@ -32,6 +35,7 @@ void loop() {
   g = c/(c+RM);
   filtrocalman = filtrocalman + g*(alturatarada - filtrocalman);
   c = (1-g)*c;
+  lowpass = (filtrocalman*lowpass_suavizacao) + (lowpass*(1.0-lowpass_suavizacao));
 
 
     Serial.print(bmp.readTemperature());
@@ -40,6 +44,6 @@ void loop() {
     Serial.print("\t");
     Serial.print(alturatarada);
     Serial.print("\t");
-    Serial.print(filtrocalman);
+    Serial.print(lowpass);
     Serial.println();
 }
