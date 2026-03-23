@@ -82,9 +82,9 @@ if (altitudeFinal > altitudeMaxima) {
 }
 if (!emQueda && altitudeFinal < (altitudeMaxima - margemQueda)) {
     //if (altitudeMaxima > 5.0) {
-      //emQueda = true;
+      emQueda = true;
     }
-  }
+  
   Serial.print(emQueda); 
 
 
