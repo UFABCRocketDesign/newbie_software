@@ -176,6 +176,19 @@ float filtro2(float output_filtro1){
 
   return altura_filtrada2_interna;
 }
+
+bool detec_queda(float output_filtro2){
+    if (output_filtro2 < alturapassada) {  //Comparação da altura atual pós-filtros com a altura anterior ("alturapassada")
+    detectorqueda += 1;
+  } else {
+    detectorqueda = 0;
+  }
+  if (detectorqueda >= 10) {
+    queda = true;
+  }
+  alturapassada = output_filtro2;  //Armazenamento da altura atual para usar como "alturapassada" no próximo loop
+  return queda;
+}
 #endif
 
 void setup(){
@@ -452,7 +465,7 @@ int32_t pressao = bmp.readPressure();
 float leitura_altitude = bmp.readAltitude() - tara;
 float altura_filtrada = filtro1(leitura_altitude);
 float altura_filtrada2 = filtro2(altura_filtrada);
-
+detec_queda(altura_filtrada2);
 //   vetor[guia] = bmp.readAltitude() - tara;  //setup do filtro 1
 //   if (guia < tamanho - 1) {
 //     guia += 1;
@@ -480,16 +493,16 @@ float altura_filtrada2 = filtro2(altura_filtrada);
   // }
   // altura_filtrada2 /= tamanho;  //output do filtro 2
 
-  /*------DETECÇÃO DE QUEDA------*/
-  if (altura_filtrada2 < alturapassada) {  //Comparação da altura atual pós-filtros com a altura anterior ("alturapassada")
-    detectorqueda += 1;
-  } else {
-    detectorqueda = 0;
-  }
-  if (detectorqueda >= 10) {
-    queda = true;
-  }
-  alturapassada = altura_filtrada2;  //Armazenamento da altura atual para usar como "alturapassada" no próximo loop
+  // /*------DETECÇÃO DE QUEDA------*/
+  // if (altura_filtrada2 < alturapassada) {  //Comparação da altura atual pós-filtros com a altura anterior ("alturapassada")
+  //   detectorqueda += 1;
+  // } else {
+  //   detectorqueda = 0;
+  // }
+  // if (detectorqueda >= 10) {
+  //   queda = true;
+  // }
+  // alturapassada = altura_filtrada2;  //Armazenamento da altura atual para usar como "alturapassada" no próximo loop
 #endif                               //Altura BMP
 
 
