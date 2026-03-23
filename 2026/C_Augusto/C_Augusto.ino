@@ -30,9 +30,7 @@ void setup() {
   
 void loop() {
   float alturatarada = bmp.readAltitude() - alturasoma;
-  if (alturatarada > apogeu) {
-    apogeu = alturatarada;
-  }
+
   //algoritmo do meu mano calman
   c = c + RS;
   g = c/(c+RM);
@@ -40,6 +38,9 @@ void loop() {
   c = (1-g)*c;
   lowpass = (filtrocalman*lowpass_suavizacao) + (lowpass*(1.0-lowpass_suavizacao));
 
+if (lowpass > apogeu) {
+  apogeu = lowpass;
+}
 
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
