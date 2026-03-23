@@ -1,37 +1,51 @@
-/*
-  Blink
+#include <Adafruit_BMP085.h>
 
-  Turns an LED on for one second, then off for one second, repeatedly.
-
-  Most Arduinos have an on-board LED you can control. On the UNO, MEGA and ZERO
-  it is attached to digital pin 13, on MKR1000 on pin 6. LED_BUILTIN is set to
-  the correct LED pin independent of which board is used.
-  If you want to know what pin the on-board LED is connected to on your Arduino
-  model, check the Technical Specs of your board at:
-  https://docs.arduino.cc/hardware/
-
-  modified 8 May 2014
-  by Scott Fitzgerald
-  modified 2 Sep 2016
-  by Arturo Guadalupi
-  modified 8 Sep 2016
-  by Colby Newman
-
-  This example code is in the public domain.
-
-  https://docs.arduino.cc/built-in-examples/basics/Blink/
-*/
-
-// the setup function runs once when you press reset or power the board
+Adafruit_BMP085 bmp;
+  
 void setup() {
-  // initialize digital pin LED_BUILTIN as an output.
-  pinMode(LED_BUILTIN, OUTPUT);
-}
+  // --- PARTE 1: Configuração do Sensor ---
+  Serial.begin(115200); // Inicia a comunicação com o PC
+  
+  if (!bmp.begin()) {
+    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+    while (1) {} // Se o sensor não for achado, o código trava aqui
+  }
 
-// the loop function runs over and over again forever
+  // --- PARTE 2: Configuração do LED ---
+  pinMode(LED_BUILTIN, OUTPUT); // Avisa que o pino do LED vai enviar energia (saída)
+}
+  
 void loop() {
-  digitalWrite(LED_BUILTIN, HIGH);  // change state of the LED by setting the pin to the HIGH voltage level
-  delay(500);                      // wait for a second
-  digitalWrite(LED_BUILTIN, LOW);   // change state of the LED by setting the pin to the LOW voltage level
-  delay(500);                      // wait for a second
+  // 1. Liga o LED para indicar que está fazendo a leitura
+  digitalWrite(LED_BUILTIN, HIGH);  
+
+  // 2. Faz as leituras do sensor e joga na tela (Monitor Serial)
+  Serial.print("Temperature = ");
+  Serial.print(bmp.readTemperature());
+  Serial.println(" *C");
+  
+  Serial.print("Pressure = ");
+  Serial.print(bmp.readPressure());
+  Serial.println(" Pa");
+  
+  Serial.print("Altitude = ");
+  Serial.print(bmp.readAltitude());
+  Serial.println(" meters");
+
+  Serial.print("Pressure at sealevel (calculated) = ");
+  Serial.print(bmp.readSealevelPressure());
+  Serial.println(" Pa");
+
+  Serial.print("Real altitude = ");
+  Serial.print(bmp.readAltitude(101500));
+  Serial.println(" meters");
+  
+  Serial.println(); // Pula uma linha no monitor serial pra ficar fácil de ler
+
+  // 3. Mantém o LED aceso e espera 500 milissegundos (meio segundo)
+  delay(500);
+
+  // 4. Apaga o LED e espera mais 500 milissegundos antes de recomeçar
+  digitalWrite(LED_BUILTIN, LOW);  
+  delay(100); 
 }
