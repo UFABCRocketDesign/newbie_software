@@ -7,9 +7,6 @@ Adafruit_BMP085 bmp;
 float altitudeInicial;
 const int medicoes = 30; // numero de leituras para calibragem
 
-//config filtro EMA
-//float alturaFiltradaEMA = 0; // valor filtrado
-//const float alpha = 0.1;   // fator de suavização
 
 //config filtro SMA 1 
 const int tamanhoJanela = 10; // quantidade de leituras para media
@@ -24,6 +21,13 @@ float leituras2[tamanhoJanela2];
 int indice2 = 0;
 float somaSMA2 = 0;
 float alturaFinal = 0;
+
+//variaveis para deteccao de queda
+float alturaMaxima = 0.0;
+bool quedaDetectada = false; // muda para true ao detectar queda
+int contadorQueda = 0;
+const float margemQueda = 1.0; // o foguete precisa cair 1 metro para confirmar
+const int confirmacoesNecessarias = 5; // precisa confirmar a queda 5 vezes seguidas
 
 
 void setup() {
@@ -40,9 +44,6 @@ void setup() {
     soma += bmp.readAltitude();
   }
   altitudeInicial = soma / medicoes; // altura 0
-  
-  // inicializa o filtro EMA com o valor zero
-  //alturaFiltradaEMA = 0;
 
   // inicializa os vetores dos filtros SMA com zeros
   for (int i = 0; i < tamanhoJanela; i++) leituras[i] = 0;
@@ -50,7 +51,7 @@ void setup() {
 
 
   //CABECALHO
-  Serial.println("Temp(C)\tPressao(Pa)\tAlturaBruta(m)\tAlturaFiltradaSMA(m)\tAlturaFinal(m)");
+  Serial.println("Temp(C)\tPressao(Pa)\tBruta(m)\tSMA1(m)\tFinal(m)\tMax(m)\tEstado");
 }
 
 void loop() {
@@ -58,20 +59,12 @@ void loop() {
   float altitudeAtual = bmp.readAltitude();
   float alturaBruta = altitudeAtual - altitudeInicial;
 
-  // filtro EMA (media movel exponencial)
-  // alturaFiltrada recebe 10% da leitura nova e mantém 90% da anterior
-  //alturaFiltradaEMA = (alpha * alturaBruta) + (1.0 - alpha) * alturaFiltradaEMA;
-
   //filtro SMA 1 (media movel simples) 
   somaSMA -= leituras[indice];
   leituras[indice] = alturaBruta;
   somaSMA += leituras[indice]; 
   indice++; 
-  
-  if (indice >= tamanhoJanela) { // 5 - se chegar no fim do array, volta ao início
-    indice = 0;
-  }
-  
+  if (indice >= tamanhoJanela) indice = 0;
   alturaFiltradaSMA = somaSMA / tamanhoJanela;
 
   //segundo filtro SMA (refinamento)
@@ -79,19 +72,38 @@ void loop() {
   leituras2[indice2] = alturaFiltradaSMA;
   somaSMA2 += leituras2[indice2]; 
   indice2++; 
-  
-  if (indice2 >= tamanhoJanela2) {
-    indice2 = 0;
-  }
-  
+  if (indice2 >= tamanhoJanela2) indice2 = 0;
   alturaFinal = somaSMA2 / tamanhoJanela2;
 
+  // LOGICA PARA DETECCAO DE QUEDA
 
+  //1. atualiza record de altura
+  if (alturaFinal > alturaMaxima) {
+    alturaMaxima = alturaFinal;
+    contadorQueda = 0; //zera contador pois ainda está subindo
+  }
 
-  Serial.print(bmp.readTemperature());
+  // 2. verifica de o foguete comecou a cair (caso queda nao detectada)
+  if (!quedaDetectada) {
+    // se altura menor do que altura max - margem de seguranca estipulada
+    if (alturaFinal < (alturaMaxima - margemQueda)) {
+      contadorQueda++; // confirma uma leitura de queda
+
+      // 3. caso confirmacoes suficientes
+      if (contadorQueda >= confirmacoesNecessarias) {
+        quedaDetectada = true;
+        }
+    } else {
+      // zera o contador caso oscile para cima
+      contadorQueda = 0; 
+    }
+  }
+
+  //SAIDA DE DADOS
+  Serial.print(bmp.readTemperature()); //temperatura
   Serial.print("\t");
 
-  Serial.print(bmp.readPressure());
+  Serial.print(bmp.readPressure()); //pressao
   Serial.print("\t");
 
   Serial.print(alturaBruta);
@@ -100,5 +112,16 @@ void loop() {
   Serial.print(alturaFiltradaSMA);
   Serial.print("\t");
 
-  Serial.println(alturaFinal);
+  Serial.print(alturaFinal);
+  Serial.print("\t");
+
+  Serial.print(alturaMaxima);
+  Serial.print("\t");
+
+  //estado
+  if (quedaDetectada){
+    Serial.println("QUEDA_DETECTADA");
+  } else {
+    Serial.println("SUBINDO");
+  }
 }
