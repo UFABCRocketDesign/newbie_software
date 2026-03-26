@@ -16,6 +16,7 @@ const int confirmacoesNecessarias = 5;
 #include <SD.h>
 const int chipSelect = 53;
 
+
 void setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);
@@ -50,13 +51,11 @@ float soma = 0;
 }
 
 void loop() {
-
-// sd
-String dataString = "";
-
-  Serial.print(bmp.readTemperature());
+ float Temperatura = bmp.readTemperature();
+ float Pressao = bmp.readPressure();
+  Serial.print(Temperatura);
   Serial.print("\t");
-  Serial.print(bmp.readPressure());
+  Serial.print(Pressao);
   Serial.print("\t");
 
 
@@ -105,28 +104,28 @@ Serial.print("\t");
   Serial.print(emQueda); 
   
 
+
+
+
+// sd
+String dataString = "";
+
+  for (int analogPin = 0; analogPin < 3; analogPin++) {
+    int sensor = analogRead(analogPin);
+    dataString += String(Temperatura) + "/t";
+    dataString += String(Pressao) + "/t";
+    dataString += String(altura) + "/t";
+    dataString += String(altitudeSuave) + "/t";
+    dataString += String(contadorQueda) + "/t";
+    dataString += String(emQueda) + "/t";
+  }
+
 // --- Salvar Dados no SD ---
 File dataFile = SD.open("datalog.txt", FILE_WRITE);
   if (dataFile) {
     dataFile.println(dataString);
     dataFile.close();
-    Serial.println(dataString);
-
-    Serial.print(bmp.readTemperature());
-    Serial.print("\t");
-    Serial.print(bmp.readPressure());
-    Serial.print("\t");
-    Serial.print(altura);
-    Serial.print("\t");
-    Serial.print(altitudeSuave);
-    Serial.print("\t");
-    Serial.print(altitudeFinal);
-    Serial.print("\t");
-    Serial.print(contadorQueda);
-    Serial.print("\t");
-    Serial.print(emQueda);
-    Serial.print("\t");
-  
+    Serial.println(dataString);  
   }
   else {
     Serial.println("error opening datalog.txt");
