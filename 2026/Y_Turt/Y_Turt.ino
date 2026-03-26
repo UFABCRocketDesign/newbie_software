@@ -37,6 +37,7 @@ Serial.print("Initializing SD card...");
     Serial.println("Note: press reset button on the board and reopen this Serial Monitor after fixing your issue!");
     while (true);
   }
+  
 Serial.println("initialization done.");
 
 
@@ -46,8 +47,10 @@ float soma = 0;
     soma += bmp.readAltitude();
   }
   altitudeInicial = soma/10; //definição da altura inicial
-  
-  Serial.println("*C\tPa\tmeters\tPa\tmeters");
+
+  String cabecalhoString = "";
+    cabecalhoString += String("*C\tPa\tmeters\tPa\tmeters\tmeters\tmeters\t(0-5)\t(0/1)") + "\t";
+  Serial.println(cabecalhoString);
 }
 
 void loop() {
@@ -114,20 +117,20 @@ File dataFile = SD.open("datalog.txt", FILE_WRITE);
   }
 
 
-  Serial.print(Temperatura);
-  Serial.print("\t");
-  Serial.print(Pressao);
-  Serial.print("\t");
-  Serial.print(altura);
-  Serial.print("\t"); 
-  Serial.print(altitudeSuave);
-  Serial.print("\t");
-  Serial.print(altitudeFinal);
-  Serial.print("\t");
-  Serial.print(contadorQueda);
-  Serial.print("\t");
-  Serial.print(emQueda); 
-  Serial.print("\t");
+  //Serial.print(Temperatura);//*C
+  //Serial.print("\t");
+  //Serial.print(Pressao);//Pa
+  //Serial.print("\t");
+  //Serial.print(altura);//meters
+  //Serial.print("\t"); 
+  //Serial.print(altitudeSuave);//meters
+  //Serial.print("\t");
+  //Serial.print(altitudeFinal);//meters
+  //Serial.print("\t");
+  //Serial.print(contadorQueda);//0-5
+  //Serial.print("\t");
+  //Serial.print(emQueda);//0/1
+  //Serial.print("\t");
   Serial.println(dataString);  
   Serial.print("\t");
   Serial.println();
