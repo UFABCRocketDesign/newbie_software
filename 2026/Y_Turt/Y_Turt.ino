@@ -10,11 +10,15 @@ bool emQueda = false;
 const float margemQueda = 1.5;
 int contadorQueda = 0;
 const int confirmacoesNecessarias = 5;
+//Nome do Arquivo SD
+String baseNome = "YBT";
+String nomeFile = "";
+
 
 // --- Constante SD
 #include <SPI.h>
 #include <SD.h>
-const int chipSelect = 53;
+  const int chipSelect = 53;
 
 
 void setup() {
@@ -49,11 +53,20 @@ void setup() {
   }
   altitudeInicial = soma / 10;  //definição da altura inicial
 
+  //Definicao arquivo SD
+  int i = 0;
+  do {
+    i++;
+    nomeFile = baseNome + String(i) + ".txt";
+  } while (SD.exists(nomeFile));
+
+
+  //Cabecalho SD
   String cabecalhoString = "";
-  cabecalhoString += String("*C\tPa\tmeters\tPa\tmeters\tmeters\tmeters\t(0-5)\t(0/1)") + "\t";
+  cabecalhoString += "*C\tPa\tmeters\tPa\tmeters\tmeters\tmeters\t(0-5)\t(0/1)";
   Serial.println(cabecalhoString);
 
-  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  File dataFile = SD.open(nomeFile, FILE_WRITE);
   if (dataFile) {
     dataFile.println(cabecalhoString);
     dataFile.close();
@@ -116,7 +129,7 @@ void loop() {
 
 
   // --- Salvar Dados no SD ---
-  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  File dataFile = SD.open(nomeFile, FILE_WRITE);
   if (dataFile) {
     dataFile.println(dataString);
     dataFile.close();
