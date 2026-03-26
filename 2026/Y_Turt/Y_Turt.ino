@@ -108,7 +108,6 @@ File dataFile = SD.open("datalog.txt", FILE_WRITE);
   if (dataFile) {
     dataFile.println(dataString);
     dataFile.close();
-    Serial.println(dataString);  
   }
   else {
     Serial.println("error opening datalog.txt");
@@ -128,6 +127,8 @@ File dataFile = SD.open("datalog.txt", FILE_WRITE);
   Serial.print(contadorQueda);
   Serial.print("\t");
   Serial.print(emQueda); 
+  Serial.print("\t");
+  Serial.println(dataString);  
   Serial.print("\t");
   Serial.println();
 }
