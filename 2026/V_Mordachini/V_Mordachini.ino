@@ -118,10 +118,6 @@ void loop() {
   Serial.print(alturaMaxima);
   Serial.print("\t");
 
-  //estado
-  if (quedaDetectada){
-    Serial.println("QUEDA_DETECTADA");
-  } else {
-    Serial.println("SUBINDO");
-  }
+  Serial.print(quedaDetectada);
+  Serial.println("");
 }
