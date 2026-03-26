@@ -57,7 +57,10 @@ void setup() {
   int i = 0;
   do {
     i++;
-    nomeFile = baseNome + String(i) + ".txt";
+    String numeroNome = String(i);
+    int numeroZeros = 8 - (numeroNome.length() + baseNome.length());
+    String zerosNome = String(numeroZeros);
+    nomeFile = baseNome + zerosNome +numeroNome + ".txt";
   } while (SD.exists(nomeFile));
 
 
@@ -68,6 +71,7 @@ void setup() {
 
   File dataFile = SD.open(nomeFile, FILE_WRITE);
   if (dataFile) {
+    dataFile.println(nomeFile);
     dataFile.println(cabecalhoString);
     dataFile.close();
   } else {
