@@ -18,7 +18,7 @@ String nomeFile = "";
 // --- Constante SD
 #include <SPI.h>
 #include <SD.h>
-  const int chipSelect = 53;
+const int chipSelect = 53;
 
 
 void setup() {
@@ -60,9 +60,9 @@ void setup() {
     String numeroNome = String(i);
     int numeroZeros = 8 - (numeroNome.length() + baseNome.length());
     String zerosNome = String(numeroZeros);
-    nomeFile = baseNome + zerosNome +numeroNome + ".txt";
+    nomeFile = baseNome + zerosNome + numeroNome + ".txt";
   } while (SD.exists(nomeFile));
-
+  Serial.print(nomeFile);
 
   //Cabecalho SD
   String cabecalhoString = "";
@@ -71,7 +71,6 @@ void setup() {
 
   File dataFile = SD.open(nomeFile, FILE_WRITE);
   if (dataFile) {
-    dataFile.println(nomeFile);
     dataFile.println(cabecalhoString);
     dataFile.close();
   } else {
