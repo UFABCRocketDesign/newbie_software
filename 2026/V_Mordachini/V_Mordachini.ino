@@ -28,7 +28,7 @@ const float margemEmergencia = 10.0; // margem de seguranca para abrir paraqueda
 
 float alturaAnterior = 0.0;
 int contadorQuedaPares = 0;
-const int confirmacoesNecessarias = 10; // precisa confirmar a queda 5 vezes seguidas
+const int confirmacoesNecessarias = 20; // precisa confirmar a queda 20 vezes seguidas
 
 void setup() {
   Serial.begin(115200);
