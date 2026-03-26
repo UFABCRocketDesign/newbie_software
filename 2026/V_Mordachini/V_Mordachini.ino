@@ -24,7 +24,7 @@ float alturaFinal = 0;
 // variaveis para deteccao de queda
 float alturaMaxima = 0.0;
 bool quedaDetectada = false; // muda para true ao detectar queda
-const float margemQueda = 1.0; // o foguete precisa cair 1 metro para confirmar
+const float margemEmergencia = 10.0; // margem de seguranca para abrir paraquedas
 
 float alturaAnterior = 0.0;
 int contadorQuedaPares = 0;
@@ -81,31 +81,32 @@ void loop() {
     alturaMaxima = alturaFinal;
   }
 
-  // 2. verifica de o foguete comecou a cair (caso queda nao detectada)
+  // 2. verifica se o foguete comecou a cair (caso queda nao detectada)
   if (!quedaDetectada) {
-    // se altura menor do que altura max - margem de seguranca estipulada
-    if (alturaFinal < (alturaMaxima - margemQueda)) {
+    
+    // SISTEMA PRIMARIO: Tendência de Queda (Pares)
+    if (alturaFinal < alturaAnterior) {
+      contadorQuedaPares++;
 
-      // verifica tendencia de queda (analise de pares)
-      if (alturaFinal < alturaAnterior) {
-        contadorQuedaPares++;
-
-        // 3. caso confirmacoes suficientes
-        if (contadorQuedaPares >= confirmacoesNecessarias) {
-          quedaDetectada = true;
-        }
-
-      } else {
-        // zera o contador caso a altura se mantenha ou suba
-        contadorQuedaPares = 0;
+      if (contadorQuedaPares >= confirmacoesNecessarias) {
+        quedaDetectada = true;
       }
-
-      // salva a altura de agora para comparar no prox ciclo
-      alturaAnterior = alturaFinal;
+    } else {
+      // zera o contador caso a altura se mantenha ou suba
+      contadorQuedaPares = 0; 
     }
+
+    // SISTEMA DE EMERGENCIA: Margem Absoluta
+    // se a altura despencar alem da margem, aciona independente dos pares
+    if (alturaFinal < (alturaMaxima - margemEmergencia)) {
+      quedaDetectada = true;
+    }
+
+    // salva a altura de agora para comparar no prox ciclo
+    alturaAnterior = alturaFinal;
   }
 
-  // SAIDA DE DADOS
+  // ---- SAIDA DE DADOS ----
   Serial.print(bmp.readTemperature()); // temperatura
   Serial.print("\t");
 
