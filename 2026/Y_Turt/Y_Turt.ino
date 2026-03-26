@@ -1,15 +1,15 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 // --- Variáveis para ajuste de altura ---
-float altitudeInicial; //definiçao da altura inicial
-float altitudeAprox[10]; //definição da altura suave
-float altitudeFiltrado[10]; //definição da altura suave 2
+float altitudeInicial;       //definiçao da altura inicial
+float altitudeAprox[10];     //definição da altura suave
+float altitudeFiltrado[10];  //definição da altura suave 2
 // --- Variáveis para detecção de queda ---
 float altitudeMaxima = 0.0;
 bool emQueda = false;
 const float margemQueda = 1.5;
-int contadorQueda = 0;                 
-const int confirmacoesNecessarias = 5; 
+int contadorQueda = 0;
+const int confirmacoesNecessarias = 5;
 
 // --- Constante SD
 #include <SPI.h>
@@ -22,12 +22,12 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
   if (!bmp.begin()) {
-	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-	while (1) {}
+    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+    while (1) {}
   }
 
   // -- Inicialização do SD
-Serial.print("Initializing SD card...");
+  Serial.print("Initializing SD card...");
 
   if (!SD.begin(chipSelect)) {
     Serial.println("initialization failed. Things to check:");
@@ -35,34 +35,43 @@ Serial.print("Initializing SD card...");
     Serial.println("2. is your wiring correct?");
     Serial.println("3. did you change the chipSelect pin to match your shield or module?");
     Serial.println("Note: press reset button on the board and reopen this Serial Monitor after fixing your issue!");
-    while (true);
+    while (true)
+      ;
   }
-  
-Serial.println("initialization done.");
+
+  Serial.println("initialization done.");
 
 
-// Calibração do referencial zero
-float soma = 0;
+  // Calibração do referencial zero
+  float soma = 0;
   for (int i = 0; i < 10; i++) {
     soma += bmp.readAltitude();
   }
-  altitudeInicial = soma/10; //definição da altura inicial
+  altitudeInicial = soma / 10;  //definição da altura inicial
 
   String cabecalhoString = "";
-    cabecalhoString += String("*C\tPa\tmeters\tPa\tmeters\tmeters\tmeters\t(0-5)\t(0/1)") + "\t";
+  cabecalhoString += String("*C\tPa\tmeters\tPa\tmeters\tmeters\tmeters\t(0-5)\t(0/1)") + "\t";
   Serial.println(cabecalhoString);
+
+  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  if (dataFile) {
+    dataFile.println(cabecalhoString);
+    dataFile.close();
+  } else {
+    Serial.println("error opening datalog.txt");
+  }
 }
 
 void loop() {
 
- float Temperatura = bmp.readTemperature();
- float Pressao = bmp.readPressure();
+  float Temperatura = bmp.readTemperature();
+  float Pressao = bmp.readPressure();
 
- //definição da altura = 0
- float altura = bmp.readAltitude() - altitudeInicial; 
-    
+  //definição da altura = 0
+  float altura = bmp.readAltitude() - altitudeInicial;
 
-// --- Primeiro Filtro (Média Móvel Simples) ---
+
+  // --- Primeiro Filtro (Média Móvel Simples) ---
   for (int i = 0; i < 9; i++) {
     altitudeAprox[i] = altitudeAprox[i + 1];
   }
@@ -72,9 +81,9 @@ void loop() {
     somaAprox += altitudeAprox[i];
   }
   float altitudeSuave = somaAprox / 10;
-  
-// --- Segundo Filtro (Cascata) ---
-for (int i = 0; i < 9; i++) {
+
+  // --- Segundo Filtro (Cascata) ---
+  for (int i = 0; i < 9; i++) {
     altitudeFiltrado[i] = altitudeFiltrado[i + 1];
   }
   altitudeFiltrado[9] = altitudeSuave;
@@ -85,19 +94,19 @@ for (int i = 0; i < 9; i++) {
   float altitudeFinal = somaFiltrado / 10;
 
 
-// --- LÓGICA DE DETECÇÃO DE QUEDA COM MÚLTIPLAS CONFIRMAÇÕES ---
-if (altitudeFinal > altitudeMaxima) {
+  // --- LÓGICA DE DETECÇÃO DE QUEDA COM MÚLTIPLAS CONFIRMAÇÕES ---
+  if (altitudeFinal > altitudeMaxima) {
     altitudeMaxima = altitudeFinal;
-}
-if (!emQueda && altitudeFinal < (altitudeMaxima - margemQueda)) {
-    contadorQueda += 1; 
-          if (contadorQueda >= confirmacoesNecessarias) {
-              emQueda = true;
-          }
-}
+  }
+  if (!emQueda && altitudeFinal < (altitudeMaxima - margemQueda)) {
+    contadorQueda += 1;
+    if (contadorQueda >= confirmacoesNecessarias) {
+      emQueda = true;
+    }
+  }
 
-// sd
-String dataString = "";
+  // sd
+  String dataString = "";
   dataString += String(Temperatura) + "\t";
   dataString += String(Pressao) + "\t";
   dataString += String(altura) + "\t";
@@ -106,13 +115,12 @@ String dataString = "";
   dataString += String(emQueda) + "\t";
 
 
-// --- Salvar Dados no SD ---
-File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  // --- Salvar Dados no SD ---
+  File dataFile = SD.open("datalog.txt", FILE_WRITE);
   if (dataFile) {
     dataFile.println(dataString);
     dataFile.close();
-  }
-  else {
+  } else {
     Serial.println("error opening datalog.txt");
   }
 
@@ -122,7 +130,7 @@ File dataFile = SD.open("datalog.txt", FILE_WRITE);
   //Serial.print(Pressao);//Pa
   //Serial.print("\t");
   //Serial.print(altura);//meters
-  //Serial.print("\t"); 
+  //Serial.print("\t");
   //Serial.print(altitudeSuave);//meters
   //Serial.print("\t");
   //Serial.print(altitudeFinal);//meters
@@ -131,7 +139,5 @@ File dataFile = SD.open("datalog.txt", FILE_WRITE);
   //Serial.print("\t");
   //Serial.print(emQueda);//0/1
   //Serial.print("\t");
-  Serial.println(dataString);  
-  Serial.print("\t");
-  Serial.println();
+  Serial.println(dataString);
 }
