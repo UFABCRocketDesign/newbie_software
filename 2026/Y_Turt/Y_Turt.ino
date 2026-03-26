@@ -51,19 +51,13 @@ float soma = 0;
 }
 
 void loop() {
+
  float Temperatura = bmp.readTemperature();
  float Pressao = bmp.readPressure();
-  Serial.print(Temperatura);
-  Serial.print("\t");
-  Serial.print(Pressao);
-  Serial.print("\t");
 
-
-
-    //definição da altura = 0
-    float altura = bmp.readAltitude() - altitudeInicial; 
-    Serial.print(altura);
-    Serial.print("\t"); 
+ //definição da altura = 0
+ float altura = bmp.readAltitude() - altitudeInicial; 
+    
 
 // --- Primeiro Filtro (Média Móvel Simples) ---
   for (int i = 0; i < 9; i++) {
@@ -75,8 +69,7 @@ void loop() {
     somaAprox += altitudeAprox[i];
   }
   float altitudeSuave = somaAprox / 10;
-  Serial.print(altitudeSuave);
-  Serial.print("\t");
+  
 // --- Segundo Filtro (Cascata) ---
 for (int i = 0; i < 9; i++) {
     altitudeFiltrado[i] = altitudeFiltrado[i + 1];
@@ -87,8 +80,8 @@ for (int i = 0; i < 9; i++) {
     somaFiltrado += altitudeFiltrado[i];
   }
   float altitudeFinal = somaFiltrado / 10;
-  Serial.print(altitudeFinal);
-  Serial.print("\t");
+
+
 // --- LÓGICA DE DETECÇÃO DE QUEDA COM MÚLTIPLAS CONFIRMAÇÕES ---
 if (altitudeFinal > altitudeMaxima) {
     altitudeMaxima = altitudeFinal;
@@ -99,26 +92,16 @@ if (!emQueda && altitudeFinal < (altitudeMaxima - margemQueda)) {
               emQueda = true;
           }
 }
-Serial.print(contadorQueda);
-Serial.print("\t");
-  Serial.print(emQueda); 
-  
-
-
-
 
 // sd
 String dataString = "";
+  dataString += String(Temperatura) + "\t";
+  dataString += String(Pressao) + "\t";
+  dataString += String(altura) + "\t";
+  dataString += String(altitudeSuave) + "\t";
+  dataString += String(contadorQueda) + "\t";
+  dataString += String(emQueda) + "\t";
 
-  for (int analogPin = 0; analogPin < 3; analogPin++) {
-    int sensor = analogRead(analogPin);
-    dataString += String(Temperatura) + "/t";
-    dataString += String(Pressao) + "/t";
-    dataString += String(altura) + "/t";
-    dataString += String(altitudeSuave) + "/t";
-    dataString += String(contadorQueda) + "/t";
-    dataString += String(emQueda) + "/t";
-  }
 
 // --- Salvar Dados no SD ---
 File dataFile = SD.open("datalog.txt", FILE_WRITE);
@@ -132,6 +115,19 @@ File dataFile = SD.open("datalog.txt", FILE_WRITE);
   }
 
 
+  Serial.print(Temperatura);
+  Serial.print("\t");
+  Serial.print(Pressao);
+  Serial.print("\t");
+  Serial.print(altura);
+  Serial.print("\t"); 
+  Serial.print(altitudeSuave);
+  Serial.print("\t");
+  Serial.print(altitudeFinal);
+  Serial.print("\t");
+  Serial.print(contadorQueda);
+  Serial.print("\t");
+  Serial.print(emQueda); 
   Serial.print("\t");
   Serial.println();
 }
