@@ -29,7 +29,6 @@ const float margemEmergencia = 10.0; // margem de seguranca para abrir paraqueda
 float alturaAnterior = 0.0;
 int contadorQuedaPares = 0;
 const int confirmacoesNecessarias = 30;
-const float toleranciaPares = 0.02; // tolerancia de 2 centímetros (0.02m) por leitura
 
 void setup() {
   Serial.begin(115200);
@@ -86,7 +85,7 @@ void loop() {
   if (!quedaDetectada) {
     
     // SISTEMA PRIMARIO: Tendência de Queda (Pares)
-    if (alturaFinal < alturaAnterior - toleranciaPares) {
+    if (alturaFinal < alturaAnterior) {
       contadorQuedaPares++;
 
       if (contadorQuedaPares >= confirmacoesNecessarias) {
