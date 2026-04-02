@@ -4,7 +4,7 @@ Adafruit_BMP085 bmp;
 
 float altitudeInicial;
 float soma = 0;
-int amostra = 5;
+int amostra = 100;
 
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
@@ -17,8 +17,8 @@ void setup() {
   }
   for (int i = 0; i < amostra; i++) {
     soma += bmp.readAltitude();
-    altitudeInicial = soma / amostra;
   }
+  altitudeInicial = soma / amostra;
   Serial.println("Temperature(*C)\tPressure(Pa)\tAltitude(meters)\tPressure at sealevel (calculated)(Pa)\tReal altitude(meters)");
   }
 
