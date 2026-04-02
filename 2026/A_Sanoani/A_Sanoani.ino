@@ -1,7 +1,7 @@
 #include <Adafruit_BMP085.h>
 
 Adafruit_BMP085 bmp;
-
+float altitudeInicial;
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
   pinMode(LED_BUILTIN, OUTPUT);
@@ -10,18 +10,22 @@ void setup() {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
+  
+  altitudeInicial = bmp.readAltitude();
+  
   Serial.println("Temperature(*C), Pressure(Pa), Altitude(meters), Pressure at sealevel (calculated)(Pa), Real altitude(meters)");
 }
 
 
 void loop() {
+ 
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
 
   Serial.print(bmp.readPressure());
   Serial.print("\t");
 
-  Serial.print(bmp.readAltitude());
+  Serial.print(bmp.readAltitude() - altitudeInicial);
   Serial.print("\t");
 
   Serial.print(bmp.readSealevelPressure());
