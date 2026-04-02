@@ -13,12 +13,19 @@ const int confirmacoesNecessarias = 5;
 //Nome do Arquivo SD
 String baseNome = "YBT";
 String nomeFile = "";
-
-
 // --- Constante SD
 #include <SPI.h>
 #include <SD.h>
 const int chipSelect = 53;
+
+
+#define IGN_1 36 /*act1*/
+#define IGN_2 61 /*act2*/
+#define IGN_3 46 /*act3*/
+#define IGN_4 55 /*act4*/
+const long interval = 1000;
+unsigned long previousMillis = 0;
+int pinState = LOW;
 
 
 void setup() {
@@ -44,7 +51,6 @@ void setup() {
   }
 
   Serial.println("initialization done.");
-
 
   // Calibração do referencial zero
   float soma = 0;
@@ -79,6 +85,7 @@ void setup() {
   } else {
     Serial.println("error opening datalog.txt");
   }
+  pinMode(IGN_1, OUTPUT);
 }
 
 void loop() {
@@ -124,6 +131,23 @@ void loop() {
     }
   }
 
+  unsigned long currentMillis = millis();
+  if (emQueda){
+    if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;
+
+    // if the LED is off turn it on and vice-versa:
+    if (pinState == LOW) {
+      pinState = HIGH;
+    } else {
+      pinState = LOW;
+    }
+
+    // set the LED with the ledState of the variable:
+    digitalWrite(IGN_1, pinState);
+    }
+  }
+  
   // sd
   String dataString = "";
   dataString += String(Temperatura) + "\t";
@@ -132,7 +156,7 @@ void loop() {
   dataString += String(altitudeSuave) + "\t";
   dataString += String(contadorQueda) + "\t";
   dataString += String(emQueda) + "\t";
-
+  dataString += String(pinState) + "\t";
 
   // --- Salvar Dados no SD ---
   File dataFile = SD.open(nomeFile, FILE_WRITE);
@@ -143,20 +167,5 @@ void loop() {
     Serial.println("error opening datalog.txt");
   }
 
-
-  //Serial.print(Temperatura);//*C
-  //Serial.print("\t");
-  //Serial.print(Pressao);//Pa
-  //Serial.print("\t");
-  //Serial.print(altura);//meters
-  //Serial.print("\t");
-  //Serial.print(altitudeSuave);//meters
-  //Serial.print("\t");
-  //Serial.print(altitudeFinal);//meters
-  //Serial.print("\t");
-  //Serial.print(contadorQueda);//0-5
-  //Serial.print("\t");
-  //Serial.print(emQueda);//0/1
-  //Serial.print("\t");
   Serial.println(dataString);
 }
