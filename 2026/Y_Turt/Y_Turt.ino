@@ -59,10 +59,13 @@ void setup() {
     i++;
     String numeroNome = String(i);
     int numeroZeros = 8 - (numeroNome.length() + baseNome.length());
-    String zerosNome = String(numeroZeros);
+    String zerosNome = "";
+    for (int j = 0; j < numeroZeros; j++) {
+      zerosNome += "0";
+    }
     nomeFile = baseNome + zerosNome + numeroNome + ".txt";
   } while (SD.exists(nomeFile));
-  Serial.print(nomeFile);
+  Serial.println(nomeFile);
 
   //Cabecalho SD
   String cabecalhoString = "";
