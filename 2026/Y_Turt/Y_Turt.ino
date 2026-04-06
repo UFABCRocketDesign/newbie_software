@@ -25,21 +25,23 @@ const int chipSelect = 53;
 #define IGN_4 55 /*act4*/
 const long interval1 = 10000;
 unsigned long previousMillis1 = 0;
-int pin1State = LOW;
-bool pin1Iniciado = false;
-bool pin1Concluido = false;
-
+// int pin1State = LOW;
+// bool pin1Iniciado = false;
+// bool pin1Concluido = false;
+int pin1Estado = 0;
 
 
 const long interval2 = 12000;
+const long interTimer = 2000;
 unsigned long previousMillis2 = 0;
 int pin2State = LOW;
 bool pin2Iniciado = false;
 bool pin2Concluido = false;
+unsigned long timerP2 = 0;
 
 
-  void
-  setup() {
+
+void setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
@@ -142,42 +144,45 @@ void loop() {
     }
   }
 
-  unsigned long currentMillis1 = millis();
-  if (emQueda && !pin1Concluido) {
-      // if the LED is off turn it on and vice-versa:
-    if (!pin1Iniciado){
-        pin1State = HIGH;
-         pin1Iniciado = true;
-         previousMillis1 = currentMillis1;
-      }
-    else {
-      if (currentMillis1 - previousMillis1 >= interval1) {
-        pin1State = LOW;
-        pin1Concluido = true;
-      }
 
-      // set the LED with the ledState of the variable:
-      digitalWrite(IGN_1, pin1State);
+
+  unsigned long currentMillis1 = millis();
+  if (emQueda && pin1Estado != 2) {
+    // if the LED is off turn it on and vice-versa:
+    if (pin1Estado == 0) {
+      // pin1State = HIGH;
+      pin1Estado = 1;
+      previousMillis1 = currentMillis1;
+    } else if ((currentMillis1 - previousMillis1 >= interval1) && (pin1Estado == 1)) {
+      //pin1State = LOW;
+      pin1Estado = 2;
     }
+
+    // set the LED with the ledState of the variable:
+
+    digitalWrite(IGN_1, pin1Estado == 1);
   }
 
-unsigned long currentMillis2 = millis();
-if (emQueda && !pin2Concluido) {
-      // if the LED is off turn it on and vice-versa:
-    if (!pin2Iniciado){
+
+
+  unsigned long currentMillis2 = millis();
+  if (emQueda && !pin2Concluido) {
+    // if the LED is off turn it on and vice-versa:
+    if (!pin2Iniciado) {
+      if (currentMillis2 - timerP2 >= interTimer) {
         pin2State = HIGH;
-         pin2Iniciado = true;
-         previousMillis2 = currentMillis2;
+        pin2Iniciado = true;
+        previousMillis2 = currentMillis2;
       }
-    else {
+    } else {
       if (currentMillis2 - previousMillis2 >= interval2) {
         pin2State = LOW;
         pin2Concluido = true;
       }
 
       // set the LED with the ledState of the variable:
-      digitalWrite(IGN_2, pin2State);
     }
+    digitalWrite(IGN_2, pin2State);
   }
 
 
@@ -191,7 +196,7 @@ if (emQueda && !pin2Concluido) {
   dataString += String(altitudeFinal) + "\t";
   dataString += String(contadorQueda) + "\t";
   dataString += String(emQueda) + "\t";
-  dataString += String(pin1State) + "\t";
+  dataString += String(pin1Estado) + "\t";
   dataString += String(pin2State) + "\t";
 
   // --- Salvar Dados no SD ---
