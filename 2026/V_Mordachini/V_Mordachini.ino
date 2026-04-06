@@ -1,7 +1,13 @@
 // Victor :)
 #include <Adafruit_BMP085.h>
+#include <SPI.h>
+#include <SD.h>
 
 Adafruit_BMP085 bmp;
+
+// configuracoes SD
+const int chipSelect = 53;
+String fileName = "voo.txt";
 
 // variaveis de altitude
 float altitudeInicial;
@@ -33,9 +39,23 @@ const int confirmacoesNecessarias = 30;
 void setup() {
   Serial.begin(115200);
 
+  // Inicializa Sensor BMP085
   if (!bmp.begin()) {
-    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+    Serial.println("Checar sensor!");
     while (1) {}
+  }
+
+  // Inicializa Cartao SD
+  if (!SD.begin(chipSelect)) {
+    Serial.println("Checar cartao SD");
+
+  } else {
+    // Cria o cabeçalho no arquivo CSV
+    File dataFile = SD.open(fileName, FILE_WRITE);
+    if (dataFile) {
+      dataFile.println("Temp(C),Pressao(Pa),AltBruta(m),AltFinal(m),Max(m),Queda");
+      dataFile.close();
+    }
   }
 
   // LOGICA DE CALIBRACAO
@@ -54,9 +74,11 @@ void setup() {
 }
 
 void loop() {
-  // leitura bruta
+  // leitura dos sensores 
   float altitudeAtual = bmp.readAltitude();
   float alturaBruta = altitudeAtual - altitudeInicial;
+  float tempAtual = bmp.readTemperature();
+  float pressAtual = bmp.readPressure();
 
   // filtro SMA 1 (media movel simples) 
   somaSMA -= leituras[indice];
@@ -106,17 +128,31 @@ void loop() {
     alturaAnterior = alturaFinal;
   }
 
-  // ---- SAIDA DE DADOS ----
-  Serial.print(bmp.readTemperature()); // temperatura
+  String dataString = String(tempAtual) + ","+
+                      String(pressAtual) + "," +
+                      String(alturaBruta) + "," +
+                      String(alturaFinal) + "," +
+                      String(alturaMaxima) + "," +
+                      String(quedaDetectada ? 1 : 0);
+
+  // GRAVACAO NO SD
+  File dataFile = SD.open(fileName, FILE_WRITE);
+  if (dataFile) {
+    dataFile.println(dataString);
+    dataFile.close();
+  } else {
+    // Se falhar o SD, avisamos no serial, mas o loop continua
+    Serial.println("Erro ao gravar no SD!"); 
+  }
+
+  // ---- SAIDA DE DADOS SERIAL----
+  Serial.print(tempAtual);
   Serial.print("\t");
 
-  Serial.print(bmp.readPressure()); // pressao
+  Serial.print(pressAtual);
   Serial.print("\t");
 
   Serial.print(alturaBruta);
-  Serial.print("\t");
-
-  Serial.print(alturaFiltradaSMA);
   Serial.print("\t");
 
   Serial.print(alturaFinal);
