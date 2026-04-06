@@ -144,8 +144,8 @@ void loop() {
          previousMillis = currentMillis;
       }
     else {
-      pinState = LOW;
       if (currentMillis - previousMillis >= interval) {
+        pinState = LOW;
         pin1Concluido = true;
       }
 
