@@ -50,15 +50,23 @@ void setup() {
     Serial.println("Checar cartao SD");
 
   } else {
-    // Logica de auto-nomeacao (incremental)
+    // Logica de auto-nomeacao (incremental) do arquivo sd
     int numArquivo = 0;
 
-        // Procura o primeiro num de arquivo que ainda não existe
-    while (true) {
-      fileName = "Victor" + String(numArquivo) + ".txt";
+    // Procura o primeiro num de arquivo que ainda não existe
+    while (true) {// Constrói o número com zeros (ex: 001, 015, 102)
+      String numStr = String(numArquivo);
+      if (numArquivo < 10) {
+        numStr = "00" + numStr;
+      } else if (numArquivo < 100) {
+        numStr = "0" + numStr;
+      }
+
+      // Concatena "Vic" (3) + numStr (3) = 6 caracteres (Seguro para o limite de 8)
+      fileName = "Vic" + numStr + ".txt"; 
+      
       if (!SD.exists(fileName)) {
-        // Encontrou um nome livre quebra o loop
-        break; 
+        break; // Achou um nome livre
       }
       numArquivo++;
     }
