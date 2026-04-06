@@ -138,7 +138,7 @@ void loop() {
   unsigned long currentMillis = millis();
   if (emQueda && !pin1Concluido) {
       // if the LED is off turn it on and vice-versa:
-    if (pinState == LOW && !pin1Iniciado){
+    if (!pin1Iniciado){
         pinState = HIGH;
          pin1Iniciado = true;
          previousMillis = currentMillis;
@@ -160,6 +160,7 @@ void loop() {
   dataString += String(Pressao) + "\t";
   dataString += String(altura) + "\t";
   dataString += String(altitudeSuave) + "\t";
+  dataString += String(altitudeFinal) + "\t";
   dataString += String(contadorQueda) + "\t";
   dataString += String(emQueda) + "\t";
   dataString += String(pinState) + "\t";
