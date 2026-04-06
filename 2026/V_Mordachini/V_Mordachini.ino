@@ -7,7 +7,7 @@ Adafruit_BMP085 bmp;
 
 // configuracoes SD
 const int chipSelect = 53;
-String fileName = "voo.txt";
+String fileName = "";
 
 // variaveis de altitude
 float altitudeInicial;
@@ -50,6 +50,22 @@ void setup() {
     Serial.println("Checar cartao SD");
 
   } else {
+    // Logica de auto-nomeacao (incremental)
+    int numArquivo = 0;
+
+        // Procura o primeiro num de arquivo que ainda não existe
+    while (true) {
+      fileName = "Victor" + String(numArquivo) + ".txt";
+      if (!SD.exists(fileName)) {
+        // Encontrou um nome livre quebra o loop
+        break; 
+      }
+      numArquivo++;
+    }
+
+    Serial.print("Arquivo criado: ");
+    Serial.println(fileName);
+
     // Cria o cabeçalho no arquivo CSV
     File dataFile = SD.open(fileName, FILE_WRITE);
     if (dataFile) {
@@ -128,12 +144,14 @@ void loop() {
     alturaAnterior = alturaFinal;
   }
 
-  String dataString = String(tempAtual) + ","+
-                      String(pressAtual) + "," +
-                      String(alturaBruta) + "," +
-                      String(alturaFinal) + "," +
-                      String(alturaMaxima) + "," +
-                      String(quedaDetectada ? 1 : 0);
+  // Montagem string de dados
+  String dataString = "";
+  dataString += String(tempAtual);     dataString += "\t";
+  dataString += String(pressAtual);    dataString += "\t";
+  dataString += String(alturaBruta);   dataString += "\t";
+  dataString += String(alturaFinal);   dataString += "\t";
+  dataString += String(alturaMaxima);  dataString += "\t";
+  dataString += String(quedaDetectada ? 1 : 0);
 
   // GRAVACAO NO SD
   File dataFile = SD.open(fileName, FILE_WRITE);
@@ -146,20 +164,5 @@ void loop() {
   }
 
   // ---- SAIDA DE DADOS SERIAL----
-  Serial.print(tempAtual);
-  Serial.print("\t");
-
-  Serial.print(pressAtual);
-  Serial.print("\t");
-
-  Serial.print(alturaBruta);
-  Serial.print("\t");
-
-  Serial.print(alturaFinal);
-  Serial.print("\t");
-
-  Serial.print(alturaMaxima);
-  Serial.print("\t");
-
-  Serial.println(quedaDetectada ? 1 : 0);
+  Serial.println(dataString);
 }
