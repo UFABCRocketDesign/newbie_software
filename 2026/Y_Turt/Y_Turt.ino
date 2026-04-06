@@ -23,7 +23,7 @@ const int chipSelect = 53;
 #define IGN_2 61 /*act2*/
 #define IGN_3 46 /*act3*/
 #define IGN_4 55 /*act4*/
-const long interval = 1000;
+const long interval = 10000;
 unsigned long previousMillis = 0;
 int pinState = LOW;
 bool pin1Iniciado = false;
