@@ -26,9 +26,13 @@ const int chipSelect = 53;
 const long interval = 1000;
 unsigned long previousMillis = 0;
 int pinState = LOW;
+bool pin1Iniciado = false;
+bool pin1Concluido = false;
 
 
-void setup() {
+
+  void
+  setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
@@ -132,22 +136,24 @@ void loop() {
   }
 
   unsigned long currentMillis = millis();
-  if (emQueda){
-    if (currentMillis - previousMillis >= interval) {
-    previousMillis = currentMillis;
-
-    // if the LED is off turn it on and vice-versa:
-    if (pinState == LOW) {
-      pinState = HIGH;
-    } else {
+  if (emQueda && !pin1Concluido) {
+      // if the LED is off turn it on and vice-versa:
+    if (pinState == LOW && !pin1Iniciado){
+        pinState = HIGH;
+         pin1Iniciado = true;
+         previousMillis = currentMillis;
+      }
+    else {
       pinState = LOW;
-    }
+      if (currentMillis - previousMillis >= interval) {
+        pin1Concluido = true;
+      }
 
-    // set the LED with the ledState of the variable:
-    digitalWrite(IGN_1, pinState);
+      // set the LED with the ledState of the variable:
+      digitalWrite(IGN_1, pinState);
     }
   }
-  
+
   // sd
   String dataString = "";
   dataString += String(Temperatura) + "\t";
