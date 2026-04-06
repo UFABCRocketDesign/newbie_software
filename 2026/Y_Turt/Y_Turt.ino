@@ -23,12 +23,19 @@ const int chipSelect = 53;
 #define IGN_2 61 /*act2*/
 #define IGN_3 46 /*act3*/
 #define IGN_4 55 /*act4*/
-const long interval = 10000;
-unsigned long previousMillis = 0;
-int pinState = LOW;
+const long interval1 = 10000;
+unsigned long previousMillis1 = 0;
+int pin1State = LOW;
 bool pin1Iniciado = false;
 bool pin1Concluido = false;
 
+
+
+const long interval2 = 12000;
+unsigned long previousMillis2 = 0;
+int pin2State = LOW;
+bool pin2Iniciado = false;
+bool pin2Concluido = false;
 
 
   void
@@ -135,24 +142,45 @@ void loop() {
     }
   }
 
-  unsigned long currentMillis = millis();
+  unsigned long currentMillis1 = millis();
   if (emQueda && !pin1Concluido) {
       // if the LED is off turn it on and vice-versa:
     if (!pin1Iniciado){
-        pinState = HIGH;
+        pin1State = HIGH;
          pin1Iniciado = true;
-         previousMillis = currentMillis;
+         previousMillis1 = currentMillis1;
       }
     else {
-      if (currentMillis - previousMillis >= interval) {
-        pinState = LOW;
+      if (currentMillis1 - previousMillis1 >= interval1) {
+        pin1State = LOW;
         pin1Concluido = true;
       }
 
       // set the LED with the ledState of the variable:
-      digitalWrite(IGN_1, pinState);
+      digitalWrite(IGN_1, pin1State);
     }
   }
+
+unsigned long currentMillis2 = millis();
+if (emQueda && !pin2Concluido) {
+      // if the LED is off turn it on and vice-versa:
+    if (!pin2Iniciado){
+        pin2State = HIGH;
+         pin2Iniciado = true;
+         previousMillis2 = currentMillis2;
+      }
+    else {
+      if (currentMillis2 - previousMillis2 >= interval2) {
+        pin2State = LOW;
+        pin2Concluido = true;
+      }
+
+      // set the LED with the ledState of the variable:
+      digitalWrite(IGN_2, pin2State);
+    }
+  }
+
+
 
   // sd
   String dataString = "";
@@ -163,7 +191,8 @@ void loop() {
   dataString += String(altitudeFinal) + "\t";
   dataString += String(contadorQueda) + "\t";
   dataString += String(emQueda) + "\t";
-  dataString += String(pinState) + "\t";
+  dataString += String(pin1State) + "\t";
+  dataString += String(pin2State) + "\t";
 
   // --- Salvar Dados no SD ---
   File dataFile = SD.open(nomeFile, FILE_WRITE);
