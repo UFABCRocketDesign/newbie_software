@@ -36,7 +36,7 @@ void loop() {
   g = c/(c+RM);
   filtrocalman = filtrocalman + g*(alturatarada - filtrocalman);
   c = (1-g)*c;
-  lowpass = (filtrocalman*lowpass_suavizacao) + (lowpass*(1.0-lowpass_suavizacao))*(lowpass*(1.0-lowpass_suavizacao));
+  lowpass = (filtrocalman*lowpass_suavizacao) + (lowpass*(1.0-lowpass_suavizacao))*(lowpass*(1.0-lowpass_suavizacao))/2;
 
 if (lowpass > apogeu) {
   apogeu = lowpass;
