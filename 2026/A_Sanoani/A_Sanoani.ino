@@ -66,6 +66,9 @@ void loop() {
   Serial.print(altura_bruta);
   Serial.print("\t");
 
+  Serial.print(average);
+  Serial.print("\t");
+
   Serial.print(filteredValue);
   Serial.print("\t");
 
