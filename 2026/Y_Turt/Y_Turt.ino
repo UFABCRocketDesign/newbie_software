@@ -152,7 +152,7 @@ void loop() {
     if (pin1Estado == 0) {
       // pin1State = HIGH;
       pin1Estado = 1;
-      previousMillis1 = currentMillis1; //salva quando ele ligou
+      previousMillis1 = currentMillis1;  //salva quando ele ligou
 
     } else if ((currentMillis1 - previousMillis1 >= interval1) && (pin1Estado == 1)) {
       //pin1State = LOW;
@@ -169,46 +169,44 @@ void loop() {
   unsigned long currentMillis2 = millis();
   if (emQueda && pin2Estado != 3) {
     // if the LED is off turn it on and vice-versa:
-    if ( pin2Estado != 2){
+    if (pin2Estado != 2) {
       if (pin2Estado == 0) {
         // pin2State = HIGH;
         pin2Estado = 1;
-        previousMillis2 = currentMillis2; // salva quando q ligou
-      
-    } 
-      else if (currentMillis2 - previousMillis2 >= interTimer && pin2Estado == 1) {
+        previousMillis2 = currentMillis2;  // salva quando q ligou
+
+      } else if (currentMillis2 - previousMillis2 >= interTimer && pin2Estado == 1) {
         // pin2State = LOW;
         pin2Estado = 2;
         previousMillis2 = currentMillis2;
-      }
-    else if (currentMillis2 - previousMillis2 >= interval2 && pin2Estado == 2)
+      } 
+    } else if (currentMillis2 - previousMillis2 >= interval2 && pin2Estado == 2) {
         pin2Estado = 3;
     }
-    digitalWrite(IGN_2, pin2Estado == 2);
+      digitalWrite(IGN_2, pin2Estado == 2);
   }
 
 
+    // sd
+    String dataString = "";
+    dataString += String(Temperatura) + "\t";
+    dataString += String(Pressao) + "\t";
+    dataString += String(altura) + "\t";
+    dataString += String(altitudeSuave) + "\t";
+    dataString += String(altitudeFinal) + "\t";
+    dataString += String(contadorQueda) + "\t";
+    dataString += String(emQueda) + "\t";
+    dataString += String(pin1Estado) + "\t";
+    dataString += String(pin2Estado) + "\t";
 
-  // sd
-  String dataString = "";
-  dataString += String(Temperatura) + "\t";
-  dataString += String(Pressao) + "\t";
-  dataString += String(altura) + "\t";
-  dataString += String(altitudeSuave) + "\t";
-  dataString += String(altitudeFinal) + "\t";
-  dataString += String(contadorQueda) + "\t";
-  dataString += String(emQueda) + "\t";
-  dataString += String(pin1Estado) + "\t";
-  dataString += String(pin2Estado) + "\t";
+    // --- Salvar Dados no SD ---
+    File dataFile = SD.open(nomeFile, FILE_WRITE);
+    if (dataFile) {
+      dataFile.println(dataString);
+      dataFile.close();
+    } else {
+      Serial.println("error opening datalog.txt");
+    }
 
-  // --- Salvar Dados no SD ---
-  File dataFile = SD.open(nomeFile, FILE_WRITE);
-  if (dataFile) {
-    dataFile.println(dataString);
-    dataFile.close();
-  } else {
-    Serial.println("error opening datalog.txt");
+    Serial.println(dataString);
   }
-
-  Serial.println(dataString);
-}
