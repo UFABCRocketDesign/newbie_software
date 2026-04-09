@@ -9,7 +9,7 @@ float altura_bruta = 0;
 const int numReadings = 10;  // Number of readings for averaging
 float readings[numReadings];
 float filteredValue = 0;  // Initialize filtered value
-float alpha = 0.5;        // Filter coefficient (0 < alpha < 1)
+float alpha = 0.1;        // Filter coefficient (0 < alpha < 1)
 float average = 0;
 float total = 0;
 int readIndex = 0;
