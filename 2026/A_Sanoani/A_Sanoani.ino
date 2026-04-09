@@ -7,7 +7,7 @@ float soma = 0;
 float amostra = 100;
 float PotData = 0; 
 float filteredValue = 0;  // Initialize filtered value
-float alpha = 0.1;  // Filter coefficient (0 < alpha < 1)
+float alpha = 0.05;  // Filter coefficient (0 < alpha < 1)
 
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
