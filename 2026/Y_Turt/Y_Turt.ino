@@ -98,6 +98,7 @@ void setup() {
     Serial.println("error opening datalog.txt");
   }
   pinMode(IGN_1, OUTPUT);
+  pinMode(IGN_2, OUTPUT);
 }
 
 void loop() {
