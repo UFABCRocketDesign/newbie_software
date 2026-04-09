@@ -8,7 +8,7 @@ float c = 1.0; //confiança do filtro
 float g = 0;//ganho do filtro
 float filtrocalman = 0;
 float lowpass = 0;
-float lowpass_suavizacao = 0.1;
+float lowpass_suavizacao = 0.45;
 float apogeu = 0;
 
 
