@@ -28,7 +28,7 @@ void setup() {
 
   void loop() {
     PotData = bmp.readAltitude();
-    filteredValue = alpha * PotData + (1 - alpha) * filteredValue;
+    filteredValue = (alpha * PotData + (1 - alpha) * filteredValue) - altitudeInicial;
 
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
@@ -36,7 +36,10 @@ void setup() {
     Serial.print(bmp.readPressure());
     Serial.print("\t");
 
-    Serial.print(filteredValue - altitudeInicial);
+    Serial.print(bmp.readAltitude());
+    Serial.print("\t");
+
+    Serial.print(filteredValue);
     Serial.print("\t");
 
     Serial.print(bmp.readSealevelPressure());
