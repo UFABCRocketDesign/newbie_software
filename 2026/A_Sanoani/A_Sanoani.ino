@@ -4,7 +4,10 @@ Adafruit_BMP085 bmp;
 
 float altitudeInicial;
 float soma = 0;
-int amostra = 100;
+float amostra = 100;
+float PotData = 0; 
+float filteredValue = 0;  // Initialize filtered value
+float alpha = 0.1;  // Filter coefficient (0 < alpha < 1)
 
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
@@ -24,6 +27,8 @@ void setup() {
 
 
   void loop() {
+    PotData = bmp.readAltitude();
+    filteredValue = alpha * PotData + (1 - alpha) * filteredValue;
 
     Serial.print(bmp.readTemperature());
     Serial.print("\t");
@@ -31,7 +36,7 @@ void setup() {
     Serial.print(bmp.readPressure());
     Serial.print("\t");
 
-    Serial.print(bmp.readAltitude() - altitudeInicial);
+    Serial.print(filteredValue - altitudeInicial);
     Serial.print("\t");
 
     Serial.print(bmp.readSealevelPressure());
