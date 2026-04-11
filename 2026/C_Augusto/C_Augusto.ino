@@ -4,8 +4,9 @@
 float altura0;
 float alturasoma = 0;
 float alturatarada;
-float alpha = 0.1;   // fator de suavização
+float alpha = 0.2;   // fator de suavização
 float filtrado = 0;  // valor inicial
+float filtrado2 = 0; //valor inicial2
 float apogeu = 0;
 
 
@@ -31,9 +32,10 @@ void loop() {
   float alturatarada = bmp.readAltitude() - alturasoma;
 
   filtrado = alpha * alturatarada + (1 - alpha) * filtrado;
+  filtrado2 = alpha * filtrado + (1-alpha) * filtrado2;
   
-if (filtrado > apogeu) {
-  apogeu = filtrado;
+if (filtrado2 > apogeu) {
+  apogeu = filtrado2;
 }
 
     Serial.print(bmp.readTemperature());
@@ -42,7 +44,7 @@ if (filtrado > apogeu) {
     Serial.print("\t");
     Serial.print(alturatarada);
     Serial.print("\t");
-    Serial.print(filtrado);
+    Serial.print(filtrado2);
     Serial.print("\t");
     Serial.print(apogeu);
     Serial.println();
