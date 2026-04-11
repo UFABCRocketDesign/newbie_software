@@ -33,7 +33,7 @@ void setup() {
 void loop() {
   float alturatarada = bmp.readAltitude() - alturasoma;
 
-  filtrado = alpha * alturatarada + (1 - alpha) * filtrado;
+  filtrado = alpha * alturasoma + (1 - alpha) * alturatarada;
   filtrado2 = alpha * filtrado + (1-alpha) * filtrado2;
   filtrado3 = alpha * filtrado2 + (1-alpha) * filtrado3;
   
