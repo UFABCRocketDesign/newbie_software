@@ -2,13 +2,8 @@
 float altura0;
 float alturasoma = 0;
 float alturatarada;
-float RS = 0.05; //ruido fisico
-float RM = 0.3; //ruido da medicao
-float c = 1.0; //confiança do filtro
-float g = 0;//ganho do filtro
-float filtrocalman = 0;
-float lowpass = 0;
-float lowpass_suavizacao = 0.1;
+float alpha = 0.1;   // fator de suavização
+float filtrado = 0;  // valor inicial
 float apogeu = 0;
 
 
@@ -31,15 +26,10 @@ void setup() {
 void loop() {
   float alturatarada = bmp.readAltitude() - alturasoma;
 
-  //algoritmo do meu mano calman
-  c = c + RS;
-  g = c/(c+RM);
-  filtrocalman = filtrocalman + g*(alturatarada - filtrocalman);
-  c = (1-g)*c;
-  lowpass = (filtrocalman*lowpass_suavizacao) + (lowpass*(1.0-lowpass_suavizacao))*(lowpass*(1.0-lowpass_suavizacao))/2;
-
-if (lowpass > apogeu) {
-  apogeu = lowpass;
+  filtrado = alpha * alturatarada + (1 - alpha) * filtrado;
+  
+if (filtrado > apogeu) {
+  apogeu = filtrado;
 }
 
     Serial.print(bmp.readTemperature());
@@ -48,7 +38,7 @@ if (lowpass > apogeu) {
     Serial.print("\t");
     Serial.print(alturatarada);
     Serial.print("\t");
-    Serial.print(lowpass);
+    Serial.print(filtrado);
     Serial.print("\t");
     Serial.print(apogeu);
     Serial.println();
