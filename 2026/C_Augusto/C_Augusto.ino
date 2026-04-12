@@ -1,9 +1,21 @@
 //#include <Adafruit_BMP085.h>
 #include <Adafruit_BMP280.h>
 #include <Wire.h>
+#include <SD.h>
+
+// SD
+#define SD_CS_PIN 53;
+#define SD_CS_PIN 10;
+const int chipSelect = 53;
+char charSD[15];
+int numtxtSD = 0;
+
+//detecção de altura
 float altura0;
 float alturasoma = 0;
 float alturatarada;
+
+//filtragem de dados
 float alpha = 0.2;   // fator de suavização
 float filtrado = 0;  // valor inicial
 float filtrado2 = 0; //valor inicial2
@@ -24,6 +36,20 @@ void setup() {
 	Serial.println("bmp nao encontrado, verifique as conexoes");
 	while (1) {}
   }
+  Serial.println("Iniciando SD");
+
+  if(!SD.begin(chipSelect)){
+    Serial.println("erro ao iniciar SD");
+    while (true);
+  }
+
+  File dataFile = SD.open(charSD, FILE_WRITE);
+  while (true){
+   sprintf(charSD, numtxtSD == 0 ? "dataCA.txt" : "dataCA%03d.txt", numtxtSD);
+   if(!SD.exists(charSD)) break;
+  numtxtSD++;
+  }
+
   Serial.println("Temperatura   |   Pressao   |   Altitude    |   Filtro    |   Apogeu    ");
   for(int i = 0; i < 9; i++){
     alturasoma += bmp.readAltitude();
