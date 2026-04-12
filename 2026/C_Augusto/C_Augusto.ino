@@ -9,6 +9,7 @@ float filtrado = 0;  // valor inicial
 float filtrado2 = 0; //valor inicial2
 float filtrado3 = 0;
 float apogeu = 0;
+float aux = 0;
 
 
 //Adafruit_BMP085 bmp;
@@ -33,7 +34,9 @@ void setup() {
 void loop() {
   float alturatarada = bmp.readAltitude() - alturasoma;
 
-  filtrado = alpha * alturasoma + (1 - alpha) * alturatarada;
+  filtrado = alpha * alturatarada + (1 - alpha) * aux;
+  aux = filtrado;
+  
   filtrado2 = alpha * filtrado + (1-alpha) * filtrado2;
   filtrado3 = alpha * filtrado2 + (1-alpha) * filtrado3;
   
