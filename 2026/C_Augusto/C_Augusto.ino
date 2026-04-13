@@ -76,6 +76,8 @@ if (filtrado3 > apogeu) {
     Serial.print("\t");
     Serial.print(alturatarada);
     Serial.print("\t");
+    Serial.print(filtrado);
+    Serial.print("\t");
     Serial.print(filtrado2);
     Serial.print("\t");
     Serial.print(filtrado3);
