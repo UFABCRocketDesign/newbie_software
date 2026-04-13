@@ -41,19 +41,19 @@ void setup() {
 	Serial.println("bmp nao encontrado, verifique as conexoes");
 	while (1) {}
   }
-  Serial.println("Iniciando SD");
+  //Serial.println("Iniciando SD");
 
-  if(!SD.begin(chipSelect)){
-    Serial.println("erro ao iniciar SD");
-    while (true);
-  }
+  //if(!SD.begin(chipSelect)){
+    //Serial.println("erro ao iniciar SD");
+    //while (true);
+  //}
 
-  File dataFile = SD.open(charSD, FILE_WRITE);
-  while (true){
-   sprintf(charSD, numtxtSD == 0 ? "dataCA.txt" : "dataCA%03d.txt", numtxtSD);
-   if(!SD.exists(charSD)) break;
-  numtxtSD++;
-  }
+  //File dataFile = SD.open(charSD, FILE_WRITE);
+  //while (true){
+   //sprintf(charSD, numtxtSD == 0 ? "dataCA.txt" : "dataCA%03d.txt", numtxtSD);
+   //if(!SD.exists(charSD)) break;
+  //numtxtSD++;
+  //}
   Serial.println("Temperatura   |   Pressao   |   Altitude    |   Filtro    |   Apogeu    ");
   for(int i = 0; i < 9; i++){
     alturasoma += bmp.readAltitude();
