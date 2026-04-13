@@ -1,6 +1,6 @@
-//#include <Adafruit_BMP085.h>
-#include <Adafruit_BMP280.h>
-#include <Wire.h>
+#include <Adafruit_BMP085.h>
+//#include <Adafruit_BMP280.h>
+//#include <Wire.h>
 #include <SD.h>
 
 // SD
@@ -24,15 +24,15 @@ float apogeu = 0;
 float aux = 0;
 
 
-//Adafruit_BMP085 bmp;
-Adafruit_BMP280 bmp;
+Adafruit_BMP085 bmp;
+//Adafruit_BMP280 bmp;
   
 void setup() {
   int contador = 0;
   Serial.begin(115200);
-  delay(1000);
-  Wire.begin(21,22);
-  if (!bmp.begin(0x76)) {
+  //delay(1000);
+  //Wire.begin(21,22);
+  if (!bmp.begin()) {
 	Serial.println("bmp nao encontrado, verifique as conexoes");
 	while (1) {}
   }
@@ -80,5 +80,4 @@ if (filtrado3 > apogeu) {
     Serial.print("\t");
     Serial.print(apogeu);
     Serial.println();
-    delay(20);
 }
