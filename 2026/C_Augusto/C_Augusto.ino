@@ -74,7 +74,7 @@ void loop() {
     apogeu = filtrado3;
   }
 
-  for (int i = 8 - 1; i > 0; i++) {
+  for (int i = 8 - 1; i > 0; i--) {
     mediafiltro[i] = mediafiltro[i - 1];
   }
   mediafiltro[0] = filtrado3;
