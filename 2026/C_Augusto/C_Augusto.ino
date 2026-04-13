@@ -25,8 +25,9 @@ float aux = 0;
 
 //detecção de queda
 int det_queda;
-int mediafiltro;
+int mediafiltro[8];
 int queda;
+int resultado;
 
 Adafruit_BMP085 bmp;
 //Adafruit_BMP280 bmp;
@@ -73,13 +74,17 @@ if (filtrado3 > apogeu) {
   apogeu = filtrado3;
 }
 
-for(int i= 0; i < 8; i++){
-  filtrado3 += mediafiltro;
+for(int i= 8-1; i > 0; i++){
+  mediafiltro[i] = mediafiltro[i-1];
 }
+  mediafiltro[0] = filtrado3;
 
-mediafiltro = mediafiltro/8;
+for(int i = 0; i < 8; i++){
+  resultado += mediafiltro[i];
+}
+resultado = resultado/8;
 
-if (filtrado3 < mediafiltro){
+if (resultado < mediafiltro){
   queda = 1;
 } else{
   queda = 0;
@@ -97,8 +102,11 @@ if (filtrado3 < mediafiltro){
     Serial.print("\t");
     Serial.print(filtrado3);
     Serial.print("\t");
+    Serial.print(resultado);
+    Serial.print("\t");
     Serial.print(apogeu);
     Serial.print("\t");
     Serial.print(queda);
+    
     Serial.println();
 }
