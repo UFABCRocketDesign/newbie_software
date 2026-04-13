@@ -25,9 +25,9 @@ float aux = 0;
 
 //detecção de queda
 int det_queda;
-int mediafiltro[8];
+float mediafiltro[8];
 int queda;
-int resultado;
+float resultado;
 
 Adafruit_BMP085 bmp;
 //Adafruit_BMP280 bmp;
@@ -62,7 +62,7 @@ void setup() {
 }
 
 void loop() {
-  float alturatarada = bmp.readAltitude() - alturasoma;
+  alturatarada = bmp.readAltitude() - alturasoma;
 
   filtrado = alpha * alturatarada + (1 - alpha) * aux;
   aux = filtrado;
@@ -79,12 +79,14 @@ void loop() {
   }
   mediafiltro[0] = filtrado3;
 
+  resultado = 0;
+  
   for (int i = 0; i < 8; i++) {
     resultado += mediafiltro[i];
   }
   resultado = resultado / 8;
 
-  if (resultado < mediafiltro) {
+  if (filtrado3 < resultado) {
     queda = 1;
   } else {
     queda = 0;
