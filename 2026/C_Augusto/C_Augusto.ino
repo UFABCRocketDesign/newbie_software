@@ -23,6 +23,10 @@ float filtrado3 = 0;
 float apogeu = 0;
 float aux = 0;
 
+//detecção de queda
+int det_queda;
+int mediafiltro;
+int queda;
 
 Adafruit_BMP085 bmp;
 //Adafruit_BMP280 bmp;
@@ -49,7 +53,6 @@ void setup() {
    if(!SD.exists(charSD)) break;
   numtxtSD++;
   }
-
   Serial.println("Temperatura   |   Pressao   |   Altitude    |   Filtro    |   Apogeu    ");
   for(int i = 0; i < 9; i++){
     alturasoma += bmp.readAltitude();
@@ -68,6 +71,18 @@ void loop() {
   
 if (filtrado3 > apogeu) {
   apogeu = filtrado3;
+}
+
+for(int i= 0; i < 8; i++){
+  filtrado3 += mediafiltro;
+}
+
+mediafiltro = mediafiltro/8;
+
+if (filtrado3 < mediafiltro){
+  queda = 1;
+} else{
+  queda = 0;
 }
 
     Serial.print(bmp.readTemperature());
