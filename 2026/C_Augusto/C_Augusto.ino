@@ -98,5 +98,7 @@ if (filtrado3 < mediafiltro){
     Serial.print(filtrado3);
     Serial.print("\t");
     Serial.print(apogeu);
+    Serial.print("\t");
+    Serial.print(queda);
     Serial.println();
 }
