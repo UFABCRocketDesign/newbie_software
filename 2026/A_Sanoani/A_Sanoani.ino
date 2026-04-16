@@ -65,7 +65,7 @@ void loop() {
 
   float temp_agr = millis();
 
-  vel = (filteredValue - altura_anterior) / (temp_agr - tempo_ant);
+  vel = ((filteredValue - altura_anterior) / (temp_agr - tempo_ant)) * 1000;
 
   if (vel < LIMIAR_QUEDA_MS) {
     confirm_queda = confirm_queda + 1;
