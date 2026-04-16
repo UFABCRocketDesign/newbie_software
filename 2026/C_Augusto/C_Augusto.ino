@@ -84,13 +84,20 @@ void loop() {
   for (int i = 0; i < 8; i++) {
     resultado += mediafiltro[i];
   }
-  resultado = resultado / 8;
-
-  if (filtrado3 < resultado) {
-    queda = 1;
-  } else {
-    queda = 0;
+  
+  for (int i = 8 - 1; i > 0; i--) {
+    if(mediafiltro[i] > mediafiltro[i-1]){
+      det_queda++;
+    } 
   }
+
+if(det_queda > 3){
+  queda = 1;
+} else {
+  queda = 0;
+  det_queda = 0;
+}
+
 
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
