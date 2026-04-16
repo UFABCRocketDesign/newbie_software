@@ -98,7 +98,10 @@ void loop() {
 
 if(det_queda > 3){
   queda = 1;
+} else {
+  queda = 0;
 }
+
 
 
   Serial.print(bmp.readTemperature());
