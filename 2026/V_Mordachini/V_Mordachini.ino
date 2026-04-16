@@ -51,30 +51,31 @@ void setup() {
 
   } else {
     // Logica de auto-nomeacao (incremental) do arquivo sd
-    int numArquivo = 0;
+    int numArquivo = 1;
+    String prefixo = "VIC"; // pode ser alterado
 
     // Procura o primeiro num de arquivo que ainda não existe
-    while (true) {// Constrói o número com zeros (ex: 001, 015, 102)
+    while (true) {
       String numStr = String(numArquivo);
-      if (numArquivo < 10) {
-        numStr = "00" + numStr;
-      } else if (numArquivo < 100) {
+      // Adiciona zeros à esquerda até que o nome tenha EXATAMENTE 8 caracteres
+      while ((prefixo.length() + numStr.length()) < 8) {
         numStr = "0" + numStr;
       }
 
-      // Concatena "Vic" (3) + numStr (3) = 6 caracteres (Seguro para o limite de 8)
-      fileName = "Vic" + numStr + ".txt"; 
+      // Concatena tudo: VIC + 00001 + .txt = VIC00001.txt
+      fileName = prefixo + numStr + ".txt"; 
       
       if (!SD.exists(fileName)) {
         break; // Achou um nome livre
       }
+
       numArquivo++;
     }
 
     Serial.print("Arquivo criado: ");
     Serial.println(fileName);
 
-    // Cria o cabeçalho no arquivo CSV
+    // Cria o aruivo com cabeçalho
     File dataFile = SD.open(fileName, FILE_WRITE);
     if (dataFile) {
       dataFile.println("Temp(C),Pressao(Pa),AltBruta(m),AltFinal(m),Max(m),Queda");
