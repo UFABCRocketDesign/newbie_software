@@ -63,7 +63,9 @@ void loop() {
 
   filteredValue = (alpha * average + (1 - alpha) * filteredValue);
 
-  vel = (filteredValue - altura_anterior) / millis() - tempo_ant;
+  float temp_agr = millis();
+
+  vel = (filteredValue - altura_anterior) / (temp_agr - tempo_ant);
 
   if (vel < LIMIAR_QUEDA_MS) {
     confirm_queda = confirm_queda + 1;
@@ -72,7 +74,7 @@ void loop() {
     }
   }
 
-  tempo_ant = millis();
+  tempo_ant = temp_agr;
 
   altura_anterior = filteredValue;
 
@@ -97,8 +99,5 @@ void loop() {
   Serial.print(queda);
   Serial.print("\t");
 
-  Serial.print(bmp.readSealevelPressure());
-  Serial.print("\t");
-
-  Serial.println(bmp.readAltitude(101500));
+  Serial.println();
 }
