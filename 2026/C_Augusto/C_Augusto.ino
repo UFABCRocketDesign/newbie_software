@@ -24,9 +24,10 @@ float apogeu = 0;
 float aux = 0;
 
 //detecção de queda
-int det_queda;
+int det_queda = 0;
 float mediafiltro[8];
 int queda = 0;
+int j = 0;
 float resultado;
 
 Adafruit_BMP085 bmp;
@@ -85,19 +86,19 @@ void loop() {
     resultado += mediafiltro[i];
   }
   
+  det_queda = 0;
+
   for (int i = 8 - 1; i > 0; i--) {
     if(mediafiltro[i] > mediafiltro[i-1]){
       det_queda++;
     } 
   }
 
-int j;
-while (j < 3){
-  if(det_queda > 3){
-    queda = 1;
-  j++;
-  }
-  }
+
+
+if(det_queda > 3){
+  queda = 1;
+}
 
 
   Serial.print(bmp.readTemperature());
