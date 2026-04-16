@@ -226,6 +226,7 @@ void loop() {
   dataString += String(emQueda) + "\t";
   dataString += String(pin1Estado) + "\t";
   dataString += String(pin2Estado) + "\t";
+  dataString += String(pin3Estado) + "\t";
 
   // --- Salvar Dados no SD ---
   File dataFile = SD.open(nomeFile, FILE_WRITE);
