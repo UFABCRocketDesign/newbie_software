@@ -1,9 +1,9 @@
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
 // --- Variáveis para ajuste de altura ---
-float altitudeInicial;       //definiçao da altura inicial
-float altitudeAprox[10];     //definição da altura suave
-float altitudeFiltrado[10];  //definição da altura suave 2
+float altitudeInicial;     //definiçao da altura inicial
+float alturaAprox[10];     //definição da altura suave
+float alturaFiltrado[10];  //definição da altura suave 2
 // --- Variáveis para detecção de queda ---
 float altitudeMaxima = 0.0;
 bool emQueda = false;
@@ -38,6 +38,13 @@ unsigned long previousMillis2 = 0;
 // bool pin2Iniciado = false;
 // bool pin2Concluido = false;
 int pin2Estado = 0;
+
+const long interval3 = 10000;
+unsigned long previousMillis3 = 0;
+int pin3Estado = 0;
+
+
+
 
 
 void setup() {
@@ -99,6 +106,7 @@ void setup() {
   }
   pinMode(IGN_1, OUTPUT);
   pinMode(IGN_2, OUTPUT);
+  pinMode(IGN_3, OUTPUT);
 }
 
 void loop() {
@@ -112,32 +120,32 @@ void loop() {
 
   // --- Primeiro Filtro (Média Móvel Simples) ---
   for (int i = 0; i < 9; i++) {
-    altitudeAprox[i] = altitudeAprox[i + 1];
+    alturaAprox[i] = alturaAprox[i + 1];
   }
-  altitudeAprox[9] = altura;
+  alturaAprox[9] = altura;
   float somaAprox = 0;
   for (int i = 0; i < 10; i++) {
-    somaAprox += altitudeAprox[i];
+    somaAprox += alturaAprox[i];
   }
-  float altitudeSuave = somaAprox / 10;
+  float alturaSuave = somaAprox / 10;
 
   // --- Segundo Filtro (Cascata) ---
   for (int i = 0; i < 9; i++) {
-    altitudeFiltrado[i] = altitudeFiltrado[i + 1];
+    alturaFiltrado[i] = alturaFiltrado[i + 1];
   }
-  altitudeFiltrado[9] = altitudeSuave;
+  alturaFiltrado[9] = alturaSuave;
   float somaFiltrado = 0;
   for (int i = 0; i < 10; i++) {
-    somaFiltrado += altitudeFiltrado[i];
+    somaFiltrado += alturaFiltrado[i];
   }
-  float altitudeFinal = somaFiltrado / 10;
+  float alturaFinal = somaFiltrado / 10;
 
 
   // --- LÓGICA DE DETECÇÃO DE QUEDA COM MÚLTIPLAS CONFIRMAÇÕES ---
-  if (altitudeFinal > altitudeMaxima) {
-    altitudeMaxima = altitudeFinal;
+  if (alturaFinal > altitudeMaxima) {
+    altitudeMaxima = alturaFinal;
   }
-  if (!emQueda && altitudeFinal < (altitudeMaxima - margemQueda)) {
+  if (!emQueda && alturaFinal < (altitudeMaxima - margemQueda)) {
     contadorQueda += 1;
     if (contadorQueda >= confirmacoesNecessarias) {
       emQueda = true;
@@ -179,34 +187,54 @@ void loop() {
         // pin2State = LOW;
         pin2Estado = 2;
         previousMillis2 = currentMillis2;
-      } 
+      }
     } else if (currentMillis2 - previousMillis2 >= interval2 && pin2Estado == 2) {
-        pin2Estado = 3;
+      pin2Estado = 3;
     }
-      digitalWrite(IGN_2, pin2Estado == 2);
+    digitalWrite(IGN_2, pin2Estado == 2);
   }
 
 
-    // sd
-    String dataString = "";
-    dataString += String(Temperatura) + "\t";
-    dataString += String(Pressao) + "\t";
-    dataString += String(altura) + "\t";
-    dataString += String(altitudeSuave) + "\t";
-    dataString += String(altitudeFinal) + "\t";
-    dataString += String(contadorQueda) + "\t";
-    dataString += String(emQueda) + "\t";
-    dataString += String(pin1Estado) + "\t";
-    dataString += String(pin2Estado) + "\t";
 
-    // --- Salvar Dados no SD ---
-    File dataFile = SD.open(nomeFile, FILE_WRITE);
-    if (dataFile) {
-      dataFile.println(dataString);
-      dataFile.close();
-    } else {
-      Serial.println("error opening datalog.txt");
+  unsigned long currentMillis3 = millis();
+  if (emQueda && pin3Estado != 2 && alturaFinal < -2) {
+    // if the LED is off turn it on and vice-versa:
+    if (pin3Estado == 0) {
+      // pin1State = HIGH;
+      pin3Estado = 1;
+      previousMillis3 = currentMillis3;  //salva quando ele ligou
+
+    } else if ((currentMillis3 - previousMillis3 >= interval3) && (pin3Estado == 1)) {
+      //pin1State = LOW;
+      pin3Estado = 2;
     }
 
-    Serial.println(dataString);
+    // set the LED with the ledState of the variable:
+
+    digitalWrite(IGN_3, pin3Estado == 1);
   }
+
+
+  // sd
+  String dataString = "";
+  dataString += String(Temperatura) + "\t";
+  dataString += String(Pressao) + "\t";
+  dataString += String(altura) + "\t";
+  dataString += String(alturaSuave) + "\t";
+  dataString += String(alturaFinal) + "\t";
+  dataString += String(contadorQueda) + "\t";
+  dataString += String(emQueda) + "\t";
+  dataString += String(pin1Estado) + "\t";
+  dataString += String(pin2Estado) + "\t";
+
+  // --- Salvar Dados no SD ---
+  File dataFile = SD.open(nomeFile, FILE_WRITE);
+  if (dataFile) {
+    dataFile.println(dataString);
+    dataFile.close();
+  } else {
+    Serial.println("error opening datalog.txt");
+  }
+
+  Serial.println(dataString);
+}
