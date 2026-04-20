@@ -1,58 +1,31 @@
-/**
- * Altimeter with Fall Detection
- * Sensor: BMP085 via I2C
- *
- * Pipeline per cycle:
- *   raw altitude → moving average → EMA filter → velocity → fall detection
- */
-
 #include <Adafruit_BMP085.h>
 
-// ─── Hardware ────────────────────────────────────────────────────────────────
-
 Adafruit_BMP085 bmp;
-
-// ─── Calibration ─────────────────────────────────────────────────────────────
-
-const int CALIBRATION_SAMPLES = 100;
-float baselineAltitude_m = 0.0f;
-
-// ─── Moving Average Filter ───────────────────────────────────────────────────
-
-const int MOVING_AVG_WINDOW = 10;
-float movingAvgBuffer_m[MOVING_AVG_WINDOW];
-float movingAvgRunningTotal_m = 0.0f;
-int bufferWriteIndex = 0;
-float movingAvgAltitude_m = 0.0f;
-
-// ─── EMA (Exponential Moving Average) Filter ─────────────────────────────────
-
-const float EMA_ALPHA = 0.1f;  // smaller = smoother, more lag
-float smoothedAltitude_m = 0.0f;
-
-// ─── Velocity & Fall Detection ───────────────────────────────────────────────
-
-const float FALL_VELOCITY_THRESHOLD_MS = -2.0f;  // m/s — negative = descending
-const int FALL_CONFIRM_SAMPLES = 3;              // consecutive samples to confirm fall
-
-float rawRelativeAltitude_m = 0.0f;
-float previousSmoothedAltitude_m = 0.0f;
-float verticalVelocity_ms = 0.0f;
-float previousTimestamp_ms = 0.0f;
-int fallConfirmCounter = 0;
-bool isFalling = false;
-
-// ─── Prototypes ──────────────────────────────────────────────────────────────
-
-void calibrateBaseline();
-void updateMovingAverage(float newSample_m);
-void updateEmaFilter();
-void updateVelocityAndFallDetection(float currentTimestamp_ms);
-void printTelemetry();
-
-// ─────────────────────────────────────────────────────────────────────────────
-
+////---VARIAVEIS--------------------------------------------------------------------------------
+//---Calibracao---------------------------------------------------------------------------------
+const int amostra_calibracao= 100;       //manual
+float altitude_zero = 0.0f;               //auto
+float soma_calibracao = 0;                //auto
+//filtro_movel----------------------------------------------------------------------------------
+const int n_amostra_filtro = 10;          //manual
+float altura_bruta = 0;                   //auto
+float readings[n_amostra_filtro];         //auto
+float valor_medio_filtromovel = 0;        //auto
+float leitura_n_filtromovel = 0;          //auto
+//filtro_alpha----------------------------------------------------------------------------------
+float alpha = 0.1;                        //manual (0 < alpha < 1)
+float valor_filtro_alpha = 0;             // auto
+int readIndex = 0;                        //auto
+//detectar_queda--------------------------------------------------------------------------------
+const float velocidade_queda_max = -2.0;  //manual
+const int n_amostra_confirmar_queda = 3;  //manual
+int amostras_confirmada = 0;              //auto
+float altura_anterior = 0;                //auto
+float velocidade = 0;                     //auto
+float tempo_ant = 0;                      //auto
+bool queda = false;                       //auto
 void setup() {
+  // initialize digital pin LED_BUILTIN as an output.
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
 
@@ -60,122 +33,75 @@ void setup() {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
     while (1) {}
   }
-
-  calibrateBaseline();
-
-  // Zero-initialise the moving average buffer
-  for (int i = 0; i < MOVING_AVG_WINDOW; i++) {
-    movingAvgBuffer_m[i] = 0.0f;
+  for (int i = 0; i < amostra_calibracao; i++) {
+    soma_calibracao += bmp.readAltitude();
   }
-
-  Serial.println(
-    "Temperature(*C)\tPressure(Pa)\tAltitude(meters)\t"
-    "Pressure at sealevel (calculated)(Pa)\tReal altitude(meters)");
+  for (int i = 0; i < n_amostra_filtro; i++) {
+    readings[i] = 0;
+  }
+  altitude_zero = soma_calibracao / amostra_calibracao;
+  Serial.println("Temperature(*C)\tPressure(Pa)\tAltitude(meters)\tPressure at sealevel (calculated)(Pa)\tReal altitude(meters)");
 }
+
 
 void loop() {
-  // 1. Raw altitude relative to ground
-  rawRelativeAltitude_m = bmp.readAltitude() - baselineAltitude_m;
+  altura_bruta = bmp.readAltitude() - altitude_zero;
+  leitura_n_filtromovel = leitura_n_filtromovel - readings[readIndex];
 
-  // 2. Moving average filter
-  updateMovingAverage(rawRelativeAltitude_m);
+  // Read the sensor
+  readings[readIndex] = altura_bruta;
 
-  // 3. EMA filter applied on top of moving average
-  updateEmaFilter();
+  // Add the reading to the leitura_n_filtromovel
+  leitura_n_filtromovel = leitura_n_filtromovel + readings[readIndex];
 
-  // 4. Velocity estimation and fall detection
-  float currentTimestamp_ms = static_cast<float>(millis());
-  updateVelocityAndFallDetection(currentTimestamp_ms);
-  previousTimestamp_ms = currentTimestamp_ms;
-  previousSmoothedAltitude_m = smoothedAltitude_m;
+  // Advance to the next position in the array
+  readIndex = readIndex + 1;
 
-  // 5. Serial telemetry
-  printTelemetry();
-}
-
-// ─── Function Definitions ────────────────────────────────────────────────────
-
-/**
- * Accumulates CALIBRATION_SAMPLES altitude readings and stores their
- * mean as the ground-level baseline.
- */
-void calibrateBaseline() {
-  float calibrationSum_m = 0.0f;
-  for (int i = 0; i < CALIBRATION_SAMPLES; i++) {
-    calibrationSum_m += bmp.readAltitude();
-  }
-  baselineAltitude_m = calibrationSum_m / static_cast<float>(CALIBRATION_SAMPLES);
-}
-
-/**
- * Circular-buffer moving average.
- * Subtracts the oldest sample, inserts the new one, then recalculates the mean.
- */
-void updateMovingAverage(float newSample_m) {
-  movingAvgRunningTotal_m -= movingAvgBuffer_m[bufferWriteIndex];
-  movingAvgBuffer_m[bufferWriteIndex] = newSample_m;
-  movingAvgRunningTotal_m += newSample_m;
-
-  bufferWriteIndex++;
-  if (bufferWriteIndex >= MOVING_AVG_WINDOW) {
-    bufferWriteIndex = 0;
+  // If we're at the end of the array, wrap around to the beginning
+  if (readIndex >= n_amostra_filtro) {
+    readIndex = 0;
   }
 
-  movingAvgAltitude_m = movingAvgRunningTotal_m / static_cast<float>(MOVING_AVG_WINDOW);
-}
+  // Calculate the valor_medio_filtromovel
+  valor_medio_filtromovel = leitura_n_filtromovel / n_amostra_filtro;
 
-/**
- * EMA blends the moving-average output with the previous smoothed value.
- * Formula: y[n] = alpha * x[n] + (1 - alpha) * y[n-1]
- */
-void updateEmaFilter() {
-  smoothedAltitude_m = (EMA_ALPHA * movingAvgAltitude_m)
-                       + ((1.0f - EMA_ALPHA) * smoothedAltitude_m);
-}
+  valor_filtro_alpha = (alpha * valor_medio_filtromovel + (1 - alpha) * valor_filtro_alpha);
 
-/**
- * Estimates vertical velocity via discrete differentiation of smoothed altitude.
- * Velocity (m/s) = Δaltitude(m) / Δtime(s).
- * millis() returns ms, so the result is multiplied by 1000.
- * Increments a confirmation counter when velocity drops below the fall threshold;
- * sets isFalling once enough consecutive samples confirm the condition.
- */
-void updateVelocityAndFallDetection(float currentTimestamp_ms) {
-  float deltaTime_ms = currentTimestamp_ms - previousTimestamp_ms;
-  float deltaAltitude_m = smoothedAltitude_m - previousSmoothedAltitude_m;
+  float temp_agr = millis();
 
-  // Guard against division by zero on the very first cycle (deltaTime_ms == 0)
-  if (deltaTime_ms > 0.0f) {
-    verticalVelocity_ms = (deltaAltitude_m / deltaTime_ms) * 1000.0f;
-  }
+  velocidade = ((valor_filtro_alpha - altura_anterior) / (temp_agr - tempo_ant)) * 1000;
 
-  if (verticalVelocity_ms < FALL_VELOCITY_THRESHOLD_MS) {
-    fallConfirmCounter++;
-    if (fallConfirmCounter > FALL_CONFIRM_SAMPLES) {
-      isFalling = true;
+  if (velocidade < velocidade_queda_max) {
+    amostras_confirmada = amostras_confirmada + 1;
+    if (amostras_confirmada > n_amostra_confirmar_queda) {
+      queda = true;
     }
   }
-}
 
-/**
- * Emits one tab-separated telemetry line per cycle.
- * Column order matches the original: temp, pressure, raw alt,
- * moving-avg alt, smoothed alt, velocity, fall flag.
- */
-void printTelemetry() {
+  tempo_ant = temp_agr;
+
+  altura_anterior = valor_filtro_alpha;
+
   Serial.print(bmp.readTemperature());
   Serial.print("\t");
+
   Serial.print(bmp.readPressure());
   Serial.print("\t");
-  Serial.print(rawRelativeAltitude_m);
+
+  Serial.print(altura_bruta);
   Serial.print("\t");
-  Serial.print(movingAvgAltitude_m);
+
+  Serial.print(valor_medio_filtromovel);
   Serial.print("\t");
-  Serial.print(smoothedAltitude_m);
+
+  Serial.print(valor_filtro_alpha);
   Serial.print("\t");
-  Serial.print(verticalVelocity_ms);
+
+  Serial.print(velocidade);
   Serial.print("\t");
-  Serial.print(isFalling);
+
+  Serial.print(queda);
   Serial.print("\t");
+
   Serial.println();
 }
